@@ -1,3 +1,7 @@
+## ENGINE-001 S5-P4 — foreground-balanced six-source-color visual experiment (2026-11-18)
+
+[S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md) preregistered before implementation. Reuses S5-P2 genuine pretrained BiRefNet mask (threshold128 and fixed checkpoint SHA256) to guide one original nearwhite background + five diverse foreground source colors; uses exactly original pinned Recolorization-Pro model and checkpoint, raw RGB output without game32/postprocessing. Baseline S5-P3 CI44151445030 remains frozen; P3 visual decision pending and its colors remain unchanged. Experiment runner, synthetic contracts and dedicated CI source committed. **E1 implementation only; E2/E3/visual acceptance PENDING until verified run.** Source/model hashes fail closed; unverified upstream license forbids production. V44-B410/1792 LAST, Stage6, master, exact CHALK unchanged.
+
 # AutoDraw — текущее состояние
 
 ## ENGINE-001 S5-P3 — pretrained native six-color full-RGB visual trial, 2026-11-17
