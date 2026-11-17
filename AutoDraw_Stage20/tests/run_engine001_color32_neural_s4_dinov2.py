@@ -25,8 +25,11 @@ WEIGHTS_SHA = "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
 
 def real_dino_features(image, model_dir):
     """No synthetic embeddings, no download fallback, pinned checkpoint only."""
-    if sha(model_dir / "model.safetensors") != WEIGHTS_SHA:
+    weights = model_dir / "model.safetensors"
+    if not weights.is_file() or sha(weights) != WEIGHTS_SHA:
         raise ValueError("BLOCKED_S4_MODEL_SHA_DRIFT")
+    if not (model_dir / "config.json").is_file() or not (model_dir / "preprocessor_config.json").is_file():
+        raise ValueError("BLOCKED_S4_MODEL_CONFIG_MISSING")
     import torch
     import transformers
     from transformers import Dinov2Model, AutoImageProcessor
