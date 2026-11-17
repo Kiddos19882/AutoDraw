@@ -13,6 +13,11 @@
 
 ## Приоритет ENGINE-001 — после завершённого COLOR32-NEURAL-S4
 
+- [x] S5 protocol preregistered: [trainable game32 head readiness](ENGINE001_COLOR32_NEURAL_S5_TRAINABLE_PALETTE_HEAD_PROTOCOL_2026-11-17.md), original RGB + true32 palette + optional immutable V44-B; historical S3/S4 controls and gates frozen.
+- [ ] S5a **BLOCKED_DATASET_LABEL_VALIDATION**: audit available independent trusted palette/background labels, image-identity train/holdout split and source SHA manifest. No trained head or S5 CI until labeling provenance and heldout gates PASS.
+
+
+
 - [x] S3 archived report crash repaired, reproducible E3 [CI44145478173](https://github.com/Kiddos19882/AutoDraw/actions/runs/44145478173) SHA `b28536fd`, 7/7 tests PASS, immutable inputs verified; **4/4 source candidates QUALITY FAIL** ΔE/background. No source acceptance/native/game/CHALK. Next S5 independent preregistration, do not reopen S3 thresholds.
 
 
