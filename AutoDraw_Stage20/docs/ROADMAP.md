@@ -2,6 +2,8 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+**2026-11-17 / new preprocessing priority:** before B3c fill, perform [COLOR32-S1 fixed A/B/C/D source comparison](ENGINE001_COLOR32_SPATIAL_SEGMENTATION_PROTOCOL_2026-11-17.md), using32 actual game colors and protected spatial region merge; evaluate color error, fine-detail fidelity and fragmented zones. Legacy 1838 V43-P4 Egret region outlines belong only to MEDIANCUT8 owners4–7. E2 comparison before native region outlines and visual selection; do not revise fill gates or old frozen archives.
+
 ## Действующий следующий этап (16.11.2026): V43-P4 — полная адаптивная заливка
 
 **Актуализация 2026-11-17 / B3b:** непосредственные осевые траектории по собственному исходному цвету действительно заменили неработающий B3a dilated-center фильтр: [CI43993003719](https://github.com/Kiddos19882/AutoDraw/actions/runs/43993003719) E2 5/5 PASS, 883 direct skeleton strokes, модельный recall4–7=81.82/81.78/81.87/91.86%, но **BLOCKED_RESOURCE** после5900 vertices/1078 paint, до микроремонта. Ни B3/B3a/B3b не является full-image quality PASS. Следующее исследование отдельно пререгистрировать как B3c — улучшение охвата на одну принятую вершину широкой круглой кистью и вдоль границ, повторное собственное покрытие free; гейты3px/99%/3000/5900 сохраняются. Пока нельзя запускать полный A/B3b как будто он прошёл budget.
