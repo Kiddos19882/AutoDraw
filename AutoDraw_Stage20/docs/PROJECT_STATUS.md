@@ -1,5 +1,12 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / P4c2 cross-platform frozen-source correction — 2026-11-17
+
+[Windows CI44113999297](https://github.com/Kiddos19882/AutoDraw/actions/runs/44113999297) job134146930705 **FAIL before Egret**, while P4c2 tests5/5, P4c1 tests5/5, Markdown and Node20/20 all PASS. Python reconstructed original G32 on Windows, but original P4c1 frozen source PNG SHA preflight failed `BLOCKED_P4C1_ORIGINAL_G_DRIFT`. No native PNG or artifact from this run. Linux original P4c1 [CI44098998634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44098998634) artifact14334728680 ZIP SHA `fac1fcf1ff6a43ac6e59da116b68b86e2238c2da13be0b167cf34f8241ac5eeb` preserves original frozen indexed G and exact 119+1014 paths. Both CI jobs installed NumPy2.4.6 / OpenCV4.14.0.94 / Pillow12.3.0 / scikit-image0.26.0; the *cause* of pixel mismatch is not yet isolated, so no unsupported platform claim.
+
+Minimal P4c2 fix: reuse existing proven GitHub signed-artifact download with original ZIP SHA verification, inspect ZIP CRC, all 5 linked file hashes, pinned report/SHA/owner masks and original P4c0 paths. Native Egret input is **the exact original P4c1 archived G and routes**, NOT a newly generated Windows G. Added separate read-only, non-gating Windows-vs-archived G pixel diagnostic in workflow; it cannot override original source identity, quality targets or geometry. Code/test/CI commit status **not yet confirmed E2/E3 after fix**; preserve old failure. Original V44-B 410 LAST remains unrendered in paint-only E3. E4/E5/game CHALK NOT_RUN.
+
+
 ## ENGINE-001 / P4c2 early Windows preflight failure (NOT native failure) — 2026-11-17
 
 [CI44112655316](https://github.com/Kiddos19882/AutoDraw/actions/runs/44112655316) job134142139040 `failure` on old checkout SHA `8100cefdbac9aa2619e4b4138e8120999ebbb2ab`: P4c2 and P4c1 unit regressions 5/5+5/5 PASS; documentation audit FAIL (one P4c2 protocol missing from README index at this historical SHA). Native paint job SKIPPED, no archives/PNGs. Current README already has correct protocol link after that commit; next step is trigger/inspect latest-SHA CI and real native per-owner RGBA, retaining original negative preflight. All 17 native coverage/3px/contours LAST NOT_RUN, game E4/E5/exact CHALK NOT_RUN.
