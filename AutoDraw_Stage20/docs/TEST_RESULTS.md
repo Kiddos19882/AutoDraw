@@ -1,3 +1,7 @@
+## ENGINE-001 S5-P4 — preregistered, not validated (2026-11-18)
+
+[S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md), dedicated [workflow](../../.github/workflows/engine001-s5p4-foreground-balanced-six-recolor.yml). S5-P4 implementation E1 COMMITTED, genuine pretrained BiRefNet + Recolorization-Pro combined E3 **NOT_VERIFIED** pending SHA-bound run; local neural inference NOT_RUN, no artifact/PNG evidence, synthetic E2 not claimed yet. Historical S5-P3 CI44151445030 remains technical E3 PASS, visual acceptance pending, no test threshold changes. Master/production/V44-B410 unchanged.
+
 ## ENGINE-001 S5-P3 — pretrained native six-color full-RGB visual trial, 2026-11-17
 
 **User decision:** for new **visual-only** pretrained-model trials, suspend game32 swatch limit and source game32 acceptance gates; evaluate RGB recognition and visually first. Historical S3/S4/S5 game32 gates and rejected evidence remain frozen/unchanged. [Preregistered S5-P3 protocol](ENGINE001_S5_P3_NATIVE6_PRETRAINED_RECOLOR_VISUAL_PROTOCOL_2026-11-17.md) was committed before inference; no training dataset, no fine-tuning.
