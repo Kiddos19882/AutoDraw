@@ -194,39 +194,39 @@ def run(workspace: Path, source: Path, palette: Path, output: Path,
         "windows_G_recomputation": "NOT_USED; original P4c1 archived pixels are authoritative",
         "safe_to_execute_game": False, "exact_CHALK": None,
     }, indent=2) + "\\n", encoding="utf-8")
-        folder = output / "P4c1-PAINT-ONLY"
-        folder.mkdir()
-        frames, metadata, manifest = native_batch(
-            workspace, "P4c1-PAINT-ONLY", paths, folder,
-            renderer_method="renderComplexHoldoutColorProbe")
-        native = native_metrics(frames, g, paths)
-        observed = assess_native(native)
-        hashes = {str(f.relative_to(output)).replace("\\", "/"): sha(f)
-                  for f in output.rglob("*") if f.is_file()}
-        report = {
-            "experiment": EXP,
-            "status": ("P4C2_NATIVE_PAINT_ONLY_PARTIAL" if observed[
-                "native_paint_numeric_gate"] else "P4C2_NATIVE_PAINT_FAIL"),
-            "github_sha": os.environ.get("GITHUB_SHA"),
-            "github_run_id": os.environ.get("GITHUB_RUN_ID"),
-            "source": "frozen original P4c1; model never accepted as native",
-            "renderer": "archived actual BoardPane / Firefox WebGL",
-            "native_paint_only": True,
-            "original_410_V44B_LAST": "NOT_RENDERED_UNCHANGED",
-            "native_observations": observed,
-            "raw_native_metrics": native,
-            "native_metadata": metadata,
-            "native_manifest": manifest,
-            "linked_file_SHA256": hashes,
-            "versions": {"python": platform.python_version(),
-                         "numpy": np.__version__},
-            "game_E4": "NOT_RUN", "independent_E5": "NOT_RUN",
-            "exact_CHALK": None, "production_accepted": False,
-        }
-        (output / "report.json").write_text(json.dumps(
-            report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
-            encoding="utf-8")
-        return report
+    folder = output / "P4c1-PAINT-ONLY"
+    folder.mkdir()
+    frames, metadata, manifest = native_batch(
+        workspace, "P4c1-PAINT-ONLY", paths, folder,
+        renderer_method="renderComplexHoldoutColorProbe")
+    native = native_metrics(frames, g, paths)
+    observed = assess_native(native)
+    hashes = {str(f.relative_to(output)).replace("\\", "/"): sha(f)
+              for f in output.rglob("*") if f.is_file()}
+    report = {
+        "experiment": EXP,
+        "status": ("P4C2_NATIVE_PAINT_ONLY_PARTIAL" if observed[
+            "native_paint_numeric_gate"] else "P4C2_NATIVE_PAINT_FAIL"),
+        "github_sha": os.environ.get("GITHUB_SHA"),
+        "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+        "source": "frozen original P4c1; model never accepted as native",
+        "renderer": "archived actual BoardPane / Firefox WebGL",
+        "native_paint_only": True,
+        "original_410_V44B_LAST": "NOT_RENDERED_UNCHANGED",
+        "native_observations": observed,
+        "raw_native_metrics": native,
+        "native_metadata": metadata,
+        "native_manifest": manifest,
+        "linked_file_SHA256": hashes,
+        "versions": {"python": platform.python_version(),
+                     "numpy": np.__version__},
+        "game_E4": "NOT_RUN", "independent_E5": "NOT_RUN",
+        "exact_CHALK": None, "production_accepted": False,
+    }
+    (output / "report.json").write_text(json.dumps(
+        report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8")
+    return report
 
 
 def main():
