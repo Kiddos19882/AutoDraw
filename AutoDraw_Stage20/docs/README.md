@@ -1,5 +1,7 @@
 # Документация AutoDraw — быстрый вход
 
+**COLOR32-S2 local E1 (2026-11-17):** [Зафиксирован отрицательный source gate](TEST_RESULTS.md): G сохраняет больше исторических RGB-границ, но S2 индексная метрика отличается от S1 и её неизменный gate FAIL; подробности в [протоколе](ENGINE001_COLOR32_S2_EDGE_PROTECTED_PROTOCOL_2026-11-17.md). GitHub E2 пока UNKNOWN, native Egret NOT_RUN.
+
 **COLOR32-S2 (2026-11-17, source-only E1, E2 UNKNOWN):** [Новый протокол edge-protected merging](ENGINE001_COLOR32_S2_EDGE_PROTECTED_PROTOCOL_2026-11-17.md) и отдельный CI [workflow](../../.github/workflows/engine001-color32-s2-edge-protection.yml). Сравнение неизменных B/E против G, защищающего сильные границы исходного изображения; новые тесты и отчёты CI пока **не подтверждены**, native Egret/game/CHALK NOT_RUN.
 
 **COLOR32-S1 (2026-11-17, source-only):** [Протокол A/B/C/D — 32 реальных игровых цвета, CIEDE2000, SLIC и пространственное объединение](ENGINE001_COLOR32_SPATIAL_SEGMENTATION_PROTOCOL_2026-11-17.md). Исходный E2 [CI43997569635](https://github.com/Kiddos19882/AutoDraw/actions/runs/43997569635) PASS, но coarse SLIC C/D теряют детали; дополнительный E2 [PAL32 V1 CI43997979526](https://github.com/Kiddos19882/AutoDraw/actions/runs/43997979526) PASS для E=мягкого объединения и F=fine SLIC. Вариант E сокращает компоненты на55.93%, но важные границы требуют дальнейшей проверки; контуры V44-B неизменны.
