@@ -179,6 +179,22 @@ def solve_region_colors(rgb, palette, regions, ink, *, use_contour, chroma_penal
                     "contour_used_for_color_prior": bool(use_contour)}
 
 
+def optional_native_contour(contour_path: Path | None):
+    """Only J1 may use authenticated RGBA; independent J0 always available."""
+    if contour_path is None:
+        return None, {"status": "BLOCKED_CONTOUR_PROVENANCE",
+                      "reason": "NO_AUTHENTICATED_NATIVE_V44B_ARCHIVE"}
+    try:
+        ink, provenance = read_immutable_contour(contour_path)
+        provenance["status"] = "VERIFIED_IMMUTABLE_NATIVE_V44B_SOURCE"
+        return ink, provenance
+    except ValueError as exc:
+        if not str(exc).startswith("BLOCKED_S3_"):
+            raise
+        return None, {"status": "BLOCKED_CONTOUR_PROVENANCE",
+                      "reason": str(exc)}
+
+
 def run(source_path: Path, palette_path: Path, s1_path: Path,
         contour_path: Path | None, output: Path):
     if output.exists():
@@ -193,21 +209,8 @@ def run(source_path: Path, palette_path: Path, s1_path: Path,
     # S3 candidate region labels are independently built from ORIGINAL RGB
     # without reading or passing frozen G32 labels.
     _, bg, region_ids, info = independent_regions(rgb, palette, masks)
-    ink = None
-    provenance = {"status": "BLOCKED_CONTOUR_PROVENANCE",
-                  "reason": "NO_AUTHENTICATED_NATIVE_V44B_ARCHIVE"}
-    if contour_path is not None:
-        try:
-            ink, provenance = read_immutable_contour(contour_path)
-            provenance["status"] = "VERIFIED_IMMUTABLE_NATIVE_V44B_SOURCE"
-        except ValueError as exc:
-            if not str(exc).startswith("BLOCKED_S3_"):
-                raise
-            # Fail closed ONLY for J1 contour-guided candidate; J0 source
-            # control can still run. Never reconstruct or modify V44-B.
-            ink = None
-            provenance = {"status": "BLOCKED_CONTOUR_PROVENANCE",
-                          "reason": str(exc)}
+    # Fail closed for J1 only; independently measured J0 stays available.
+    ink, provenance = optional_native_contour(contour_path)
     outputs = {}
     details = {}
     for with_penalty in (False, True):
