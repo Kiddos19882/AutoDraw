@@ -13,6 +13,11 @@
 
 ## Приоритет ENGINE-001 — после завершённого COLOR32-NEURAL-S4
 
+- [x] S5-P1 genuine OneFormer semantic preflight [CI44147852418](https://github.com/Kiddos19882/AutoDraw/actions/runs/44147852418) SHA `d22740d2` E3 SUCCESS, pretrained model checkpoint SHA verified, only two semantic label IDs (0,22), not 32-swatch color mapping; no production change. Follow-up strict ADE20K label-bounds / upstream metadata fix at `7f3ccf49` CI PENDING.
+- [ ] Investigate original foreground/background only as separate pretrained BiRefNet P2 after immutable checkpoint and custom code security review; semantic OneFormer labels are too coarse to establish face/hair/clothes color owners. Then choose trained palette recoloring candidate with actual 32-swatch interface and verified weights; no retraining requested.
+
+
+
 - [x] S5 protocol preregistered: [trainable game32 head readiness](ENGINE001_COLOR32_NEURAL_S5_TRAINABLE_PALETTE_HEAD_PROTOCOL_2026-11-17.md), original RGB + true32 palette + optional immutable V44-B; historical S3/S4 controls and gates frozen.
 - [ ] S5a **BLOCKED_DATASET_LABEL_VALIDATION**: audit available independent trusted palette/background labels, image-identity train/holdout split and source SHA manifest. No trained head or S5 CI until labeling provenance and heldout gates PASS.
 
