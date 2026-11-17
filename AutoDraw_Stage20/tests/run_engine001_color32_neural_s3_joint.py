@@ -194,9 +194,20 @@ def run(source_path: Path, palette_path: Path, s1_path: Path,
     # without reading or passing frozen G32 labels.
     _, bg, region_ids, info = independent_regions(rgb, palette, masks)
     ink = None
-    provenance = {"status": "BLOCKED_CONTOUR_PROVENANCE"}
+    provenance = {"status": "BLOCKED_CONTOUR_PROVENANCE",
+                  "reason": "NO_AUTHENTICATED_NATIVE_V44B_ARCHIVE"}
     if contour_path is not None:
-        ink, provenance = read_immutable_contour(contour_path)
+        try:
+            ink, provenance = read_immutable_contour(contour_path)
+            provenance["status"] = "VERIFIED_IMMUTABLE_NATIVE_V44B_SOURCE"
+        except ValueError as exc:
+            if not str(exc).startswith("BLOCKED_S3_"):
+                raise
+            # Fail closed ONLY for J1 contour-guided candidate; J0 source
+            # control can still run. Never reconstruct or modify V44-B.
+            ink = None
+            provenance = {"status": "BLOCKED_CONTOUR_PROVENANCE",
+                          "reason": str(exc)}
     outputs = {}
     details = {}
     for with_penalty in (False, True):
