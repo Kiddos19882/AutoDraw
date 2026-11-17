@@ -1,0 +1,68 @@
+name: ENGINE-001 V43-P4 B3a contour-medial source resource gate
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b3a-contour-medial-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b3a_contour_medial_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b3a_contour_medial_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b3a-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b3a-source-model-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original source tool dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "selenium>=4,<5" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Run new B3a geometry and budget regression
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b3a_contour_medial_source.py AutoDraw_Stage20/tests/test_engine001_v43p4_b3a_contour_medial_source.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b3a_contour_medial_source.py -v
+      - name: First fixed original-image B3a geometry proposal or resource blocker
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b3a_contour_medial_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-b3a-contour-medial"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-b3a-contour-medial/b3a-contour-medial-source-report.json"
+          r=json.loads(p.read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V43P4_B3A_CONTOUR_MEDIAL_REPAIR_SOURCE_MODEL"
+          assert r["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["status"] in ["BLOCKED_RESOURCE","MODEL_LOW_COVERAGE","SOURCE_CANDIDATE_FOR_NATIVE_REVIEW"]
+          assert r["same_owner_overpaint_penalty"]==0
+          assert r["original_A_B0_B1_B2_B3_paint_retained"]==0
+          assert r["frozen_V44B_410_colored_details_required_last"]
+          assert r["safe_to_execute"] is False and r["E3_native"]=="NOT_RUN"
+          assert r["total_strokes_including_frozen_410"]<=3000
+          assert r["synthetic_vertices_including_frozen_1792_NOT_CHALK"]<=5900
+          assert set(r["by_owner"])=={"4","5","6","7"}
+          print("SOURCE_ONLY B3a candidate SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          print("SOURCE_ONLY B3a outcome",r["status"],
+                "paint",r["new_paint_strokes"],
+                "model",{k:x["source_model_coverage_NOT_EGRET"] for k,x in r["by_owner"].items()})
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Archive B3a source and any negative first attempt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b3a-contour-medial-source-first-registered-model
+          path: ${{ runner.temp }}/engine001-b3a-contour-medial
+          if-no-files-found: warn
+          retention-days: 30
