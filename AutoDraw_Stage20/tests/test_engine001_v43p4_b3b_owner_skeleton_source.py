@@ -44,8 +44,9 @@ class DirectOwnerSkeletonB3bTests(unittest.TestCase):
         self.assertIn([(130,80)],routes)
 
     def test_closed_loops_not_collapsed_to_a_single_dot(self):
-        mask=np.zeros(SHAPE,bool)
-        cv2.circle(mask,(65,80),17,1,1)
+        raw=np.zeros(SHAPE,np.uint8)
+        cv2.circle(raw,(65,80),17,1,1)
+        mask=raw.astype(bool)
         routes=trace_owner_skeleton(mask)
         self.assertTrue(routes)
         dist=cv2.distanceTransform((~mask).astype(np.uint8),
