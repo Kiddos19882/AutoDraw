@@ -1,0 +1,86 @@
+name: ENGINE-001 V43-P4 B1 owner-constrained real Egret A B1
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b1-native.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b1_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b1_source.py"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b1_native.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: autodraw-v43p4-b1-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  first-b1-native:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install frozen Egret and source dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Retrieve immutable V44-B and original native B0 archives
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v44" "$RUNNER_TEMP/b0"
+          gh run download 43813812976 --repo Kiddos19882/AutoDraw -n engine001-v44-adaptive-contour-native-evidence -D "$RUNNER_TEMP/v44"
+          gh run download 43983619222 --repo Kiddos19882/AutoDraw -n engine001-v43p4-first-full-adaptive-native-ab-evidence -D "$RUNNER_TEMP/b0"
+      - name: Independent B1 source and original Egret regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b1_source.py AutoDraw_Stage20/tests/run_engine001_v43p4_b1_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b1_source.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_full_adaptive_fill_v43p4.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Pixel-exact frozen A, verified original B0 and first B1 native
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b1_native.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v44-archive "$RUNNER_TEMP/v44" \
+            --b0-archive "$RUNNER_TEMP/b0" \
+            --output "$RUNNER_TEMP/engine001-v43p4-b1-native"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v43p4-b1-native"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V43P4_B1_OWNER_CONSTRAINED_NATIVE_E3"
+          assert r["baseline_A_pixel_exact"] is True
+          assert r["frozen_B0_report_sha256"]=="5e1b62ae38ca15fc55efac7edb1d2d8ce393c237e4d96f8221427c5c7a90dd3a"
+          assert r["preflight"]["original_A_paint_retained"]==0
+          assert r["preflight"]["original_B0_paint_retained"]==0
+          assert r["preflight"]["V44B_410_detail_exact_last"] is True
+          assert r["preflight"]["new_paint_strokes"]+410<=3000
+          assert r["preflight"]["vertices_NOT_CHALK"]<=5900
+          assert r["quality_accepted"] is False
+          assert r["E4"]=="NOT_RUN" and r["E5"]=="NOT_RUN" and r["game_exact_CHALK"] is None
+          for name,digest in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest
+          print("Frozen B0 retained. B1 genuine Egret native numeric result:",r["numeric_status"])
+          print("B1 relative to frozen B0:",r["relative_to_immutable_B0"])
+          PY
+      - name: Archive independent B1 raw PNGs, source diagnostics and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p4-b1-owner-constrained-native-ab-evidence
+          path: ${{ runner.temp }}/engine001-v43p4-b1-native
+          if-no-files-found: warn
+          retention-days: 30
