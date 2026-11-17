@@ -18,6 +18,9 @@ import numpy as np
 from run_engine001_palette32_region_study import SOURCE_SHA, read_source, sha
 from run_engine001_color32_neural_s1 import EXP
 
+FROZEN_SAM2_SOURCE_SHA = "2b90b9f5ceec907a1c18123530e92e794ad901a4"
+FROZEN_SAM2_TINY_CHECKPOINT_SHA = "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69"
+
 
 def git_sha(directory: Path):
     return subprocess.check_output(
@@ -30,8 +33,7 @@ def run(source: Path, sam2_repo: Path, checkpoint: Path, output: Path):
         raise ValueError("BLOCKED_NEURAL_S1_NO_OVERWRITE")
     if not sam2_repo.is_dir() or not checkpoint.is_file():
         raise ValueError("BLOCKED_NEURAL_S1_MODEL_MISSING")
-    _, image = read_source(source)
-    import torch
+    if git_sha(sam2_repo) != FROZEN_SAM2_SOURCE_SHA:\n        raise ValueError("BLOCKED_NEURAL_S1_SAM2_CODE_DRIFT")\n    if sha(checkpoint) != FROZEN_SAM2_TINY_CHECKPOINT_SHA:\n        raise ValueError("BLOCKED_NEURAL_S1_SAM2_WEIGHT_DRIFT")\n    _, image = read_source(source)\n    import torch
     import sam2
     from sam2.build_sam import build_sam2
     from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
