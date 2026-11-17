@@ -2,6 +2,9 @@
 
 ## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S1
 
+**Latest verified E2 CI44127991472:** true SAM2 Tiny inference with exact official weights/source PASS (2 masks; original run artifacts verified). B0 1284 source regions, N1 1237 (−3.66%), N2 1259 (−1.95%): BOTH NEURAL-S1 candidates FAIL preregistered ≥25% region reduction. **Do not retune/continue same experiment**. Next new-version protocol must target actual color regions/flatting and preserve accepted V44-B contour boundaries; do not treat object proposals as flat-color masks or run new Egret fill yet. Historical open NEURAL-S1 CI/model boxes below are superseded by this verified result.
+
+
 **Current CI:** [44127150880](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127150880): B0 G32 E2 source PASS, source artifact14346804951 verified ZIP/CRC/PNG/metrics; 1284 components,1097≤4px,779 singletons; real SAM2 source installed but weights verification shell syntax FAIL before inference. Corrected YAML `0d8e276` without changing weights SHA; new CI/model outcome UNKNOWN.
 
 
