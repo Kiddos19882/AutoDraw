@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: pip
+          cache-dependency-path: .github/workflows/engine001-color32-s5p1-oneformer-original-semantics.yml
       - name: Install pinned CPU PyTorch runtime
         run: python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.7.1" "torchvision==0.22.1"
       - name: Install pinned original RGB and model dependencies
