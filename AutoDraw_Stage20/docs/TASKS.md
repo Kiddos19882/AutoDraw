@@ -1,3 +1,5 @@
+**2026-11-17 / COLOR32-S2b reproducibility audit:** new identity regression [test](../tests/test_engine001_color32_s2b_rgb_edge.py) at `f6229777957d` asserts B/E/G components2369/1044/1339, historical RGB edge86.1667/84.4167/85.3333%, source ΔE00 and unmodified protected pixels from prior E1 baseline. GitHub CI job is NOT VERIFIED, not PASS. Next required: validate S2b workflow log and report manifest at exact SHA, then visually assess protected character details before Egret.
+
 # AutoDraw — действующие задачи
 
 ## Текущий приоритет — 2026-11-16
