@@ -51,6 +51,9 @@ jobs:
           root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-s2b"
           data=json.loads((root/"report.json").read_text(encoding="utf-8"))
           assert data["experiment"]=="ENGINE001_COLOR32_S2B_RGB_EDGE_SOURCE_ONLY"
+          assert data["github_sha"]==os.environ["GITHUB_SHA"]
+          assert data["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert data["versions"]["Python"] and data["versions"]["OpenCV"]
           assert data["input_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
           assert data["settings"]["game_colors"]==32
           assert data["visual_review"]=="PENDING"
