@@ -1,9 +1,17 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-039`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-040`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
+
+## DEC-040. Допуск более 3 px разрешён лишь как отдельный исследовательский опыт
+
+**Дата:** 2026-11-18. **Статус:** ACCEPTED SCOPE / NOT PRODUCTION. Пользователь предложил: «Если не выйдет можно по немногу корректировать допуск более 3px, возможно он поможет, продолжай». Это разрешило **P4B4 эксперимент** с исходным контрольным3.0 и заранее фиксированными 3.5/4.0 px, но **не** изменило исторические accepted limits, и не разрешило ухудшать узнаваемость, лица, руки, контур или переписывать FAILED результаты.
+
+**Результат, после заранее записанного протокола:** [P4B4 CI44312164066](https://github.com/Kiddos19882/AutoDraw/actions/runs/44312164066) at `b53e0c988e4a000fcc5fb8de9a30f3c6711afe4d` E2 Python17+18+18, Node20, E3 6 actual native Egret scenes, technical SUCCESS; E/F native component coverage T3.0 99.6228/99.6392, T3.5 99.6561/99.6559, T4.0 99.7004/99.7225%, yet **6/6 TOTAL QUALITY FAIL**, foreign sensitive source pixels422–430, total foreign backing4384–6027, and far3/far4 failures per arm. Native whole image, actual game E4/E5, exact CHALK not measured. [Verified ZIP artifact14430962185](https://github.com/Kiddos19882/AutoDraw/actions/runs/44312164066/artifacts/14430962185) SHA256 `32cc6f9d7dfdc924f5587ce1a2a3b08f6a71bb817cc7cb936843a65fd3f6c34c`, CRC and 43/43 report SHA PASS.
+
+**Decision:** **DO NOT** raise production/default permitted spill beyond3 logical px; higher numerical coverage is insufficient if paint enters protected foreign details. Next [P4B5 protected source baseline/prune/rebalance prereg](ENGINE001_B1R_P4B5_PROTECTED_BASELINE_REBALANCE_PREREG_2026-11-18.md) addresses true origin of sensitive bleed, still same3px/99%/250 strokes/500 vertices. Old G32/V44 only frozen history, not active source. Both E/F continue without winner.
 
 ## DEC-039. Пользователь сообщает о выборе всех 128 цветов; работу над палитрой откладываем
 
