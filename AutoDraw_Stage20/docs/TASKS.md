@@ -1,3 +1,11 @@
+## ENGINE-001 / DEC-039 — palette DEFERRED; NEXT P4A native Egret brush geometry (2026-11-18)
+
+- [x] Пользователь сообщил, что все128 игровых цветов выбираются в UI; **USER_REPORTED**, без independent run-bound E4; отложить дальнейшие проверки/настройки палитры до запроса пользователя. Старые screenshot32 экранные координаты не использовать без новой калибровки.
+- [x] Existing `native_batch` + `game_renderer_reference.js` + source P3D runner проинвентаризированы read-only E1; **никакой legacy G32/V44/P4c1 генеративной карты** не использовать.
+- [x] [P4A first original-only E/F native Egret brush pilot prereg](ENGINE001_B1R_P4A_NATIVE_ROUND_BRUSH_PILOT_PREREG_2026-11-18.md) записан до запуска. Только один C192 D_COMPONENT24 source для pilot, оба E/F сохраняются; остальные3 P2D комбинации — будущая расширенная матрица, не отбрасывать.
+- [ ] Исследовательский pilot E2 synthetic + E3 genuine archived Egret WebGL per-color alpha geometry, one ZIP/negative evidence, **без production/executor/old G32/V44**. Измерить цветовую leakage в пикселях, не CHALK.
+- [ ] После valid pilot — собственный original-derived контур совместно с P3D зонами и native full-color coverage, separate prereg. E4 live/exact CHALK только при свежем session binding; palette revisit deferred.
+
 ## ENGINE-001 / P3E E1/E2/E3 done: verify real palette accessibility before native brush (2026-11-18)
 
 - [x] DEC-038 — both P3D `E_SOBEL90` and `F_SOBEL90_LAB12` user visually approved for continuation without sole winner; all4 source P2D remain.
