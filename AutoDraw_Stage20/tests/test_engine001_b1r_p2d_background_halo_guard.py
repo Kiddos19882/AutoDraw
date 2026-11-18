@@ -145,6 +145,14 @@ class P2DGuardSyntheticTest(unittest.TestCase):
             "run_engine001_b1r_p2c_source_ink_palette",
         })
 
+    def test_13_manual_guard_cannot_whiten_real_source_dark(self):
+        guard = np.zeros(p2d.FULL_SHAPE[:2], dtype=bool)
+        guard[9, 105] = True
+        no_ink = np.zeros_like(self.ink)
+        with self.assertRaisesRegex(ValueError, "NON_SOURCE_BRIGHT_MASK"):
+            p2d.apply_source_bright_guard(
+                self.original, self.flat, no_ink, guard)
+
     def test_12_overwrite_not_allowed(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaisesRegex(ValueError, "OVERWRITE"):
