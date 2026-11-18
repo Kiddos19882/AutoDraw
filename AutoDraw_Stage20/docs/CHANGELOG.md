@@ -1,3 +1,8 @@
+## 2026-11-18 — ENGINE-001 B1-R-P2C source-mask ink palette compression (research only)
+
+- Added independent prereg, test-only deterministic CIELAB source-member palette selection on original-source K_DETAIL residual ink (96/192 swatches), 11 synthetic tests, bounded CI, and one ZIP review bundle. Old G32/V44/M1 and frozen P2/P2B images not consumed as candidates.
+- [CI44263770838](https://github.com/Kiddos19882/AutoDraw/actions/runs/44263770838) `b20d9e8ead30fa7605d69f655ae3d7ab6c0890fb` E2 11/11 and E3 PASS, ZIP CRC/26 hashes PASS. Original full discrete 347/443 RGB, logical NEAREST 347/442, source numerical quality PASS for both, human visual PENDING; no game32/native Egret/CHALK/production claims.
+
 ## 2026-11-18 — ENGINE-001 B1-R-P2B source-original detail layer experiment
 
 - Isolated original-RGB residual detail source overlay using independently recomputed SLIC source medoids and only original edge/color evidence; no G32/V44/M1 source candidates, no production changes.
