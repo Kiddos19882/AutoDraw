@@ -1,0 +1,142 @@
+name: ENGINE-001 R2-P1 genuine BiRefNet alpha assisted merge replay N2
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color-island-r2-p1-n2.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_n2.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color_island_r2_p1_n2.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: autodraw-engine001-r2-p1-n2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  genuine-pretrained-birefnet-soft-alpha-merge-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout source (bounded, no LFS or submodules)
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install source-only dependencies (no new pretrained inference)
+        run: |
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27" "selenium>=4,<5" "requests>=2.31,<3"
+      - name: Source math and pretrained archive replay contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_m0.py AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_n1.py AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_n2.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p1_n2.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p1_m0.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p1_n1.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p1_n2.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download original verified M0, DINOv2 S4 and BiRefNet S5-P2 artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, os, requests
+          from pathlib import Path
+          original = {
+              14385505684: ('original-m0.zip', '574320c11cd189adab08c1fd85de2119204589194e44c5df9d8279dcf6f2f782'),
+              14352502866: ('original-dinov2-s4.zip', '408f26b7d349bb5ee503bdf8f825c9f1dde9d639abd4bf4c96ee575beb3c860e'),
+              14358930528: ('original-birefnet-s5p2.zip', 'fe143f904a2d3694213537f228b5a6b5580de916533eed51def393aafd900ea2'),
+          }
+          for artifact_id,(filename,pinned_sha) in original.items():
+              response=requests.get(
+                  f'https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{artifact_id}/zip',
+                  headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                           'Accept':'application/vnd.github+json',
+                           'User-Agent':'AutoDraw-ENGINE001-R2P1-N2'},
+                  timeout=180)
+              response.raise_for_status()
+              content=response.content
+              if hashlib.sha256(content).hexdigest()!=pinned_sha:
+                  raise ValueError('BLOCKED_R2_P1_N2_FROZEN_ARCHIVE_SHA')
+              (Path(os.environ['RUNNER_TEMP'])/filename).write_bytes(content)
+              print('Verified original immutable archive',artifact_id,filename,pinned_sha)
+          PY
+      - name: Compare identical N1 with N2 original-supported soft BiRefNet ranking
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_n2.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --m0-archive "$RUNNER_TEMP/original-m0.zip" \
+            --s4-archive "$RUNNER_TEMP/original-dinov2-s4.zip" \
+            --s5-archive "$RUNNER_TEMP/original-birefnet-s5p2.zip" \
+            --output "$RUNNER_TEMP/engine001-color-island-r2-p1-n2"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'engine001-color-island-r2-p1-n2'
+          report=json.loads((root/'report.json').read_text(encoding='utf-8'))
+          assert report['experiment']=='ENGINE001_COLOR_ISLAND_R2_P1_NEURAL_MERGE_REPLAY_N2'
+          assert report['github_sha']==os.environ['GITHUB_SHA']
+          assert report['github_run_id']==os.environ['GITHUB_RUN_ID']
+          assert report['source_sha256']=='07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a'
+          assert report['palette_blob_sha']=='461b5f3725b9b79888ad36e807b3cf4c9e445e98'
+          assert report['S4_true_pretrained_features']['real_pretrained_checkpoint_sha256']=='ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1'
+          assert report['S5_true_pretrained_alpha']['true_pretrained_checkpoint_sha256']=='5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333'
+          assert report['source_gates']['identical_4connected_partition_for_N1_and_N2']
+          assert report['source_gates']['N2_original_protected_pixels_unchanged']
+          assert report['source_gates']['N2_original_background_unchanged']
+          assert report['new_DINO_or_BIREFNET_inference']=='NOT_RUN_ARCHIVED_GENUINE_REPLAY'
+          assert report['quality_status'] in ('SOURCE_GATE_FAIL','SOURCE_RGB_VISUAL_PENDING')
+          assert report['game32_candidate']==report['native_Egret']=='NOT_RUN'
+          assert report['original_V44B_410_LAST']=='UNCHANGED_NOT_OVERLAID'
+          assert report['game_E4']==report['independent_E5']=='NOT_RUN'
+          assert report['exact_CHALK'] is None and report['production_accepted'] is False
+          for filename,digest in report['file_sha256'].items():
+              assert hashlib.sha256((root/filename).read_bytes()).hexdigest()==digest,filename
+          print('R2-P1 N2 technical source status:',report['quality_status'])
+          print('R2-P1 N2 changed eligible merges:',report['N1_N2_changed_merge_choices'])
+          print('R2-P1 N2 colors:',report['N1_quality_same_env'],report['N2_quality_same_env'])
+          print('R2-P1 N2 mandatory gates:',json.dumps(report['source_gates'],sort_keys=True))
+          print('R2-P1 N2 report SHA256:',hashlib.sha256((root/'report.json').read_bytes()).hexdigest())
+          PY
+      - name: Record technical failure even if diagnostic fails
+        if: failure()
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          out=Path(os.environ['RUNNER_TEMP'])/'engine001-color-island-r2-p1-n2'
+          out.mkdir(exist_ok=True,parents=True)
+          if not (out/'report.json').exists():
+              (out/'ci-failure.json').write_text(json.dumps({
+                  'status':'BLOCKED_R2_P1_N2_TECHNICAL_OR_PROVENANCE',
+                  'github_sha':os.getenv('GITHUB_SHA'),
+                  'github_run_id':os.getenv('GITHUB_RUN_ID'),
+                  'source_pass':False,'production_accepted':False,
+              },indent=2)+'\n')
+          PY
+      - name: Preserve original comparative PNGs and negative source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color-island-r2-p1-n2-genuine-birefnet-alpha-replay
+          path: ${{ runner.temp }}/engine001-color-island-r2-p1-n2/
+          if-no-files-found: warn
+          retention-days: 30
