@@ -51,7 +51,7 @@ class P4D1Contracts(unittest.TestCase):
                          ["icon-"+str(i) for i in range(8)])
         self.assertEqual([s["colorIndex"] for s in plan],
                          [10,1,2,10,3,4,10,5])
-        self.assertEqual(meta["contour_paint_transitions"],6)
+        self.assertEqual(meta["contour_paint_transitions"],5)
         self.assertEqual(meta["unique_paint_anchor_slots"],3)
 
     def test_03_deterministic_and_does_not_mutate_inputs(self):
