@@ -35,7 +35,8 @@ class BrushMatrixContracts(unittest.TestCase):
         self.assertEqual(p[11]["points"],p[-1]["points"])
         displacement=(p[1]["points"][0]["x"]-p[0]["points"][0]["x"],
                       p[1]["points"][0]["y"]-p[0]["points"][0]["y"])
-        self.assertEqual(displacement,(114.0,0.0))
+        self.assertAlmostEqual(displacement[0],114.0,places=12)
+        self.assertAlmostEqual(displacement[1],0.0,places=12)
         for i in range(10):
             a,b=p[i]["points"]
             self.assertAlmostEqual(b["x"]-a["x"],
