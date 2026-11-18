@@ -425,13 +425,27 @@ def run(workspace:Path,source:Path,engine_js:Path,
                     trial["actual_net_gain"]=improvement
                     trial["previous_ones_erased"]=int((state & ~after).sum())
                     trial["native_cumulative_png_sha256"]=meta["source_sha256"]
-                    if improvement>0:
+                    # Cumulative blending can turn sub-alpha24 fringe into
+                    # ink after multiple same-color strokes. Recheck actual
+                    # full-scene safety, not only isolated candidate safety.
+                    old_metrics=roi_metrics(current,index,palette)
+                    next_metrics=roi_metrics(native,index,palette)
+                    cumulative_safe=(
+                        next_metrics["white_target_ink_alpha24_backing"]<=
+                        old_metrics["white_target_ink_alpha24_backing"] and
+                        next_metrics["any_ink_outside_crop_alpha24_backing"]<=
+                        old_metrics["any_ink_outside_crop_alpha24_backing"])
+                    trial["cumulative_no_new_white_or_outside_ink"]=cumulative_safe
+                    trial["cumulative_white_ink"]=next_metrics["white_target_ink_alpha24_backing"]
+                    trial["cumulative_outside_ink"]=next_metrics["any_ink_outside_crop_alpha24_backing"]
+                    if improvement>0 and cumulative_safe:
                         plan=new_plan
                         state=after
                         current=native
                         accepted.append(i)
                     else:
-                        trial["rejected_no_real_gain"]=True
+                        trial["rejected_no_real_gain"]=improvement<=0
+                        trial["rejected_cumulative_spill"]=not cumulative_safe
                     if attempts%10==0:
                         print("P4D5_FEEDBACK",method,"attempts",attempts,"accepted",
                               len(plan),"correct",int(state.sum()),"of",
