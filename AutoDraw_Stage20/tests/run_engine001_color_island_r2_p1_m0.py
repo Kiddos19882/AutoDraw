@@ -169,7 +169,7 @@ def _de(x, y):
     return float(color.deltaE_ciede2000(np.asarray(x)[None, :], np.asarray(y)[None, :])[0])
 
 
-def merge_one_pass(rgb, labels, coarse, protected):
+def merge_one_pass(rgb, labels, coarse, protected, *, score_adjustment=None):
     """Strict M0: frozen initial region statistics and one no-chain pass.
 
     Returns a mathematical source-only region map and complete merge ledger.
@@ -239,14 +239,19 @@ def merge_one_pass(rgb, labels, coarse, protected):
                     if delta - row["baseline"] > MERGE_EXTRA:
                         why = "EXTRA_COLOR_ERROR"
                     else:
-                        possible.append((separation, -contacts, target, delta - row["baseline"]))
+                        adjustment = 0.0 if score_adjustment is None else float(
+                            score_adjustment(row, t, separation, contacts, delta - row["baseline"]))
+                        if not np.isfinite(adjustment):
+                            raise ValueError("BLOCKED_R2_P1_INVALID_NEURAL_SCORE")
+                        possible.append((separation + adjustment, -contacts, target,
+                                         delta - row["baseline"], separation))
             if why:
                 reasons[why] += 1
         if not possible:
             ledger.append({"source": i, "pixels": row["pixels"], "status": "KEEP_NO_SAFE_TARGET",
                            "reason_counts": dict(reasons)})
             continue
-        separation, minus_contact, target, extra = min(possible)
+        chosen_score, minus_contact, target, extra, separation = min(possible)
         merged.ravel()[pixels] = target
         accepted.append({"source": i, "target": target, "pixels": row["pixels"],
                          "shared_contacts": -minus_contact, "source_median_deltaE00": round(separation, 8),
