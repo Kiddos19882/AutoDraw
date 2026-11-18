@@ -1,0 +1,118 @@
+name: ENGINE-001 B1-R P3B exact engine128 adaptive32 source screening
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p3b-engine128-adaptive32.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3b_engine128_adaptive32.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p3b_engine128_adaptive32.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+      - 'AutoDraw_Stage20/gameEngine/main.min_653f95bc.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p3b-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p3b-engine128-adaptive32:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned original RGB math dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: P3B provenance and synthetic E2 plus Markdown audit
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p3b_engine128_adaptive32.py AutoDraw_Stage20/tests/test_engine001_b1r_p3b_engine128_adaptive32.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p3b_engine128_adaptive32.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Recompute all four accepted original-source RGB and select 32 of engine128
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p3b_engine128_adaptive32.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --output "$RUNNER_TEMP/engine001-b1r-p3b"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p3b"
+          r=json.loads((root/"report.json").read_text(encoding="utf8"))
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["experiment"]=="ENGINE001_B1R_P3B_ENGINE128_ADAPTIVE32_V1"
+          assert r["source_original_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["actual_static_engine_palette"]["engine_git_blob_sha1"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["actual_static_engine_palette"]["engine_colors"]==128
+          assert r["actual_static_engine_palette"]["swatch_RGB"][6]["hex"]=="#FFFFFF"
+          assert r["actual_static_engine_palette"]["swatch_availability_live_E4"]=="UNKNOWN"
+          assert r["source_original_region_count"]==682
+          assert r["source_K_DETAIL_pixels_full"]==14904
+          assert r["source_guard_full_counts"]=={"D_BORDER":56,"D_COMPONENT24":243}
+          for k in ("G32_legacy_mapping_input_used","V44_legacy_contours_input_used",
+                    "M1_legacy_masks_input_used","frozen_P2B_P2C_P2D_P3_artifacts_as_input",
+                    "old_screen32_used_as_selection_seed_or_target"):
+              assert r[k] is False,k
+          assert r["source_original_200x320_only"] is True
+          assert r["source_P2D_manual_acceptance"]=="C096_C192_X_BOTH_GUARDS_ACCEPTED"
+          assert r["engine128_gameplay_runtime_access"]=="UNKNOWN_E4_NOT_RUN"
+          assert r["actual_native_Egret_round_brush"]=="NOT_RUN"
+          assert r["actual_game_CHALK_bound_to_run"] is None
+          assert r["source_game32_visual_acceptance"]=="PENDING"
+          assert r["production_promotion"] is False
+          names=[f"C_{n}_{d}" for n in ("096","192") for d in ("D_BORDER","D_COMPONENT24")]
+          assert set(r["all_candidate_results"])==set(names)
+          checked=0
+          for candidate,source in r["all_candidate_results"].items():
+              assert set(source["palette32_methods"])=={"A_BALANCED","B_FACE_DETAIL"}
+              assert source["source_hair_false_gray_logical"]["false_dark_logical_pixels"]==1
+              assert source["source_full_RGB_count"]==(347 if "C_096" in candidate else 443)
+              for method,item in source["palette32_methods"].items():
+                  sel=item["selected_engine_indices"]
+                  assert len(sel)==32 and len(set(sel))==32 and sel[0]==6
+                  assert item["gates"]["real_engine_swatches_only"] is True
+                  assert item["gates"]["assigned_game_swatches_at_most32"] is True
+                  assert item["status"] in ("SOURCE_GATE_FAIL","SOURCE_SCREEN_PASS_VISUAL_PENDING_RUNTIME_ACCESS_UNVERIFIED")
+                  checked+=1
+                  print("P3B_CI",candidate,method,item["status"],
+                        "meanDE",round(item["original_deltaE00"]["mean_deltaE00"],4),
+                        "p95",round(item["original_deltaE00"]["p95_deltaE00"],4),
+                        "male",round(item["original_deltaE00"]["male_face_eyes_mean_deltaE00"],4),
+                        "chroma",item["source_chroma_excess_plus12"],
+                        "hue",item["source_hue_mismatch_chroma12_hue45"],
+                        "used",len(item["engine_color_indices_used"]),
+                        "failed",[k for k,v in item["gates"].items() if not v])
+          assert checked==8
+          for f,expected in r["file_sha256"].items():
+              got=hashlib.sha256((root/f).read_bytes()).hexdigest()
+              assert got==expected,("BLOCKED_P3B_SHA",f)
+          print("P3B_SOURCE_ONLY_MEMBER_SHA_PASS",len(r["file_sha256"]))
+          print("E4_GAME_RUNTIME_ENGINE128_ACCESS_UNKNOWN_NATIVE_EGRET_CHALK_NOT_RUN")
+          PY
+      - name: Always preserve full RGB, eight candidates, four controls, ROI and audit ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p3b-engine128-selected32-all-source-review
+          path: ${{ runner.temp }}/engine001-b1r-p3b/
+          retention-days: 30
+          if-no-files-found: warn
