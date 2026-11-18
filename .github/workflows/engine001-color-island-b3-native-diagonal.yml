@@ -1,0 +1,115 @@
+name: ENGINE-001 B3 native diagonal real Egret brush feasibility
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-color-island-b3-native-diagonal.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b3_native_diagonal.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_b3_native_diagonal.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-b3-native-diagonal-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-diagonal-egret:
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install real renderer capture requirements
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Validate deterministic B3 selection and archived Egret renderer
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b3_native_diagonal.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_b3_native_diagonal.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p2_p2_b3_native_diagonal.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Get hash-bound B1 swatches and M1 protected mask
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import os,requests,hashlib
+          from pathlib import Path
+          dir=Path(os.environ["RUNNER_TEMP"])
+          for aid,name,digest in [
+            (14394179902,"b1-original.zip","5998d4c9cc4e9f20eda637ebd0192ba5f38e824d22946fea6f3363dbfcbed916"),
+            (14388687061,"m1-original.zip","8bedc496bf01cf7205ecc8ceb7be8eb0f68b751b11c53ea67dbdd3982c7fe583")]:
+            res=requests.get(
+              f"https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{aid}/zip",
+              headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                       "Accept":"application/vnd.github+json","User-Agent":"AutoDraw-B3-native"},
+              timeout=180,allow_redirects=True)
+            res.raise_for_status()
+            got=hashlib.sha256(res.content).hexdigest()
+            if got!=digest:raise ValueError(f"BLOCKED_ARTIFACT_SHA {aid} {got}")
+            (dir/name).write_bytes(res.content)
+            print("B3_ARCHIVE_SHA_PASS",aid)
+          PY
+      - name: Sample actual Egret WebGL diagonal join widths 2 and 4
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b3_native_diagonal.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --b1-archive "$RUNNER_TEMP/b1-original.zip" \
+            --m1-archive "$RUNNER_TEMP/m1-original.zip" \
+            --output "$RUNNER_TEMP/engine001-b3-native-diagonal"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          out=Path(os.environ["RUNNER_TEMP"])/"engine001-b3-native-diagonal"
+          report=json.loads((out/"report.json").read_text(encoding="utf-8"))
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["renderer_js_git_blob"]=="74ad4d8ad162bb04bf8f1ff94860ef673c02512b"
+          assert report["protected_original_pixels"]==7947
+          assert report["native_case_count"]==12, report["native_case_count"]
+          assert set(report["population_by_category"])=={"BOTH_FOREIGN","MIXED","BOTH_WHITE"}
+          assert len(report["batches"])==6
+          assert report["native_game_play_E4"]=="NOT_RUN" and report["real_game_CHALK"] is None
+          for name,expected in report["file_sha256"].items():
+              actual=hashlib.sha256((out/name).read_bytes()).hexdigest()
+              assert actual==expected,("BLOCKED_B3_OUTPUT_FILE_SHA",name)
+          print("B3_NATIVE_CAPTURE_AND_LINKED_SHA_PASS",len(report["file_sha256"]))
+          for name,batch in report["batches"].items():
+              print(name,"safe",report["native_safe_gate_counts"][name],
+                    "cases",len(batch["cases"]),
+                    [(o,d["native_result"]["native_alpha"]["24"]["foreign_color_pixels"])
+                     for o,d in batch["cases"].items()])
+          print("ARCHIVED_EGRET_E3_ONLY; E4/EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Archive raw native PNGs and negative cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b3-native-egret-diagonal-source-feasibility
+          path: ${{ runner.temp }}/engine001-b3-native-diagonal/
+          if-no-files-found: warn
+          retention-days: 30
