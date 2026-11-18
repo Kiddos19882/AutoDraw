@@ -111,7 +111,7 @@ def palette_guard(lab,plab,delta_chroma):
 def choose_by_support(d,allowed):
     if d.shape!=(240,150,32) or allowed.shape!=d.shape:
         raise ValueError("BLOCKED_COLOR_MAP_SHAPE")
-    if not allowed.all(axis=-1).any() and not allowed.any(axis=-1).all():
+    if not allowed.any(axis=-1).all():
         raise ValueError("BLOCKED_EMPTY_VALID_CHOICES")
     return np.argmin(np.where(allowed,d,np.inf),axis=2).astype(np.uint8)
 
