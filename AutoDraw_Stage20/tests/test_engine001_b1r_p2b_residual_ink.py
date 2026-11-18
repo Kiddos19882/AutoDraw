@@ -20,6 +20,12 @@ def fixture():
     a[177:286, 35:176] = [233, 225, 214]
     a[193:220, 62:163] = [244, 161, 141]
     a[71:79, 66:74] = [7, 8, 11]
+    # Thin original-supported source lines within larger matte regions are
+    # required to exercise a residual-ink selector. Uniform blocks alone
+    # legitimately have zero source residual and must fail closed.
+    a[28:150:9, 30:90] = [34, 28, 32]
+    a[66:168:11, 110:175] = [112, 91, 83]
+    a[180:283:13, 47:169] = [171, 155, 148]
     return a
 
 
