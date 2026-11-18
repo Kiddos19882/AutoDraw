@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 B1-R-P3B static engine128 palette32 research (no production)
+
+- Independent prereg P3B, source-only 32-of-exact-engine128 greedy swatch facility selection A_BALANCED/B_FACE_DETAIL, full original RGB+accepted P2D recomputation, new 13 source regression tests, bounded CI and one ZIP of all source/32/128 diagnostic/ROI images. [CI44282755427](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282755427) SHA `1db7d085e96b1a0449ae388c4dc663d997392a88` E2 13/13/E3 PASS, ZIP CRC/83 hashes PASS. Both selectors use identical selected 32-set per source; all 8 prereg numerical original-source gates PASS but **user game32 visuals PENDING**, ~4.9k tiny color islands remain. Old P3 8/8 image FAIL frozen; initial CI44282518621 key assertion technical FAIL retained. Static engine128 RGB does NOT prove runtime color-accessibility; no Stage6/Monitor/Bridge/master edits or CHALK assertions.
+
 ## 2026-11-18 — DEC-036 and ENGINE-001 B1-R-P3 actual game32 research negative
 
 - User visual signoff approves **both P2D guards D_BORDER and D_COMPONENT24** across source C096/C192 for next stage; DEC-036, old P2D frozen outputs unchanged, no forced winner.

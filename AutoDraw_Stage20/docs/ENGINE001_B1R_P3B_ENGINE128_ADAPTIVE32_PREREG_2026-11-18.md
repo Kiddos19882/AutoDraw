@@ -28,3 +28,25 @@
 
 **Human comparison of all four user-accepted source variants and two palettes** with original, face/hand crops, annotated marks for artificial pink, palette32 swatch indices, engine128 strip and full128 theoretical control. `SINGLE ZIP` including raw JSON, complete source RGB and mapped PNG, masks/labels, reproducible engine-128 swatch provenance and every file SHA256; archive prior negative results. P3B E2 unit and E3 full CI pinned Ubuntu Py3.11, NumPy2.2.6, SciPy1.15.3, Pillow11.3.0, scikit-image0.25.2, OpenCV4.11.0.86; 25-minute job timeout, 5min checkout, artifact always. User reviews before native workflow. **No claim 128 palette is runtime accessible** until actual game E4 check; no Egret brush, Stage6 executor, Monitor, Bridge, game exact CHALK or independent E5; master and production unchanged.
 
+## First P3B execution — immutable results appended after prereg (2026-11-18)
+
+**First attempt:** [CI44282518621](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282518621), source/test SHA `32bc7d2b85ae79e59dbec6fd9a2107b0c6cb6b3e`: py_compile, 13/13 synthetic E2 PASS, Markdown audit PASS; independent original/source image study **all 8 numeric source gates PASS** and raw artifact exists, but CI job **technical FAIL** on mismatched report-check key (`source_original_200x320_only` instead of actual `original_source_200x320_only`) *after* rendering. Retain this negative CI result; no source model/weights/gates changed. Corrected **only YAML test assertion** in `1db7d085e96b1a0449ae388c4dc663d997392a88`.
+
+**First fully valid run:** [CI44282755427](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282755427), exact source/CI SHA `1db7d085e96b1a0449ae388c4dc663d997392a88`, **13/13 E2 PASS**, E3 dedicated workflow **SUCCESS**, Markdown audit PASS. [One ZIP artifact14417312637](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282755427/artifacts/14417312637), independent download SHA256 `4ebde5b2204f200a9ca6833740fbf6aff8f550384f0e6c2c3e2c814029a4003e`, ZIP CRC PASS and **83/83** report-linked individual member SHA256 matches (84 ZIP members incl report); report SHA256 `a7cd1a1edbc4f672ec52f9a5ebd608d32c54a010b482c1ae5cbe96ab042ecfda`. Engine JS Git blob pinned `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388` bytes 4,859,418; engine SHA256 `71f60890b967f9474ff5a46c313eb4b2d0f5b2a09dc4480e0e8e5eec24dc0329`; 128 distinct palette RGB, exact original source SHA `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`. Fresh same-run original-only J_FINE 682 labels, 14,904 K_DETAIL ink source pixels, D_BORDER56/D_COMPONENT24 243 corrected pixels. All frozen source P2D source-preview counts unchanged347/443, hair false dark 1 for each.
+
+| Source P2D→selected32 (each of A/B methods) | C096 BORDER | C096 COMPONENT24 | C192 BORDER | C192 COMPONENT24 |
+|---|---:|---:|---:|---:|
+| Source mean ΔE00 vs original LANCZOS | 4.31320 | 4.31308 | 4.29752 | **4.29740** |
+| P95 ΔE00 | 14.0230 | 14.0230 | 13.8919 | 13.8919 |
+| Female face eyes ΔE00 | 7.1617 | 7.1624 | 7.0979 | 7.0985 |
+| Male face eyes ΔE00 | 8.6187 | 8.6137 | 8.5770 | **8.5721** |
+| Hands ΔE00 | 6.9068 | 6.9077 | 6.8513 | 6.8523 |
+| Source+12 chroma excess logical pixels | 291 | 291 | 304 | 304 |
+| Source hue mismatch originalC≥12/gameC≥12/Δh>45° | 61 | 61 | 48 | 48 |
+| Color connected components (4-neighbor) | 5361 | 5353 | 5382 | 5374 |
+| **Tiny 1–3-pixel color islands** | **4921** | **4918** | **4934** | **4931** |
+| Every numerical prereg source gate | **PASS** | **PASS** | **PASS** | **PASS** |
+
+**Critical distinction:** `A_BALANCED` and `B_FACE_DETAIL` independently selected the **same unordered set of 32 engine indices for a given P2D source**, although greedy order differs; resulting logical RGB/index assignments are **byte-identical** under each same source. Thus 8 prereg candidates comprise **four distinct 32-color images**, not evidence that face weighting outperforms balancing. `full128` is intentionally a separate (non-game32) ungrounded nearest diagnostic; its source mean ΔE00 approx4.3487–4.3762 can be worse than source-grounded 32 selection even with more swatches; do not call this an optimal 128-color baseline.
+
+**Status per eight output:** `SOURCE_SCREEN_PASS_VISUAL_PENDING_RUNTIME_ACCESS_UNVERIFIED`, strictly E2/E3 mathematical source numerical pass, **not human palette32 acceptance, not playable**. Assistant E1 crop review: recognizable faces/white clothes; hair/suit mapped from dark original wine-purple to warmer brown, some highly saturated pink/orange residual detail. The number of tiny components **4,918–4,934** at 150×240 and a 4-connectivity measure is an **open suitability/painting-chalk blocker**, not a newly imposed retrospective gate; prereg had required measuring it without numeric threshold. Need human image review first; then separately prereg source-original geometry-aware spatial coherence/island reduction before native brush. Exact engine-128 *runtime accessibility* **UNKNOWN**, no valid screen-to-executor calibration, Egret/E4/E5/exact bound CHALK NOT_RUN. Previous P3 8/8 image FAIL remains historical unchanged. No master/production changes.

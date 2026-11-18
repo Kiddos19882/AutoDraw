@@ -1,3 +1,22 @@
+## 2026-11-18 — ENGINE-001 B1-R-P3B static engine128 adaptive32, source numerical PASS but no native/game gate
+
+**First image execution, technical E3 negative:** [CI44282518621](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282518621) SHA `32bc7d2b85ae79e59dbec6fd9a2107b0c6cb6b3e`: 13/13 E2 PASS, Markdown PASS; all 8 in-source result gates numerically PASS; job FAIL after rendering because CI checks incorrectly spelled report key (`source_original_200x320_only` vs actual `original_source_200x320_only`). Old raw artifact14418730327 retained, no rollback. Fixed CI assertion only at SHA `1db7d085e96b1a0449ae388c4dc663d997392a88`.
+
+**Valid repeat:** [CI44282755427](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282755427), SHA `1db7d085e96b1a0449ae388c4dc663d997392a88`, 13/13 E2 PASS, image E3 SUCCESS, Markdown audit PASS. Artifact [14417312637](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282755427/artifacts/14417312637) downloaded ZIP SHA256 `4ebde5b2204f200a9ca6833740fbf6aff8f550384f0e6c2c3e2c814029a4003e`, 84 ZIP entries, **CRC PASS**, **83/83** matching file_sha256 report-linked members, report SHA256 `a7cd1a1edbc4f672ec52f9a5ebd608d32c54a010b482c1ae5cbe96ab042ecfda`. Original source 200×320 pinned `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, engine JS git blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, engine bytes4,859,418, SHA256 `71f60890b967f9474ff5a46c313eb4b2d0f5b2a09dc4480e0e8e5eec24dc0329`, 128 unique game-code swatches with white index6. Fresh P2D four source maps pass frozen count masks/guard invariant; G32/V44/M1 not read as candidate inputs.
+
+| C source / D guard | C096+D_BORDER | C096+D_COMPONENT24 | C192+D_BORDER | C192+D_COMPONENT24 |
+|---|---:|---:|---:|---:|
+| Source mean ΔE00, both A/B | 4.31320 | 4.31308 | 4.29752 | **4.29740** |
+| Source p95 ΔE00 |14.0230|14.0230|13.8919|13.8919|
+| Male face-eye mean ΔE00 |8.6187|8.6137|8.5770|8.5721|
+| Original source chroma-excess pixel count |291|291|304|304|
+| Source hue mismatch pixel count |61|61|48|48|
+| 4-connected components (palette index) |5361|5353|5382|5374|
+| 4-connected **1–3px** components |4921|4918|4934|4931|
+| Prespecified original-source gates |PASS|PASS|PASS|PASS|
+
+A_BALANCED and B_FACE_DETAIL selected **same unordered 32 engine palette indices** per same source, hence byte-identical maps; no evidence face-weight adjustment improves these images. Full128 game-colour nearest was only a non-32 diagnostic, not a native result. **All eight statuses exactly `SOURCE_SCREEN_PASS_VISUAL_PENDING_RUNTIME_ACCESS_UNVERIFIED`**, no user game32 acceptance, no E4 native/CHALK/E5. Masking/paint islands and remaining saturation accents still under review. Note 4,918–4,934 tiny palette components should NOT be retroactively presented as prereg numerical FAIL/PASS threshold; they are a future paint-planning blocker needing fresh study.
+
 ## ENGINE-001 / B1-R-P3 source-only real game32 screen — independent verified quality FAIL (2026-11-18)
 
 [CI44278535963](https://github.com/Kiddos19882/AutoDraw/actions/runs/44278535963) exact `c1bfbfa7b85d6cd86e793f81fb9f54e92fb8039d`, E2 **13/13 PASS**, E3 technical SUCCESS and P3 Markdown audit PASS; [artifact14415806718](https://github.com/Kiddos19882/AutoDraw/actions/runs/44278535963/artifacts/14415806718) ZIP SHA256 `e39f01342daf708d54eb30407e73d6ba36511b2a3b1eb22d83aadc08415215a9`, ZIP CRC PASS and 59/59 report-member files SHA256 PASS, 60 ZIP entries incl `report.json`, report SHA256 `ed0c5c93a1e53758bfc721edbbb9fd427e71b7eb625e98443182e3b0998d728d`. Original pinned PNG SHA `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, actual palette32 JSON Git blob SHA `461b5f3725b9b79888ad36e807b3cf4c9e445e98`, real32 swatches exact; legacy G32/P4c1, V44-B410 and M1 *map/artifact inputs none*. Regenerated four accepted source combinations from original, 347/443 true full RGB P2D, guard source pixels56/243 and fixed hair1. D_BORDER vs D_COMPONENT24 original NEAREST changes106 px but palette32 label maps identical for same original C and mapping, so independent user approval carried along despite same raster projection outcome.
