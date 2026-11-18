@@ -1,0 +1,110 @@
+name: ENGINE-001 B1-R P3C original-source protected island coherence
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p3c-source-coherence.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3c_source_coherence.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p3c_source_coherence.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3b_engine128_adaptive32.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+      - 'AutoDraw_Stage20/gameEngine/main.min_653f95bc.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p3c-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p3c-original-only-coherence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned source math dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Isolated P3C synthetic and provenance E2 plus Markdown audit
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p3c_source_coherence.py AutoDraw_Stage20/tests/test_engine001_b1r_p3c_source_coherence.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p3c_source_coherence.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Original-only P3B fresh recomputation and P3C protected tiny-island study
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p3c_source_coherence.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --output "$RUNNER_TEMP/engine001-b1r-p3c"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          directory=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p3c"
+          r=json.loads((directory/"report.json").read_text(encoding="utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P3C_SOURCE_COHERENCE_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["engine_blob_sha1"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["engine_palette_colors"]==128
+          assert r["P3B_A_B_user_visual_acceptance"]=="BOTH_ACCEPTED_OFFLINE_ONLY_DEC037"
+          assert r["P3B_recomputed_original_only"] is True
+          assert r["legacy_G32_V44_M1_inputs"] is False
+          assert r["frozen_P3B_images_or_artifacts_used_as_input"] is False
+          assert r["engine_palette_runtime_E4"]=="UNKNOWN"
+          assert r["game_Egret_native_round_brush"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          assert r["new_P3C_human_visual_acceptance"]=="PENDING"
+          assert r["production_promotion"] is False
+          assert set(r["source_results"])=={
+              "C_096_D_BORDER","C_096_D_COMPONENT24",
+              "C_192_D_BORDER","C_192_D_COMPONENT24"}
+          count=0
+          for key,source in r["source_results"].items():
+              assert source["P3B_A_B_exact_pixel_identity"] is True
+              assert len(source["selected_engine_indices"])==32
+              assert len(set(source["selected_engine_indices"]))==32
+              assert set(source["candidate_methods"])=={"S_STRICT","T_LOCAL"}
+              assert all(source["M0_baseline"]["gates"].values())
+              for method,item in source["candidate_methods"].items():
+                  assert item["status"] in {
+                      "SOURCE_GATE_FAIL","NO_MATERIAL_ISLAND_GAIN",
+                      "SOURCE_SCREEN_PASS_VISUAL_PENDING_RUNTIME_ACCESS_UNVERIFIED"}
+                  assert item["changes"]["changed_pixels"]<=360
+                  assert item["changes"]["all_changes_complete_components_from_M0"]
+                  count+=1
+                  print("P3C_CI",key,method,item["status"],
+                        "changed",item["changes"]["changed_pixels"],
+                        "tiny",item["tiny_components_before"],
+                        "to",item["tiny_components_after"],
+                        "failed",[k for k,v in item["gates"].items() if not v])
+          assert count==8
+          for f,h in r["file_sha256"].items():
+              assert hashlib.sha256((directory/f).read_bytes()).hexdigest()==h,f
+          print("P3C_REVIEW_ARTIFACT_MEMBER_SHA_PASS",len(r["file_sha256"]))
+          print("E4_E5_EXACT_CHALK_NOT_RUN_STATIC_ENGINE128_RUNTIME_UNKNOWN")
+          PY
+      - name: Always preserve entire source/P3B/P3C visual review one ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p3c-all-four-source-coherence-one-review-zip
+          path: ${{ runner.temp }}/engine001-b1r-p3c/
+          retention-days: 30
+          if-no-files-found: warn
