@@ -1,0 +1,137 @@
+name: ENGINE-001 B1-R P4B8 original causal native surgery eight scenes
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4b8-causal-native-surgery.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4b8_causal_stroke_surgery.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4B8_CAUSAL_NATIVE_STROKE_SURGERY_PREREG_2026-11-18.md'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4b8-one-branch-native-surgery
+  cancel-in-progress: true
+jobs:
+  original-causal-surgery:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned native Egret test dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: P4B8 E2 plus inherited P4B7 P4B6 P4B5 P4B4 P4B2 P4B1 and JS
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py AutoDraw_Stage20/tests/test_engine001_b1r_p4b8_causal_stroke_surgery.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b8_causal_stroke_surgery.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b7_native_stroke_attribution.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b6_source_protected_margin.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b5_protected_baseline_rebalance.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b4_boundary_tolerance_sweep.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b2_native_edge_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Pin exact source engine renderer and parent runners
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py":"0053829480c6327ef5c541024593f6e0018aa35e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py":"6bde1a99ff200c55cd7929f7cea32eae0aba9178",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py":"2f9ca1756da58e7062fcae6c6c64c83e4db79ea9",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+          }
+          for path,needed in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==needed,(path,found,needed)
+              Path(path).write_bytes(raw)
+              print("P4B8_FROZEN_BLOB",path,found)
+          PY
+      - name: Fresh P4B6 source and 8 genuine Egret P4B8 surgery scenes
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4b8-work
+          python - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.p4b8-work")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4B8_CAUSAL_STROKE_SURGERY_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"] and r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["native_Egret_scenes_8_complete"] is True
+          assert r["original_source_SHA256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["P4B6_git_blob"]=="2f9ca1756da58e7062fcae6c6c64c83e4db79ea9"
+          assert r["P4B7_git_blob"]=="87ea292c01c75e594c4ff09acf716c4500e88644"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["original_P4B6_recomputed_fresh"] is True
+          assert r["legacy_G32_P4c1_V44_used"] is False
+          assert r["original_native_coverage_gate"]==.99
+          assert r["original_protected_foreign_gate"]==0
+          assert r["original_spill_logical_gate"]==3.
+          assert r["original_stroke_cap"]==250 and r["original_vertex_cap_NOT_CHALK"]==500
+          assert r["production_promotion"] is False
+          assert r["E4_game_runtime"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          assert r["result"] in ("SURGICAL_ALL_GATES_PASS","SURGICAL_NATIVE_QUALITY_NOT_ALL_PASS")
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          n=0
+          for method,item in r["methods"].items():
+              assert item["same_run_native_full_alpha_parity"] is True
+              assert set(item["arms"])=={"DROP2","WIDTH1","TRIM50","WIDTH1_TRIM50"}
+              for arm,entry in item["arms"].items():
+                  assert entry["actual_native_Egret"] and entry["native_blank_zero"]==0
+                  assert entry["source_surgery_ledger"]["source_support_verified"] is True
+                  assert entry["source_surgery_ledger"]["nonculprit_geometry_unchanged"] is True
+                  assert entry["source_surgery_ledger"]["total_strokes"]<=250
+                  assert entry["source_surgery_ledger"]["synthetic_vertices_NOT_CHALK"]<=500
+                  metrics=entry["native_alpha"]["24"]
+                  print("P4B8_E3",method,arm,entry["status"],"coverage",
+                        metrics["native_component_coverage"],"protected",
+                        metrics["native_protected_foreign_face_eyes_hands_pixels"],"far3",
+                        metrics["native_foreign_distance_gt_T3_0"],
+                        "targets",entry["original_P4B7_protected_target_alpha"])
+                  n+=1
+          assert n==8
+          for name,expected in r["file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("P4B8_8_NATIVE_SCENES_MANIFEST_PASS",len(r["file_sha256"]))
+          print("P4B8_COMPOUND_QUALITY_SEPARATE",r["result"],"CHALK_NOT_RUN")
+          PY
+      - name: Upload one archive with raw source and all native PNG negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4b8-native-causal-surgery-one-zip
+          path: AutoDraw_Stage20/.p4b8-work/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: warn
