@@ -1,0 +1,126 @@
+name: ENGINE-001 B1-R P4D0 full unlimited Egret adaptive versus first scanline
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d0-unbounded-native-comparison.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D0_UNBOUNDED_ADAPTIVE_VS_SCANLINE_NATIVE_PREREG_2026-11-18.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4d0-unlimited-native-compare
+  cancel-in-progress: true
+jobs:
+  genuine-original-source-egret-uncapped:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen native Egret and source dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Check P4D0 E2 plus P4C0 and original renderer JS and docs
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4c0_full_multicolor_native_preview.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Pin original source, engine, BoardPane JS; no production changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+          }
+          for name,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+name])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==expected,(name,found,expected)
+              print("P4D0_ORIGINAL_FROZEN_BLOB",name,found)
+          raw=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: Recompute B1-R E F from original then native render without total stroke caps
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d0-work
+      - name: Evidence SHA256 and real native full-scene results
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          folder=Path("AutoDraw_Stage20/.p4d0-work")
+          r=json.loads((folder/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D0_UNBOUNDED_ADAPTIVE_VS_SCANLINE_EGRET_V1"
+          assert r["github_sha"]==os.getenv("GITHUB_SHA")
+          assert r["github_run_id"]==os.getenv("GITHUB_RUN_ID")
+          assert r["source_original_recomputed_same_run"] is True
+          assert r["native_arms_requested"]==4
+          assert r["production_promotion"] is False
+          assert r["E4_game_runtime"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          assert r["temporary_test_renderer"]["original_renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["temporary_test_renderer"]["board_quota_dynamic"] is True
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,data in r["methods"].items():
+              assert set(data["arms"])=={"ADAPTIVE_UNBOUNDED","FIRST_SCANLINE"}
+              for arm,entry in data["arms"].items():
+                  native=folder/method/arm
+                  assert (native/"PAINT_ONLY_FULL_PLAN.json").exists()
+                  assert (native/"PAINT_AND_CONTOUR_FULL_PLAN.json").exists()
+                  assert entry["paint"]["strokes"]>0
+                  assert entry["full"]["strokes"]>=entry["paint"]["strokes"]
+                  assert entry["full"]["synthetic_vertices_NOT_CHALK"]>=entry["paint"]["synthetic_vertices_NOT_CHALK"]
+                  for stage,metrics in entry["real_native_snapshots"].items():
+                      if metrics.get("rendered_successfully"):
+                          with Image.open(native/(stage+"_REAL_NATIVE_BOARD.png")) as im:
+                              assert im.size==(1380,720)
+                          assert metrics["metadata"]["renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+                  print("P4D0_NATIVE",method,arm,entry["native_status"],
+                        "strokes",entry["full"]["strokes"],"vertices",
+                        entry["full"]["synthetic_vertices_NOT_CHALK"])
+          assert len(r["members_sha256"])>=15
+          for name,sha in r["members_sha256"].items():
+              assert hashlib.sha256((folder/name).read_bytes()).hexdigest()==sha,name
+          assert r["native_arms_full_2stage"]>=1,"No complete genuine Egret painting generated"
+          assert r["result"] in ("ALL_FOUR_UNBOUNDED_EGRET_FULL_RENDERS_COMPLETED",
+                                 "PARTIAL_OR_BLOCKED_UNBOUNDED_EGRET")
+          print("P4D0_MANIFEST_PASS",len(r["members_sha256"]))
+          print("P4D0_REAL_NATIVE_ARMS_FULL",r["native_arms_full_2stage"])
+          PY
+      - name: Upload single archive with full uncapped native plans images and failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d0-original-EF-unlimited-adaptive-versus-scanline
+          path: AutoDraw_Stage20/.p4d0-work/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
