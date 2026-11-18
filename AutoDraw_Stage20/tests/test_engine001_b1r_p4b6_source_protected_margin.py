@@ -98,8 +98,14 @@ class P4B6Contracts(unittest.TestCase):
 
     def test_10_no_foreign_protected_source_refused(self):
         owner,prot,base=synthetic()
-        with self.assertRaisesRegex(ValueError,"NO_PROTECTED_FOREIGN"):
+        with self.assertRaisesRegex(ValueError,"SOURCE_MASK_SHAPE"):
             p._guard_distance_map(owner,np.zeros_like(owner))
+        # Nonempty protected mask entirely inside same owner is a distinct
+        # fail-closed condition, not missing safety information.
+        inside=np.zeros_like(owner)
+        inside[80:90,60:70]=True
+        with self.assertRaisesRegex(ValueError,"NO_PROTECTED_FOREIGN"):
+            p._guard_distance_map(owner,inside)
 
     def test_11_unbounded_and_nonfinite_points_refused(self):
         owner,prot,base=synthetic()
