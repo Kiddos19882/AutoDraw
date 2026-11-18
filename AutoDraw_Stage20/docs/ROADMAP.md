@@ -1,3 +1,11 @@
+## Очередность ENGINE-001 / B1-R после P4B9 (2026-11-18)
+
+1. **P4B9 native forensic complete:** [P4B9 native CI44376627412](https://github.com/Kiddos19882/AutoDraw/actions/runs/44376627412) 6 out-of-bound backing pixels fully attributable to three short thick original-source correction strokes; 12 P4B9 E2, 26/14 grouped E/F native, 2/1 leave-one-out confirmed, 205 manifest hashes CI PASS. Source owner coverage still83.23/83.13% and 99 gate failed. [P4B9 real Egret evidence ZIP14461319592](https://github.com/Kiddos19882/AutoDraw/actions/runs/44376627412/artifacts/14461319592).
+2. **P4B10 E0 prereg frozen, code/E2/E3 NOT_RUN:** **NEXT P4B10 E0 prereg / E2/E3 NOT_RUN at freeze:** [true-native width sweep of just proven far3 correction strokes](ENGINE001_B1R_P4B10_NATIVE_CORRECTION_WIDTH_SWEEP_PREREG_2026-11-18.md), E 10x6=60 width pairs for original `icon-110` w10 and `icon-202` w6, F 10 single widths for original `icon-109` w10; preserve source TRIM50 geometry and all nonculprits, 70 real Egret scenes, prioritize zero source protected AND zero farther3 and then owner coverage, never promote <99%. Further independent long-stroke safe-clipping/coverage rescue needed for ~16.8% missing owner.. The width sweep tests whether smaller actual widths avoid current far3 without sacrificing owner; not yet a quality PASS.
+3. **After P4B10:** separate prereg native-safe trimming/clipping of P4B5-pruned *long* original A strokes, investigate 16.8% missing owner, protect faces/hands and source-aware color/contour fidelity. Later full four P2D×E/F owners and real E4/exact CHALK. No old G32/V44 input or production changes.
+
+*Earlier roadmaps below are historical snapshots, not the current first task.*
+
 ## Очередность ENGINE-001 / B1-R после P4B8 (2026-11-18)
 
 1. **P4B8 finished native:** [P4B8 native CI44373769534](https://github.com/Kiddos19882/AutoDraw/actions/runs/44373769534) original-only E/F 8 actual arm images, E2 16/16 and E3 technical PASS, 8/8 full painting quality FAIL. TRIM50 E/F protected foreign alpha24 0/0 and unchanged owner83.23/83.13%, residual far>3logical 4/2, alpha11 on exact two protected targets each; source and limits unchanged. [P4B8 original-source native one ZIP14461112045](https://github.com/Kiddos19882/AutoDraw/actions/runs/44373769534/artifacts/14461112045).
