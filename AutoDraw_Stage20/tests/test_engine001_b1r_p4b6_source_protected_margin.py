@@ -153,8 +153,11 @@ class P4B6Contracts(unittest.TestCase):
         owner,prot,base=synthetic()
         opts=[{"source_xy":[(70.,110.),(80.,110.)],
                "width":4,"projected_max_nonowner_distance_MODEL_ONLY":3.5}]
+        # Source P4B4 catalog accepts up to 4.0 as its fixed superset,
+        # but P4B6 uses T3.0: extra candidates are skipped, not run blockers.
+        self.assertEqual(p.filter_candidate_margin(opts,owner,prot,"G1_0"),[])
         with self.assertRaisesRegex(ValueError,"UNPINNED_MODEL_CANDIDATE"):
-            p.filter_candidate_margin(opts,owner,prot,"G1_0")
+            p.filter_candidate_margin([{"width":4}],owner,prot,"G1_0")
 
     def test_16_fail_closed_incorrect_arm_or_empty_parent(self):
         owner,prot,base=synthetic()

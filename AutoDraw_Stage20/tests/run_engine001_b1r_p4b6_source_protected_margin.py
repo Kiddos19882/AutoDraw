@@ -137,8 +137,12 @@ def filter_candidate_margin(candidates:list[dict], full_owner:np.ndarray,
     for c in candidates:
         if (not isinstance(c,dict) or
                 "source_xy" not in c or "width" not in c or
-                c.get("projected_max_nonowner_distance_MODEL_ONLY",100.)>LEGACY_NATIVE_SPILL):
+                "projected_max_nonowner_distance_MODEL_ONLY" not in c):
             raise ValueError("BLOCKED_P4B6_UNPINNED_MODEL_CANDIDATE")
+        # The common catalog is frozen at <=4 logical px by P4B4.
+        # P4B6's legacy T3.0 arm must SKIP (not abort on) members >3.
+        if c["projected_max_nonowner_distance_MODEL_ONLY"]>LEGACY_NATIVE_SPILL:
+            continue
         val=clearance(c["source_xy"],int(c["width"]),dist)
         if val>ARMS[arm]:
             kept.append(c)
