@@ -1,0 +1,136 @@
+name: ENGINE-001 B1-R P4B9 real native TRIM50 farther3 stroke attribution
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4b9-native-far3-attribution.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b9_native_far3_attribution.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4b9_native_far3_attribution.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4B9_NATIVE_FAR3_ATTRIBUTION_PREREG_2026-11-18.md'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4b9-native-far3-attribution
+  cancel-in-progress: true
+jobs:
+  real-native-far3-attribution:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned native Egret test dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: P4B9 E2 plus P4B8 P4B7 P4B6 P4B5 P4B4 P4B2 P4B1 and JS
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4b9_native_far3_attribution.py AutoDraw_Stage20/tests/test_engine001_b1r_p4b9_native_far3_attribution.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b9_native_far3_attribution.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b8_causal_stroke_surgery.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b7_native_stroke_attribution.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b6_source_protected_margin.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b5_protected_baseline_rebalance.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b4_boundary_tolerance_sweep.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b2_native_edge_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Pin exact original source engine and P4B6-P4B8 runners
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py":"0053829480c6327ef5c541024593f6e0018aa35e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py":"6bde1a99ff200c55cd7929f7cea32eae0aba9178",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py":"2f9ca1756da58e7062fcae6c6c64c83e4db79ea9",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py":"9ddf8e2f745de4f78006b14c00e99e74c2f3cb67",
+          }
+          for path,needed in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==needed,(path,found,needed)
+              Path(path).write_bytes(raw)
+              print("P4B9_FROZEN_BLOB",path,found)
+          PY
+      - name: Recompute source TRIM50 and attribute native far3 pixels with true Egret
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4b9_native_far3_attribution.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4b9-work
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.p4b9-work")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4B9_NATIVE_FAR3_ATTRIBUTION_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_recomputed_same_run"] is True
+          assert r["native_Egret_EF_reference_parity"] is True
+          assert r["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["p4b6_git_blob"]=="2f9ca1756da58e7062fcae6c6c64c83e4db79ea9"
+          assert r["p4b7_git_blob"]=="87ea292c01c75e594c4ff09acf716c4500e88644"
+          assert r["p4b8_git_blob"]=="9ddf8e2f745de4f78006b14c00e99e74c2f3cb67"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["legacy_G32_P4c1_V44_used"] is False
+          assert r["native_test_alpha"]==24
+          assert r["spill_logical_gate"]==3.0
+          assert r["native_selected_owner_coverage_gate"]==.99
+          assert r["max_strokes"]==250 and r["synthetic_vertices_cap_NOT_CHALK"]==500
+          assert r["result"] in ("COMPLETE_NATIVE_FAR3_ATTRIBUTION","PARTIAL_NATIVE_FAR3_ATTRIBUTION")
+          assert r["production_promotion"] is False and r["native_full_artwork_quality_pass"] is False
+          assert r["E4_game_runtime"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN" and r["exact_game_CHALK"] is None
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,data in r["methods"].items():
+              expected=4 if method=="E_SOBEL90" else 2
+              assert data["native_real_egret_complete"] is True
+              assert data["full_native_reference_and_control_alpha_identical"] is True
+              assert len(data["far3_target_backing_yx"])==expected
+              assert data["native_reference_alpha"]["24"]["native_foreign_distance_gt_T3_0"]==expected
+              assert data["baseline_protected_foreign_alpha24"]==0
+              assert data["native_group_replays"]<=64
+              assert data["additional_loo_scenes"]<=16
+              print("P4B9_E3",method,data["causal_status"],"pixels",
+                    data["far3_target_backing_yx"],"source_culprits",
+                    data["possible_contributor_ids"],"native_groups",
+                    data["native_group_replays"],"loo",data["leave_one_out_native"])
+          for name,sha in r["file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print("P4B9_E3_NATIVE_MEMBER_SHA_PASS",len(r["file_sha256"]))
+          print("P4B9_ATTRIBUTION_SEPARATE",r["result"],"FULL_QUALITY_FAIL")
+          PY
+      - name: Preserve all genuine Egret native PNG and negative evidence in one ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4b9-native-far3-attribution-one-zip
+          path: AutoDraw_Stage20/.p4b9-work/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: warn

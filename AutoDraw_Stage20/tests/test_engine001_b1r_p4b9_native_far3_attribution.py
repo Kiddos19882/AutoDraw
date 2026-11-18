@@ -19,10 +19,10 @@ class P4B9Contract(unittest.TestCase):
         owner[40:80,40:80]=True
         # One outside backing pixel >9 pixels from full owner, another <=9.
         rgba[150,(155+35)*3-8,3]=24
-        rgba[150,(155+35)*3,3]=24
+        rgba[150,(155+40)*3-7,3]=24
         targets=p.native_far3_targets(rgba,owner)
         self.assertIn((150,(155+35)*3-8),targets)
-        self.assertNotIn((150,(155+35)*3),targets)
+        self.assertNotIn((150,(155+40)*3-7),targets)
     def test_03_alpha24_gate_not_alpha1(self):
         rgba=np.zeros(p.p4b5.BACKING,np.uint8)
         owner=np.zeros(p.p4b5.SHAPE,bool)
