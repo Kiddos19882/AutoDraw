@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE001 B1-R-P1 original-source prefilter and new outline diagnostics
+
+Added test-only B1-R original full200×320 RGB protection from original Sobel/ΔE, two fixed bilateral filters, original-only extracted outline preview, synthetic tests and independent source-only workflow. [CI44244364830](https://github.com/Kiddos19882/AutoDraw/actions/runs/44244364830) 8/8 E2, E3 successful, 14/14 member hashes verified; A_SOFT/A_MID numeric SOURCE_SCREEN_PASS_VISUAL_PENDING, no added chroma excess and no G32/V44/M1 old candidate inputs. Real native brush, new playable contour, game32, exact CHALK NOT_RUN. Source SHA typo first CI FAIL preserved; no production/master changed.
+
 ## 2026-11-18 — DEC-034: B1-R RGB-first image preparation restart
 
 По прямому решению пользователя прежние G32/P4c1 и V44-B контуры исключены из активного проектирования рисунка; теперь разрешены только history/comparison controls. Новый [B1-R plan](ENGINE001_B1R_RGB_FIRST_RESTART_PLAN_2026-11-18.md) возвращает исследование к оригинальному RGB, предварительной защите деталей/новых границ, edge-aware упрощению, совместному построению цветовых зон и нового контура; затем отдельная palette32, Egret round brush, лимиты CHALK/возможный split-to-boards. Отрицательные B1/B2/B3/B4 и настоящие PNG сохраняются. Пока это документы/принятый plan, не новая проверенная реализация или CI изображения.
