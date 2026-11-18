@@ -1,3 +1,8 @@
+## ENGINE-001 B3 active isolated native diagonal footprint (2026-11-18)
+
+- [x] B3 frozen protocol, source selection, test-only runner, 7 synthetic contracts and dedicated bounded Windows native Egret workflow recorded at commit `100e3432ee8ff8f41e3259b27b2d6bee71f29f2f`. Reuses original archived BoardPane WebGL renderer, B1 owner index map and protected details, widths2/4 only; production unaffected.
+- [ ] **B3 run evidence IN_PROGRESS:** [CI44234300377](https://github.com/Kiddos19882/AutoDraw/actions/runs/44234300377) has passed initial tests/archival SHA downloads, native step still running at last check. Must validate completion, all required jobs, archived SHA/CRC, per-case native alpha foreign-color crossings and eligibility before declaring any B3 PASS/FAIL. E4/E5 and exact CHALK NOT_RUN.
+
 ## ENGINE-001 R2-P2-P2 B2 completed; B3 native diagonal feasibility open (2026-11-18)
 
 - [x] B2 frozen source-safe cleanup [CI44232121497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44232121497), `e5b9f1553b2fa11d473e1e558cfcb983edbdc903`, E2 6/6 PASS, full E3 SUCCESS, artifact14396035800 CRC/15-of-15 report-linked SHA PASS; B2_SAFE4 only 8 donor merges/8 pixels (1427→1417 components), B2_SAFE12 7 merges/11 pixels (→1418). Both predeclared SOURCE_GATE_FAIL; full PNG/ledgers retained, no game/CHALK.
