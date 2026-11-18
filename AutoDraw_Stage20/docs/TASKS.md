@@ -1,3 +1,13 @@
+## ENGINE-001 / B1-R — P4C0 полный E/F native preview E3 завершён, quality FAIL (2026-11-18)
+
+- [x] P4B10 [CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831), native70/70 technical PASS, 54 safe, 0 quality PASS; owner83.23/83.13%, не production. ZIP14462144950.
+- [x] P4C0 [E0 prereg](ENGINE001_B1R_P4C0_FULL_SOURCE_MULTICOLOR_NATIVE_PREVIEW_PREREG_2026-11-18.md) до кода, тестовый runner E/F 31 source colors + white, настоящий Egret 5.4.1 с отдельным новым оригинальным контуром.
+- [x] P4C0 E2/E3 [CI44388330915](https://github.com/Kiddos19882/AutoDraw/actions/runs/44388330915) SHA f79e7765: E2 10/10 и inherited/JS/Markdown PASS, E/F full-native paint+outline, blank и maps E3 technical PASS, **native quality FAIL E69.8795% F69.4543%, 0/31 цветовых слоёв PASS**, original protected foreign ink3086/3113, часть контура не поместилась в5900 synthetic vertices. [ZIP14465354420](https://github.com/Kiddos19882/AutoDraw/actions/runs/44388330915/artifacts/14465354420) independently SHA256/CRC +93/93 member hashes PASS, E4/E5/exact CHALK NOT_RUN. К production не переносить.
+- [ ] **NEXT E0:** совместная диагностика/упрощение тысяч tiny original-source E/F islands, сохранение деталей лиц/глаз/рук; после фиксации методики — новый native тест полного рисунка и реальных пробелов. Исторический P4B5/P4B10 safe-long-stroke coverage rescue остаётся открытым как отдельная задача.
+- [ ] Дальше все 4 P2D original sources, исходный новый контур + native coverage safety, E4 живой игры и exact bound CHALK; palette128 UI доступность всё ещё должна быть проверена в игре.
+
+*Далее сохранён снимок backlog до завершения P4C0; отметки NEXT в нём исторические.*
+
 ## Актуально ENGINE-001 B1-R: P4B10 завершён, P4C0 полный оригинальный Egret preview в работе (2026-11-18)
 
 - [x] P4B10 genuine native [CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831) SHA `1a5f23fd18bc8ca264951d4f299b052a949df956`: 18/18 P4B10 E2 PASS, 70 E/F Egret сцен E3 technical PASS, 45 E + 9 F из 70 вариантов safety (0 protected alpha24, 0 further3), но **0/70 quality PASS** из-за ~83.2% owner (<99). E diagnostic W09_W05, F W09, **без promotion**. [Один ZIP14462144950](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831/artifacts/14462144950), 426 manifest members проверены на CI; независимая CRC не запущена.
