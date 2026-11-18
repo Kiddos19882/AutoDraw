@@ -1,0 +1,125 @@
+name: ENGINE-001 B1-R P4C0 full original E F multicolor Egret preview
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4c0-full-source-egret-preview.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4c0_full_multicolor_native_preview.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4c0_full_multicolor_native_preview.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4C0_FULL_SOURCE_MULTICOLOR_NATIVE_PREVIEW_PREREG_2026-11-18.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4c0-full-native-source-preview
+  cancel-in-progress: true
+jobs:
+  original-full-source-ef-native:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned native Egret test dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: P4C0 source E2 and inherited JS Markdown checks
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4c0_full_multicolor_native_preview.py AutoDraw_Stage20/tests/test_engine001_b1r_p4c0_full_multicolor_native_preview.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4c0_full_multicolor_native_preview.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p3d_source_edge_mask_ablation.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Verify pinned original engine renderer P4B1 source and original RGB
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+          }
+          for path,needed in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==needed,(path,found,needed)
+              Path(path).write_bytes(raw)
+              print("P4C0_FROZEN_BLOB",path,found)
+          raw=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: Generate current original source and native full E F with new contours
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4c0_full_multicolor_native_preview.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4c0-work
+      - name: Independently validate full source evidence manifest and native previews
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          p=Path("AutoDraw_Stage20/.p4c0-work")
+          r=json.loads((p/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4C0_FULL_MULTICOLOR_EGRET_PREVIEW_V1"
+          assert r["result"]=="DIAGNOSTIC_FULL_NATIVE_EF_AVAILABLE"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["source_current_run_P3D"] is True
+          assert r["G32_V44_old_as_candidate"] is False
+          assert r["production_promotion"] is False
+          assert r["game_E4"]=="NOT_RUN" and r["E5"]=="NOT_RUN" and r["exact_CHALK"] is None
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,item in r["methods"].items():
+              folder=p/method
+              assert item["native_renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+              assert item["nonwhite_colors_actually_native_rendered"]==item["nonwhite_colors_in_source"]
+              assert item["total_real_Egret_strokes_NOT_CHALK"]<=3000
+              assert item["total_synthetic_vertices_NOT_CHALK"]<=5900
+              assert item["global_outline_strokes"]>0
+              for name in ("REAL_EGRET_PAINT_ONLY.png",
+                           "REAL_EGRET_PAINT_AND_NEW_OUTLINE.png",
+                           "REVIEW_ORIGINAL_SOURCE_EGRET_COMPARE.png",
+                           "REAL_EGRET_MISSING_ALPHA24.png",
+                           "REAL_EGRET_FOREIGN_ALPHA24.png"):
+                  assert (folder/name).is_file(),(method,name)
+              with Image.open(folder/"REAL_EGRET_PAINT_AND_NEW_OUTLINE.png") as im:
+                  assert im.size==(450,720)
+              print("P4C0_NATIVE_METHOD",method,"coverage",
+                    item["overall_owner_weighted_native_coverage"],
+                    "quality",item["all_frozen_99_0protected_3logical_gates"])
+          assert len(r["members_sha256"])>=20
+          for name,want in r["members_sha256"].items():
+              assert hashlib.sha256((p/name).read_bytes()).hexdigest()==want,name
+          print("P4C0_MANIFEST_PASS",len(r["members_sha256"]))
+          print("P4C0_DIAGNOSTIC_NOT_PRODUCTION")
+          PY
+      - name: Upload one archive of actual Egret E F original comparison and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4c0-original-full-EF-egret-one-zip
+          path: AutoDraw_Stage20/.p4c0-work/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
