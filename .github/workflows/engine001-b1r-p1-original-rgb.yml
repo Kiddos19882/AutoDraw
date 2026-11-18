@@ -1,0 +1,100 @@
+name: ENGINE-001 B1-R P1 original RGB-first detail preserving visual
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p1-original-rgb.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p1_fullrgb_edge_aware.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b1r-original-rgb-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-rgb-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned original-RGB-only dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Test original RGB provenance and deterministic masks, inspect no legacy imports
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py AutoDraw_Stage20/tests/test_engine001_b1r_p1_fullrgb_edge_aware.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p1_fullrgb_edge_aware.py -v
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path("AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py")
+          t=ast.parse(p.read_text(encoding="utf8"))
+          modules={node.module for node in ast.walk(t) if isinstance(node,ast.ImportFrom)}
+          modules.update(a.name for node in ast.walk(t) if isinstance(node,ast.Import) for a in node.names)
+          deny=sorted(m for m in modules if m and (
+              m.startswith("run_engine001") or "old_contour" in m or "g32" in m.lower()))
+          assert not deny,("BLOCKED_B1R_LEGACY_IMPORTS",deny)
+          print("B1R_ISOLATED_NO_OLD_G32_M1_V44_CODE_IMPORTS_PASS")
+          PY
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Generate full-res source-only candidates and new independent RGB outline
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-b1r-p1"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p1"
+          data=json.loads((d/"report.json").read_text(encoding="utf8"))
+          assert data["github_sha"]==os.environ["GITHUB_SHA"]
+          assert data["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert data["candidate_source"]=="original_RGB"
+          assert data["legacy_G32_used_as_candidate"] is False
+          assert data["legacy_V44_used_as_candidate"] is False
+          assert data["legacy_M1_mask_used_as_candidate"] is False
+          assert data["historical_comparison_input_count"]==0
+          assert data["game32_projection"]=="NOT_RUN" and data["exact_game_CHALK"] is None
+          assert data["new_outline_quality"]=="SOURCE_ONLY_PREVIEW_NOT_NATIVE"
+          assert set(data["metrics"])=={"A_SOFT","A_MID"}
+          assert len(data["file_sha256"])==14, len(data["file_sha256"])
+          for name,want in data["file_sha256"].items():
+              actual=hashlib.sha256((d/name).read_bytes()).hexdigest()
+              assert actual==want,("BLOCKED_B1R_OUTPUT_SHA",name)
+          for key,result in data["metrics"].items():
+              assert result["full_original_protected_equal"]
+              assert result["logical_original_protected_equal"]
+              assert result["status"] in ("SOURCE_SCREEN_PASS_VISUAL_PENDING","SOURCE_GATE_FAIL")
+              print(key,"status",result["status"],
+                    "meanDE",round(result["mean_deltaE00"],4),
+                    "p95",round(result["p95_deltaE00"],4),
+                    "edge",round(result["fixed_logical_original_sobel90_overlap"],4),
+                    "roughness",round(result["flat_rgb_roughness_reduction_fraction"],4),
+                    "chroma_excess",result["excess_chroma_over_original_plus12_pixels"])
+          print("B1R_E3_SOURCE_RGB_ARTIFACT_MEMBER_SHA_PASS",len(data["file_sha256"]))
+          print("REAL_GAME_E4_NOT_RUN; NEW_NATIVE_CONTOUR_NOT_RUN; EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Archive source-only originals, full RGB variants and new outline (positive or negative)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p1-original-only-rgb-new-outline
+          path: ${{ runner.temp }}/engine001-b1r-p1/
+          retention-days: 30
+          if-no-files-found: warn
