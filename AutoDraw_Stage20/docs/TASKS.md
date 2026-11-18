@@ -1,3 +1,13 @@
+## ENGINE-001 B1-R — P4D1 interleaved fill+contour Egret completed, still artwork quality NOT_ACCEPTED (2026-11-19)
+
+- [x] [P4D1 prereg E0 before code](ENGINE001_B1R_P4D1_INTERLEAVED_FILL_CONTOUR_NATIVE_PREREG_2026-11-19.md), user-authorized combined painting/contour native E/F; identical original-source RGB, same P4D0 adaptive widths1..10 / scanline width2 plus all 358 source new contour paths; change order ONLY, with outline inserted just before spatially nearest paint stroke. P4D0 original baseline 4/4 pixel-identical replays confirmed.
+- [x] [P4D1 E2/E3 CI44408669840](https://github.com/Kiddos19882/AutoDraw/actions/runs/44408669840) SHA b2f8980d: 10/10 new, inherited 20/20, JS, Markdown PASS; 8/8 genuine BoardPane/WebGL images and blank PASS; from 686 to694 actual fill/outline alternations; no total point caps in scoped test only. [One ZIP artifact14476627379](https://github.com/Kiddos19882/AutoDraw/actions/runs/44408669840/artifacts/14476627379), independent SHA256/CRC and 69/69 member SHA PASS. Earlier [CI44408316432](https://github.com/Kiddos19882/AutoDraw/actions/runs/44408316432) bad new synthetic test transition expectation FAIL retained as history.
+- [ ] **QUALITY/acceptance still open:** E/F adaptive image RGB closeness rises to71.314/71.271% from62.952/62.830%, scanline59.035/58.903% from51.715/51.593%; white area overpaint and nonwhite any-ink unchanged. Dark overly dense contour still damages faces/details. Composite coverage != per-owner same-color coverage. Original99%/protected0/3logical gates NOT_MEASURED; no user visual acceptance.
+- [ ] **NEXT:** separate E0 prereg density-aware contour selection / protection of faces and hands PLUS owner-specific native leakage/safety audit for P4D1 on same original E/F; preserve full negative evidence and all source material; no blanket image simplification, no production promotion.
+- [ ] E4 live game/independent E5, exact run-bound CHALK NOT_RUN; P4B10 color115 long-stroke rescue remains a distinct backlog task; master untouched.
+
+*P4D0 and older task summaries below remain history.*
+
 ## ENGINE-001 / B1-R — P4D0 полный uncapped native Egret и первый scanline завершены, acceptance не получен (2026-11-18)
 
 - [x] [P4D0 original-source E0 prereg](ENGINE001_B1R_P4D0_UNBOUNDED_ADAPTIVE_VS_SCANLINE_NATIVE_PREREG_2026-11-18.md), freeze до кода и CI, baseline [P4C0](https://github.com/Kiddos19882/AutoDraw/actions/runs/44388330915) E/F source quality FAIL (P4C0 per-owner 69.88%/69.45%).

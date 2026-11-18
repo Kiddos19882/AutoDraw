@@ -1,3 +1,11 @@
+## ENGINE-001 B1-R after P4D1 native interleaved source outline result (2026-11-19)
+
+1. **P4D1 finished E2/E3, artwork still FAIL/NOT_ACCEPTED:** [CI44408669840](https://github.com/Kiddos19882/AutoDraw/actions/runs/44408669840) SHA b2f8980d native 4 E/F×adaptive/scanline matched order comparisons =8 real Egret screenshots with identical strokes/widths/colors and 358 source contour paths. Interleaved improves original RGB closeness E/F adaptive from62.95/62.83 to71.31/71.27%; scanline from51.72/51.59 to59.04/58.90%. Background ink same, face/hair outlines still too dark. P4D0 previous 4 baseline RGBA pixel parity PASS; [one SHA256/CRC/69-files verified ZIP](https://github.com/Kiddos19882/AutoDraw/actions/runs/44408669840/artifacts/14476627379); [frozen prereg](ENGINE001_B1R_P4D1_INTERLEAVED_FILL_CONTOUR_NATIVE_PREREG_2026-11-19.md). No E4/E5/CHALK.
+2. **Next single open step:** prereg independent original-source selected contour mask density/shape test preserving facial and silhouette recognition, and per-owner native RGBA source leakage validation on P4D1 before artwork acceptance. Fix actual dark/foreign color, not round-number sweep nor new pixel-art.
+3. Later safe color115 P4B10 long stroke repair / other P2D source variants / real game E4 & exact run-bound CHALK; no master/production/default changes without evidence.
+
+*Older roadmap sections retained as prior snapshots.*
+
 ## ENGINE-001 B1-R следующий этап после P4D0 без лимитов (2026-11-18)
 
 1. [P4D0 E2/E3 native CI #44396483490](https://github.com/Kiddos19882/AutoDraw/actions/runs/44396483490), source SHA 07cc4568, actual E/F adaptive no-cap vs row-major scanline + full new 358-stroke outline, 8 genuine Egret PNG. Adaptive paint any-ink97.215% E /97.274% F, RGB match85.63%/85.49%; simple scanline any-ink100% but RGB match64.44%/64.27% and nonwhite background overpaint ~8x. **No true owner-specific quality PASS**. [One ZIP14471561424](https://github.com/Kiddos19882/AutoDraw/actions/runs/44396483490/artifacts/14471561424), CRC/53 member hashes independently verified. [Pre-reg](ENGINE001_B1R_P4D0_UNBOUNDED_ADAPTIVE_VS_SCANLINE_NATIVE_PREREG_2026-11-18.md) unchanged.
