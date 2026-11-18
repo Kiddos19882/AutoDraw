@@ -1,3 +1,7 @@
+## 2026-11-18 — DEC-034: B1-R RGB-first image preparation restart
+
+По прямому решению пользователя прежние G32/P4c1 и V44-B контуры исключены из активного проектирования рисунка; теперь разрешены только history/comparison controls. Новый [B1-R plan](ENGINE001_B1R_RGB_FIRST_RESTART_PLAN_2026-11-18.md) возвращает исследование к оригинальному RGB, предварительной защите деталей/новых границ, edge-aware упрощению, совместному построению цветовых зон и нового контура; затем отдельная palette32, Egret round brush, лимиты CHALK/возможный split-to-boards. Отрицательные B1/B2/B3/B4 и настоящие PNG сохраняются. Пока это документы/принятый plan, не новая проверенная реализация или CI изображения.
+
 ## 2026-11-18 — B4 genuine complete Egret color+contour negative study
 
 Experimental test-only real BoardPane/WebGL opt-in B4 method and validated Python native_batch whitelist with unchanged historical behavior; frozen 17-game-color P4c1 paint + 410 native V44-B detail strokes LAST in two A/B scenes (original395-color details vs CIEDE2000-nearest15 game32 detail colors). [CI44236852882](https://github.com/Kiddos19882/AutoDraw/actions/runs/44236852882) E2 15 Python/20 Node PASS, E3 SUCCESS, both quality FAIL, 44/44 artifact hashes verified. Avoid further production optimization on rejected G32 map; B5 will research visually coherent source zones independently. No game/live/CHALK changes.
