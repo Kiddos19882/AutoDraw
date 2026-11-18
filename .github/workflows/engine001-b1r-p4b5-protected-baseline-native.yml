@@ -1,0 +1,142 @@
+name: ENGINE-001 B1-R P4B5 source protected Egret baseline prune then refill
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4b5-protected-baseline-native.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4b5_protected_baseline_rebalance.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py'
+      - 'AutoDraw_Stage20/tests/game_renderer_reference.js'
+      - 'AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4b5-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-protected-original-native:
+    runs-on: windows-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned Egret native and source dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E2 protected-prune tests old regression JS renderer and Markdown
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py AutoDraw_Stage20/tests/test_engine001_b1r_p4b5_protected_baseline_rebalance.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b5_protected_baseline_rebalance.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b4_boundary_tolerance_sweep.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b2_native_edge_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore exact pinned source Python and game Egret blobs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pinned={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py":"0053829480c6327ef5c541024593f6e0018aa35e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+          }
+          for path,expected in pinned.items():
+            raw=subprocess.check_output(["git","show","HEAD:"+path])
+            blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+            assert blob==expected,(path,blob,expected)
+            Path(path).write_bytes(raw)
+            assert Path(path).read_bytes()==raw
+            print("P4B5_PINNED_GIT_BLOB",path,blob)
+          PY
+      - name: Native P4B5 pruned baseline and safe-edge refill E F all four Egret scenes
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output "$RUNNER_TEMP/engine001-b1r-p4b5"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p4b5"
+          r=json.loads((base/"report.json").read_text(encoding="utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4B5_PROTECTED_BASELINE_REBALANCE_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["native_E3_scenes_complete"]==4
+          assert r["source_SHA256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["engine_blob_sha1"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["renderer_blob_sha1"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["P4B1_BLOB"]=="b95aa361cf2ec94d5fa28e7309bd3e4af15eca93"
+          assert r["P4B2_BLOB"]=="0053829480c6327ef5c541024593f6e0018aa35e"
+          assert r["P4B4_BLOB"]=="6f67edcb942018bb006ed60b853470e4a202408d"
+          assert r["source_original_only_all_EF_P3D_quality_pass"] is True
+          assert r["max_strokes"]==250 and r["max_synthetic_vertices_NOT_CHALK"]==500
+          assert r["native_coverage_gate_unchanged"]==.99
+          assert r["legacy_3logical_spill_gate_unchanged"]==3.0
+          assert r["legacy_G32_P4c1_V44_used_as_candidate"] is False
+          assert r["frozen_old_ZIPs_as_source"] is False
+          assert r["E4_actual_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None and r["production_promotion"] is False
+          assert r["status"] in {"NATIVE_PROTECTED_BOTH_PASS",
+                                 "NATIVE_PROTECTED_QUALITY_NOT_ALL_PASS"}
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,x in r["methods"].items():
+            assert x["unsafe_original_A_strokes_removed"]>0
+            assert x["pruned_strokes_count"] < x["original_A_baseline_strokes"]
+            assert x["native_final_Egret_real"] is True
+            assert x["pruned_baseline_Egret_native"] is True
+            assert x["pruned_blank_nonzero"]==0 and x["final_blank_nonzero"]==0
+            assert x["final_repair_admission"]["cumulative_strokes"]<=250
+            assert x["final_repair_admission"]["cumulative_vertices_NOT_CHALK"]<=500
+            assert x["status"] in {
+              "NATIVE_PROTECTED_COMPONENT_PASS","NATIVE_PROTECTED_COMPONENT_QUALITY_FAIL"}
+            assert (base/("NATIVE_PRUNED_BASELINE_"+method)).is_dir()
+            assert (base/("NATIVE_PRUNED_AND_REPAIRED_"+method)).is_dir()
+            alpha=x["native_final_alpha"]["24"]
+            print("P4B5_NATIVE",method,x["status"],
+                  "removed",x["unsafe_original_A_strokes_removed"],
+                  "initial_protected",x["original_pruned_native_alpha"]["24"][
+                    "native_protected_foreign_face_eyes_hands_pixels"],
+                  "coverage",alpha["native_component_coverage"],
+                  "final_protected",alpha["native_protected_foreign_face_eyes_hands_pixels"],
+                  "far3",alpha["native_foreign_distance_gt_T3_0"])
+          for name,sha in r["file_sha256"].items():
+            assert hashlib.sha256((base/name).read_bytes()).hexdigest()==sha,name
+          print("P4B5_ALL_FOUR_ACTUAL_NATIVE_E3_SCENES_MEMBER_SHA_PASS",
+                len(r["file_sha256"]))
+          print("P4B5_QUALITY_SEPARATE",r["status"])
+          print("NATIVE_E3_IS_NOT_GAME_E4_OR_EXACT_CHALK")
+          PY
+      - name: Always archive one ZIP real Egret and frozen negative outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4b5-source-protected-prune-and-refill-one-zip
+          path: ${{ runner.temp }}/engine001-b1r-p4b5/
+          if-no-files-found: warn
+          retention-days: 30
