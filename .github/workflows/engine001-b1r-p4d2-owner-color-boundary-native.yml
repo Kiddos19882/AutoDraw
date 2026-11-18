@@ -1,0 +1,147 @@
+name: ENGINE-001 B1-R P4D2 owner-colored boundary as fill native Egret
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d2-owner-color-boundary-native.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D2_OWNER_COLORED_BOUNDARY_AS_FILL_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4d2-native-owner-color-boundary-as-fill
+  cancel-in-progress: true
+jobs:
+  source-owner-colored-native-egret:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native replay libraries from frozen P4D0
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E2 P4D2 original-source same-color boundary and prior Egret contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d1_interleaved_fill_contour_native.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Verify and restore pinned game palette, reference renderer and parent source bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py":"cf4f0b0b8a1fef5879067f41901f2806758e81bd",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("P4D2_FROZEN_SOURCE_PIN",path,actual)
+          original=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(original).hexdigest()=="07cc4568cb5e90d9514bc6f2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: Render E F adaptive and scanline source-colored inner edges as fill Egret
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d2-work
+      - name: Independently verify real native board, complete source edge and all manifest hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d2-work")
+          report=json.loads((root/"report.json").read_text("utf8"))
+          assert report["experiment"]=="ENGINE001_B1R_P4D2_OWNER_COLORED_BOUNDARY_AS_FILL_NATIVE_V1"
+          assert report["result"]=="ALL_EIGHT_OWNER_COLORED_NATIVE_EGRET_SCENES_COMPLETED"
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["original_source_sha256"]=="07cc4568cb5e90d9514bc6f2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert report["source_recomputed_current_run"]
+          assert report["source"]=="C_192_D_COMPONENT24"
+          assert report["no_dark_or_global_contour"]
+          assert report["native_scenes"]==8 and report["true_native_blank_alpha0"]
+          assert report["production_promotion"] is False
+          assert report["E4_live_game"]=="NOT_RUN" and report["E5_independent"]=="NOT_RUN"
+          assert report["exact_run_bound_CHALK"] is None
+          assert report["frozen_owner99_protected0_far3"]=="NOT_MEASURED_COMPOSITE_ONLY"
+          assert report["runtime_renderer_test_only"]["original_renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert report["runtime_renderer_test_only"]["board_quota_dynamic"]
+          assert set(report["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,data in report["methods"].items():
+              assert data["source_original_only"] and data["no_legacy_g32_v44_used"]
+              assert data["global_dark_outline_strokes"]==0
+              assert data["nonwhite_source_owners"]==31
+              assert data["inner_owner_colored_boundary_runs"]>0
+              assert data["inner_owner_edge_logical_pixels"]>0
+              assert set(data["arms"])=={"ADAPTIVE_UNBOUNDED","FIRST_SCANLINE"}
+              for arm,a in data["arms"].items():
+                  folder=root/method/arm
+                  assert a["boundary_width"]==1
+                  assert a["owner_color_boundary_strokes"]==data["inner_owner_colored_boundary_runs"]
+                  assert a["full_strokes"]==a["paint_strokes"]+a["owner_color_boundary_strokes"]
+                  assert a["full_vertices_NOT_CHALK"]==a["paint_vertices_NOT_CHALK"]+2*a["owner_color_boundary_strokes"]
+                  assert a["native_status"]=="COMPLETE"
+                  assert a["owner_specific_quality_gates"]=="NOT_MEASURED"
+                  assert set(a["stages"])=={"PAINT_ONLY_CONTROL","OWNER_COLOR_BOUNDARY_AS_PAINT"}
+                  with Image.open(folder/"COMPARE_NATIVE_OWNER_COLOR_AS_FILL.png") as im:
+                      assert im.size==(1800,764)
+                  for stage,ss in a["stages"].items():
+                      assert ss["true_native_egret"]
+                      assert ss["renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+                      assert ss["schema"]=="ENGINE001_B1R_P4A2_NATIVE_1_TO_10"
+                      expected=a["paint_strokes"] if stage=="PAINT_ONLY_CONTROL" else a["full_strokes"]
+                      assert ss["accepted_strokes"]==expected
+                      stage_dir=folder/stage
+                      with Image.open(stage_dir/"REAL_EGRET_NATIVE_BOARD.png") as im:
+                          assert im.size==(1380,720)
+                      with Image.open(stage_dir/"REAL_EGRET_CROP.png") as im:
+                          assert im.size==(450,720)
+                      assert (stage_dir/"MISSING_ANY_INK_ALPHA24.png").is_file()
+                      assert (stage_dir/"COMPOSITE_RGB_DELTA_GT32.png").is_file()
+                  print("P4D2_NATIVE_PAIR",method,arm,a["numeric_candidate"],
+                        a["change_from_paint_only"])
+          assert len(report["members_sha256"])>=60
+          for path,hash_ in report["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==hash_,path
+          print("P4D2_NATIVE_8_OF_8_AND_BLANK_PASS")
+          print("P4D2_MANIFEST_HASHES",len(report["members_sha256"]))
+          PY
+      - name: Single ZIP artifact with Egret native E F, RGB, masks, raw geometry and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d2-original-EF-owner-colored-boundary-as-fill-native
+          path: AutoDraw_Stage20/.p4d2-work/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
