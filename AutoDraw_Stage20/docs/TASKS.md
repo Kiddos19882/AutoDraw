@@ -1,3 +1,12 @@
+## Актуально ENGINE-001 B1-R: P4B10 завершён, P4C0 полный оригинальный Egret preview в работе (2026-11-18)
+
+- [x] P4B10 genuine native [CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831) SHA `1a5f23fd18bc8ca264951d4f299b052a949df956`: 18/18 P4B10 E2 PASS, 70 E/F Egret сцен E3 technical PASS, 45 E + 9 F из 70 вариантов safety (0 protected alpha24, 0 further3), но **0/70 quality PASS** из-за ~83.2% owner (<99). E diagnostic W09_W05, F W09, **без promotion**. [Один ZIP14462144950](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831/artifacts/14462144950), 426 manifest members проверены на CI; независимая CRC не запущена.
+- [x] По запросу пользователя отдельно заморожен [P4C0 E0 протокол полноцветной исходной отрисовки](ENGINE001_B1R_P4C0_FULL_SOURCE_MULTICOLOR_NATIVE_PREVIEW_PREREG_2026-11-18.md); добавлены изолированные runner/E2/CI в `feature/image-geometry-optimization`, без production.
+- [ ] **NEXT:** получить и проверить P4C0 настоящий E/F full-color Egret paint-only + source-derived contour, missing/foreign maps и один архив; `E2/E3 IN_PROGRESS` на момент записи, **не объявлять успешным до проверенных jobs/SHA**. Допускается diagnostic FULL even if native-quality FAIL.
+- [ ] После P4C0 отдельно prereg safe-long-stroke clipping/recovery, затем все четыре P2D источника, все цвета и новый контур для acceptance, E4/E5, exact CHALK. Production 3 logical px / >=99% / protected0 / 250 & 500 original per-owner bounds не менялись.
+
+*Ниже — предыдущий активный снимок до P4B10 E3; строки NEXT в нём исторические, а не новое задание.*
+
 ## ENGINE-001 / B1-R-P4B9 complete causal native E/F attribution; NEXT P4B10 width sweep (2026-11-18)
 
 - [x] [frozen P4B9 prereg](ENGINE001_B1R_P4B9_NATIVE_FAR3_ATTRIBUTION_PREREG_2026-11-18.md) frozen before code, original C192/P4B8 TRIM50 source and mask, native true far>3 logical gate, caps64 E/F group and16 LOO.
