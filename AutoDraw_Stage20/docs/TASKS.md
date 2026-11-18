@@ -1,3 +1,8 @@
+## ENGINE-001 B3 completed native Egret; full-image feasibility remains open (2026-11-18)
+
+- [x] B3 pre-registered genuine archived BoardPane WebGL width2/4 diagonal probe [CI44234300377](https://github.com/Kiddos19882/AutoDraw/actions/runs/44234300377), SHA `100e3432ee8f`: 7/7 E2 Python +20/20 Node reference tests PASS, E3 job SUCCESS, artifact14396257751 CRC+25/25 linked file SHA PASS. 12 actual native color-isolated captures. Strict safe-join 2/12 (zero foreign alpha24), 10/12 strict FAIL, **all12 within3 logical px owner depth and 0 outside ROI**, no game E4/CHALK.
+- [ ] **NEXT B4 E1/prereg:** evaluate actual Egret per-color native overlay under existing accepted 3logical px boundary tolerance, using complete region target, palette correctness, protected details, original V44-B LAST, resource limits and recognizability. B3 sampling is not full-fill validation. Do not retune B3 gate to PASS; do not launch production or expect 8-connectivity to imply cheaper CHALK.
+
 ## ENGINE-001 B3 active isolated native diagonal footprint (2026-11-18)
 
 - [x] B3 frozen protocol, source selection, test-only runner, 7 synthetic contracts and dedicated bounded Windows native Egret workflow recorded at commit `100e3432ee8ff8f41e3259b27b2d6bee71f29f2f`. Reuses original archived BoardPane WebGL renderer, B1 owner index map and protected details, widths2/4 only; production unaffected.

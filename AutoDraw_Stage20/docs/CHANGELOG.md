@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 B3 actual Egret diagonal brush evidence
+
+Added test-only B3 authentic BoardPane/WebGL source-pinned diagonal isolated width2/4 probe with original B1 source/protected masks, frozen fixture selection, unit contracts and Windows Actions. [CI44234300377](https://github.com/Kiddos19882/AutoDraw/actions/runs/44234300377) E2/E3 successful execution, 12/12 native traces, 2/12 conservative safe-join PASS vs 10/12 foreign-alpha failures; no foreign ink farther than3logical px in these narrow samples. No game runtime, no production integration or original V44 modification.
+
 ## 2026-11-18 — B2 negative report and E1 diagonal topology
 
 Verified B2 safe-area4/12 original-supported island cleanup ([CI44232121497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44232121497)), technical PASS but both source quality FAIL; 8/7 merges accepted. Added diagnostic 4-vs-8 same-swatch component topology and next research on genuine Egret round-brush footprint; original map, contour, production/master unchanged.
