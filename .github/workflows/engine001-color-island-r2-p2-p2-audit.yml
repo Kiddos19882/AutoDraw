@@ -1,0 +1,123 @@
+name: ENGINE-001 R2-P2-P2 source island and game32 support diagnostic A1
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color-island-r2-p2-p2-audit.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_audit.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_audit.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: autodraw-engine001-r2-p2-p2-a-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-palette-audit-a1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source (bounded)
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned source-only CPU dependencies
+        run: |
+          python -m pip install "numpy==2.3.5" "Pillow==12.3.0" "scipy==1.17.0" "scikit-image==0.26.0" "requests==2.32.5"
+          python -m pip freeze > "${{ runner.temp }}/p2-p2-a1-pip-freeze.txt"
+      - name: Run synthetic source-support tests and Markdown audit
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_audit.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_audit.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p2_p2_audit.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact frozen original M1 artifact (hash-bound)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,os,requests
+          artifact_id=14388687061
+          sha='8bedc496bf01cf7205ecc8ceb7be8eb0f68b751b11c53ea67dbdd3982c7fe583'
+          r=requests.get(f'https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{artifact_id}/zip',
+              headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                       'Accept':'application/vnd.github+json','User-Agent':'AutoDraw-P2P2-A1'},timeout=180)
+          r.raise_for_status()
+          if hashlib.sha256(r.content).hexdigest()!=sha:
+              raise ValueError('BLOCKED_M1_FROZEN_ARCHIVE_IDENTITY')
+          (Path(os.environ['RUNNER_TEMP'])/'M1_original_exact.zip').write_bytes(r.content)
+          print('Pinned M1 artifact verified SHA256',sha)
+          PY
+      - name: Compute non-destructive source region vs game32 swatch support diagnosis
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_audit.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --m1-archive "$RUNNER_TEMP/M1_original_exact.zip" \
+            --output "$RUNNER_TEMP/engine001-r2-p2-p2-a1"
+          cp "$RUNNER_TEMP/p2-p2-a1-pip-freeze.txt" "$RUNNER_TEMP/engine001-r2-p2-p2-a1/environment-pip-freeze.txt"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path(os.environ['RUNNER_TEMP'])/'engine001-r2-p2-p2-a1'
+          r=json.loads((d/'report.json').read_text('utf8'))
+          assert r['experiment']=='ENGINE001_COLOR_ISLAND_R2_P2_P2_SOURCE_SUPPORT_AUDIT_A1'
+          assert r['status']=='DIAGNOSTIC_PASS_IMAGE_QUALITY_NOT_VALIDATED'
+          assert r['github_sha']==os.environ['GITHUB_SHA'] and r['github_run_id']==os.environ['GITHUB_RUN_ID']
+          assert r['m1_original_zip_sha256']=='8bedc496bf01cf7205ecc8ceb7be8eb0f68b751b11c53ea67dbdd3982c7fe583'
+          assert r['source_sha256']=='07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a'
+          assert r['palette_git_blob_sha']=='461b5f3725b9b79888ad36e807b3cf4c9e445e98'
+          assert r['frozen_G32_index_sha256']=='b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637'
+          assert r['no_original_or_G32_pixels_changed'] and r['new_candidate_RGB']=='NOT_RUN'
+          assert r['summary']['source_singletons']==179 and r['summary']['protected_singletons']==81
+          assert r['summary']['diagonal_only_singletons']==83 and r['summary']['fully_8_isolated_singletons']==28
+          assert r['summary']['B0_white_source_foreground_pixels']==3929
+          assert r['summary']['chroma_suspect_at_source_singletons']<=r['summary']['chroma_suspect_pixels']
+          assert len(r['game32_swatch_diagnostics'])==32
+          assert r['production_accepted'] is False and r['exact_CHALK'] is None
+          for name,sha in r['files_sha256'].items():
+              assert hashlib.sha256((d/name).read_bytes()).hexdigest()==sha,name
+          print('P2-P2-A1 technical status',r['status'])
+          print('P2-P2-A1 source region/suspect counts:',r['summary'])
+          print('P2-P2-A1 report sha256:',hashlib.sha256((d/'report.json').read_bytes()).hexdigest())
+          PY
+      - name: Record explicit blocked run (if necessary)
+        if: failure()
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=Path(os.environ['RUNNER_TEMP'])/'engine001-r2-p2-p2-a1'
+          d.mkdir(exist_ok=True,parents=True)
+          if not (d/'report.json').exists():
+              (d/'ci-failure.json').write_text(json.dumps({
+                  'status':'BLOCKED_R2_P2_P2_A1_TECHNICAL_OR_PROVENANCE',
+                  'github_sha':os.getenv('GITHUB_SHA'),'github_run_id':os.getenv('GITHUB_RUN_ID'),
+                  'no_pixels_recolored':True,'production_accepted':False,
+                  'native_Egret':'NOT_RUN'},indent=2)+'\n')
+          PY
+      - name: Archive reproducible source-vs-swatch mismatch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-r2-p2-p2-a1-source-vs-game32-diagnostic
+          path: ${{ runner.temp }}/engine001-r2-p2-p2-a1/
+          if-no-files-found: warn
+          retention-days: 30
