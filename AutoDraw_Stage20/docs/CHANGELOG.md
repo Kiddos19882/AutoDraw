@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 R2 N2 optional source diagnostic; P2 independent plan
+
+Added safe optional BiRefNet soft-alpha merge ranking N2 with genuine frozen ONNX-mask replay, 9 unit contracts and CI; [CI44212777049](https://github.com/Kiddos19882/AutoDraw/actions/runs/44212777049) technical SUCCESS, source quality FAIL, negative evidence kept. Created [R2-P2 root-cause и протокол M1](ENGINE001_COLOR_ISLAND_R2_P2_ROOT_CAUSE_AND_NUMERICAL_REBASE_PROTOCOL_2026-11-18.md) for separately preregistered stable source-Lab medoid and fixed original gradient scoring; preserves all frozen P1 thresholds and avoids more model downloads.
+
 ## 2026-11-18 — ENGINE-001 R2-P1 M0/N1 source-only controlled experiments
 
 Added original RGB fine-partition mathematical M0, synthetic tests and bounded CI. Added N1 using original pretrained S4 DINOv2 *dense feature replay* only as eligible mathematical merge ranking, with explicit original artifacts/shape/label checks and negative numerical render-drift handling. M0 E3 PASS/source quality FAIL; N1 E3 PASS/source quality FAIL (27 changed eligible decisions but slightly worse source mean ΔE00, 78px archived M0 RGB render mismatch). All 24 unit contracts and original data hashes validated; R1/P1 gates and V44-B410 LAST unchanged; no production or native tests. Next research requires new R2-P2 ID/prereg.
