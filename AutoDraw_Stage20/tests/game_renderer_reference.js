@@ -2486,7 +2486,7 @@
 
   // ENGINE-001 V35 pilot2 ONLY: paint width2 first, then V18-B detail width1.
   // Same real archived Egret BoardPane/WebGL renderer; V5 API remains unchanged.
-  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false, allowV43WideBrush=false, allowV43P4=false, allowV43P4B1=false) {
+  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false, allowV43WideBrush=false, allowV43P4=false, allowV43P4B1=false, allowB4Game32AndDetails=false) {
     if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
       throw new Error("V35 requires 1..3000 bounded strokes.");
     }
@@ -2502,8 +2502,8 @@
       const isFill=allowV43P4B1 ? /^p4-b1-[4-7]-[0-9]{5}$/.test(stroke.strokeId) : allowV43P4 ? /^p4-b0-[4-7]-[0-9]{5}$/.test(stroke.strokeId) : /^icon-[0-9]+$/.test(stroke.strokeId);
       const isDetail=/^detail-v18-B-[0-9]+$/.test(stroke.strokeId);
       if ((!isFill && !isDetail) ||
-          (isFill && !((allowV43P4 || allowV43P4B1) ? [2,4,6,10].includes(stroke.width) : allowV43WideBrush ? [2,4,6].includes(stroke.width) : stroke.width===2)) ||
-          (isDetail && (stroke.width!==1 || (!allowV36SourceColors && !allowV43P4 && !allowV43P4B1 && stroke.colorRgb!==0x31262B)))) {
+          (isFill && !(allowB4Game32AndDetails ? [2,4,6,8,10,15,30].includes(stroke.width) : (allowV43P4 || allowV43P4B1) ? [2,4,6,10].includes(stroke.width) : allowV43WideBrush ? [2,4,6].includes(stroke.width) : stroke.width===2)) ||
+          (isDetail && (stroke.width!==1 || (!allowV36SourceColors && !allowV43P4 && !allowV43P4B1 && !allowB4Game32AndDetails && stroke.colorRgb!==0x31262B)))) {
         throw new Error("V35 source-bound layer or native width mismatch.");
       }
       if (isDetail) detailStarted=true;
@@ -2532,7 +2532,8 @@
       throw new Error("V35 native Egret Stage geometry mismatch.");
     }
     return {
-      schema:allowV43P4B1 ? "ENGINE001_V43P4_B1_OWNER_CONSTRAINED_FILL_NATIVE" :
+      schema:allowB4Game32AndDetails ? "ENGINE001_B4_FULL_GAME32_PAINT_AND_V44_DETAIL_NATIVE" :
+      allowV43P4B1 ? "ENGINE001_V43P4_B1_OWNER_CONSTRAINED_FILL_NATIVE" :
       allowV43P4 ? "ENGINE001_V43P4_FULL_ADAPTIVE_FILL_NATIVE" :
       allowV43WideBrush ? "ENGINE001_V43P2A_NATIVE_WIDE_INTERIOR" :
         allowV36SourceColors ? "ENGINE001_SOURCE_COLOR_CONTOUR_V36" :
@@ -2546,6 +2547,23 @@
       sceneDiagnostics:result.sceneDiagnostics,
       webglPngDataUrl:result.canvas.toDataURL("image/png")
     };
+  }
+
+  // B4 opt-in real WebGL: original 17-game-color paint plus 410 historical
+  // contours LAST. Original RGB colors remain allowed only for detail class100.
+  // Source identities and palette-valid detail recolor are independently pinned
+  // in B4's Python native runner; legacy V35/V43 defaults are unchanged.
+  function renderB4FullGame32AndDetailProbe(strokes) {
+    if (!Array.isArray(strokes) || !strokes.length) throw new Error("B4 requires strokes.");
+    const owners=new Set([4,5,6,10,11,14,15,16,17,19,20,22,23,27,28,29,31]);
+    for (const stroke of strokes) {
+      const detail=/^detail-v18-B-[0-9]+$/.test(stroke.strokeId||"");
+      if (detail ? (stroke.colorIndex!==100 || stroke.width!==1) :
+          (!/^icon-[0-9]+$/.test(stroke.strokeId||"") || !owners.has(stroke.colorIndex))) {
+        throw new Error("B4 invalid owner or detail identity.");
+      }
+    }
+    return renderV35LayeredColorProbe(strokes, false,false,false,false,true);
   }
 
   // V36 isolated color-only variation; same actual BoardPane/Egret paths and widths.
@@ -2797,6 +2815,7 @@
   api.renderV43WideInteriorProbe = renderV43WideInteriorProbe;
   api.renderV43P4FullAdaptiveProbe = renderV43P4FullAdaptiveProbe;
   api.renderV43P4B1OwnerConstrainedProbe = renderV43P4B1OwnerConstrainedProbe;
+  api.renderB4FullGame32AndDetailProbe = renderB4FullGame32AndDetailProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
