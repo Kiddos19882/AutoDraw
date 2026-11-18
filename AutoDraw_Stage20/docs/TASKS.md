@@ -1,3 +1,11 @@
+## ENGINE-001 / B1-R-P3D 2026-11-18: new 8/8 numerical source PASS, visual game32 review NEXT
+
+- [x] DEC-037 user visual acceptance BOTH P3B A/B, identical 32-color preview maps; all four approved P2D source inputs preserved.
+- [x] P3C strict/local original-source cleanup [CI44288257200](https://github.com/Kiddos19882/AutoDraw/actions/runs/44288257200) 13/13 E2, E3 SUCCESS but **8/8 NO_MATERIAL_ISLAND_GAIN**; source protection 88.82%; independent ZIP CRC/55 hashes PASS. Frozen prereg thresholds remain.
+- [x] New independent [P3D original-edge mask-only prereg](ENGINE001_B1R_P3D_SOURCE_EDGE_MASK_ABLATION_PREREG_2026-11-18.md) BEFORE image runner; reuse unchanged P3C T_LOCAL and original/source palette; 11 synthetic tests + CI. [Valid CI44290366441](https://github.com/Kiddos19882/AutoDraw/actions/runs/44290366441) exact `8d5859254882468af17ce206c256bcb2d12abc57`: 11/11 E2 PASS / E3 SUCCESS; first technical negative CI44290255339 preserved. [One ZIP artifact14420417870](https://github.com/Kiddos19882/AutoDraw/actions/runs/44290366441/artifacts/14420417870) SHA256 `9441d2d0b68672bc5fdbef5edf68f4560fecac3beec1fb37c2c4fb28880b8ca1`, CRC/56 report-member hashes PASS. All **8/8 P3D numerical source gates PASS** incl frozen ≥5% tiny reduction: 298–351 fewer of≈4.9k source-color islands, 6.04–7.12%; original ROI and source fidelity gates unchanged.
+- [ ] **NEXT USER VISUAL REVIEW of P3D one ZIP**: `REVIEW_C_192_D_COMPONENT24_FIVE_WAY.png`, `REVIEW_C_096_D_BORDER_FIVE_WAY.png` and remaining two, enlarged face/hand ROIs. Assess subtle source-unsupported pink/orange, hair/suit chromatic drift, preserved eyes, outlines and contrast; do not auto-pick E vs F or C096 vs C192 without visual review.
+- [ ] Only after P3D visual decision: confirm **engine128 runtime palette availability** and valid UI/color calibration/fail-closed mapping, then native Egret round brush coverage/leakage, E4/E5/actual run-bound `post.pointCount-pre.pointCount` CHALK. No production/master changes; small island count not interchangeable with paint cost.
+
 ## ENGINE-001 / B1-R-P3C (2026-11-18) — visual A/B accepted, original-source island coherence NEXT
 
 - [x] DEC-037: пользователь визуально одобрил **и A_BALANCED, и B_FACE_DETAIL** P3B; оба проходят дальше; одинаковый map confirmed by P3B 8/8 source screen. No native/CHALK approval.
