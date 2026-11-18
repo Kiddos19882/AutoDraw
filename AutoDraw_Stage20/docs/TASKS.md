@@ -1,3 +1,10 @@
+## ENGINE-001 P4B2 native edge repair partial and P4B3 source grid phase next (2026-11-18)
+
+- [x] [P4B2 CI44306515799](https://github.com/Kiddos19882/AutoDraw/actions/runs/44306515799) E2 18+18 Python/20 JS PASS, E3 archived Egret technical SUCCESS; E native98.0418%, F98.0741%, **both below frozen99 quality FAIL**, far outside owner beyond3logicalpx0, source unchanged, budget250/500 exhausted. [ZIP14428926339](https://github.com/Kiddos19882/AutoDraw/actions/runs/44306515799/artifacts/14428926339) SHA256 68f57c7589c4da85b9d9d2d341d0b284d4e707e61dec810b5b79fa395f43c5bc CRC/28 SHA PASS; preserve first CI44305996839 E2 17/18 FAIL, no native.
+- [x] Native source-only remaining missing E353 (96 logical cells), F347 (93 cells); E173/F167 additional backing owner pixels needed at fixed99%, x mod3=2 residual bias. Do not assume model coverage or CHALK.
+- [x] Independent [P4B3 prereg](ENGINE001_B1R_P4B3_NATIVE_GRID_PHASE_PREREG_2026-11-18.md) before code; three fixed +0.25 subpixel shifts of correction-only strokes (x, y, xy), no extra vertices, exact source-owner validation and Egret rerender, original99%/3logical gates unchanged.
+- [ ] P4B3 E2/CI E3 6 true native scenes and one ZIP; then expand multiple owner zones/full RGB and new original-only contour. No E4/E5/exact CHALK.
+
 ## ENGINE-001 P4B1 frozen native negative; P4B2 one-pass edge feedback NEXT (2026-11-18)
 
 - [x] Source-recomputed P4B1 A oriented vs B contour-hybrid research, original 4×E/F model and 4 real Egret scenes C192 D_COMPONENT24. [CI44303577898](https://github.com/Kiddos19882/AutoDraw/actions/runs/44303577898) E2 18/18 JS20/20 E3 technical SUCCESS; quality all4 <99% PASS gate, far leakage >3=0. [ZIP artifact14426183749](https://github.com/Kiddos19882/AutoDraw/actions/runs/44303577898/artifacts/14426183749) independent CRC/28 hashes PASS, SHA d0c3ad6de4051d9f5c3d5ea5a79d6dff31b0b6e933e6bc188af7d4959257bf80.
