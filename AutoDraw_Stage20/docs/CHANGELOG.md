@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 R2-P1 M0/N1 source-only controlled experiments
+
+Added original RGB fine-partition mathematical M0, synthetic tests and bounded CI. Added N1 using original pretrained S4 DINOv2 *dense feature replay* only as eligible mathematical merge ranking, with explicit original artifacts/shape/label checks and negative numerical render-drift handling. M0 E3 PASS/source quality FAIL; N1 E3 PASS/source quality FAIL (27 changed eligible decisions but slightly worse source mean ΔE00, 78px archived M0 RGB render mismatch). All 24 unit contracts and original data hashes validated; R1/P1 gates and V44-B410 LAST unchanged; no production or native tests. Next research requires new R2-P2 ID/prereg.
+
 ## 2026-11-18 — ENGINE-001 R2-0 verification and frozen R2-P1
 
 Completed E1 pinned-S4/S5 archive verification, confirming real DINOv2 dense features and BiRefNet soft alpha reusable from immutable artifacts. Registered [R2-P1 frozen protocol](ENGINE001_COLOR_ISLAND_R2_P1_FROZEN_PRECOMPUTED_NEURAL_MERGE_PROTOCOL_2026-11-18.md) before first R2 source run: original RGB and detail protected M0 math baseline, genuine DINOv2 N1 eligible-merge ranking, independent BiRefNet N2; same source guards and negative evidence. No new R2 model, code or native tests.
