@@ -1,3 +1,7 @@
+## 2026-11-18 — B2 negative report and E1 diagonal topology
+
+Verified B2 safe-area4/12 original-supported island cleanup ([CI44232121497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44232121497)), technical PASS but both source quality FAIL; 8/7 merges accepted. Added diagnostic 4-vs-8 same-swatch component topology and next research on genuine Egret round-brush footprint; original map, contour, production/master unchanged.
+
 ## 2026-11-18 — ENGINE-001 B1 game32 source-support candidates (negative)
 
 Added test-only B1 original RGB chroma/brightness guard and deterministic protected-seam Potts candidate for 32 actual game swatches, synthetic contracts and independent GitHub workflow. [CI44230985963](https://github.com/Kiddos19882/AutoDraw/actions/runs/44230985963) E2/E3 technical PASS, all four candidates SOURCE_GATE_FAIL on nonwhite connected-component/singleton counts; real V44-B410, production, master, Stage6 unchanged. Preserve negative PNG/labels for new separately preregistered B2 source-safe cleanup.

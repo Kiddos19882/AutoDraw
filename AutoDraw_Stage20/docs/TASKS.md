@@ -1,3 +1,9 @@
+## ENGINE-001 R2-P2-P2 B2 completed; B3 native diagonal feasibility open (2026-11-18)
+
+- [x] B2 frozen source-safe cleanup [CI44232121497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44232121497), `e5b9f1553b2fa11d473e1e558cfcb983edbdc903`, E2 6/6 PASS, full E3 SUCCESS, artifact14396035800 CRC/15-of-15 report-linked SHA PASS; B2_SAFE4 only 8 donor merges/8 pixels (1427→1417 components), B2_SAFE12 7 merges/11 pixels (→1418). Both predeclared SOURCE_GATE_FAIL; full PNG/ledgers retained, no game/CHALK.
+- [x] Read-only E1 4-versus-8 connectivity diagnostic on exact B2 index archive, excluded index30 white: G32 1284/924, B1 1427/816, B2_SAFE4 1417/814. This counts logical pixel components, not gameplay strokes.
+- [ ] **NEXT B3 E1:** inspect existing genuine archived BoardPane round-brush rendering/coordinates and 4-vs-8 diagonal same-swatch adjacency; prereg native footprint experiment for diagonal travel only if source inspection supports safe method. Need E3 native coverage/leakage then E4 live and exact CHALK; no additional generic tiny-island cleaning until evidenced. Human visual recognition review remains pending.
+
 ## ENGINE-001 R2-P2-P2-B1 game32 source support — completed negative (2026-11-18)
 
 - [x] Frozen independent B1 P0→32-game-swatch protocol and original P0/M1/V44 inputs; [CI44230985963](https://github.com/Kiddos19882/AutoDraw/actions/runs/44230985963) SHA `774dedb4f6`, 7/7 unit PASS, full E3 SUCCESS, artifact14394179902 CRC+19/19 SHA PASS, all four source candidates `SOURCE_GATE_FAIL`. CHROMA12_SPATIAL chroma suspects0 vs1368 baseline but 1427 components/883 singletons vs G32 1284/779; P0 nearest32 increases components to2210. Native/game/CHALK NOT_RUN.
