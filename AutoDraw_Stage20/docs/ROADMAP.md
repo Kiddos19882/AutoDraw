@@ -1,3 +1,11 @@
+## Очередность ENGINE-001 / B1-R после P4B8 (2026-11-18)
+
+1. **P4B8 finished native:** [P4B8 native CI44373769534](https://github.com/Kiddos19882/AutoDraw/actions/runs/44373769534) original-only E/F 8 actual arm images, E2 16/16 and E3 technical PASS, 8/8 full painting quality FAIL. TRIM50 E/F protected foreign alpha24 0/0 and unchanged owner83.23/83.13%, residual far>3logical 4/2, alpha11 on exact two protected targets each; source and limits unchanged. [P4B8 original-source native one ZIP14461112045](https://github.com/Kiddos19882/AutoDraw/actions/runs/44373769534/artifacts/14461112045).
+2. **P4B9 E0 (NOT_RUN):** prereg and diagnose remaining native far3 contributors in TRIM50 versus source, then separate coverage-rescue candidate design for ~16.8% missing owner under 99% requirement. Actual Egret native safety not OpenCV alone; preserve source/contour and all failures.
+3. **Later:** validate original all4 P2D sources, original E/F, each color owner and newly source-aligned outline; only after quality gates seek real E4 and exact game CHALK. Palette work deferred per DEC-039; G32/V44 historical only.
+
+*Older roadmaps below are frozen historical sequences, not current open priorities.*
+
 **P4B7 CI performance follow-up (2026-11-18):** [optimized P4B7 native CI44368676034](https://github.com/Kiddos19882/AutoDraw/actions/runs/44368676034) at `6285200546a16aeb97b82cf26ff81a35954b3ac1` **SUCCESS**. Native Egret E/F full-plan alpha array parity vs original captured P4B6 PASS; identical two protected target backing coordinates and same source strokes E `icon-100,icon-114`, F `icon-98,icon-114`, individual leave-one-out verified again; P4B7 E2 **17/17 PASS**, inherited checks PASS. End-to-end CI ~6min vs prior ~18min (different runs; observed, not a guaranteed speed SLA). New reusable Firefox runner emits per-scene progress and real blank scenes; not altered Egret brush/renderer/production. [optimized P4B7 archive14456854486](https://github.com/Kiddos19882/AutoDraw/actions/runs/44368676034/artifacts/14456854486), 248/248 member hashes CI verified, uploader-reported ZIP SHA256 `639941b875699c1cec9578b81af590d39931bf18c6db4e70323c163c45530e36` (independent download/CRC NOT_RUN). Original painting quality gates remain 4/4 FAIL; no new source, E4/E5/exact CHALK.
 
 ## Текущая очередность после P4B7 native attribution (2026-11-18)
