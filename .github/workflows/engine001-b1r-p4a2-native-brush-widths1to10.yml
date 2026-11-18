@@ -62,7 +62,7 @@ jobs:
           }
           for path, expected_blob in inputs.items():
             raw=subprocess.check_output(["git","show","HEAD:"+path])
-            blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\\0"+raw).hexdigest()
+            blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
             assert blob==expected_blob,(path,blob,expected_blob)
             p=Path(path)
             before=p.read_bytes()
