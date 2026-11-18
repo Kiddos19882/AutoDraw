@@ -1,3 +1,7 @@
+## 2026-11-18 — source micro-island vs unsupported game32 swatch diagnostic
+
+Added preregistered test-only `ENGINE001_COLOR_ISLAND_R2_P2_P2_SOURCE_SUPPORT_AUDIT` runner, 15 regression tests and isolated CI; [CI44220144140](https://github.com/Kiddos19882/AutoDraw/actions/runs/44220144140) E3 technical PASS with verified original M1 archive hashes. M1 source singletons and false-looking G32 swatch fragments measured separately, no silent recolor/removal. Same original V44-B410, production, master and frozen negative outcomes. Next independent B1 source-supported region color plan.
+
 ## 2026-11-18 — R2-P2-P1 stable medoid and fixed-edge mathematics
 
 Added independent source-only M1 with numerical CIELAB medoid tie at 1e-9 squaredLab, fixed original Sobel90 threshold comparisons, complete 4/8-connected island diagnostics and pinned M0 baseline provenance. [CI44216262024](https://github.com/Kiddos19882/AutoDraw/actions/runs/44216262024) technical 26/26 PASS, source FAIL because mean ΔE worsens when merging; all old source errors/frozen history preserved. Next E1 classify 179 singleton regions rather than blindly delete. No production or native change.
