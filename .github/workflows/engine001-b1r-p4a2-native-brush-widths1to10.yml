@@ -50,6 +50,28 @@ jobs:
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
           python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore exact pinned Git blob bytes of game engine and renderer on Windows
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          inputs={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+          }
+          for path, expected_blob in inputs.items():
+            raw=subprocess.check_output(["git","show","HEAD:"+path])
+            blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\\0"+raw).hexdigest()
+            assert blob==expected_blob,(path,blob,expected_blob)
+            p=Path(path)
+            before=p.read_bytes()
+            p.write_bytes(raw)
+            assert p.read_bytes()==raw
+            print("P4A2_PINNED_ORIGINAL_GIT_BLOB",path,
+                  "bytes",len(raw),"checkout_bytes_different",before!=raw,
+                  "SHA",blob)
+          PY
       - name: Original-only P3D E/F with true Egret WebGL all ten sizes
         shell: bash
         env:

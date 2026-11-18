@@ -19,3 +19,7 @@ Baseline: source original \`testImages/wV6VeZI9S1Y.png\` SHA256 \`07cc4568cb5e90
 ## Первая техническая попытка после freeze (2026-11-18)
 
 [CI44297339997](https://github.com/Kiddos19882/AutoDraw/actions/runs/44297339997) at `5e9e8b4a6e0f5df483aba72881598961a4c0a5f3`: E2 Python **14/14 PASS**, existing JS Node **20/20 PASS**; Markdown index **FAIL**: missing this new prereg link in top docs/README.md; original-only P3D and all native widths **NOT_RUN** because prior step failed. No image-quality FAIL and no ZIP evidence generated. Fix only docs navigation and workflow watch of prereg (no geometry/method/threshold change). Preserve this negative technical CI.
+
+## Вторая техническая попытка после freeze (2026-11-18)
+
+[CI44297723475](https://github.com/Kiddos19882/AutoDraw/actions/runs/44297723475), SHA `db3a1c528d7af305f23a0833ea66442f7177a549`: E2 Python14/14, JS20/20, Markdown integrity PASS. **NATIVE NOT_RUN**: fail-closed P3B input source pin on Windows `BLOCKED_P3B_ENGINE_BLOB_SHA_OR_SIZE` at first engine read, before source image/any renderer; likely Windows Git text EOL conversion, as `.gitattributes` already pins `game_renderer_reference.js -text` but lacks the same marking for `gameEngine/main.min_653f95bc.js`. Fix only CI restore pinned bytes directly from `git show HEAD:path` for engine/renderer with exact Git blob SHA verification, no source algorithm or quality gate changes and no production repository file modification. Retain this technical FAIL; not an Egret width result.
