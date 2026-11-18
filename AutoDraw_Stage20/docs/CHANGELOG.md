@@ -1,3 +1,8 @@
+## 2026-11-18 — ENGINE-001 B1-R-P2B source-original detail layer experiment
+
+- Isolated original-RGB residual detail source overlay using independently recomputed SLIC source medoids and only original edge/color evidence; no G32/V44/M1 source candidates, no production changes.
+- [CI44261071470](https://github.com/Kiddos19882/AutoDraw/actions/runs/44261071470) `699c5a641db31ff6f9be4e82bf0d3397109091d0`: 9/9 E2 tests and E3 SUCCESS, archive CRC/25-of-25 SHA PASS; prereg source gates PASS for both K variants but visual user acceptance pending. Combined output >11k RGB despite flat medoid 252 colors; no game32/native/CHALK promotion. Initial uniform-fixture CI FAIL preserved.
+
 ## 2026-11-18 — ENGINE-001 B1-R-P2 test-only joint RGB segmentation and source contour
 
 - Added independently preregistered source-only P2-V1 script, 10 synthetic regression guards and bounded GitHub Actions. Immutable original source medoids per region, own source-edge-linked contour previews; forbidden old G32/V44/M1 maps never used as candidate.
