@@ -1,3 +1,8 @@
+## 2026-11-18 — DEC-036 and ENGINE-001 B1-R-P3 actual game32 research negative
+
+- User visual signoff approves **both P2D guards D_BORDER and D_COMPONENT24** across source C096/C192 for next stage; DEC-036, old P2D frozen outputs unchanged, no forced winner.
+- Added prereg separate P3 original-first game32 with 2 ablations per 4 approved RGB candidates, deterministic 32 real game swatch pin, protected-source hue/chroma abstention instead of unsupported pink, 13 synthetic tests, one ZIP artifact. [CI44278535963](https://github.com/Kiddos19882/AutoDraw/actions/runs/44278535963) SHA `c1bfbfa7b85d6cd86e793f81fb9f54e92fb8039d`, E2 13/13, E3 SUCCESS, CRC/59 file SHA PASS. **8/8 original-image gates FAIL**, primarily male face and >720 unresolved on guarded: no game32 or native acceptance. Further full swatch provenance E1 before new variants. No G32 prior map, V44, master or production changes.
+
 ## 2026-11-18 — ENGINE-001 B1-R-P2D (test-only halo repair, DEC-035)
 
 - Recorded user's **qualified** positive visual response to both P2C variants and identified source-level artifact: original pale hair/background pixels were darkened by J_FINE source-region medoid *before* P2C. Original P2B/P2C frozen baselines not overwritten; no old G32/V44 inputs.
