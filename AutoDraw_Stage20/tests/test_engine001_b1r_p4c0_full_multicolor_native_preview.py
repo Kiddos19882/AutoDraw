@@ -29,7 +29,7 @@ class P4C0Contracts(unittest.TestCase):
     def test_03_original_palette_source_fail_closed(self):
         game=np.zeros((128,3),np.uint8)
         index=np.full((240,150),6,np.uint8)
-        chosen=[6]+list(range(1,32))
+        chosen=[6]+[i for i in range(33) if i != 6][:31]
         p4c0.validate_source(index,game,chosen)
         index[100,100]=115
         with self.assertRaisesRegex(ValueError,"PALETTE"):
@@ -107,7 +107,7 @@ class P4C0Contracts(unittest.TestCase):
         self.assertIn('"exact_CHALK":None',text)
         self.assertIn('native_batch(',text)
         self.assertIn('renderP4A2BrushWidths1to10Probe(arguments[0])',text)
-        self.assertIn('not actual',text.lower() if "not actual" in text.lower() else "not actual")
+        self.assertIn('"production_promotion":False',text)
 
 
 if __name__=="__main__":
