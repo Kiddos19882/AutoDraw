@@ -18,7 +18,7 @@ from scipy import ndimage
 from skimage import color, filters, measure, morphology
 
 EXPERIMENT = "ENGINE001_B1R_P1_FULLRGB_EDGE_AWARE_A"
-SOURCE_SHA256 = "07cc4568cb5e90d9514bc6f2112fee623f87f8fd0cea02fa517b04108e502a"
+SOURCE_SHA256 = "07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
 FULL_SHAPE = (320, 200, 3)
 LOGICAL_WH = (150, 240)
 ROIS_FULL = {
