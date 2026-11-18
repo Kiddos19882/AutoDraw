@@ -1,0 +1,140 @@
+name: ENGINE-001 B1-R P4B2 one true-native source edge gap correction
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4b2-native-edge-gap.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4b2_native_edge_repair.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py'
+      - 'AutoDraw_Stage20/tests/game_renderer_reference.js'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4B2_NATIVE_EDGE_GAP_REPAIR_PREREG_2026-11-18.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4b2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-native-measured-boundary:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned native Egret and original-image scientific dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: P4B2 E2 regression, inherited P4B1 and real Egret Node tests, docs audit
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py AutoDraw_Stage20/tests/test_engine001_b1r_p4b2_native_edge_repair.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b2_native_edge_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore pinned Git source bytes, no Windows checkout text conversion
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          blobs={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":
+                "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":
+                "76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":
+                "b95aa361cf2ec94d5fa28e7309bd3e4af15eca93"
+          }
+          for path, want in blobs.items():
+            raw=subprocess.check_output(["git","show","HEAD:"+path])
+            got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+            assert got==want,(path,got,want)
+            Path(path).write_bytes(raw)
+            assert Path(path).read_bytes()==raw
+            print("PINNED_P4B2_SOURCE_BLOB",path,got)
+          PY
+      - name: Same-run P4B1 E3 negative baseline and P4B2 real source-edge correction E and F
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output "$RUNNER_TEMP/engine001-b1r-p4b2"
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p4b2"
+          r=json.loads((root/"report.json").read_text(encoding="utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4B2_NATIVE_EDGE_GAP_REPAIR_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["engine_git_blob_sha1"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["renderer_git_blob_sha1"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["baseline_P4B1_runner_blob_sha1"]=="b95aa361cf2ec94d5fa28e7309bd3e4af15eca93"
+          assert r["parent_same_run_quality_gate"]=="NATIVE_COMPONENT_QUALITY_NOT_ALL_PASS"
+          assert r["P4B1_recomputed_current_run_original_only"] is True
+          assert r["P3D_original_only_all_EF_quality_pass"] is True
+          assert r["legacy_G32_P4c1_V44_as_input"] is False
+          assert r["read_frozen_P4B1_P3D_ZIPs_for_candidate"] is False
+          assert r["native_two_EF_replay_scenes_complete"] is True
+          assert r["new_widths_only"]==[1,2]
+          assert r["one_native_feedback_round"] is True
+          assert r["fixed_cumulative_max_strokes"]==250
+          assert r["fixed_cumulative_max_synthetic_vertices_NOT_CHALK"]==500
+          assert r["coverage_alpha24_gate"]==.99
+          assert r["far_leakage_logical_px_gate"]==3.0
+          assert r["methods"]==["E_SOBEL90","F_SOBEL90_LAB12"]
+          assert r["actual_game_E4"]=="NOT_RUN"
+          assert r["independent_E5"]=="NOT_RUN"
+          assert r["exact_game_run_bound_CHALK"] is None
+          assert r["production_promotion"] is False
+          assert r["result"] in {"NATIVE_EDGE_REPAIR_PASS",
+                                 "NATIVE_EDGE_REPAIR_PARTIAL_OR_FAIL"}
+          for name,x in r["methods_results"].items():
+            assert x["real_native_Egret_BoardPane"] is True
+            assert x["changed_source_RGB_or_game_index_pixels"]==0
+            assert x["correction_decision"]["combined_stroke_count"]<=250
+            assert x["correction_decision"]["combined_synthetic_vertices_NOT_CHALK"]<=500
+            assert x["native_no_coverage_regression"] is True or (
+                x["status"]=="NATIVE_EDGE_REPAIR_INCOMPLETE_OR_FAIL")
+            assert x["status"] in {"NATIVE_EDGE_REPAIR_PASS",
+                                   "NATIVE_EDGE_REPAIR_INCOMPLETE_OR_FAIL"}
+            print("P4B2_E3",name,x["status"],
+                  "before",x["original_A_native_before"]["24"]["native_component_coverage"],
+                  "after",x["corrected_native_after"]["24"]["native_component_coverage"],
+                  "added",x["correction_decision"]["additional_stroke_count"],
+                  "far",x["corrected_native_after"]["24"]["native_beyond3logicalpx_other_color_pixels"])
+          for file,sha in r["file_sha256"].items():
+            assert hashlib.sha256((root/file).read_bytes()).hexdigest()==sha,file
+          print("P4B2_ALL_FILES_SHA256_PASS",len(r["file_sha256"]))
+          print("P4B2_NATIVE_E3_COMPLETE_QUALITY_SEPARATE",r["result"])
+          print("NO_LIVE_GAME_NO_E4_E5_EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Always preserve one ZIP containing native before and after and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4b2-measured-edge-native-review-one-zip
+          path: ${{ runner.temp }}/engine001-b1r-p4b2/
+          retention-days: 30
+          if-no-files-found: warn
