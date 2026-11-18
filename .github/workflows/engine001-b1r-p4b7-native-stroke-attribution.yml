@@ -1,0 +1,122 @@
+name: ENGINE-001 B1-R P4B7 genuine Egret per-stroke protected attribution
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4b7-native-stroke-attribution.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4b7_native_stroke_attribution.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4B7_NATIVE_STROKE_ATTRIBUTION_PREREG_2026-11-18.md'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4b7-native-attribution
+  cancel-in-progress: true
+
+jobs:
+  per-stroke-native-egret:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned native-source and selenium dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: P4B7 E2 and pinned inherited P4B6 P4B5 P4B4 P4B2 P4B1 tests
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py AutoDraw_Stage20/tests/test_engine001_b1r_p4b7_native_stroke_attribution.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b7_native_stroke_attribution.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b6_source_protected_margin.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b5_protected_baseline_rebalance.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b4_boundary_tolerance_sweep.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b2_native_edge_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore exact original engine/renderer/parent runner source bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          expected={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py":"0053829480c6327ef5c541024593f6e0018aa35e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py":"6bde1a99ff200c55cd7929f7cea32eae0aba9178",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py":"2f9ca1756da58e7062fcae6c6c64c83e4db79ea9",
+          }
+          for path,required in expected.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==required,(path,actual,required)
+              Path(path).write_bytes(raw)
+              assert Path(path).read_bytes()==raw
+              print("P4B7_FROZEN_BLOB",path,actual)
+          PY
+      - name: Run source-recomputed P4B6 and native Egret attribution E and F
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4b7-work
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.p4b7-work")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4B7_NATIVE_STROKE_ATTRIBUTION_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["E3_true_native_Egret"] is True
+          assert r["p4b6_fresh_recomputed_from_original"] is True
+          assert r["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["parent_runner_git_blob"]=="2f9ca1756da58e7062fcae6c6c64c83e4db79ea9"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["frozen_coverage_gate"]==.99 and r["frozen_protected_foreign_gate"]==0
+          assert r["frozen_spill_gate_logical"]==3.0
+          assert r["result"] in ("NATIVE_ATTRIBUTION_COMPLETE","NATIVE_ATTRIBUTION_PARTIAL")
+          assert r["production_promotion"] is False and r["native_quality_pass_claim"] is False
+          assert r["E4_runtime"]=="NOT_RUN" and r["exact_CHALK"] is None
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,item in r["methods"].items():
+              assert item["full_native_protected_pixels"]==2
+              assert item["total_frozen_final_strokes"] in (214,212)
+              assert item["split_native_replays"]<=48
+              assert item["additional_native_loo_replays"]<=12
+              print("P4B7_NATIVE_RESULT",method,item["attribution_status"],
+                    "target_pixels",item["native_original_target_backing_yx"],
+                    "candidates",item["nonzero_native_contributor_indices"],
+                    "necessary",item["leave_one_out"])
+          for name,sha in r["file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print("P4B7_NATIVE_MANIFEST_PASS",len(r["file_sha256"]))
+          print("NOT_GAME_E4_NOT_EXACT_CHALK")
+          PY
+      - name: Preserve all source/native positive and negative evidence in one ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4b7-genuine-egret-attribution-one-zip
+          path: AutoDraw_Stage20/.p4b7-work/
+          retention-days: 30
+          if-no-files-found: warn
