@@ -131,6 +131,15 @@ def apply_source_bright_guard(original: np.ndarray,
         raise ValueError("BLOCKED_B1R_P2D_APPLY_SHAPE")
     if np.any(guard & original_ink_mask):
         raise ValueError("BLOCKED_B1R_P2D_GUARD_OVERLAPS_INK")
+    # Fail closed even if a future caller bypasses source_bright_guard():
+    # never turn a genuine dark contour or colored detail into background white.
+    if np.any(guard):
+        original_guard = original[guard]
+        spread = (np.max(original_guard, axis=1).astype(np.int16) -
+                  np.min(original_guard, axis=1).astype(np.int16))
+        if (np.any(np.min(original_guard, axis=1) < ORIGINAL_MIN_CHANNEL)
+                or np.any(spread > ORIGINAL_MAX_CHANNEL_SPREAD)):
+            raise ValueError("BLOCKED_B1R_P2D_NON_SOURCE_BRIGHT_MASK")
     corrected = base_full.copy()
     corrected[guard] = original[0, 0]
     if not np.array_equal(corrected[~guard], base_full[~guard]):
