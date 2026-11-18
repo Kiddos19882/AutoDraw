@@ -1,0 +1,111 @@
+name: ENGINE-001 R2-P1 original RGB mathematical M0 source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color-island-r2-p1-m0.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_m0.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color_island_r2_p1_m0.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-engine001-r2-p1-m0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  original-source-math-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source (bounded, no LFS/submodules)
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install mathematical CPU-only dependencies
+        run: |
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27" "selenium>=4,<5"
+      - name: M0 synthetic contracts and markdown audit
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_m0.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p1_m0.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p1_m0.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Run pinned original mathematical M0 (preserve negative outcomes)
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_m0.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-color-island-r2-p1-m0"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'engine001-color-island-r2-p1-m0'
+          r=json.loads((root/'report.json').read_text())
+          assert r['experiment']=='ENGINE001_COLOR_ISLAND_R2_P1_NEURAL_MERGE_REPLAY_M0'
+          assert r['github_sha']==os.environ['GITHUB_SHA']
+          assert r['github_run_id']==os.environ['GITHUB_RUN_ID']
+          assert r['source_sha256']=='07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a'
+          assert r['palette_git_blob']=='461b5f3725b9b79888ad36e807b3cf4c9e445e98'
+          assert r['frozen_g32_png_sha256']=='b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637'
+          assert r['params_frozen_before_first_run'] is True
+          assert r['source_gates']['exact_pinned_inputs'] is True
+          assert r['source_gates']['full_partition_36000_pixels'] is True
+          assert r['source_gates']['protected_region_ownership_unchanged'] is True
+          assert r['source_gates']['original_rgb_medoid_only'] is True
+          assert r['math_only'] is True and r['neural_features_used'] is False
+          assert r['S4_DINOv2_replay']=='NOT_RUN' and r['S5_P2_BiRefNet_replay']=='NOT_RUN'
+          assert r['game32_candidate']=='NOT_RUN'
+          assert r['status'] in ('SOURCE_RGB_VISUAL_PENDING', 'SOURCE_GATE_FAIL')
+          assert r['original_V44B_410_LAST']=='UNCHANGED_NOT_OVERLAID'
+          assert r['native_Egret']==r['game_E4']==r['independent_E5']=='NOT_RUN'
+          assert r['exact_CHALK'] is None and r['production_accepted'] is False
+          for f, expected in r['files_sha256'].items():
+              assert hashlib.sha256((root/f).read_bytes()).hexdigest()==expected, f
+          print('R2-P1 M0 result:',r['status'])
+          print('R2-P1 M0 merge:',r['merge']['merged_regions'],r['merge']['changed_pixels'])
+          print('R2-P1 M0 source quality:',r['M0_MERGED_RGB_quality'])
+          print('R2-P1 M0 source gates:',r['source_gates'])
+          print('R2-P1 M0 report SHA256:',hashlib.sha256((root/'report.json').read_bytes()).hexdigest())
+          PY
+      - name: Preserve technical CI failure metadata
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path=Path(os.environ['RUNNER_TEMP'])/'engine001-color-island-r2-p1-m0'
+          path.mkdir(exist_ok=True,parents=True)
+          if not (path/'report.json').exists():
+              (path/'ci-failure.json').write_text(json.dumps({
+                'status':'BLOCKED_R2_P1_M0_TECHNICAL_OR_CONTRACT',
+                'github_sha':os.getenv('GITHUB_SHA'),
+                'github_run_id':os.getenv('GITHUB_RUN_ID'),
+                'new_neural_model_inference':'NOT_RUN',
+                'production_accepted':False,
+              },indent=2)+'\n')
+          PY
+      - name: Preserve M0 evidence regardless of source quality
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color-island-r2-p1-m0-source-only
+          path: ${{ runner.temp }}/engine001-color-island-r2-p1-m0/
+          if-no-files-found: warn
+          retention-days: 30
