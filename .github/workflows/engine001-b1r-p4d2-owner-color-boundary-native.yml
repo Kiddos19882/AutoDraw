@@ -61,7 +61,7 @@ jobs:
               Path(path).write_bytes(raw)
               print("P4D2_FROZEN_SOURCE_PIN",path,actual)
           original=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
-          assert hashlib.sha256(original).hexdigest()=="07cc4568cb5e90d9514bc6f2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert hashlib.sha256(original).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
           PY
       - name: Render E F adaptive and scanline source-colored inner edges as fill Egret
         shell: bash
@@ -85,7 +85,7 @@ jobs:
           assert report["result"]=="ALL_EIGHT_OWNER_COLORED_NATIVE_EGRET_SCENES_COMPLETED"
           assert report["github_sha"]==os.environ["GITHUB_SHA"]
           assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
-          assert report["original_source_sha256"]=="07cc4568cb5e90d9514bc6f2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert report["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
           assert report["source_recomputed_current_run"]
           assert report["source"]=="C_192_D_COMPONENT24"
           assert report["no_dark_or_global_contour"]
