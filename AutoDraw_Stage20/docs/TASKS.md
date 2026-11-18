@@ -1,3 +1,9 @@
+## ENGINE-001 / B1-R-P2D source visual review approved for BOTH guards; P3 next (2026-11-18)
+
+- [x] **DEC-036 user approval, scope source RGB only:** D_COMPONENT24 и D_BORDER «оба проходят дальше» on P2D review ZIP. Preserve four candidates C096/C192×2 guards, no single forced champion, no historical G32/V44 candidate. Prior pending P2D user review is **closed at P2D source scope**, not game32/native.
+- [x] First P3 independent [prereg registered before new study](ENGINE001_B1R_P3_ORIGINAL_SOURCE_GAME32_PREREG_2026-11-18.md): input 4 recomputed accepted P2D RGB maps, actual32 game RGB swatches (not old G32 indices) and two mapping ablations each; no production code. E0 protocol complete, P3 E2/E3 yet NOT_RUN.
+- [ ] **NEXT** E2/E3 P3 original-first actual32 colors, source-vs-palette errors, new false magenta/purple island screening, unresolved/abstain. All 8 findings (including failures) in **one ZIP** for user. Game source visual success DOES NOT imply 32-color rendering success; no native Egret until new user palette acceptance.
+
 ## ENGINE-001 / B1-R-P2D finished original-only numeric gates; user review of fixed picture pending (2026-11-18)
 
 - [x] User visual feedback for previous P2C recorded as `BOTH_MOSTLY_GOOD_BUT_MARKED_DEFECT` (qualified initial, not final acceptance). Source-level defect DEC-035: original near-white background over top hair became J_FINE flat gray RGB(227,226,221) **before** K_DETAIL/P2C; corrected previous diagnosis. Frozen P2C remains intact.
