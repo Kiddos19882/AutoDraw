@@ -11,10 +11,17 @@ import json
 import os
 import shutil
 import tempfile
+import threading
+from contextlib import contextmanager
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from run_engine001_complex_holdout_v5 import read_webgl_result
 
 import run_engine001_b1r_p4b6_source_protected_margin as p4b6
 import run_engine001_b1r_p4b5_protected_baseline_rebalance as p4b5
@@ -33,6 +40,78 @@ MAX_LOO_REPLAYS = 12
 EXPECTED_TARGETS = 2
 ALPHA_GATE = 24
 EXPECTED_STROKES = {"E_SOBEL90": 214, "F_SOBEL90_LAB12": 212}
+
+
+@contextmanager
+def native_egret_session(workspace: Path):
+    """Same genuine Egret BoardPane renderer, reused Firefox (test-only).
+
+    Each render invokes the pinned JS method afresh; no path/width optimization,
+    raster emulation, production settings, or source transformation.
+    """
+    class Handler(SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=str(workspace), **kwargs)
+        def log_message(self, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    driver = None
+    try:
+        opts = Options()
+        opts.add_argument("-headless")
+        opts.set_preference("webgl.disabled", False)
+        opts.set_preference("webgl.force-enabled", True)
+        opts.set_preference("webgl.disable-fail-if-major-performance-caveat", True)
+        driver = webdriver.Firefox(options=opts)
+        driver.set_page_load_timeout(180)
+        driver.set_script_timeout(180)
+        driver.get(f"http://127.0.0.1:{server.server_port}/"
+                   "AutoDraw_Stage20/tests/game_renderer_reference.html"
+                   "?twoicons=home-envelope")
+        WebDriverWait(driver, 90).until(
+            lambda d: d.execute_script(
+                "return document.body.dataset.twoIconStatus") == "ready")
+        yield driver
+    finally:
+        if driver is not None:
+            driver.quit()
+        server.shutdown()
+        server.server_close()
+
+
+def native_replay_in_session(driver, output: Path, method: str,
+                             stage: str, strokes: list[dict]):
+    """Real pinned game renderer and a real blank control for every subset."""
+    if (not strokes or not isinstance(stage, str) or not stage
+            or method not in METHODS):
+        raise ValueError("BLOCKED_P4B7_REPLAY_ARGS")
+    stem = "P4B7-"+method+"-"+stage
+    if (output/(stem+"-color-115.png")).exists():
+        raise ValueError("BLOCKED_P4B7_NATIVE_CAPTURE_ALREADY_EXISTS")
+    command = ("return window.AutoDrawGameRendererReference."
+               "renderP4A2BrushWidths1to10Probe(arguments[0]);")
+    real = driver.execute_script(command, strokes)
+    rgba, metadata = read_webgl_result(real, output, stem+"-color-115")
+    if (metadata.get("schema") != "ENGINE001_B1R_P4A2_NATIVE_1_TO_10"
+            or metadata.get("renderer") !=
+                "real Egret 5.4.1 BoardPane/WebGLRenderer"):
+        raise ValueError("BLOCKED_P4B7_NOT_REAL_NATIVE_EGRET")
+    empty = driver.execute_script(command, [])
+    blank, blank_meta = read_webgl_result(empty, output, stem+"-blank")
+    if (blank_meta.get("schema") != "ENGINE001_B1R_P4A2_BLANK_WEBGL"
+            or blank_meta.get("renderer") !=
+                "real Egret 5.4.1 BoardPane/WebGLRenderer"
+            or np.any(blank[:, :, 3])):
+        raise ValueError("BLOCKED_P4B7_NATIVE_BLANK_NONZERO")
+    meta_path = output/(stem+"-metadata.json")
+    meta_path.write_text(json.dumps(
+        {"real_scene": metadata, "real_blank": blank_meta,
+         "parent_stroke_count": len(strokes), "stage": stage},
+        ensure_ascii=False, indent=2, allow_nan=False)+"\n", "utf8")
+    return rgba
 
 
 def normalized_subset(strokes: list[dict], indices: tuple[int, ...]) -> list[dict]:
@@ -194,62 +273,79 @@ def run(workspace: Path, source: Path, engine_js: Path, renderer: Path,
             if any(a < ALPHA_GATE for a in original_alpha):
                 raise ValueError("BLOCKED_P4B7_FULL_ALPHA_DRIFT")
 
-            # Every subset is an independently captured real Egret BoardPane
-            # scene with a blank control. Only IDs renumber for native replay.
-            draw_counter = [0]
-            def draw(indices, stage):
-                scene = p4b5.native_replay(
-                    workspace, method, "P4B7_"+stage,
-                    normalized_subset(data, indices), output)
-                if np.any(scene["blank"][:, :, 3] != 0):
-                    raise ValueError("BLOCKED_P4B7_NONEMPTY_NATIVE_BLANK")
-                draw_counter[0] += 1
-                return pixel_alpha(scene["color-115"], targets)
+            with native_egret_session(workspace) as driver:
+                full_control = native_replay_in_session(
+                    driver,output,method,"FULL_REPLAY_CONTROL",
+                    normalized_subset(data,tuple(range(len(data)))))
+                if not np.array_equal(full_control[:, :, 3],full[:, :, 3]):
+                    raise ValueError("BLOCKED_P4B7_NATIVE_SESSION_MISMATCH")
+                print("P4B7_NATIVE_FULL_CONTROL_PASS",method,
+                      "original_target_alpha",original_alpha,flush=True)
+                # Every subset is still rendered afresh by the pinned real
+                # Egret BoardPane method; only Firefox process startup is reused.
+                # A real full-plan control must match frozen P4B6 native alpha.
+                draw_counter = [0]
+                progress_path = output/(method+"_PROGRESS.json")
+                def draw(indices, stage):
+                    rgb = native_replay_in_session(
+                        driver, output, method, stage,
+                        normalized_subset(data, indices))
+                    draw_counter[0] += 1
+                    alpha = pixel_alpha(rgb, targets)
+                    print("P4B7_NATIVE_PROGRESS", method, "scene",draw_counter[0],
+                          "stage",stage,"subset",len(indices),
+                          "target_alpha",alpha, flush=True)
+                    progress_path.write_text(json.dumps({
+                        "experiment":EXPERIMENT, "method":method, "stage":stage,
+                        "scene_number":draw_counter[0], "subset_size":len(indices),
+                        "target_alpha":alpha, "status":"NATIVE_IN_PROGRESS",
+                    }, ensure_ascii=False, indent=2)+"\n", "utf8")
+                    return alpha
 
-            trace = split_trace(len(data), original_alpha,
-                                draw, MAX_SPLIT_REPLAYS)
-            candidates = sorted(trace["leaves"])
-            record = {"source_method": method, "arm": ARM,
-                      "native_original_target_backing_yx":
-                          [list(x) for x in targets],
-                      "native_original_target_alpha": original_alpha,
-                      "target_source_logical_xy":
-                          [[x//3-155, y//3] for y,x in targets],
-                      "full_native_protected_pixels": len(targets),
-                      "total_frozen_final_strokes": len(data),
-                      "split_native_replays": trace["calls"],
-                      "split_status": trace["status"],
-                      "split_ledger": trace["ledger"],
-                      "nonzero_native_contributor_indices": candidates,
-                      "nonzero_native_contributor_original_stroke_ids":
-                          [data[i]["strokeId"] for i in candidates],
-                      "nonzero_native_contributor_per_pixel_raw_alpha":
-                          {str(i): trace["leaves"][i] for i in candidates},
-                      "leave_one_out": [],
-                      "native_replay_blank_zero": True}
-            if trace["status"] == "ATTRIBUTION_LEAVES_COMPLETE":
-                if len(candidates) > MAX_LOO_REPLAYS or not candidates:
-                    record["attribution_status"] = "PARTIAL_NATIVE_LOO_LIMIT_OR_NO_LEAF"
+                trace = split_trace(len(data), original_alpha,
+                                    draw, MAX_SPLIT_REPLAYS)
+                candidates = sorted(trace["leaves"])
+                record = {"source_method": method, "arm": ARM,
+                          "native_original_target_backing_yx":
+                              [list(x) for x in targets],
+                          "native_original_target_alpha": original_alpha,
+                          "target_source_logical_xy":
+                              [[x//3-155, y//3] for y,x in targets],
+                          "full_native_protected_pixels": len(targets),
+                          "total_frozen_final_strokes": len(data),
+                          "split_native_replays": trace["calls"],
+                          "split_status": trace["status"],
+                          "split_ledger": trace["ledger"],
+                          "nonzero_native_contributor_indices": candidates,
+                          "nonzero_native_contributor_original_stroke_ids":
+                              [data[i]["strokeId"] for i in candidates],
+                          "nonzero_native_contributor_per_pixel_raw_alpha":
+                              {str(i): trace["leaves"][i] for i in candidates},
+                          "leave_one_out": [],
+                          "native_replay_blank_zero": True}
+                if trace["status"] == "ATTRIBUTION_LEAVES_COMPLETE":
+                    if len(candidates) > MAX_LOO_REPLAYS or not candidates:
+                        record["attribution_status"] = "PARTIAL_NATIVE_LOO_LIMIT_OR_NO_LEAF"
+                    else:
+                        for i in candidates:
+                            remaining = tuple(k for k in range(len(data)) if k != i)
+                            alpha = draw(remaining, "LOO_%03d" % i)
+                            loss = necessary_pixels(original_alpha, alpha)
+                            record["leave_one_out"].append({
+                                "removed_original_index": i,
+                                "removed_original_stroke_id": data[i]["strokeId"],
+                                "native_without_target_alpha": alpha,
+                                "individually_necessary_target_pixel_indices": loss})
+                        record["attribution_status"] = (
+                            "ATTRIBUTION_COMPLETE_NATIVE_POSSIBLE_AND_NECESSARY")
                 else:
-                    for i in candidates:
-                        remaining = tuple(k for k in range(len(data)) if k != i)
-                        alpha = draw(remaining, "LOO_%03d" % i)
-                        loss = necessary_pixels(original_alpha, alpha)
-                        record["leave_one_out"].append({
-                            "removed_original_index": i,
-                            "removed_original_stroke_id": data[i]["strokeId"],
-                            "native_without_target_alpha": alpha,
-                            "individually_necessary_target_pixel_indices": loss})
-                    record["attribution_status"] = (
-                        "ATTRIBUTION_COMPLETE_NATIVE_POSSIBLE_AND_NECESSARY")
-            else:
-                record["attribution_status"] = trace["status"]
-            record["additional_native_loo_replays"] = (
-                draw_counter[0] - trace["calls"])
-            record["total_additional_real_native_replays"] = draw_counter[0]
-            (output/(method+"_ATTRIBUTION.json")).write_text(
-                json.dumps(record, indent=2, ensure_ascii=False)+"\n", "utf8")
-            outcome[method] = record
+                    record["attribution_status"] = trace["status"]
+                record["additional_native_loo_replays"] = (
+                    draw_counter[0] - trace["calls"])
+                record["total_additional_real_native_replays"] = draw_counter[0]
+                (output/(method+"_ATTRIBUTION.json")).write_text(
+                    json.dumps(record, indent=2, ensure_ascii=False)+"\n", "utf8")
+                outcome[method] = record
             print("P4B7_NATIVE",method,record["attribution_status"],
                   "targets",targets, "candidates",candidates,
                   "group_scenes",trace["calls"], "loo",len(record["leave_one_out"]),

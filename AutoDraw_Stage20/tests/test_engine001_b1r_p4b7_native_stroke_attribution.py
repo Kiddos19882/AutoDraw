@@ -134,6 +134,17 @@ class P4B7Contracts(unittest.TestCase):
         self.assertIn('if output.exists():',code)
         self.assertIn('"BLOCKED_P4B7_OUTPUT_EXISTS"',code)
 
+    def test_17_native_replay_reuses_one_session_but_fresh_egret_scene(self):
+        import inspect
+        from run_engine001_complex_holdout_v5 import native_batch
+        hot = inspect.getsource(p.native_replay_in_session)
+        self.assertIn("renderP4A2BrushWidths1to10Probe", hot)
+        self.assertIn("read_webgl_result", hot)
+        self.assertIn("BLOCKED_P4B7_NATIVE_BLANK_NONZERO", hot)
+        self.assertIn("ENGINE001_B1R_P4A2_NATIVE_1_TO_10", hot)
+        self.assertIn("BLOCKED_P4B7_NATIVE_CAPTURE_ALREADY_EXISTS", hot)
+        self.assertEqual(p.ALPHA_GATE, 24)
+
     def test_16_native_renderer_and_parent_blob_fixed(self):
         self.assertEqual(p.RENDERER_BLOB,
                          "76d950e0a8911888a9df3b675b866519ecf7bba4")

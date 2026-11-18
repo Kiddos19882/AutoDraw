@@ -18,7 +18,7 @@ concurrency:
 jobs:
   per-stroke-native-egret:
     runs-on: windows-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         timeout-minutes: 5
@@ -70,7 +70,7 @@ jobs:
               assert Path(path).read_bytes()==raw
               print("P4B7_FROZEN_BLOB",path,actual)
           PY
-      - name: Run source-recomputed P4B6 and native Egret attribution E and F
+      - name: Run source-recomputed P4B6 then real Egret subsets in reused Firefox session
         shell: bash
         run: |
           python AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py \
