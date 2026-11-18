@@ -1,3 +1,7 @@
+## 2026-11-18 — B4 genuine complete Egret color+contour negative study
+
+Experimental test-only real BoardPane/WebGL opt-in B4 method and validated Python native_batch whitelist with unchanged historical behavior; frozen 17-game-color P4c1 paint + 410 native V44-B detail strokes LAST in two A/B scenes (original395-color details vs CIEDE2000-nearest15 game32 detail colors). [CI44236852882](https://github.com/Kiddos19882/AutoDraw/actions/runs/44236852882) E2 15 Python/20 Node PASS, E3 SUCCESS, both quality FAIL, 44/44 artifact hashes verified. Avoid further production optimization on rejected G32 map; B5 will research visually coherent source zones independently. No game/live/CHALK changes.
+
 ## 2026-11-18 — ENGINE-001 B3 actual Egret diagonal brush evidence
 
 Added test-only B3 authentic BoardPane/WebGL source-pinned diagonal isolated width2/4 probe with original B1 source/protected masks, frozen fixture selection, unit contracts and Windows Actions. [CI44234300377](https://github.com/Kiddos19882/AutoDraw/actions/runs/44234300377) E2/E3 successful execution, 12/12 native traces, 2/12 conservative safe-join PASS vs 10/12 foreign-alpha failures; no foreign ink farther than3logical px in these narrow samples. No game runtime, no production integration or original V44 modification.
