@@ -72,7 +72,7 @@ def filter_candidate(full,method,raw,protected):
 def composite(roi,contour):
     # Reuse previously validated P4b layout/alpha method; no synthetic outline.
     from run_engine001_color32_s2b_p4b_v44b_hybrid import compose
-    _,screen=compose(Image.fromarray(roi,'RGB'),contour)
+    _,screen=compose(Image.fromarray(roi),contour)
     return screen.crop((465,0,915,720)).convert('RGB')
 def metrics(source,rgb,protected,contour,edge,thr,low):
     d=color.deltaE_ciede2000(color.rgb2lab(source/255.),color.rgb2lab(rgb/255.))
@@ -109,7 +109,7 @@ def sheet(variants,contour,path,with_contour):
     for i,name in enumerate(names):
         row,col=divmod(i,3);x=col*450;y=row*756
         im=(composite(variants[name],contour) if with_contour else
-            Image.fromarray(variants[name],'RGB').resize((450,720),Image.Resampling.NEAREST))
+            Image.fromarray(variants[name]).resize((450,720),Image.Resampling.NEAREST))
         out.paste(im,(x,y+36));dr.text((x+8,y+6),labels[i],font=font,fill='black')
     out.save(path)
 def run(source,m1,v44,out):
@@ -125,7 +125,7 @@ def run(source,m1,v44,out):
     out.mkdir(parents=True)
     result={}
     for n,rgb in variants.items():
-        Image.fromarray(rgb,'RGB').save(out/(n+'_RGB.png'))
+        Image.fromarray(rgb).save(out/(n+'_RGB.png'))
         composite(rgb,contour).save(out/(n+'_plus_original_V44B.png'))
         result[n]=metrics(original,rgb,protected,contour,edge,threshold,low)
     sheet(variants,contour,out/'comparison_RGB.png',False)
