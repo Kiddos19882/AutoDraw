@@ -1,0 +1,120 @@
+name: ENGINE-001 B4 full genuine Egret G32 paint and 410 contour source vs palette
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-color-island-b4-full-native.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b4_native_full.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_b4_native_full.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-b4-actual-egret-full-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-b4-full-g32-detail:
+    runs-on: windows-latest
+    timeout-minutes: 95
+    steps:
+      - name: Checkout minimal
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen Egret and color image analysis tools
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: B4 frozen geometry and prior renderer regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b4_native_full.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_b4_native_full.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p2_p2_b4_native_full.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_p4c2_full_native.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download and validate original P4c1, P4c2 negative, V44-B full detail
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os,hashlib,requests
+          from pathlib import Path
+          dest=Path(os.environ['RUNNER_TEMP'])
+          for aid,name,want in [
+            (14334728680,'p4c1-frozen.zip','fac1fcf1ff6a43ac6e59da116b68b86e2238c2da13be0b167cf34f8241ac5eeb'),
+            (14354311133,'p4c2-actual-native.zip','edc15612da5660de0fd3e12c06bddfc4e0e6fec3dc6310d37c9abe46ec5344e7'),
+            (14201581692,'v44-b-original.zip','43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c2d41e8945042fc80304a1')]:
+              r=requests.get(
+                f'https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{aid}/zip',
+                headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                         'Accept':'application/vnd.github+json',
+                         'User-Agent':'AutoDraw-ENGINE001-B4'},timeout=180,allow_redirects=True)
+              r.raise_for_status()
+              have=hashlib.sha256(r.content).hexdigest()
+              if have!=want:raise ValueError(f'BLOCKED_ORIGINAL_ZIP_SHA {aid} {have}')
+              (dest/name).write_bytes(r.content)
+              print('B4_PINNED_ZIP_SHA_PASS',aid,have)
+          PY
+      - name: Actual Egret BoardPane full G32 and original 410 detail or palette-mapped 410 detail
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b4_native_full.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --p4c1-archive "$RUNNER_TEMP/p4c1-frozen.zip" \
+            --p4c2-archive "$RUNNER_TEMP/p4c2-actual-native.zip" \
+            --v44-archive "$RUNNER_TEMP/v44-b-original.zip" \
+            --output "$RUNNER_TEMP/engine001-b4-full"
+          python - <<'PY'
+          import os,hashlib,json
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'engine001-b4-full'
+          r=json.loads((root/'report.json').read_text(encoding='utf8'))
+          assert r['github_sha']==os.environ['GITHUB_SHA'], 'WRONG_COMMIT'
+          assert r['github_run_id']==os.environ['GITHUB_RUN_ID'], 'WRONG_RUN'
+          assert r['experiment']=='ENGINE001_COLOR_ISLAND_R2_P2_P2_B4_NATIVE_FULL_COLOR_OUTLINE'
+          assert r['original_detail_strokes']==410
+          assert r['original_contour_RGB_colors']==395
+          assert set(r['variants'])=={'B4_A_ORIGINAL_DETAIL_RGB','B4_B_DETAIL_NEAREST32'}
+          for n,x in r['variants'].items():
+              assert x['all_full_native_strokes']==1543
+              assert x['all_synthetic_vertices_NOT_CHALK']==5277
+              assert len(x['owner_native_alpha_pixel_identity_to_original_P4c2'])==17
+              assert x['status'] in ('E3_NATIVE_CAPTURE_PASS_QUALITY_FAIL','E3_NATIVE_FULL_SCREEN_PASS_VISUAL_PENDING')
+              print(n,x['status'],'paint source baseline drift',sum(not t for t in x['owner_native_alpha_pixel_identity_to_original_P4c2'].values()),
+                    'mean DeltaE source',x['diagnostic_image_source_error']['mean_deltaE00_diagnostic'])
+          assert r['variants']['B4_B_DETAIL_NEAREST32']['native_detail_alpha_pixel_identical_to_A'], 'CONTOUR_ALPHA_DRIFT'
+          assert r['game_E4']=='NOT_RUN' and r['real_game_CHALK'] is None
+          for name,want in r['file_sha256'].items():
+              got=hashlib.sha256((root/name).read_bytes()).hexdigest()
+              assert got==want,('FILE_SHA_FAIL',name)
+          print('B4_REAL_EGRET_NATIVE_COMPLETE_HASH_PASS',len(r['file_sha256']))
+          print('NOT_GAME_LIVE_NOT_EXACT_CHALK; VISUAL_USER_PENDING')
+          PY
+      - name: Preserve raw source, native full scenes and negative findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b4-true-egret-full-g32-contour-comparison
+          path: ${{ runner.temp }}/engine001-b4-full/
+          if-no-files-found: warn
+          retention-days: 30
