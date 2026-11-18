@@ -1,3 +1,14 @@
+## ENGINE-001 / B1-R — P4D0 полный uncapped native Egret и первый scanline завершены, acceptance не получен (2026-11-18)
+
+- [x] [P4D0 original-source E0 prereg](ENGINE001_B1R_P4D0_UNBOUNDED_ADAPTIVE_VS_SCANLINE_NATIVE_PREREG_2026-11-18.md), freeze до кода и CI, baseline [P4C0](https://github.com/Kiddos19882/AutoDraw/actions/runs/44388330915) E/F source quality FAIL (P4C0 per-owner 69.88%/69.45%).
+- [x] Реализованы отдельные не-production P4D0 Python runner, unit E2, CI. Scoped temporary JS bypass возвращает frozen renderer, не меняет live BoardPane. Адаптивная кисть1–10 полностью без per-color/total count ceilings, исторический простой row-major scanline fixed2 нарисован заново на тех же E/F исходниках.
+- [x] [P4D0 CI #44396483490](https://github.com/Kiddos19882/AutoDraw/actions/runs/44396483490), SHA `0af2bbab04fa5128abd640a7f8b84f776bc3e678`: E2 10/10 + P4C0 10/10/JS/Markdown PASS; E3 4/4 arms × 2 scene stages TRUE BoardPane/WebGL, zero blank, 31 colors+white source, 358 contour strokes each, arbitrary total accepted vertices up to19871. ZIP [14471561424](https://github.com/Kiddos19882/AutoDraw/actions/runs/44396483490/artifacts/14471561424), independent CRC +53/53 member SHA256 PASS. Initial #44396145358 E2 pass E3 BLOCKED checkout blob drift, preserved as negative.
+- [ ] **Native image quality NOT_ACCEPTED:** adaptive paint-only E/F any-ink coverage97.215/97.274%, target RGB delta max<=32 85.633/85.487%; scanline coverage100% but RGB64.443/64.270% and foreign white background ink33718/33645 vs adaptive4269/4283. Это не per-owner coverage99/0protected/3logical PASS. Новый источник-контур полностью нарисован, но переусилен и портит картинку. No visual sign-off.
+- [ ] **NEXT:** настоящий per-color native coverage/leakage/critical protected audit и separate contour-density/width calibration on same original source E/F, без новых агрессивных упрощений и без изменения frozen source/gates; только затем выбор стабильной production-quality схемы. Сохранить P4B10 owner115 safe-long-stroke rescue отдельно.
+- [ ] E4 live game session, E5 independent, exact run-bound CHALK NOT_RUN; 128 UI runtime user-reported not independently measured; production/master unchanged.
+
+*Ниже история задач до закрытого P4D0; старые NEXT не являются первыми невыполненными шагами.*
+
 ## ENGINE-001 / B1-R — P4C0 полный E/F native preview E3 завершён, quality FAIL (2026-11-18)
 
 - [x] P4B10 [CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831), native70/70 technical PASS, 54 safe, 0 quality PASS; owner83.23/83.13%, не production. ZIP14462144950.

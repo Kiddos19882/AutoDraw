@@ -1,3 +1,12 @@
+## ENGINE-001 B1-R следующий этап после P4D0 без лимитов (2026-11-18)
+
+1. [P4D0 E2/E3 native CI #44396483490](https://github.com/Kiddos19882/AutoDraw/actions/runs/44396483490), source SHA 07cc4568, actual E/F adaptive no-cap vs row-major scanline + full new 358-stroke outline, 8 genuine Egret PNG. Adaptive paint any-ink97.215% E /97.274% F, RGB match85.63%/85.49%; simple scanline any-ink100% but RGB match64.44%/64.27% and nonwhite background overpaint ~8x. **No true owner-specific quality PASS**. [One ZIP14471561424](https://github.com/Kiddos19882/AutoDraw/actions/runs/44396483490/artifacts/14471561424), CRC/53 member hashes independently verified. [Pre-reg](ENGINE001_B1R_P4D0_UNBOUNDED_ADAPTIVE_VS_SCANLINE_NATIVE_PREREG_2026-11-18.md) unchanged.
+2. **NEXT:** separately prereg safe native owner-specific audit of color correctness, source protected foreign on faces/eyes/hands and farther-than3logical leakage for both variants and physically appropriate real Egret per-swatch metrics; do not use composite-any-ink100% to claim frozen 99%/0protected/3logical gates.
+3. **THEN:** independently test source-grounded contour thickness/density, currently 358 dark lines harm recognizability; compare no-contour, selected source edges, protected feature path, while retaining original image as reference. Preserve accepted RGB source E/F; do not force pixel art, extra simplification, more colors, new ML without evidence.
+4. Optional long-stroke clipping for P4B10 color115; later all four P2D original source variants, real game E4/E5 and exact run-bound CHALK. Stop before production until visual and native quality gates. No master/default changes.
+
+*Ниже — prior P4C0/P4B10 roadmap history.*
+
 ## ENGINE-001 / B1-R: очередь после P4C0 true native full-color visual (2026-11-18)
 
 1. [P4B10 real native CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831) технически завершён, 54/70 safety, 0/70 quality PASS, E/F 83.23/83.13% в одиночной области115.
