@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/engine001-b1r-p4a2-native-brush-widths1to10.yml'
       - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4a2_native_brush_widths.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4A2_NATIVE_WIDTHS_1_TO_10_PREREG_2026-11-18.md'
       - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4a2_native_brush_widths.py'
       - 'AutoDraw_Stage20/tests/game_renderer_reference.js'
       - 'AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py'
