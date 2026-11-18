@@ -1,3 +1,11 @@
+## ENGINE-001 P4B1 frozen native negative; P4B2 one-pass edge feedback NEXT (2026-11-18)
+
+- [x] Source-recomputed P4B1 A oriented vs B contour-hybrid research, original 4×E/F model and 4 real Egret scenes C192 D_COMPONENT24. [CI44303577898](https://github.com/Kiddos19882/AutoDraw/actions/runs/44303577898) E2 18/18 JS20/20 E3 technical SUCCESS; quality all4 <99% PASS gate, far leakage >3=0. [ZIP artifact14426183749](https://github.com/Kiddos19882/AutoDraw/actions/runs/44303577898/artifacts/14426183749) independent CRC/28 hashes PASS, SHA d0c3ad6de4051d9f5c3d5ea5a79d6dff31b0b6e933e6bc188af7d4959257bf80.
+- [x] Diagnose source pixels: 92–99% of true native misses are in first1logical boundary pixel; no misses deeper3, while model A predicted100% (invalid proxy). Original P4B1 E/F source/gates preserved.
+- [x] New [P4B2 prereg](ENGINE001_B1R_P4B2_NATIVE_EDGE_GAP_REPAIR_PREREG_2026-11-18.md) before code: same-run native A baseline, one pass contour short width1/2 repair ranked by measured alpha24 misses; cap remains250 strokes/500 vertices,99% and3px unchanged.
+- [ ] Implement P4B2 E2+E3 and one ZIP including negative outcomes; no automatic promotion if quality <99.
+- [ ] After owner pilot, generalize to other original source classes/all source masks and new joint outline, no legacy G32/V44. E4/E5/game exact CHALK remains NOT_RUN; palette deferred per DEC-039.
+
 ## ENGINE-001 / B1-R-P4A2 all 10 native brush widths COMPLETE; full-color native study NEXT (2026-11-18)
 
 - [x] User requested every brush width 1,2,3,4,5,6,7,8,9,10. New independent [P4A2 frozen experiment](ENGINE001_B1R_P4A2_NATIVE_WIDTHS_1_TO_10_PREREG_2026-11-18.md) registered before any native image; unexecuted P4A-V1 four-width proposal superseded only as pilot.
