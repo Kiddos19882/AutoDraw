@@ -72,7 +72,7 @@ jobs:
                     "M1_legacy_masks_input_used","frozen_P2B_P2C_P2D_P3_artifacts_as_input",
                     "old_screen32_used_as_selection_seed_or_target"):
               assert r[k] is False,k
-          assert r["source_original_200x320_only"] is True
+          assert r["original_source_200x320_only"] is True
           assert r["source_P2D_manual_acceptance"]=="C096_C192_X_BOTH_GUARDS_ACCEPTED"
           assert r["engine128_gameplay_runtime_access"]=="UNKNOWN_E4_NOT_RUN"
           assert r["actual_native_Egret_round_brush"]=="NOT_RUN"
