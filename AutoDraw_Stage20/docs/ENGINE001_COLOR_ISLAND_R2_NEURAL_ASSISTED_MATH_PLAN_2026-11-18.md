@@ -74,3 +74,8 @@ AutoDraw должен превратить исходные цвета в осм
 **Планируемые изменения только после разрешённой разработки:** (п) `AutoDraw_Stage20/tests/` новые R2 test-only runner/contract files; (п) `.github/workflows/` отдельный workflow; (п) `AutoDraw_Stage20/docs/` только точные статусы/evidence. **Не изменять** (п) `AutoDraw_Stage20/source/`, замороженные (ф) `tests/run_engine001_color_island_r1.py`, (ф) `data/palettes/browser_palette.json`, (ф) `testImages/wV6VeZI9S1Y.png`, исходные V44-B.
 
 **Definition of Done R2 experimental:** source-bound model weights/embeddings, completed required E2/E3 jobs, audited artifact hashes, ablation M0/N1/N2 with actual measured differential effect, visual user acceptance, then separately native brush evidence. Без этих уровней не заявлять, что «нейросеть улучшила заливку». **На момент записи:** E0 `PLAN_REGISTERED`, все новые R2 tests/CI/PNG `NOT_RUN`.
+
+
+## R2-0 E1 завершён / заморожен первый R2-P1 (2026-11-18)
+
+[Точные параметры R2-P1](ENGINE001_COLOR_ISLAND_R2_P1_FROZEN_PRECOMPUTED_NEURAL_MERGE_PROTOCOL_2026-11-18.md) зарегистрированы **до первого R2 source-result**. Подтверждены оригинальный RGB, S4 genuine DINOv2 aligned dense features(240,150,384) из SHA-проверенного artifact14352502866 и S5-P2 BiRefNet alpha240×150 из SHA-проверенного artifact14358930528. Это прежние настоящие pretrained результаты; повторные загрузка/запуск моделей в R2-P1 не нужны. Для новых R2 region IDs S4 pooled tensor(468,384) не использовать; N1 заново вычисляет pooled features из dense. **R2-0 E1 PASS; R2-1 M0 и дальнейшие N1/N2 code/tests/CI NOT_RUN; следующий шаг R2-1.**

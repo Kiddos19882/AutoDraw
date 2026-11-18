@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 R2-0 verification and frozen R2-P1
+
+Completed E1 pinned-S4/S5 archive verification, confirming real DINOv2 dense features and BiRefNet soft alpha reusable from immutable artifacts. Registered [R2-P1 frozen protocol](ENGINE001_COLOR_ISLAND_R2_P1_FROZEN_PRECOMPUTED_NEURAL_MERGE_PROTOCOL_2026-11-18.md) before first R2 source run: original RGB and detail protected M0 math baseline, genuine DINOv2 N1 eligible-merge ranking, independent BiRefNet N2; same source guards and negative evidence. No new R2 model, code or native tests.
+
 ## 2026-11-18 — DEC-033 / ENGINE-001 R2 neural-assisted mathematics plan
 
 New independent R2 protocol supersedes R1 as *active research priority* after R1 E3 technical PASS / SOURCE_GATE_FAIL. Color truth remains original RGB; mathematical source edges/geometry/ΔE/chroma hold final authority; verified DINOv2 real features may influence only safe merge ordering, optional BiRefNet soft-alpha is a separate foreground ablation, SAM2/OneFormer not assumed to provide flat-color owners. Pre-register M0/N1/N2 controls, detail preservation, false-accent localization, separate unrestricted-RGB visual stage and pinned game32 projection/abstention before experiment. R1 histories and thresholds frozen, V44-B410 LAST, production/master untouched. Documentation-only; R2 tests and native NOT_RUN.
