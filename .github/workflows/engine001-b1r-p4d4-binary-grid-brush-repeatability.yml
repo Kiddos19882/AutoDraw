@@ -1,0 +1,127 @@
+name: ENGINE-001 B1-R P4D4 binary-grid native brush 480-case diagnostic
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d4-binary-grid-brush-repeatability.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d4_binary_grid_brush_repeatability.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d4_binary_grid_brush_repeatability.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D4_BINARY_GRID_BRUSH_REPEATABILITY_DIAGNOSTIC_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d4-native-binary-grid
+  cancel-in-progress: true
+jobs:
+  native-binary-coordinates-repeatability:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact existing native Egret dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Run P4D4 relative-binary-point regressions plus native parent and Markdown
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d4_binary_grid_brush_repeatability.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d4_binary_grid_brush_repeatability.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d4_binary_grid_brush_repeatability.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d3_native_brush_repeatability.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Verify and restore frozen original engine renderer and parent P4D3 exact bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import subprocess,hashlib
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==expected,(path,found,expected)
+              Path(path).write_bytes(raw)
+              print("P4D4_FROZEN_BYTES",path,found)
+          PY
+      - name: Real pinned Egret 480 cases x 2 pixel-identical full BoardPane scenes
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d4_binary_grid_brush_repeatability.py \
+            --workspace . \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d4-native
+      - name: Independently validate native PNG count, matrices and full SHA manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d4-native")
+          rep=json.loads((root/"report.json").read_text("utf8"))
+          assert rep["experiment"]=="ENGINE001_B1R_P4D4_BINARY_GRID_TRANSLATION_REPRODUCIBILITY_V1"
+          assert rep["technical_result"]=="ALL_961_PINNED_EGRET_IMAGES_CAPTURED"
+          assert rep["github_sha"]==os.environ["GITHUB_SHA"]
+          assert rep["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert rep["engine_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert rep["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert rep["parent_test_blob"]=="3437a9326b381d9c94d6ade80059d40adf233d09"
+          assert rep["grid_resolution_inverse"]==256
+          assert rep["all_relative_stroke_endpoints_bit_exact_by_construction"]
+          assert rep["widths"]==list(range(1,11))
+          assert rep["directed_angles"]==list(range(0,360,15))
+          assert rep["lengths_logical"]==[4,34]
+          assert rep["native_cases"]==480 and rep["full_native_captures"]==961
+          assert rep["reversed_pairs"]==240
+          assert rep["blank_native_zero_alpha"]
+          assert rep["original_p4d3_exact_translation_292_of_480"]==292
+          assert rep["E4_live_game"]=="NOT_RUN" and rep["E5_independent_live"]=="NOT_RUN"
+          assert rep["exact_run_bound_CHALK"] is None and not rep["production_promotion"]
+          with Image.open(root/"REAL_EGRET_BLANK.png") as im:
+              assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
+          rows=[json.loads(s) for s in (root/"CASES_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==480
+          assert all(r["relative_endpoints_binary_exact"] and r["total_accepted_strokes"]==21
+                     and r["total_accepted_vertices_NOT_CHALK"]==42 for r in rows)
+          assert all(r["render1"]["renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+                     and r["render2"]["schema"]=="ENGINE001_B1R_P4A2_NATIVE_1_TO_10" for r in rows)
+          pngs=list(root.rglob("*.png"))
+          assert len(pngs)==963,len(pngs)
+          assert len(rep["members_sha256"])>1200
+          for name,expected in rep["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("P4D4_TECHNICAL_NATIVE_PASS",len(pngs),"PNG")
+          print("P4D4_MEMBER_HASH_PASS",len(rep["members_sha256"]))
+          print("P4D4_TRANSLATION_EXACT",rep["translation_exact_cases"],"/480",
+                "previous",rep["original_p4d3_exact_translation_292_of_480"])
+          print("P4D4_REPLAY_EXACT",rep["native_same_input_cross_run_exact"],"/480")
+          print("P4D4_REVERSE_EXACT",rep["reversed_equal_pairs"],"/240")
+          PY
+      - name: Archive original native evidence, including negative and partial runs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d4-binary-grid-repeatability-native
+          path: AutoDraw_Stage20/.p4d4-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
