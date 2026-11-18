@@ -1,0 +1,98 @@
+name: ENGINE-001 B1-R P2D source-bright halo guard
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p2d-source-bright-halo-guard.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p2d_background_halo_guard.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b1r-p2d-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p2d-original-source-bright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout source with timeout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned source-only image math
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: P2D source guard synthetic contracts and Markdown
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py AutoDraw_Stage20/tests/test_engine001_b1r_p2d_background_halo_guard.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p2d_background_halo_guard.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Run independently original-derived P2D plus frozen P2C reconstructions
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-b1r-p2d"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p2d"
+          r=json.loads((root/"report.json").read_text(encoding="utf8"))
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["source_original_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["source_only_original_file_read"] is True
+          assert r["no_frozen_P2B_or_P2C_artifacts_read_as_inputs"] is True
+          for k in ("legacy_G32_input","legacy_V44_input","legacy_M1_input"):
+              assert r[k] is False,k
+          assert r["user_assessment_of_P2C"]=="BOTH_MOSTLY_GOOD_BUT_MARKED_DEFECT"
+          assert r["new_P2D_user_visual_signoff"]=="PENDING"
+          assert r["game32_projection"]=="NOT_RUN"
+          assert r["native_Egret_round_brush"]=="NOT_RUN"
+          assert r["exact_game_CHALK"] is None
+          assert set(r["baseline"])=={"C_096","C_192"}
+          assert all(set(v)=={"D_BORDER","D_COMPONENT24"} for v in r["results"].values())
+          for k,want in r["file_sha256"].items():
+              got=hashlib.sha256((root/k).read_bytes()).hexdigest()
+              assert got==want,("BLOCKED_P2D_MEMBER_SHA",k)
+          for palette,strategies in r["results"].items():
+              for name,m in strategies.items():
+                  assert m["gates"]["K_DETAIL_ink_source_palette_unmodified"]
+                  assert m["gates"]["guard_disjoint_ink"]
+                  assert m["gates"]["all_pixels_outside_guard_unchanged"]
+                  assert m["gates"]["full_RGB_plus_one_color_bound"]
+                  assert m["status"] in ("SOURCE_SCREEN_PASS_VISUAL_PENDING","SOURCE_GATE_FAIL")
+                  print("FINAL",palette,name,m["status"],
+                        "marked_false_gray",m["marked_hair_before"]["false_dark_logical_pixels"],
+                        "->",m["marked_hair_after"]["false_dark_logical_pixels"],
+                        "full_color_count",m["candidate_full_unique_RGB"],
+                        "changed_source_pixels",m["corrected_original_full_pixels"],
+                        "failed",[k for k,v in m["gates"].items() if not v])
+          print("B1R_P2D_MEMBER_SHA_PASS",len(r["file_sha256"]))
+          print("GAME32_NATIVE_EGRET_E4_E5_EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Preserve all visual outputs, failures and source hash evidence in one ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p2d-halo-c096-c192-both-guards-one-review-zip
+          path: ${{ runner.temp }}/engine001-b1r-p2d/
+          retention-days: 30
+          if-no-files-found: warn
