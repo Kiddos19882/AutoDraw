@@ -1,0 +1,136 @@
+name: ENGINE-001 B1-R P4D3 widths1-10 x24 directions native repeatability
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d3-native-brush-repeatability.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d3_native_brush_repeatability.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D3_NATIVE_BRUSH_REPEATABILITY_DIRECTION_MATRIX_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d3-native-repeatability
+  cancel-in-progress: true
+jobs:
+  genuine-game-brush-directions-repeats:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing Egret and image-analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E2 all widths angles repeats paths native attribution and Markdown
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d3_native_brush_repeatability.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d3_native_brush_repeatability.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d2_owner_colored_boundary_as_fill_native.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore exact frozen test renderer and game bundle bytes on Windows checkout
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("P4D3_FROZEN_SOURCE",path,actual)
+          PY
+      - name: Real Egret WebGL 10 brush widths 24 angles 2 lengths 10 isolated 10 overlapped twice
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py \
+            --workspace . \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d3-native
+      - name: Independently validate 1121 native PNG, complete cases, SHA256 manifest and E3 qualification
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d3-native")
+          report=json.loads((root/"report.json").read_text("utf8"))
+          assert report["experiment"]=="ENGINE001_B1R_P4D3_NATIVE_BRUSH_WIDTH_DIRECTION_REPEATABILITY_V1"
+          assert report["technical_result"]=="ALL_P4D3_TRUE_NATIVE_BOARD_SCENES_CAPTURED"
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["pinned_renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert report["pinned_engine_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert report["native_widths"]==list(range(1,11))
+          assert report["angles_deg"]==list(range(0,360,15))
+          assert report["line_lengths_logical"]==[4,34]
+          assert report["native_primary_cases"]==480
+          assert report["native_edge_stress_cases"]==80
+          assert report["full_native_captures"]==1121
+          assert report["reversed_direction_pairs"]==240
+          assert report["blank_zero_alpha"] is True
+          assert report["E4_live_game"]=="NOT_RUN" and report["E5_independent_live"]=="NOT_RUN"
+          assert report["exact_run_bound_CHALK"] is None
+          assert report["production_promotion"] is False
+          assert report["source_and_game_code_modified"] is False
+          assert set(report["width_summary"])==set(str(i) for i in range(1,11))
+          assert all(s["primary_cases"]==48 for s in report["width_summary"].values())
+          assert len(report["members_sha256"])>=1500
+          rows=[json.loads(x) for x in (root/"CASES_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==560
+          assert sum(r["kind"]=="PRIMARY" for r in rows)==480
+          assert sum(r["kind"]=="STRESS_EDGE_COLOR" for r in rows)==80
+          for r in rows:
+              assert r["total_accepted_strokes"] in (21,11)
+              assert r["render1"]["renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+              assert r["render2"]["schema"]=="ENGINE001_B1R_P4A2_NATIVE_1_TO_10"
+              if r["kind"]=="PRIMARY":
+                  assert r["isolated_strokes"]==10 and r["overlay_strokes"]==10
+                  assert r["render1"]["accepted_vertices_NOT_CHALK"]==42
+              else:
+                  assert r["ten_overlapping_edge_strokes"]==10
+          images=list(root.rglob("*.png"))
+          assert len(images)==1123, len(images)  # 1120 native scenes, blank, 2 summary heatmaps
+          for path,actual in report["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==actual,path
+          with Image.open(root/"REAL_EGRET_BLANK.png") as im:
+              assert im.size==(1380,720)
+              assert im.getchannel("A").getbbox() is None
+          print("P4D3_TECHNICAL_NATIVE_PASS",len(images),"PNG")
+          print("P4D3_MANIFEST_HASH_PASS",len(report["members_sha256"]))
+          print("P4D3_PRIMARY_EXACT",report["primary_cases_exact"],"/480")
+          print("P4D3_EDGE_REPEAT_EXACT",report["edge_stress_cases_exact"],"/80")
+          print("P4D3_OVERLAY_CHANGED",report["overlay_changed_cases"],"/480")
+          print("P4D3_REVERSE_MATCH",report["reversed_native_footprint_equal_pairs"],"/240")
+          PY
+      - name: Upload all real native images, full plans and partial evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d3-width1to10-angle15deg-ten-repeat-native
+          path: AutoDraw_Stage20/.p4d3-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
