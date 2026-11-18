@@ -1,0 +1,42 @@
+# ENGINE-001 / B1-R-P2 — original-RGB coherent region + jointly derived outline (prereg)
+
+**Experiment ID:** `ENGINE001_B1R_P2_JOINT_REGION_OUTLINE_V1`. **Статус 2026-11-18: E0, PREREG BEFORE ANY P2 IMAGE RUN.** Parent: ENGINE-001 / B1-R, DEC-034, [план](ENGINE001_B1R_RGB_FIRST_RESTART_PLAN_2026-11-18.md). Следующий шаг после B1-R-P1 [CI44244364830](https://github.com/Kiddos19882/AutoDraw/actions/runs/44244364830), у которого source RGB ≈12k цветов и новый contour ещё не принят визуально. Не переобъявлять P1 визуальным PASS.
+
+## Границы, исходные данные, гипотеза
+
+Единственный исполняемый вход: неизменённые байты `testImages/wV6VeZI9S1Y.png`, RGB 200×320, SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`. Координаты x вправо / y вниз; предварительный original-derived анализ в 200×320 **до** 150×240. Сохранять 4 обзорные ROI из B1-R-P1 (female face/eyes, male face/eyes, hands, blouse), они только rough rectangles, НЕ подтверждённые точные semantic landmarks. Один оригинал — ограниченная выборка, без подтверждения обобщения.
+
+Гипотеза: совместные original-RGB superpixel labels и original-edge-derived контур дадут узнаваемую картинку с существенно меньшим количеством однородных цветовых зон, не перенося G32/V44-B или их ошибочные цвета/границы. Математический proof источника каждого цвета и защитный original-edge контур не гарантируют семантического узнавания, поэтому human visual gate обязателен.
+
+**Fail closed**: запрещены G32/P4c1, прежние B1/R2/M1 маски, старые V44-B410 strokes/outline, старые палитры, trained target masks, old game32 color assignments, cached historical layers и любой fallback на них. Разрешено **только** повторно использовать чистые original-RGB функции B1-R-P1 `check_source`, `full_features`, `filter_original` и `original_outline_rgba`; ни один их runner/архивный P0 `inputs()` не загружать. Проверять imports на отсутствие старых runner families; P1 source functions являются allowed dep и сохраняют source hash/ROI инварианты. **P2 RGB + outline создаются совместно из НОВЫХ меток**, P1 preview outline не копируется как слой и не используется как target. Production/Stage6/Monitor/Bridge/master не менять.
+
+## Независимые переменные — зафиксировано до результатов
+
+Один скрипт только в `tests/`, две абляции без подбора параметров после CI:
+
+| Кандидат | edge-aware RGB base из оригинала | `skimage.segmentation.slic` full RGB |
+|---|---|---|
+| `J_FINE` | B1-R-P1 `A_SOFT`: bilateral d5/sigmaColor18/sigmaSpace2, original full protected pixels exact | n_segments=900, compactness=6.0 |
+| `J_COARSE` | B1-R-P1 `A_MID`: bilateral d7/sigmaColor28/sigmaSpace3, original full protected pixels exact | n_segments=500, compactness=9.0 |
+
+SLIC: `sigma=0`, `convert2lab=True`, `enforce_connectivity=True`, `start_label=1`, `channel_axis=-1`, `slic_zero=False`, normalized RGB [0,1]. Детерминированная нумерация и 4-связность labels. Для каждой метки выбрать **один реальный RGB пиксель именно original full RGB из этой метки**, минимизирующий квадрат расстояния CIELAB до медианного CIELAB всех исходных пикселей метки; равные расстояния — первый original row-major пиксель. Никаких средних фантазийных RGB, глобальной палитры или DINO. Плоскую цветовую карту формировать из этих медоидов; downscale RGB-карты до logical 150×240 **NEAREST** (никакого смешения swatches). Цветовой medoid регионов — только source candidate, не игровые 32 цвета.
+
+**Совместный контур конкретного кандидата:** `skimage.segmentation.find_boundaries(labels, connectivity=1, mode="inner")`, пересечь с расширенными на один original px `(source Sobel90 OR original delta4>=12)`; для локальных деталей добавить `ROI AND (original delta4>=6 OR original Sobel90)`; затем `morphology.thin`, удалить 8-связные компоненты с площадью <3 **вне** ROI-detail, но сохранить пересекающие ROI-detail. Все исходные edge/ROI вычислять функциями P1 из оригинала, до фильтра, *без* использования P1 new_outline. Цвет 1px RGBA preview — из самого тёмного original RGB в 3×3 через `original_outline_rgba`, alpha185; 150×240 NEAREST; это **MODEL_ONLY source preview, не Egret native**. Отдельно сохранить source RGB/no-outline, same RGB/own new outline, source original и per-candidate masks/labels/region ledger. Не подменять protected source pixels в итоговых регионах оригинальными RGB: защита значимых деталей проверяется edges+outline и визуально, а не сохранением >13k цветов поверх medoids.
+
+## Freeze gates до обработки исходного тестового изображения
+
+Для каждой карты `J_FINE`/`J_COARSE`:
+1. Проверена неизменность source SHA/full shape; original-only full features/ROI; label-count>0, каждое label 4-connected; source medoid RGB присутствует **именно среди пикселей оригинала своего региона**; все цвета full/logical map — из source medoids; `logical unique RGB<=label-count`. Исходные colors не генерируются.
+2. Численная source fidelity на source-only RGB карте logical vs raw LANCZOS original: mean CIEDE2000 ≤6.0, p95 ≤23.0, female/male face-eye ROI mean ≤8.0 каждый, hands mean ≤9.0. На composite с новым контуром те же исходные ROI и mean/p95 записать отдельно, но **не** заменять им source-only gate.
+3. Chroma original support diagnostic: logical RGB mapped chroma > source logical chroma +12 не более 1800/36000. Это pixel-local подозрительные назначения, **не** глобальный запрет реального розового.
+4. Strong-edge retain: для исходных original logical top10% Sobel edges доля, для которой new candidate **composite** Sobel ≥0.5×исходного fixed threshold в том же пикселе или 1-px neighborhood, ≥0.60. Исходный threshold неизменен для обеих карт; дополнительный 1px tolerance описывает alignment, не разрешение игрового leakage.
+5. New outline nonempty; каждый outside-ROI detail outline пиксель лежит в 1 full px от **своей** label boundary. ROI-source edges могут быть добавлены для глаз/лица без требования region boundary. Предпросмотр не должен импортировать старый контур. Source logical unique colors должны сократиться относительно original 12,696. Ложные мелкие RGB компоненты, нарушение контуров и жизнеспособность больших областей документировать, но по одному count не принимать quality.
+6. **Human visual acceptance обязательна отдельно:** узнаваемость лиц/глаз/рта/волос/рук и одежды, непрерывность внешнего контура, нет новых чуждых насыщенных полос или геометрии «плитки». При слабой визуальной разнице либо повреждении лиц статус `SOURCE_GATE_FAIL`/ `SOURCE_SCREEN_PASS_VISUAL_PENDING` / `VISUAL_REJECTED` по факту, не ретюнить gates. P1 и G32/V44 history лишь отдельно отмеченные non-input comparisons.
+
+Контроль — raw original логический (150×240 LANCZOS); B1-R-P1 A_SOFT/A_MID numerical historical comparison только текст/ссылка, не input целевого кандидата. Каждый экспериментальный вариант one deterministic run + synthetic fixtures; независимый второй runtime/repeated random seeds не подтверждён и не запланирован. Результаты mean/p95, ROI, counts/areas, boundary overlap, excess chroma, protected full geometry, labels/medoids, provenance, visualization и SHA каждого artifact. Измерения производятся для пары вариантов на одном и том же оригинале. Любой FAIL архивировать и не ослаблять thresholds.
+
+## Выполнение и доказательства
+
+Новый ограниченный Linux GitHub Actions CI (Python3.11, numpy2.2.6, opencv-python-headless4.11.0.86, Pillow11.3.0, scikit-image0.25.2, scipy1.15.3): `py_compile`, synthetic `unittest`, Markdown audit, одно source-only `run`, SHA каждого PNG/NPY/JSON и GitHub SHA/run ID в report, ZIP artifact upload даже при несоблюдении численных gates; green CI означает только E2/E3, не visual PASS. Отчёт сохраняет версии и status каждого варианта. Никакого game32/brush/native/E4/E5, никаких CHALK estimators: exact CHALK только `post.pointCount-pre.pointCount` для конкретного игрового запуска. Переход на B1-R-P3 palette32 только после human visual RGB acceptance; вся новая разработка остаётся isolated test-only.
+
+**Статус на prereg:** P2 implementation `NOT_RUN`, P2 E2/E3 `NOT_RUN`, P2 visual `PENDING`, game32/native/game/CHALK `NOT_RUN`. Дата, идентификатор CI, исходный SHA, результат/отрицательные результаты и артефакты добавлять только в append-only outcome section после запуска.
