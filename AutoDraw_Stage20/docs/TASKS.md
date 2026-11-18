@@ -1,3 +1,11 @@
+## ENGINE-001 / B1-R-P3D visual signoff / P3E palette UI feasibility (2026-11-18)
+
+- [x] **DEC-038 user visual acceptance BOTH E_SOBEL90 and F_SOBEL90_LAB12:** no strong degradation observed; keep all four P2D C096/C192×both D; no sole winner; applies offline P3D preview only.
+- [x] E1 independent read of verified P3D ZIP and current screenshot32 palette: 5/32 used game swatches in browser_palette.json, 27 used colors missing in screenshot32, 34.9–35.1% of candidate indexed pixels; **not proof these are inaccessible in actual game**. Old palette screen positions cannot be used as current executor calibration.
+- [x] Freeze [P3E static engine128 UI palette routing audit prereg](ENGINE001_B1R_P3E_ENGINE128_COLOR_UI_AUDIT_PREREG_2026-11-18.md), new E2/E3 NOT_RUN.
+- [ ] **NEXT** read only pinned engine128 code through bounded CI static audit, inspect conditional selection route and exact 32 snapshot subset; preserve one ZIP and input SHA, E2/E3 results; mark runtime UI availability UNKNOWN_E4.
+- [ ] Once verified live game swatch selection UI and current valid calibration exists, native BoardPane/Egret coverage/leakage and run-bound CHALK in a separately preregistered P4, no native validation claims before that.
+
 ## ENGINE-001 / B1-R-P3D 2026-11-18: new 8/8 numerical source PASS, visual game32 review NEXT
 
 - [x] DEC-037 user visual acceptance BOTH P3B A/B, identical 32-color preview maps; all four approved P2D source inputs preserved.
