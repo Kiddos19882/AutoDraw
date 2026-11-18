@@ -14,6 +14,9 @@
 
 **Следующий шаг:** [prereg P2D](ENGINE001_B1R_P2D_BACKGROUND_HALO_GUARD_PREREG_2026-11-18.md), E2/E3 независимый CI, человек просматривает единый ZIP. Native game/round brush/E4/E5/exact run-bound CHALK ещё **NOT_RUN**.
 
+
+**Итог отдельного P2D source-only исследования (последующее evidence, не ретроизменение DEC-035):** [CI44275730549](https://github.com/Kiddos19882/AutoDraw/actions/runs/44275730549), exact SHA `6170db18fd249c551b4ca627606b5977d8a3958f`, 13/13 regression E2 PASS, E3 SUCCESS, ZIP artifact14414227735 SHA256 `1899a2bf10413e787cc79bdbd69cf7ea8e5ffafc31f4f91a0380ba0cef303b43` CRC/38 report-member SHA PASS. Оба исходных цвета C096/C192 и обе защиты D_BORDER/D_COMPONENT24 дают 27→1 ложных затемнённых пикселей в отмеченной области, без изменения K_DETAIL ink. D_BORDER затрагивает56 пикселей, D_COMPONENT24 —243, оба source-gates PASS. Решение продолжает требовать свежую человеческую оценку P2D, и не переносит этот PASS на game32/native CHALK.
+
 ## DEC-034. ENGINE-001: перезапуск с B1-R; G32 и старый V44-B — только история и сравнение
 
 **Дата:** 2026-11-18. **Статус:** ACCEPTED — прямое решение пользователя «G32 и старый контур больше не используется, могут использовать только для сверки или как история, и снова начинай от B1». **Приоритет:** выше старых планов B1/P0→game32, B2–B4 и любых исторических «NEXT B5». Это не удаление результатов и не ретроспективная отмена доказательств.

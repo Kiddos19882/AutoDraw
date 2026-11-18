@@ -1,3 +1,8 @@
+## 2026-11-18 — ENGINE-001 B1-R-P2D (test-only halo repair, DEC-035)
+
+- Recorded user's **qualified** positive visual response to both P2C variants and identified source-level artifact: original pale hair/background pixels were darkened by J_FINE source-region medoid *before* P2C. Original P2B/P2C frozen baselines not overwritten; no old G32/V44 inputs.
+- Added independent frozen prereg, original-source bright-halo correction D_BORDER/D_COMPONENT24, source immutable-ink protections, 13 regression tests and bounded artifact-producing CI. [CI44275730549](https://github.com/Kiddos19882/AutoDraw/actions/runs/44275730549) SHA `6170db18fd249c551b4ca627606b5977d8a3958f` E2 13/13 and E3 SUCCESS; downloadable ZIP SHA `1899a2bf10413e787cc79bdbd69cf7ea8e5ffafc31f4f91a0380ba0cef303b43` CRC/38 member SHA PASS. Both C096/C192 marked source false gray ROI27→1, original color count347/443 unchanged; four `SOURCE_SCREEN_PASS_VISUAL_PENDING`. First doc-index CI44275465194 FAIL preserved; corrected before valid run. No playable game32/native/production/CHALK claims.
+
 ## 2026-11-18 — ENGINE-001 B1-R-P2C source-mask ink palette compression (research only)
 
 - Added independent prereg, test-only deterministic CIELAB source-member palette selection on original-source K_DETAIL residual ink (96/192 swatches), 11 synthetic tests, bounded CI, and one ZIP review bundle. Old G32/V44/M1 and frozen P2/P2B images not consumed as candidates.

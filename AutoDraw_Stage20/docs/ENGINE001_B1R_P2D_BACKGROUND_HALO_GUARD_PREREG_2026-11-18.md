@@ -29,3 +29,22 @@ For each of four:
 
 **Output:** independent source pinned original, source flat and same-run original-only P2B/P2C baselines, all 4 candidate full RGB, NEAREST and visual LANCZOS PNG, original-bright and each guard mask, 2 columns per budget 4× zoom annotated hair ROI plus wider face/hair original-vs-candidates and global comparative sheet, raw per-output source source-member ledger, version/commit/run stamped report.json with all gates and all generated file SHA256. Deliver all items **one ZIP archive** including reports and negative outcomes; no duplicate previews sent as separate required downloads. CI independent Ubuntu Python3.11 pinned libraries to match P2C; py_compile, synthetic regression, Markdown audit, bounded checkout, 25-min job, upload artifact always; reproducibility recorded. If technical fail do not call it image-quality fail. Verification level E2/E3 only; no native Egret/game32/brush, E4/E5, exact CHALK `post.pointCount-pre.pointCount` (NOT_RUN). Production, game executors, user PC and master untouched.
 
+## First full P2D execution and frozen outcome — appended after registration (2026-11-18)
+
+**First workflow attempt:** [CI44275465194](https://github.com/Kiddos19882/AutoDraw/actions/runs/44275465194) source runner SHA `1ab8eb3dee3870a36283b7646b4c18ea140eff8b`: E2 **12/12 synthetic PASS**, test-only Markdown audit **FAIL** because new P2D prereg was not yet indexed in `docs/README.md` (`unindexed_files=1`), therefore original image experiment SKIPPED; this is an auditable technical negative, **NOT** a source-quality failure. README indexing fixed by `42905827ca09447c085fa0c9763d3d8eddef1f50` (separate Markdown CI44275549101 SUCCESS). Later fail-closed `apply_source_bright_guard` contract rejects any accidentally whitened non-bright pixel (without modifying prereg criteria), with regression test #13. All original source and gate thresholds unchanged.
+
+**First valid standalone run:** [CI44275730549](https://github.com/Kiddos19882/AutoDraw/actions/runs/44275730549) SHA `6170db18fd249c551b4ca627606b5977d8a3958f`; E2 **13/13 PASS**, E3 dedicated job SUCCESS, Markdown audit PASS. [Artifact14414227735](https://github.com/Kiddos19882/AutoDraw/actions/runs/44275730549/artifacts/14414227735), GitHub downloaded ZIP independently verified SHA256 `1899a2bf10413e787cc79bdbd69cf7ea8e5ffafc31f4f91a0380ba0cef303b43`, CRC PASS and **38/38** report-linked SHA256 file hashes PASS; 39 ZIP entries incl. `report.json`, report SHA256 `d5bfb074249d87ddd58fef73190e0988087cbac97b9085bb084c19b6cea5099b`. Source original PNG pinned SHA `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a` 200×320 original only; fresh-run original K_DETAIL and P2C original source palettes, no frozen artifact or legacy used to generate candidates.
+
+| Same-run source baseline / guarded output | C_096 + D_BORDER | C_096 + D_COMPONENT24 | C_192 + D_BORDER | C_192 + D_COMPONENT24 |
+|---|---:|---:|---:|---:|
+| Original full corrected bright-only pixels | 56 | 243 | 56 | 243 |
+| User-marked false-dark original bright logical ROI | 27→**1** | 27→**1** | 27→**1** | 27→**1** |
+| Full discrete RGB distinct | 347 | 347 | 443 | 443 |
+| Source logical mean ΔE00 | 1.143543 | 1.135292 | 1.031207 | 1.022981 |
+| Source logical p95 ΔE00 | 3.493875 | 3.459217 | 3.024602 | 2.992661 |
+| Female face-eye mean ΔE00 | 2.024609 | 2.011361 | 1.754564 | 1.740344 |
+| Male face-eye mean ΔE00 | 1.735698 | 1.718968 | 1.507256 | 1.489483 |
+| Hands mean ΔE00 | 1.708125 | 1.697680 | 1.517662 | 1.508473 |
+| All prereg gates | **PASS** | **PASS** | **PASS** | **PASS** |
+
+Old same-run C_096/C_192 source mean ΔE00 before guard 1.148854/1.036390, full color counts347/443 and 27 false-dark ROI pixels. Both guards keep every original K_DETAIL selected ink pixel unmodified and do not expand full original-source swatch counts, do not claim game32. **All four strictly `SOURCE_SCREEN_PASS_VISUAL_PENDING`**. Assistant E1 inspection of enlarged 6-panel hair and full images shows gray patch gone while outer hair strand still visible. This observation is not user's P2D visual acceptance. Next manually compare user-facing single ZIP first, cautious default **D_BORDER** (minimal change56 vs243) if visual equivalent, then independent source-backed game32 experiment **only after** fixed visual signoff. Existing P2C source gates and old outcomes remain immutable; no native Egret brush, live E4/E5, exact game CHALK or production approval.
