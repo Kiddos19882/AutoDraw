@@ -1,3 +1,12 @@
+## ENGINE-001 / B1-R: очередь после P4C0 true native full-color visual (2026-11-18)
+
+1. [P4B10 real native CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831) технически завершён, 54/70 safety, 0/70 quality PASS, E/F 83.23/83.13% в одиночной области115.
+2. [P4C0 full native CI44388330915](https://github.com/Kiddos19882/AutoDraw/actions/runs/44388330915) original-derived all 31 nonwhite colors + real Egret paint-only/paint+new contour E/F завершён; глобальный E/F native coverage лишь **69.88%/69.45%**, 0/31 owner quality PASS, fragmentary outline12/14 strokes under total5900 vertices. [Один ZIP14465354420](https://github.com/Kiddos19882/AutoDraw/actions/runs/44388330915/artifacts/14465354420), independently ZIP/CRC/93 member hashes PASS. Это diagnostic evidence, не production или acceptance.
+3. **NEXT E0:** отделить настоящие источниковые tiny islands (E4759/F4806; <=3px E4376/F4435) от действительно узнаваемых деталей, описать original-RGB связанное упрощение и budget-aware paint/contour split без потери лиц/рук/глаз; отдельный prereg и native validation, прежние пороги99/0/3logical не ослаблять.
+4. Отдельно безопасная резка длинных P4B5-pruned штрихов owner115; затем расширить на четыре P2D источника, новый согласованный контур, live game E4/независимый E5/exact CHALK. Production/master без изменений.
+
+*Ниже сохранён предыдущий roadmap после P4B10 и до P4C0 E3.*
+
 ## Актуальная очередность ENGINE-001 B1-R после P4B10 (2026-11-18)
 
 1. **P4B10 E2/E3 завершён:** [CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831), native 70/70, 54/70 safety и 0/70 full quality, лучший owner E83.230709% F83.127983% vs99%, [ZIP14462144950](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831/artifacts/14462144950). Нельзя считать успех CI успехом качества рисунка.
