@@ -1,3 +1,10 @@
+## ENGINE-001 / B1-R-P3C (2026-11-18) — visual A/B accepted, original-source island coherence NEXT
+
+- [x] DEC-037: пользователь визуально одобрил **и A_BALANCED, и B_FACE_DETAIL** P3B; оба проходят дальше; одинаковый map confirmed by P3B 8/8 source screen. No native/CHALK approval.
+- [x] [P3C original-RGB protected tiny-island prereg](ENGINE001_B1R_P3C_SOURCE_COHERENCE_PREREG_2026-11-18.md) freeze before image/CI. M0 unchanged; S_STRICT and T_LOCAL, protected faces/eyes/hands/source original edges/detail, 32 actual engine RGB.
+- [ ] P3C independent experimental runner + unit E2 + CI E3 and **one visual ZIP** with source/P3B/new maps, masks, risks and all PASS/FAIL outcomes. New user visual review after numerical result; do not re-tune P3B/P3C gates.
+- [ ] Confirm game runtime 128 swatch access and real Egret round brush before coverage, leakage, E4 and exact CHALK.
+
 ## ENGINE-001 / B1-R-P3B 2026-11-18: engine128 source-adaptive 32 color numeric screen complete, human game32 review and island reduction next
 
 - [x] Independent pre-registered [P3B engine128 adaptive32 source math](ENGINE001_B1R_P3B_ENGINE128_ADAPTIVE32_PREREG_2026-11-18.md). Exact original RGB pinned, engine static JS blob pinned128 true RGB (not archived G32 assignment), four P2D user-accepted sources preserved; A_BALANCED and B_FACE_DETAIL 32 each, 13 source-only unit tests, CI+one review ZIP. [CI44282755427](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282755427) `1db7d085e96b1a0449ae388c4dc663d997392a88`: 13/13 E2 PASS, E3 SUCCESS, ZIP artifact14417312637 SHA `4ebde5b2204f200a9ca6833740fbf6aff8f550384f0e6c2c3e2c814029a4003e` CRC/83 SHA PASS. All 8 source numerical gates PASS, mean ΔE4.297–4.313, male ROI8.57–8.62; no unresolved; A/B select identical32 set per source, same output. First [CI44282518621](https://github.com/Kiddos19882/AutoDraw/actions/runs/44282518621) technical FAIL from report field mismatch after 13/13 and source image computation, archive preserved.
