@@ -1,0 +1,134 @@
+name: ENGINE-001 R2-P2-P1 original RGB stable medoid M1 source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color-island-r2-p2-p1-m1.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p1_m1.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p1_m1.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: autodraw-engine001-r2-p2-p1-m1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-stable-medoid-m1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source (bounded; no LFS/submodules)
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned numerical CPU dependencies (no neural inference)
+        run: |
+          python -m pip install "numpy==2.3.5" "opencv-python-headless==4.13.0.92" "Pillow==12.3.0" "scipy==1.17.0" "scikit-image==0.26.0" "selenium>=4,<5" "requests==2.32.5"
+          python -m pip freeze > "${{ runner.temp }}/r2-p2-m1-pip-freeze.txt"
+      - name: Mathematical source test contracts and Markdown audit
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p1_m0.py AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p1_m1.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p1_m1.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p1_m0.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p2_p1_m1.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact pinned original M0 source evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,os,requests
+          artifact_id=14385505684
+          sha="574320c11cd189adab08c1fd85de2119204589194e44c5df9d8279dcf6f2f782"
+          response=requests.get(f'https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{artifact_id}/zip',
+             headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                      'Accept':'application/vnd.github+json','User-Agent':'AutoDraw-R2-P2-M1'},timeout=180)
+          response.raise_for_status()
+          binary=response.content
+          if hashlib.sha256(binary).hexdigest()!=sha:
+              raise ValueError('BLOCKED_R2_P2_FROZEN_M0_ARCHIVE_SHA')
+          (Path(os.environ['RUNNER_TEMP'])/'M0_pinned_original.zip').write_bytes(binary)
+          print('EXACT R2-P1 original frozen M0 archive sha256',sha)
+          PY
+      - name: Run P2 numerical stable medoid and fixed source-gradient evidence
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p1_m1.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --m0-archive "$RUNNER_TEMP/M0_pinned_original.zip" \
+            --output "$RUNNER_TEMP/engine001-r2-p2-p1-m1"
+          cp "$RUNNER_TEMP/r2-p2-m1-pip-freeze.txt" "$RUNNER_TEMP/engine001-r2-p2-p1-m1/environment-pip-freeze.txt"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path(os.environ['RUNNER_TEMP'])/'engine001-r2-p2-p1-m1'
+          r=json.loads((d/'report.json').read_text(encoding='utf-8'))
+          assert r['experiment']=='ENGINE001_COLOR_ISLAND_R2_P2_P1_STABLE_RGB_M1'
+          assert r['github_sha']==os.environ['GITHUB_SHA']
+          assert r['github_run_id']==os.environ['GITHUB_RUN_ID']
+          assert r['source_sha256']=='07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a'
+          assert r['palette_git_blob_sha']=='461b5f3725b9b79888ad36e807b3cf4c9e445e98'
+          assert r['g32_sha256']=='b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637'
+          assert r['frozen_M0_ZIP_sha256']=='574320c11cd189adab08c1fd85de2119204589194e44c5df9d8279dcf6f2f782'
+          assert r['medoid_tie_epsilon_squared_lab']==1e-9
+          assert r['source_gates']['identical_original_rgb_partition_from_P1']
+          assert r['source_gates']['stable_medoid_cross_run_bitwise']
+          assert r['source_gates']['protected_source_ownership']
+          assert r['R2_P1_SOURCE_GATE_FAIL_HISTORY_UNCHANGED']
+          assert r['status'] in ('SOURCE_GATE_FAIL','SOURCE_RGB_VISUAL_PENDING')
+          assert r['neural_features']==r['game32_candidate']==r['native_Egret']=='NOT_RUN'
+          assert r['game_E4']==r['independent_E5']=='NOT_RUN' and r['exact_CHALK'] is None
+          for name,digest in r['file_sha256'].items():
+              assert hashlib.sha256((d/name).read_bytes()).hexdigest()==digest,name
+          print('R2-P2 M1 source status:',r['status'])
+          print('R2-P2 M1 original-source mean/P95 before/after:',r['M1_no_merge_quality'],r['M1_merged_quality'])
+          print('R2-P2 M1 fixed source edges:',r['fixed_edge_no_merge'],r['fixed_edge_merged'])
+          print('R2-P2 M1 gates:',r['source_gates'])
+          print('R2-P2 M1 report sha256:',hashlib.sha256((d/'report.json').read_bytes()).hexdigest())
+          PY
+      - name: Record explicit technical or source prerequisite failure
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=Path(os.environ['RUNNER_TEMP'])/'engine001-r2-p2-p1-m1'
+          d.mkdir(exist_ok=True,parents=True)
+          if not (d/'report.json').exists():
+              (d/'ci-failure.json').write_text(json.dumps({
+                'status':'BLOCKED_R2_P2_P1_M1_TECHNICAL_OR_PROVENANCE',
+                'github_sha':os.getenv('GITHUB_SHA'),
+                'github_run_id':os.getenv('GITHUB_RUN_ID'),
+                'production_accepted':False,
+                'native_Egret':'NOT_RUN'
+              },indent=2)+'\n')
+          PY
+      - name: Upload immutable source evidence, including negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-r2-p2-p1-m1-stable-medoid-source-evidence
+          path: ${{ runner.temp }}/engine001-r2-p2-p1-m1/
+          if-no-files-found: warn
+          retention-days: 30
