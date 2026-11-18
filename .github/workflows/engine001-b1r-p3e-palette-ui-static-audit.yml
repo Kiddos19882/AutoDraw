@@ -1,0 +1,86 @@
+name: ENGINE-001 B1-R P3E static engine128 palette and UI selection route audit
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p3e-palette-ui-static-audit.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3e_palette_ui_static_audit.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p3e_palette_ui_static_audit.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3b_engine128_adaptive32.py'
+      - 'AutoDraw_Stage20/gameEngine/main.min_653f95bc.js'
+      - 'AutoDraw_Stage20/data/palettes/browser_palette.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p3e-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  p3e-static-engine-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned source static audit dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Bounded E2 static contracts and Markdown docs audit
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p3e_palette_ui_static_audit.py AutoDraw_Stage20/tests/test_engine001_b1r_p3e_palette_ui_static_audit.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p3e_palette_ui_static_audit.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Pinned engine128 JS static route and old screenshot32 subset E1 evidence
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p3e_palette_ui_static_audit.py \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --screenshot-json AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-b1r-p3e"
+          python - <<'PY'
+          import json, hashlib, os
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p3e"
+          r=json.loads((base/"report.json").read_text(encoding="utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P3E_ENGINE128_COLOR_UI_AUDIT_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["source_engine_git_blob_sha1"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["source_engine_bytes"]==4859418
+          assert r["source_screenshot_json_git_blob_sha1"]=="461b5f3725b9b79888ad36e807b3cf4c9e445e98"
+          assert r["all_engine_colors_static"]==128
+          assert r["screenshot32_source_matches"]==32
+          assert r["engine_colors_not_in_screenshot32"]==96
+          assert all(r["checks"].values()),r["checks"]
+          assert r["source_screenshot_coordinates_current_executor_calibration"] is False
+          assert r["all_128_colors_currently_clickable_in_live_game"]=="UNKNOWN_E4_NOT_RUN"
+          assert r["existing_128_to_actual_ui_position_mapping"] is None
+          assert r["native_game_egret_coverage_leakage"]=="NOT_RUN"
+          assert r["exact_game_CHALK"] is None
+          assert r["production_promotion"] is False
+          for f,h in r["file_sha256"].items():
+              assert hashlib.sha256((base/f).read_bytes()).hexdigest()==h,f
+          print("P3E_STATIC_ENGINE128_SCREENSHOT32_MATCH_ONLY")
+          print("P3E_STATIC_UI_HANDLER_E1_POSSIBLE",r["UI_event_handler_setColor_E1_possible"])
+          print("P3E_STATIC_UI_ROUTING_TOKEN_COUNTS",r["UI_js_token_occurrence_counts"])
+          print("P3E_ALL_MEMBER_SHA_PASS",len(r["file_sha256"]))
+          print("NOT_E4_NOT_LIVE_NOT_NATIVE_NO_EXACT_CHALK")
+          PY
+      - name: Preserve one audit ZIP even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p3e-static-engine128-ui-audit-one-zip
+          path: ${{ runner.temp }}/engine001-b1r-p3e/
+          retention-days: 30
+          if-no-files-found: warn
