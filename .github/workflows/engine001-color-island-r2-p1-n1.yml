@@ -94,7 +94,7 @@ jobs:
           assert r['S4_archive_sha256']=='408f26b7d349bb5ee503bdf8f825c9f1dde9d639abd4bf4c96ee575beb3c860e'
           assert r['checkpoint']['real_pretrained_checkpoint_sha256']=='ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1'
           assert r['DINO_dense_repooled_for_R2'] is True
-          assert r['source_gates']['identical_source_partition_and_m0_replay']
+          assert r['source_gates']['identical_source_partition_and_m0_labels']
           assert r['source_gates']['protected_original_region_ids_unchanged']
           assert r['true_pretrained_inference']=='REPLAY_OF_HISTORICAL_S4_NOT_NEW_INFERENCE'
           assert r['status'] in ('SOURCE_GATE_FAIL','SOURCE_RGB_VISUAL_PENDING','NEURAL_NO_EFFECT')
@@ -106,6 +106,7 @@ jobs:
               assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name
           print('R2-P1 N1 genuine archive replay status:',r['status'])
           print('R2-P1 N1 changed merge choices:',r['M0_N1_changed_merge_choices'])
+          print('R2-P1 M0 archived RGB vs same-env replay drift:',r['M0_frozen_to_same_environment_render_drift_pixels'])
           print('R2-P1 N1 source quality:',r['N1_RGB_source_quality'])
           print('R2-P1 N1 gates:',r['source_gates'])
           print('R2-P1 N1 report SHA256:',hashlib.sha256((root/'report.json').read_bytes()).hexdigest())

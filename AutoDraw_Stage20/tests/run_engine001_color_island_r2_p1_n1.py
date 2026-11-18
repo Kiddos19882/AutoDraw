@@ -158,8 +158,10 @@ def run(source: Path, palette: Path, m0_archive: Path, s4_archive: Path, output:
     # Integrity of baseline M0 after enabling the optional pair-scoring extension.
     m0_ids,m0_info=merge_one_pass(rgb,labels,coarse,protected)
     regenerated_m0=render_source_medoids(rgb,m0_ids,bg)
-    if not np.array_equal(m0_ids,frozen_m0_ids) or not np.array_equal(regenerated_m0,frozen_m0_rgb):
-        raise ValueError('BLOCKED_R2_P1_M0_BASELINE_CHANGED')
+    if not np.array_equal(m0_ids,frozen_m0_ids):
+        raise ValueError('BLOCKED_R2_P1_M0_BASELINE_LABELS_CHANGED')
+    baseline_render_drift_pixels = int(np.count_nonzero(np.any(
+        regenerated_m0 != frozen_m0_rgb, axis=2)))
     scored=[]
     def scorer(source_row,target_row,source_de,contacts,extra):
         src=int(source_row['id']); dst=int(target_row['id'])
@@ -171,19 +173,21 @@ def run(source: Path, palette: Path, m0_archive: Path, s4_archive: Path, output:
         return -bonus
     n1_ids, info=merge_one_pass(rgb,labels,coarse,protected,score_adjustment=scorer)
     n1_rgb=render_source_medoids(rgb,n1_ids,bg)
-    qm0=_quality(rgb,frozen_m0_rgb); qn1=_quality(rgb,n1_rgb)
-    e0=strong_edges(frozen_m0_rgb)[0];e1=strong_edges(n1_rgb)[0];es=strong_edges(rgb)[0]
+    qm0=_quality(rgb,regenerated_m0); qn1=_quality(rgb,n1_rgb)
+    frozen_m0_quality=_quality(rgb,frozen_m0_rgb)
+    e0=strong_edges(regenerated_m0)[0];e1=strong_edges(n1_rgb)[0];es=strong_edges(rgb)[0]
     overlap_m0=float(np.count_nonzero(es&e0)/max(1,int(es.sum())))
     overlap_n1=float(np.count_nonzero(es&e1)/max(1,int(es.sum())))
     m0_choices={int(i['source']):int(i['target']) for i in m0_info['accepted']}
     n1_choices={int(i['source']):int(i['target']) for i in info['accepted']}
     changes={str(i):{'M0':m0_choices.get(i),'N1':n1_choices.get(i)}
              for i in sorted(m0_choices.keys()|n1_choices.keys()) if m0_choices.get(i)!=n1_choices.get(i)}
-    accents_m0=source_rgb_unsupported_chroma(rgb,frozen_m0_rgb)
+    accents_m0=source_rgb_unsupported_chroma(rgb,regenerated_m0)
     accents_n1=source_rgb_unsupported_chroma(rgb,n1_rgb)
     guards={
         'authentic_pretrained_and_source_sha':True,
-        'identical_source_partition_and_m0_replay':True,
+        'identical_source_partition_and_m0_labels':True,
+        'frozen_m0_rgb_render_exact':baseline_render_drift_pixels==0,
         'protected_original_region_ids_unchanged':info['protected_unchanged'],
         'background_unchanged':info['background_unchanged'],
         'mean_deltaE00_not_worse_than_M0':qn1['mean_delta_e00']<=qm0['mean_delta_e00']+1e-7,
@@ -193,7 +197,7 @@ def run(source: Path, palette: Path, m0_archive: Path, s4_archive: Path, output:
         'R2_P1_frozen_source_mean_gate':qn1['mean_delta_e00']<=4.79698,
         'R2_P1_frozen_source_p95_gate':qn1['p95_delta_e00']<=20.0,
     }
-    if not changes:
+    if not changes and baseline_render_drift_pixels==0:
         status='NEURAL_NO_EFFECT'
     else:
         status='SOURCE_RGB_VISUAL_PENDING' if all(guards.values()) else 'SOURCE_GATE_FAIL'
@@ -202,21 +206,24 @@ def run(source: Path, palette: Path, m0_archive: Path, s4_archive: Path, output:
         'original_RGB.png':rgb,
         'B0_original_G32.png':palette_rgb[g32],
         'M0_original_frozen_RGB.png':frozen_m0_rgb,
+        'M0_replayed_same_environment_RGB.png':regenerated_m0,
+        'M0_frozen_vs_replayed_drift.png':(np.any(
+            regenerated_m0 != frozen_m0_rgb,axis=2).astype(np.uint8)*255),
         'N1_DINO_HINTS_RGB.png':n1_rgb,
-        'M0_N1_changed_pixels.png':(np.any(n1_rgb!=frozen_m0_rgb,axis=2).astype(np.uint8)*255),
+        'M0_N1_changed_pixels.png':(np.any(n1_rgb!=regenerated_m0,axis=2).astype(np.uint8)*255),
         'original_protected_source_union.png':(protected.astype(np.uint8)*255),
     }
     for name,array in images.items():
         Image.fromarray(array).save(output/name)
     Image.fromarray(n1_ids.astype(np.int32),mode='I').save(output/'N1_merged_region_ids.tiff')
     for name,(x0,y0,x1,y1) in ROI.items():
-        imgs=[rgb,frozen_m0_rgb,n1_rgb]
+        imgs=[rgb,regenerated_m0,n1_rgb]
         crop=Image.new('RGB',((x1-x0)*len(imgs),y1-y0))
         for k,a in enumerate(imgs):
             crop.paste(Image.fromarray(a).crop((x0,y0,x1,y1)),(k*(x1-x0),0))
         crop.resize((crop.width*3,crop.height*3),Image.Resampling.NEAREST).save(output/f'detail_{name}.png')
     strip=Image.new('RGB',(150*4,240))
-    for k,a in enumerate((rgb,palette_rgb[g32],frozen_m0_rgb,n1_rgb)):
+    for k,a in enumerate((rgb,palette_rgb[g32],regenerated_m0,n1_rgb)):
         strip.paste(Image.fromarray(a),(k*150,0))
     strip.resize((1200,480),Image.Resampling.NEAREST).save(output/'original_B0_M0_N1_2x.png')
     rep={
@@ -241,6 +248,10 @@ def run(source: Path, palette: Path, m0_archive: Path, s4_archive: Path, output:
         'neural_candidate_scores':scored,
         'N1_merge_ledger':info,
         'M0_RGB_source_quality':qm0,
+        'M0_original_frozen_RGB_source_quality':frozen_m0_quality,
+        'M0_frozen_to_same_environment_render_drift_pixels':baseline_render_drift_pixels,
+        'M0_baseline_render_drift_disclaimer':
+          'The N1 vs M0 differential uses the same-env recalculated M0, never reuses the frozen M0 render as a fake same-env comparison. Any nonzero drift fails source gates.',
         'N1_RGB_source_quality':qn1,
         'M0_source_edge_overlap':overlap_m0,
         'N1_source_edge_overlap':overlap_n1,
