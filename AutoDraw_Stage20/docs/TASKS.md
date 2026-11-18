@@ -1,3 +1,11 @@
+## ENGINE-001 / B1-R-P4A2 all 10 native brush widths COMPLETE; full-color native study NEXT (2026-11-18)
+
+- [x] User requested every brush width 1,2,3,4,5,6,7,8,9,10. New independent [P4A2 frozen experiment](ENGINE001_B1R_P4A2_NATIVE_WIDTHS_1_TO_10_PREREG_2026-11-18.md) registered before any native image; unexecuted P4A-V1 four-width proposal superseded only as pilot.
+- [x] Reuse existing Egret BoardPane/WebGL`native_batch`; opt-in method `renderP4A2BrushWidths1to10Probe` isolated, all legacy default widths unchanged. Two short original-derived H/diagonal RGB strokes against BOTH E/F from C192 D_COMPONENT24; only source-derived game-engine pixels, no G32/V44 images as candidate.
+- [x] **[Native CI44298271642](https://github.com/Kiddos19882/AutoDraw/actions/runs/44298271642)** exact `bc2732c0a104cfc02392d12b14773bdb87900c87`: Python 14/14 PASS, Node JS20/20 PASS, Markdown PASS, 10/10 widths E3 PASS, **40/40 native E/F × orientations at alpha24 beyond3logicalpx=0**, every native blank zero ink. Technical CI44297339997 markdown fail and CI44297723475 Windows EOL source pin fail retained. ZIP [artifact14423584387](https://github.com/Kiddos19882/AutoDraw/actions/runs/44298271642/artifacts/14423584387) SHA256 `dd7f7b6bc8241c69ff3251787d691299fee25b1b2338245dbb97099940b0c64a`: independently CRC+47/47 SHA PASS, 48 members.
+- [ ] **NEXT:** one new prereg original-only full-color owner coverage and NEW joint contour/outline, preserving all 4 P2D sources, E+F, all actual brush widths1..10, widths limited by native footprint E3. Measure native coverage≥99%, leakage≤3logicalpx and source readability separately before any promotion; this pilot only 2 short strokes.
+- [ ] E4 real game/valid calibration/independent E5 and exact `post.pointCount-pre.pointCount` CHALK still NOT_RUN. 128-color UI work deferred per DEC-039, not production blockage for offline source E3.
+
 ## ENGINE-001 / DEC-039 — palette DEFERRED; NEXT P4A native Egret brush geometry (2026-11-18)
 
 - [x] Пользователь сообщил, что все128 игровых цветов выбираются в UI; **USER_REPORTED**, без independent run-bound E4; отложить дальнейшие проверки/настройки палитры до запроса пользователя. Старые screenshot32 экранные координаты не использовать без новой калибровки.
