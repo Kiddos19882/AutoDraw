@@ -118,5 +118,6 @@ jobs:
         with:
           name: engine001-b1r-p4b7-genuine-egret-attribution-one-zip
           path: AutoDraw_Stage20/.p4b7-work/
+          include-hidden-files: true
           retention-days: 30
           if-no-files-found: warn
