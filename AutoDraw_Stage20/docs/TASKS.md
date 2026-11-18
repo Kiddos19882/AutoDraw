@@ -1,3 +1,8 @@
+## ENGINE-001 R2-P2-P2-B1 game32 source support — completed negative (2026-11-18)
+
+- [x] Frozen independent B1 P0→32-game-swatch protocol and original P0/M1/V44 inputs; [CI44230985963](https://github.com/Kiddos19882/AutoDraw/actions/runs/44230985963) SHA `774dedb4f6`, 7/7 unit PASS, full E3 SUCCESS, artifact14394179902 CRC+19/19 SHA PASS, all four source candidates `SOURCE_GATE_FAIL`. CHROMA12_SPATIAL chroma suspects0 vs1368 baseline but 1427 components/883 singletons vs G32 1284/779; P0 nearest32 increases components to2210. Native/game/CHALK NOT_RUN.
+- [ ] **NEXT B2 (new prereg before implementation):** source-supported conservative component cleanup on B1_CHROMA12_SPATIAL **only**, preserve actual original protected geometry and component negative evidence; report whether cleanup can meet G32 component/singleton counts without color and face degradation. Separate real Egret round-brush validation later and visual human review pending.
+
 ## RGB-VISUAL-MVP-P0 — completed source visual screening, gameplay still open (2026-11-18)
 
 - [x] **P0 E2/E3 source-only:** [CI44229576245](https://github.com/Kiddos19882/AutoDraw/actions/runs/44229576245) `b0b134d98c7ed7093dc61fcf02e0ba87e3f1e3c2` 5/5 unit PASS, 4/4 visual RGB candidates `SOURCE_SCREEN_PASS_VISUAL_PENDING`, artifact14393769123 CRC+14/14 files SHA PASS; original V44-B410 unchanged, M1 baseline remains failed. One earlier CI run failed on unindexed protocol, fixed with Markdown audit PASS.

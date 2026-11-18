@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 B1 game32 source-support candidates (negative)
+
+Added test-only B1 original RGB chroma/brightness guard and deterministic protected-seam Potts candidate for 32 actual game swatches, synthetic contracts and independent GitHub workflow. [CI44230985963](https://github.com/Kiddos19882/AutoDraw/actions/runs/44230985963) E2/E3 technical PASS, all four candidates SOURCE_GATE_FAIL on nonwhite connected-component/singleton counts; real V44-B410, production, master, Stage6 unchanged. Preserve negative PNG/labels for new separately preregistered B2 source-safe cleanup.
+
 ## 2026-11-18 — original RGB prefilter MVP-P0 test-only controls
 
 Preregistered one source-only P0 edge-aware experiment, four bilateral/mean-shift original-input filters, 5 synthetic regression tests and dedicated bounded GitHub Actions. [CI44229576245](https://github.com/Kiddos19882/AutoDraw/actions/runs/44229576245) E3 successful with pinned M1/V44 archives and 14/14 SHA. Screens pass source-only; no production or game-color/native promotion, user visual pending. Documentation-index initial failure and repair retained. Exact original410 and M1 historical FAIL unchanged.
