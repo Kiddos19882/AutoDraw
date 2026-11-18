@@ -1,0 +1,98 @@
+name: ENGINE-001 B1-R P2C original RGB residual ink palette
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p2c-source-ink-palette.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b1r-p2c-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p2c-original-source-ink:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout with bounded timeout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned mathematical libraries
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Validate source and provenance contracts plus documentation index
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py AutoDraw_Stage20/tests/test_engine001_b1r_p2c_source_ink_palette.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p2c_source_ink_palette.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Run original RGB-only P2C compression and archive member checks
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-b1r-p2c"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p2c"
+          result=json.loads((d/"report.json").read_text(encoding="utf8"))
+          assert result["github_sha"]==os.environ["GITHUB_SHA"]
+          assert result["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert result["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert result["candidate_source"]=="original_RGB"
+          for k in ("legacy_G32_used_as_candidate","legacy_V44_used_as_candidate",
+                    "legacy_M1_mask_used_as_candidate",
+                    "frozen_P2_V1_or_P2B_artifacts_used_as_input"):
+              assert result[k] is False,k
+          assert result["only_original_RGB_file_read"] is True
+          assert result["native_Egret_brush"]=="NOT_RUN"
+          assert result["game32_projection"]=="NOT_RUN"
+          assert result["human_visual"]=="PENDING"
+          assert result["exact_game_CHALK"] is None
+          assert set(result["metrics"])=={"C_096","C_192"}
+          for filename,want in result["file_sha256"].items():
+              got=hashlib.sha256((d/filename).read_bytes()).hexdigest()
+              assert got==want,("BLOCKED_P2C_MEMBER_SHA",filename)
+          for name,m in result["metrics"].items():
+              assert m["gates"]["source_member_provenance"]
+              assert m["gates"]["no_changes_outside_original_ink"]
+              assert m["gates"]["full_rgb_bounded"]
+              assert m["gates"]["discrete_logical_no_new_colors"]
+              assert m["status"] in ("SOURCE_SCREEN_PASS_VISUAL_PENDING","SOURCE_GATE_FAIL")
+              print(name, m["status"],
+                    "full_RGB",m["full_composite_distinct_RGB"],
+                    "NEAREST_RGB",m["logical_discrete_NEAREST_distinct_RGB"],
+                    "LANCZOS_RGB",m["logical_visual_LANCZOS_distinct_RGB_NOT_palette"],
+                    "meanDE",round(m["source_original_lanczos"]["mean_deltaE00"],5),
+                    "p95",round(m["source_original_lanczos"]["p95_deltaE00"],5),
+                    "edge_recall",round(m["original_fixed_sobel90_1px_recall"],5),
+                    "failed_gates",[k for k,v in m["gates"].items() if not v])
+          print("B1R_P2C_MEMBER_SHA_PASS",len(result["file_sha256"]))
+          print("PALETTE32_NATIVE_EGRET_E4_E5_EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Always preserve all PNG, masks, ledgers, report for user ZIP review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p2c-review-all-png-and-evidence
+          path: ${{ runner.temp }}/engine001-b1r-p2c/
+          retention-days: 30
+          if-no-files-found: warn
