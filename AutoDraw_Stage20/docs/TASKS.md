@@ -1,3 +1,10 @@
+## ENGINE-001 / P3E E1/E2/E3 done: verify real palette accessibility before native brush (2026-11-18)
+
+- [x] DEC-038 — both P3D `E_SOBEL90` and `F_SOBEL90_LAB12` user visually approved for continuation without sole winner; all4 source P2D remain.
+- [x] Pinned [P3E static engine128 UI audit](ENGINE001_B1R_P3E_ENGINE128_COLOR_UI_AUDIT_PREREG_2026-11-18.md) [CI44294130870](https://github.com/Kiddos19882/AutoDraw/actions/runs/44294130870) exact `7247011cdc682601ca551df90f9acb2b5b188090`: 12/12 E2 PASS, E3 SUCCESS, [ZIP14422178249](https://github.com/Kiddos19882/AutoDraw/actions/runs/44294130870/artifacts/14422178249) SHA256 `75f95ccd064d4b76e0b153ed0cf7c0b6ad59a5fbe53c8c078e13c05d761b064e`, CRC/5 member hashes PASS. Source JS proves static `eggColorChangedHandler → painterBoard.setColor`, not live palette.
+- [ ] **NEXT** verify active game's extended palette mode, actual ability to select all 32 P3D engine swatches, current UI calibration and color echo; fail-closed if unavailable. 27/32 required colors outside archived screenshot32; never use old screenshot coords.
+- [ ] After verified live UI color access, prereg actual native Egret round-brush/coverage/leakage/E4 and exact CHALK run binding. No production/master changes.
+
 ## ENGINE-001 / B1-R-P3D visual signoff / P3E palette UI feasibility (2026-11-18)
 
 - [x] **DEC-038 user visual acceptance BOTH E_SOBEL90 and F_SOBEL90_LAB12:** no strong degradation observed; keep all four P2D C096/C192×both D; no sole winner; applies offline P3D preview only.
