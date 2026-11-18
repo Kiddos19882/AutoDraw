@@ -38,3 +38,25 @@
 
 **Граница:** palette32 projection, actual native Egret round brush, Stage6 executor, Monitor/Bridge, live E4, independent E5 и exact CHALK `post.pointCount-pre.pointCount` — **NOT_RUN**. Master/production неизменны. Итог визуального просмотра пользователя — `PENDING` до получения его оценки; E3 не объявлять визуальным PASS. До исполнения: P2C code/E2/E3 = `NOT_RUN`; после добавить outcome append-only в этот протокол и нужные status/tasks/results.
 
+## Первый P2C run: frozen outcome (2026-11-18; append-only)
+
+[CI44263770838](https://github.com/Kiddos19882/AutoDraw/actions/runs/44263770838), **exact SHA** `b20d9e8ead30fa7605d69f655ae3d7ab6c0890fb`: E2 11/11 deterministic synthetic regression PASS; E3 full original-only GitHub Actions job SUCCESS; Markdown audit PASS. [Artifact14408783882](https://github.com/Kiddos19882/AutoDraw/actions/runs/44263770838/artifacts/14408783882), independent downloaded ZIP SHA256 `f396ed07bb9fb46427350c57a4bf37aa47f5bbc49e89db25b72a3f9093b09e42`, CRC PASS, **26/26** member hashes exactly match frozen `report.json` (27 ZIP entries total incl report); report SHA256 `35d61dc3e51bafddcf7bcf118cd692160ab1c1befef3772be614202aac7e003a`. Python3.11.18/NumPy2.2.6/SciPy1.15.3/scikit-image0.25.2/OpenCV4.11/Pillow11.3.0. Only original pinned 200×320 RGB SHA `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, no G32/V44/M1 or frozen P2/P2B outputs used.
+
+Same-run reference: source-only J_FINE **682** regions, **252** unique full RGB medoids; original `K_DETAIL` source residual geometry **14,904/64,000 pixels**, same-run uncompressed complete full RGB **13,517** colors and LANCZOS logical RGB **11,374** colors, mean original ΔE00 **0.748620**. P2C mask geometry unchanged; each compressed ink pixel obtains a real RGB source member from its own original source ink mask.
+
+| Outcome | C_096 | C_192 |
+|---|---:|---:|
+| Source mask colors | 96 | 192 |
+| Full uninterpolated RGB distinct | 347 | 443 |
+| Logical NEAREST RGB distinct | 347 | 442 |
+| Logical LANCZOS RGB distinct (*not* game swatches) | 10,778 | 11,068 |
+| Source mean ΔE00 | 1.148854 | 1.036390 |
+| Source p95 ΔE00 | 3.510995 | 3.038565 |
+| Female face-eye ROI mean ΔE00 | 2.024609 | 1.754564 |
+| Male face-eye ROI mean ΔE00 | 1.743704 | 1.514455 |
+| Hands ROI mean ΔE00 | 1.708125 | 1.517662 |
+| Source Sobel90 recall (1-logical-pixel neighborhood) | 1.000 | 1.000 |
+| Source+12 chroma-excess pixels | 0 | 0 |
+| All prereg source numerical gates | PASS | PASS |
+
+**Both statuses strictly `SOURCE_SCREEN_PASS_VISUAL_PENDING`** (no user visual acceptance). Source medoid/geometry provenance confirmed by contracts and raw SHA. Assistant E1 inspection of original/flat/P2B/C_096/C_192 five-column PNG: original face structure/hair/clothes remain recognizable; C_192 changes colors less than C_096 but both visibly close to P2B. This inspection is **not** a user review, native Egret test, palette32 feasibility or run-bound CHALK measurement. Preserve independent P2/V1 and P2B/V1 results and failures unchanged. Next: user visually compare images in artifact ZIP; separately prereg original-first palette32 **only after** visual acceptance. No production promotion; palette32/native round brush/E4/E5/exact CHALK `NOT_RUN`.
