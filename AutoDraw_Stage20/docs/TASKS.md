@@ -1,3 +1,8 @@
+## RGB-VISUAL-MVP-P0 — completed source visual screening, gameplay still open (2026-11-18)
+
+- [x] **P0 E2/E3 source-only:** [CI44229576245](https://github.com/Kiddos19882/AutoDraw/actions/runs/44229576245) `b0b134d98c7ed7093dc61fcf02e0ba87e3f1e3c2` 5/5 unit PASS, 4/4 visual RGB candidates `SOURCE_SCREEN_PASS_VISUAL_PENDING`, artifact14393769123 CRC+14/14 files SHA PASS; original V44-B410 unchanged, M1 baseline remains failed. One earlier CI run failed on unindexed protocol, fixed with Markdown audit PASS.
+- [ ] **Visual user review + B1 NEXT:** decide if prefiltered RGB preserves recognizability, then separately preregister source-supported regions/swatch assignment to real game32 without false pink and verify real round-brush coverage. P0 still has >10k colors, does NOT fit game palette yet; do not treat CI execution or visual preview as native PASS.
+
 ## ENGINE-001 / COLOR-ISLAND-R2 — next step (2026-11-18)
 
 - [x] **R2-P2-0 E1 root-cause completed:** G32 white/source mask discrepancy3929 in one direction, dynamic Sobel threshold alone explains six false source-edge losses at unchanged gradients, 78px/37-region medoid float ties. [R2-P2 root-cause и протокол M1](ENGINE001_COLOR_ISLAND_R2_P2_ROOT_CAUSE_AND_NUMERICAL_REBASE_PROTOCOL_2026-11-18.md); do not rewrite frozen P1 FAIL.

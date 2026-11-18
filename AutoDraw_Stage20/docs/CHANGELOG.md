@@ -1,3 +1,7 @@
+## 2026-11-18 — original RGB prefilter MVP-P0 test-only controls
+
+Preregistered one source-only P0 edge-aware experiment, four bilateral/mean-shift original-input filters, 5 synthetic regression tests and dedicated bounded GitHub Actions. [CI44229576245](https://github.com/Kiddos19882/AutoDraw/actions/runs/44229576245) E3 successful with pinned M1/V44 archives and 14/14 SHA. Screens pass source-only; no production or game-color/native promotion, user visual pending. Documentation-index initial failure and repair retained. Exact original410 and M1 historical FAIL unchanged.
+
 ## 2026-11-18 — source micro-island vs unsupported game32 swatch diagnostic
 
 Added preregistered test-only `ENGINE001_COLOR_ISLAND_R2_P2_P2_SOURCE_SUPPORT_AUDIT` runner, 15 regression tests and isolated CI; [CI44220144140](https://github.com/Kiddos19882/AutoDraw/actions/runs/44220144140) E3 technical PASS with verified original M1 archive hashes. M1 source singletons and false-looking G32 swatch fragments measured separately, no silent recolor/removal. Same original V44-B410, production, master and frozen negative outcomes. Next independent B1 source-supported region color plan.
