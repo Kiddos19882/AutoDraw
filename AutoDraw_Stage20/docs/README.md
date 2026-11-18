@@ -1,3 +1,5 @@
+**ENGINE-001 B1-R-P1 original RGB-only prereg (2026-11-18):** [B1-R-P1 full-resolution source-derived protection and independently generated new edge-outline protocol](ENGINE001_B1R_P1_FULLRGB_EDGE_AWARE_PREREG_2026-11-18.md). Fixed A_SOFT/A_MID bilateral, original 200×320 RGB → 150×240, no G32/M1/V44 candidates or historical masks, no palette32/native/game/CHALK. Test-only source runner registered, E2/E3 NOT_RUN until concrete CI.
+
 ## Текущая активная задача (2026-11-18) — ENGINE-001 / B1-R
 
 **Решение пользователя [DEC-034](DECISIONS.md#dec-034-engine-001-перезапуск-с-b1-r-g32-и-старый-v44-b--только-история-и-сравнение):** G32/P4c1 и старый контур V44-B **больше не входят в новые кандидаты**; только отдельные исторические/сравнительные материалы. Нельзя возвращаться к их заливке или накладывать прежний V44-B как готовый контур новой картинки. Старые B1/B2/B3/B4 артефакты, workflow и отрицательные исходы **сохранены**, не являются текущим backlog.
