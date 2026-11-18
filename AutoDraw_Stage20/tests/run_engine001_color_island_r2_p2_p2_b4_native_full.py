@@ -124,7 +124,8 @@ def _stats(source_rgb,real_native_frame):
                     "RGB_MAE_diagnostic":float(np.abs(source_rgb.astype(float)-native.astype(float)).mean())}
 
 def _sheet(images,output):
-    font=ImageFont.truetype("DejaVuSans.ttf",18)
+    try:font=ImageFont.truetype("DejaVuSans.ttf",18)
+    except OSError:font=ImageFont.load_default()
     canvas=Image.new("RGB",(1800,768),"white")
     dr=ImageDraw.Draw(canvas)
     for i,(name,img) in enumerate(images.items()):
@@ -167,7 +168,8 @@ def run(workspace,source,palette_path,renderer_path,p4c1_zip,p4c2_zip,v44_zip,ou
             raise ValueError("BLOCKED_B4_NATIVE_BACKING_SHAPE")
         stable={int(i):bool(np.array_equal(rgba[f"color-{i}"][:,:,3],old_owner_frames[i][:,:,3]))
                 for i in OWNERS}
-        native=native_metrics(rgba,g,strokes)
+        paint_frames={"composite":rgba["composite"],**{f"color-{int(i)}":rgba[f"color-{int(i)}"] for i in OWNERS}}
+        native=native_metrics(paint_frames,g,paint)
         assessed=assess_native(native)
         scene,numeric=_stats(original,rgba["composite"])
         scene.save(out/(variant+"_native_real_ROI.png"))
