@@ -1,0 +1,156 @@
+name: ENGINE-001 B1-R P4B10 genuine Egret original correction width 70-arm sweep
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4b10-native-width-sweep.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b10_native_correction_width_sweep.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4b10_native_correction_width_sweep.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4B10_NATIVE_CORRECTION_WIDTH_SWEEP_PREREG_2026-11-18.md'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4b9_native_far3_attribution.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4b10-70-source-width-egret
+  cancel-in-progress: true
+jobs:
+  real-native-width-70-arm-sweep:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned native Egret test dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: P4B10 E2 plus P4B9 P4B8 P4B7 P4B6 P4B5 P4B4 P4B2 P4B1 and JS
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4b10_native_correction_width_sweep.py AutoDraw_Stage20/tests/test_engine001_b1r_p4b10_native_correction_width_sweep.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b10_native_correction_width_sweep.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b9_native_far3_attribution.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b8_causal_stroke_surgery.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b7_native_stroke_attribution.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b6_source_protected_margin.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b5_protected_baseline_rebalance.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b4_boundary_tolerance_sweep.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b2_native_edge_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4b1_hybrid_zone_coverage.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Pin exact original game engine renderer and P4B6-P4B9 source
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b2_native_edge_repair.py":"0053829480c6327ef5c541024593f6e0018aa35e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b5_protected_baseline_rebalance.py":"6bde1a99ff200c55cd7929f7cea32eae0aba9178",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b6_source_protected_margin.py":"2f9ca1756da58e7062fcae6c6c64c83e4db79ea9",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b8_causal_stroke_surgery.py":"9ddf8e2f745de4f78006b14c00e99e74c2f3cb67",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b9_native_far3_attribution.py":"c4b1d06011a6acbd90bb4e18d8bd6a72a3cce4ef",
+          }
+          for path,needed in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==needed,(path,found,needed)
+              Path(path).write_bytes(raw)
+              print("P4B10_FROZEN_BLOB",path,found)
+          PY
+      - name: Recompute original P4B6 and run 70 genuine E/F native width scenes
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4b10_native_correction_width_sweep.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4b10-work
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.p4b10-work")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4B10_NATIVE_CORRECTION_WIDTH_SWEEP_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["true_Egret_native_arms_complete"]==70
+          assert r["source_original_SHA256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["source_key"]=="C_192_D_COMPONENT24" and r["source_engine_owner_index"]==115
+          assert r["p4b6_git_blob"]=="2f9ca1756da58e7062fcae6c6c64c83e4db79ea9"
+          assert r["p4b7_git_blob"]=="87ea292c01c75e594c4ff09acf716c4500e88644"
+          assert r["p4b8_git_blob"]=="9ddf8e2f745de4f78006b14c00e99e74c2f3cb67"
+          assert r["p4b9_git_blob"]=="c4b1d06011a6acbd90bb4e18d8bd6a72a3cce4ef"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["p4b6_recomputed_original_same_run"] is True
+          assert r["frozen_width_matrix_E_60_F_10"] is True
+          assert r["source_original_EF_only"] is True
+          assert r["old_G32_P4c1_V44_as_candidate"] is False
+          assert r["native_alpha_gate"]==24
+          assert r["frozen_owner_coverage_gate"]==.99
+          assert r["frozen_protected_foreign_gate"]==0
+          assert r["frozen_spill_logical_gate"]==3.
+          assert r["max_strokes"]==250 and r["max_synthetic_vertices_NOT_CHALK"]==500
+          assert r["production_promotion"] is False
+          assert r["E4_game_runtime"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_CHALK"] is None
+          assert r["result"] in ("BOTH_EF_NATIVE_ALL_GATES_PASS",
+                                  "NATIVE_WIDTH_SWEEP_QUALITY_NOT_ALL_PASS")
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          assert len(r["methods"]["E_SOBEL90"]["arms"])==60
+          assert len(r["methods"]["F_SOBEL90_LAB12"]["arms"])==10
+          scenes=0
+          for method,part in r["methods"].items():
+              assert part["exact_native_full_alpha_parity"] is True
+              assert part["all_arms_genuine_native"] is True
+              for arm,entry in part["arms"].items():
+                  assert entry["native_Egret_real"] is True
+                  assert entry["native_blank_zero"]==0
+                  assert entry["source_width_ledger"]["all_nonculprits_immutable"] is True
+                  assert entry["source_width_ledger"]["source_supported_true"] is True
+                  assert entry["source_width_ledger"]["strokes_NOT_CHALK"]<=250
+                  assert entry["source_width_ledger"]["synthetic_vertices_NOT_CHALK"]<=500
+                  assert len(entry["source_width_ledger"]["changed_candidate_ids"])<=2
+                  s=entry["native_alpha"]["24"]
+                  print("P4B10_NATIVE_RESULT",method,arm,entry["quality_status"],
+                        "coverage",s["native_component_coverage"],
+                        "protected",s["native_protected_foreign_face_eyes_hands_pixels"],
+                        "far3",s["native_foreign_distance_gt_T3_0"])
+                  scenes+=1
+              print("P4B10_METHOD_SUMMARY",method,part["native_safe_width_arm_count"],
+                    "best",part["best_safe_diagnostic"])
+          assert scenes==70
+          for name,sha in r["file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print("P4B10_70_TRUE_NATIVE_SCENES_AND_MANIFEST_PASS",len(r["file_sha256"]))
+          print("P4B10_IMAGE_QUALITY_SEPARATE",r["result"],"NO_E4_OR_EXACT_CHALK")
+          PY
+      - name: Preserve source 70 actual Egret PNG blank and negative evidence in one ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p4b10-native-width-70-arm-one-zip
+          path: AutoDraw_Stage20/.p4b10-work/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: warn
