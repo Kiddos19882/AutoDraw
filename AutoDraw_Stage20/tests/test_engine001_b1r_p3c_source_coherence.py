@@ -144,7 +144,9 @@ class P3CContracts(unittest.TestCase):
                 imported.add(node.module)
         self.assertFalse(any("v44" in s.lower() or "g32" in s.lower()
                              for s in imported))
-        self.assertIn("run_engine001_b1r_p3b_engine128_adaptive32", imported)
+        direct = {name for n in ast.walk(tree) if isinstance(n, ast.Import)
+                  for name in (x.name for x in n.names)}
+        self.assertIn("run_engine001_b1r_p3b_engine128_adaptive32", direct)
         self.assertIn("run_engine001_b1r_p1_fullrgb_edge_aware", imported)
 
     def test_13_output_overwrite_fail_closed(self):

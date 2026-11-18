@@ -100,6 +100,7 @@ def coherence_pass(index: np.ndarray, original: np.ndarray,
             game128.dtype != np.uint8 or selected.shape != (32,) or
             selected.dtype != np.int16 or
             len(set(selected.tolist())) != 32 or
+            np.any(selected < 0) or np.any(selected >= 128) or
             p3b.ENGINE_WHITE_INDEX not in selected or
             protected_core.shape != index.shape or
             protected_core.dtype != np.bool_ or
@@ -122,7 +123,8 @@ def coherence_pass(index: np.ndarray, original: np.ndarray,
     swatch_lab = p3b.lab_rgb(game128.reshape(128, 1, 3)).reshape(128, 3)
     # Vectorized source distances reused by each tiny component.
     source_losses = {
-        int(k): color.deltaE_ciede2000(orig_lab, swatch_lab[int(k)])
+        int(k): color.deltaE_ciede2000(
+            orig_lab, np.broadcast_to(swatch_lab[int(k)], orig_lab.shape))
         for k in selected_unique
     }
     all_components = _component_candidates(index)
