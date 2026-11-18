@@ -1,3 +1,7 @@
+## 2026-11-18 — R2-P2-P1 stable medoid and fixed-edge mathematics
+
+Added independent source-only M1 with numerical CIELAB medoid tie at 1e-9 squaredLab, fixed original Sobel90 threshold comparisons, complete 4/8-connected island diagnostics and pinned M0 baseline provenance. [CI44216262024](https://github.com/Kiddos19882/AutoDraw/actions/runs/44216262024) technical 26/26 PASS, source FAIL because mean ΔE worsens when merging; all old source errors/frozen history preserved. Next E1 classify 179 singleton regions rather than blindly delete. No production or native change.
+
 ## 2026-11-18 — ENGINE-001 R2 N2 optional source diagnostic; P2 independent plan
 
 Added safe optional BiRefNet soft-alpha merge ranking N2 with genuine frozen ONNX-mask replay, 9 unit contracts and CI; [CI44212777049](https://github.com/Kiddos19882/AutoDraw/actions/runs/44212777049) technical SUCCESS, source quality FAIL, negative evidence kept. Created [R2-P2 root-cause и протокол M1](ENGINE001_COLOR_ISLAND_R2_P2_ROOT_CAUSE_AND_NUMERICAL_REBASE_PROTOCOL_2026-11-18.md) for separately preregistered stable source-Lab medoid and fixed original gradient scoring; preserves all frozen P1 thresholds and avoids more model downloads.
