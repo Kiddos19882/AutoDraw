@@ -86,6 +86,7 @@ class P3BEngine128UnitContracts(unittest.TestCase):
             p3b.parse_engine_palette(prefix + bad + "];" + old + bad + "]")
         numbers[7] = 7
         numbers[6] = 8
+        numbers[8] = 6
         wrong_white = ",".join(map(str, numbers))
         with self.assertRaisesRegex(ValueError, "WHITE_INDEX"):
             p3b.parse_engine_palette(
