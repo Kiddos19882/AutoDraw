@@ -1,0 +1,107 @@
+name: ENGINE-001 B1-R P3 original RGB to actual game32 swatches
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p3-source-real-game32.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3_source_game32.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p3_source_game32.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+      - 'AutoDraw_Stage20/data/palettes/browser_palette.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b1r-p3-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p3-real-game32-source-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout bounded original research source
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source-only mathematics
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0
+      - name: Run prereg source and exact true 32 palette contracts
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p3_source_game32.py AutoDraw_Stage20/tests/test_engine001_b1r_p3_source_game32.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p3_source_game32.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Execute new original RGB only P3 true real game32 source screen
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p3_source_game32.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --game-palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-b1r-p3"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          directory=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p3"
+          r=json.loads((directory/"report.json").read_text(encoding="utf8"))
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_png_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["actual_game_palette_git_blob_sha1"]=="461b5f3725b9b79888ad36e807b3cf4c9e445e98"
+          assert r["exact_game_palette32_unique_RGB"]==32
+          assert r["source_original_visual_acceptance_P2D"]=="BOTH_GUARDS_ACCEPTED_FOUR_COMBINATIONS"
+          assert r["P2D_guards_source_pixels"]=={"D_BORDER":56,"D_COMPONENT24":243}
+          assert set(r["source_screen_results"])=={
+              "C_096_D_BORDER","C_096_D_COMPONENT24",
+              "C_192_D_BORDER","C_192_D_COMPONENT24"}
+          for flag in ("old_G32_mapping_used","V44_outline_used",
+                       "old_M1_mask_used","frozen_P2B_P2C_P2D_artifact_consumed"):
+              assert r[flag] is False
+          assert r["original_only_candidate_input"] is True
+          assert r["manual_game32_visual_approval"]=="PENDING"
+          assert r["actual_native_Egret_brush"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          for filename,want in r["all_output_files_sha256"].items():
+              got=hashlib.sha256((directory/filename).read_bytes()).hexdigest()
+              assert got==want,("P3_FILE_SHA_FAIL",filename)
+          for source,methods in r["source_screen_results"].items():
+              assert set(methods)=={"N_NEAREST","S_GUARDED"}
+              for method,record in methods.items():
+                  assert record["game_swatch_compliant"] is True
+                  assert record["gates"]["all_resolved_indices_game_palette"]
+                  assert record["gates"]["new_palette_swatch_count_at_most32"]
+                  assert record["status"] in ("SOURCE_SCREEN_PASS_VISUAL_PENDING","SOURCE_GATE_FAIL")
+                  if method=="N_NEAREST":
+                      assert record["unresolved_pixels"]==0
+                  print("P3_SOURCE",source,method,
+                        "image_gate",record["status"],
+                        "swatches_used",len(record["game_indices_used"]),
+                        "unresolved",record["unresolved_pixels"],
+                        "meanDE",round(record["source_deltaE00_vs_original_LANCZOS"]["mean_deltaE00"],4),
+                        "failed",[k for k,v in record["gates"].items() if not v])
+          print("P3_REVIEW_FILES_SHA_PASS",len(r["all_output_files_sha256"]))
+          print("GAME32_ONLY_MODEL_NOT_NATIVE_E4_E5_EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Always keep full source quality outcomes and user review images as ONE ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p3-all-four-approved-source-to-game32-ablation-review
+          path: ${{ runner.temp }}/engine001-b1r-p3/
+          retention-days: 30
+          if-no-files-found: warn
