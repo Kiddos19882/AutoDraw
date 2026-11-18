@@ -2435,7 +2435,7 @@
 
   // ENGINE-001 V5 only: permitted per-stroke RGB for independently frozen
   // palette-class holdout. Existing black/fixed-radius research is untouched.
-  function renderComplexHoldoutColorProbe(strokes, allowV43P3Widths=false) {
+  function renderComplexHoldoutColorProbe(strokes, allowV43P3Widths=false, allowP4A2Widths1To10=false) {
     if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
       throw new Error("V5 requires 1..3000 bounded strokes.");
     }
@@ -2443,7 +2443,8 @@
     for (const stroke of strokes) {
       if (!stroke || typeof stroke.strokeId !== "string" ||
           !/^icon-[0-9]+$/.test(stroke.strokeId) ||
-          !(allowV43P3Widths ? [4,6,10,20,30].includes(stroke.width) : [2,4,6,8,10,15,30].includes(stroke.width)) ||
+          !(allowP4A2Widths1To10 ? Number.isInteger(stroke.width) && stroke.width >= 1 && stroke.width <= 10 :
+            (allowV43P3Widths ? [4,6,10,20,30].includes(stroke.width) : [2,4,6,8,10,15,30].includes(stroke.width))) ||
           !Number.isInteger(stroke.colorRgb) ||
           stroke.colorRgb < 0 || stroke.colorRgb > 0xffffff ||
           !Array.isArray(stroke.points) || stroke.points.length < 2 ||
@@ -2808,6 +2809,34 @@
   function renderV43P3PaintBrushProbe(strokes) {
     return renderComplexHoldoutColorProbe(strokes, true);
   }
+  // ENGINE-001 B1-R-P4A2 opt-in only. Preserve every legacy renderer width gate.
+  // Empty input is a genuine blank BoardPane/WebGL native control.
+  function renderP4A2BrushWidths1to10Probe(strokes) {
+    if (!Array.isArray(strokes)) throw new Error("P4A2 expected stroke array.");
+    if (strokes.length === 0) {
+      const board = makeTemporalBoard([], 2, "normal", false, 0, true);
+      if (board.accepted !== 0) throw new Error("P4A2 blank BoardPane accepted ink.");
+      const state = initializeWebGL(null, 3);
+      const blank = document.createElement("canvas");
+      blank.width = BOARD_WIDTH * 3; blank.height = BOARD_HEIGHT * 3;
+      const image = renderWebGLProbe("normal", [], 2, blank, state, board.shape);
+      if (!image.sceneDiagnostics.stageAttached || image.canvas.width !== 1380 ||
+          image.canvas.height !== 720) throw new Error("P4A2 blank native board geometry.");
+      return {schema:"ENGINE001_B1R_P4A2_BLANK_WEBGL",
+        renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
+        syntheticAcceptedVerticesNotChalk:0,
+        sceneDiagnostics:image.sceneDiagnostics,
+        webglPngDataUrl:image.canvas.toDataURL("image/png")};
+    }
+    if (!strokes.every(s => s && Number.isInteger(s.width) &&
+        s.width >= 1 && s.width <= 10)) {
+      throw new Error("P4A2 only accepts integer brush widths 1..10.");
+    }
+    const result = renderComplexHoldoutColorProbe(strokes, false, true);
+    result.schema = "ENGINE001_B1R_P4A2_NATIVE_1_TO_10";
+    return result;
+  }
+  api.renderP4A2BrushWidths1to10Probe = renderP4A2BrushWidths1to10Probe;
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
   api.renderV43P3PaintBrushProbe = renderV43P3PaintBrushProbe;
   api.renderV35LayeredColorProbe = renderV35LayeredColorProbe;

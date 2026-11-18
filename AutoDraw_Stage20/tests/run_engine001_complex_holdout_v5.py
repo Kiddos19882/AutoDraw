@@ -235,7 +235,8 @@ def native_batch(workspace:Path,variant:str,strokes:list[dict],
                                "renderV43P3PaintBrushProbe",
                                "renderV43P4FullAdaptiveProbe",
                                "renderV43P4B1OwnerConstrainedProbe",
-                               "renderB4FullGame32AndDetailProbe"):
+                               "renderB4FullGame32AndDetailProbe",
+                               "renderP4A2BrushWidths1to10Probe"):
         raise ValueError("Unsupported native Egret renderer method")
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self,*a,**kw):
@@ -270,6 +271,13 @@ def native_batch(workspace:Path,variant:str,strokes:list[dict],
             data,meta=read_webgl_result(result,output,f"{variant}-{stem}")
             arrays[stem]=data
             info[stem]=meta
+        if renderer_method == "renderP4A2BrushWidths1to10Probe":
+            blank_result = driver.execute_script(
+                "return window.AutoDrawGameRendererReference."+renderer_method+"([]);")
+            blank_data,blank_meta=read_webgl_result(
+                blank_result,output,f"{variant}-blank")
+            arrays["blank"]=blank_data
+            info["blank"]=blank_meta
     finally:
         if driver is not None:driver.quit()
         server.shutdown()
