@@ -136,7 +136,7 @@ class P4B5Contracts(unittest.TestCase):
         names=[n.name for node in ast.walk(tree)
                if isinstance(node,ast.Import) for n in node.names]
         names += [n.module for node in ast.walk(tree)
-                  if isinstance(node,ast.ImportFrom) and n.module]
+                  if isinstance(node,ast.ImportFrom) and node.module]
         self.assertFalse(any("g32" in x.lower() or "v44" in x.lower()
                              or "p4c1" in x.lower() for x in names))
         self.assertIn("run_engine001_b1r_p4b4_boundary_tolerance_sweep",names)
