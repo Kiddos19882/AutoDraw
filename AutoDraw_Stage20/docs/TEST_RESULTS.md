@@ -1,3 +1,20 @@
+## ENGINE-001 B1-R-P4B7: native per-stroke protected-source attribution COMPLETE (2026-11-18)
+
+[P4B7 genuine Egret CI #44365008128](https://github.com/Kiddos19882/AutoDraw/actions/runs/44365008128), SHA `457752bfc6ff4e914760a89e1fead20badfc8bd6`: E2 P4B7 16/16, inherited P4B6 18/18 and regressions, genuine Egret E3 completed; G1.0 original owner115 E/F target pixels (backing PNG x833 y191; x776 y275). E candidates `icon-100` and `icon-114`, F candidates `icon-98` and `icon-114`. Egret split replay E28 groups/F30 groups plus leave-one-out 2 each: removing first stroke drops only first target's alpha24 from original35 to0, removing second drops only second target from35 to0. **NATIVE_ATTRIBUTION_COMPLETE for both E/F; source full-image quality remains FAIL**, not a new accepted planner.
+
+| Native original method | Backing target (x,y) | Source final stroke ID | After omitting stroke, native alpha24 at that pixel | Other target pixel alpha |
+|---|---|---|---:|---:|
+| E_SOBEL90 | (833,191) | `icon-100` | 0 | 35 |
+| E_SOBEL90 | (776,275) | `icon-114` | 0 | 35 |
+| F_SOBEL90_LAB12 | (833,191) | `icon-98` | 0 | 35 |
+| F_SOBEL90_LAB12 | (776,275) | `icon-114` | 0 | 35 |
+
+Native original alpha at BOTH targets was35 for each E/F; alpha >=24 constitutes ink. Leave-one-out proves *individual necessity for these exact two protected pixels* under original full strokes; it does NOT establish that removing these strokes improves image quality enough or that other foreign pixels are fixed. [P4B7 one ZIP #14459026211](https://github.com/Kiddos19882/AutoDraw/actions/runs/44365008128/artifacts/14459026211), uploaded ZIP SHA256 `138b198e5523b3fbfcc09506cfa85035a7fe34ea1ac9c0bf4e3ab91076b04aeb` per GitHub uploader; CI checked 240/240 manifest files, independent external ZIP re-download/CRC NOT_RUN. Frozen P4B6 guard1.0 owner coverage E83.2307%/F83.1280% (<99), protected2/2 (>0), farther3logical4/2 (>0). No actual game E4, E5 independent or exact CHALK. Original RGB/P2D source E/F preserved, old G32/P4c1/V44 historical only; no production/master change.
+
+Separate **test-only performance correction** in SHA `6285200546a16aeb97b82cf26ff81a35954b3ac1`: reuse Firefox during subset renders with full-alpha original Egret parity fail-closed and per-scene progress/blank control; CI [#44368676034](https://github.com/Kiddos19882/AutoDraw/actions/runs/44368676034) **IN_PROGRESS at documentation freeze**, not yet credited PASS.
+
+**Next (P4B8 E0 / NOT_RUN):** independent prereg of targeted safe repair of these necessary source-origin strokes and separately measured owner residual gaps, preserve fixed>=99%/zero protected/>3logical zero and existing250 strokes/500 vertices; removing 4 pixels alone cannot restore missing ~16–17% owner coverage or other distance leaks. All original four P2D variants and both E/F remain eligible; new outline and multicolor still need independent native acceptance.
+
 ## ENGINE-001 / B1-R-P4B6: original-source protected-margin true Egret result — 4/4 quality FAIL (2026-11-18)
 
 [P4B6 CI44320733535](https://github.com/Kiddos19882/AutoDraw/actions/runs/44320733535), SHA `18028b61ae3f14833fdd8957ed35c694cb7ca584`: Python P4B6 18/18, inherited P4B5 17/17 + P4B4 17/17 + P4B2 18/18 + P4B1 18/18, JS20/20, Markdown PASS; genuine archived Egret BoardPane/WebGL eight E/F×G0.5/G1.0 baseline/final scenes E3 technical SUCCESS. E/F G0.5 coverage 94.6580/94.6387%, protected foreign84/84 backing px, farther3logical 4/7; G1.0 coverage83.2307/83.1280%, protected2/2, farther3logical4/2. Fixed source gates >=99%, protected foreign0, far>3logical0: 4/4 QUALITY FAIL. [ZIP14434264990](https://github.com/Kiddos19882/AutoDraw/actions/runs/44320733535/artifacts/14434264990), uploader-reported ZIP SHA256 `af890b27583d230a5318f6b33dfdd91ab34240808fe3f4dfa368ef36fc842275`; runner verified 51/51 member SHA256, independent ZIP download/CRC NOT_RUN.

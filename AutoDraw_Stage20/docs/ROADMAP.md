@@ -1,3 +1,11 @@
+## Текущая очередность после P4B7 native attribution (2026-11-18)
+
+1. **P4B7 diagnostic complete:** [P4B7 genuine Egret CI #44365008128](https://github.com/Kiddos19882/AutoDraw/actions/runs/44365008128), 2/2 E/F culprit attribution at original G1.0, same true Egret and verified 240 CI member hashes; E original `icon-100`/`icon-114`, F `icon-98`/`icon-114`. Source owner coverage remains83.23/83.13%, native image overall FAIL. Archive [P4B7 one ZIP #14459026211](https://github.com/Kiddos19882/AutoDraw/actions/runs/44365008128/artifacts/14459026211).
+2. **Next independent E0 P4B8 protocol:** attribute other far>3 foreign and prioritize missing native owner coverage while protecting protected original details; propose surgical stroke replacement with unchanged 99%/0protected/3px/250strokes/500vertices, source RGB E/F retained; prereg before new runner/native tests. No P4B8 implementation currently.
+3. **After P4B8 evidence:** other source owners, all four approved P2D maps, joint new original-derived contours; future E4 game/E5 independent and exact CHALK. Never reactivate G32/V44 as candidate, palette128 deferred.
+
+*Older P4B6/P4B7 plan text below is historical at its original timestamp, not a current backlog.*
+
 ## ENGINE-001 / B1-R: live sequence after P4B6 (2026-11-18)
 
 1. **Completed P4B6 negative:** [P4B6 CI44320733535](https://github.com/Kiddos19882/AutoDraw/actions/runs/44320733535) E3 8 true native scenes technical SUCCESS, 4/4 quality FAIL. E/F G0.5 coverage 94.6580/94.6387%, protected foreign84/84 backing px, farther3logical 4/7; G1.0 coverage83.2307/83.1280%, protected2/2, farther3logical4/2. Fixed source gates >=99%, protected foreign0, far>3logical0: 4/4 QUALITY FAIL. [P4B6 prereg + outcome](ENGINE001_B1R_P4B6_SOURCE_PROTECTED_MARGIN_PREREG_2026-11-18.md); raw ZIP [ZIP14434264990](https://github.com/Kiddos19882/AutoDraw/actions/runs/44320733535/artifacts/14434264990).
