@@ -1,0 +1,108 @@
+name: ENGINE-001 B1 P0 original supported real game32 diagnostic
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-color-island-b1-p0-game32.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b1_p0_game32.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_b1_p0_game32.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-color-island-b1-p0-game32-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b1-source-game32:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout bounded
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source-only dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Check B1 contracts, source code and documentation
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b1_p0_game32.py AutoDraw_Stage20/tests/test_engine001_color_island_r2_p2_p2_b1_p0_game32.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r2_p2_p2_b1_p0_game32.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Read only pinned genuine source ZIPs from GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,os,requests
+          from pathlib import Path
+          d=Path(os.environ["RUNNER_TEMP"])
+          packs=[
+            (14393769123,"p0-original.zip","8edf928b96a5af56bfc91afd753affcbbfbcaaf821b4e372457eaf9128930536"),
+            (14388687061,"m1-original.zip","8bedc496bf01cf7205ecc8ceb7be8eb0f68b751b11c53ea67dbdd3982c7fe583"),
+            (14201581692,"v44-original.zip","43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c2d41e8945042fc80304a1")]
+          for id,name,digest in packs:
+              res=requests.get(f"https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{id}/zip",
+                headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                "Accept":"application/vnd.github+json","User-Agent":"AutoDraw-B1-P0"},
+                timeout=180,allow_redirects=True)
+              res.raise_for_status()
+              got=hashlib.sha256(res.content).hexdigest()
+              if got!=digest:raise ValueError(f"BLOCKED_ORIGINAL_ARCHIVE_SHA {id} {got}")
+              (d/name).write_bytes(res.content)
+              print("PINNED_ARCHIVE_SHA_PASS",id,digest)
+          PY
+      - name: Run candidate-only real 32 palette comparisons
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r2_p2_p2_b1_p0_game32.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --p0-archive "$RUNNER_TEMP/p0-original.zip" \
+            --m1-archive "$RUNNER_TEMP/m1-original.zip" \
+            --v44-archive "$RUNNER_TEMP/v44-original.zip" \
+            --output "$RUNNER_TEMP/engine001-b1-p0-game32"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-b1-p0-game32"
+          r=json.loads((p/"report.json").read_text(encoding="utf8"))
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert len(r["candidate_index_maps"])==5
+          assert r["original_contour_strokes"]==410 and r["original_contour_vertices_NOT_CHALK"]==1792
+          assert r["spatial_protected_labels_identical_to_chroma12"]
+          assert r["game_brush"]=="NOT_RUN" and r["exact_CHALK"] is None
+          for n,expected in r["file_sha256"].items():
+              actual=hashlib.sha256((p/n).read_bytes()).hexdigest()
+              assert actual==expected,(n,"SHA_FAIL")
+          print("TECHNICAL_E3_COMPLETE_ALL_REPORT_FILE_SHA_PASS",len(r["file_sha256"]))
+          for k,v in r["metrics"].items():
+              print(k,v["status"],"meanDE",round(v["mean_deltaE00"],3),
+                    "chroma",v["excess_chroma_pixels"],"components",v["nonwhite_components4"],
+                    "singletons",v["nonwhite_singletons"])
+          print("NOT_NATIVE_GAME_FILL; EXACT_CHALK_NOT_RUN; VISUAL_PENDING")
+          PY
+      - name: Preserve all B1 positives and negatives and 32-index PNGs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1-p0-original-supported-game32-comparison
+          path: ${{ runner.temp }}/engine001-b1-p0-game32/
+          retention-days: 30
+          if-no-files-found: warn
