@@ -1,0 +1,91 @@
+name: ENGINE-001 B1-R P2 joint RGB regions and original-derived outline
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p2-joint-rgb-outline.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b1r-p2-joint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  original-joint-rgb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original-only source math dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Test source provenance, own-boundary contour and guard against old candidate imports
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py AutoDraw_Stage20/tests/test_engine001_b1r_p2_joint_region_outline.py AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p2_joint_region_outline.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Execute source-only joint region and outline variants on SHA-pinned original
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-b1r-p2"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p2"
+          data=json.loads((d/"report.json").read_text(encoding="utf8"))
+          assert data["github_sha"] == os.environ["GITHUB_SHA"]
+          assert data["github_run_id"] == os.environ["GITHUB_RUN_ID"]
+          assert data["candidate_source"] == "original_RGB"
+          for key in ("legacy_G32_used_as_candidate", "legacy_V44_used_as_candidate",
+                      "legacy_M1_mask_used_as_candidate"):
+              assert data[key] is False,(key,data[key])
+          assert data["historical_comparison_input_count"]==0
+          assert data["game32_projection"]=="NOT_RUN" and data["exact_game_CHALK"] is None
+          assert data["native_round_brush_E3"]=="NOT_RUN"
+          assert data["human_visual"]=="PENDING"
+          assert set(data["metrics"])=={"J_FINE","J_COARSE"}
+          for name,want in data["file_sha256"].items():
+              actual=hashlib.sha256((d/name).read_bytes()).hexdigest()
+              assert actual==want,("BLOCKED_B1R_P2_MEMBER_SHA",name)
+          for name,metrics in data["metrics"].items():
+              assert metrics["labels_full"]>0
+              assert metrics["gates"]["region_medoid_exists_in_original_own_region"]
+              assert metrics["gates"]["source_map_unique_not_above_region_count"]
+              assert metrics["gates"]["nonempty_new_outline"]
+              assert metrics["status"] in ("SOURCE_SCREEN_PASS_VISUAL_PENDING","SOURCE_GATE_FAIL")
+              print(name,metrics["status"],
+                    "regions",metrics["labels_full"],
+                    "colors",metrics["logical_RGB_unique"],
+                    "meanDE",round(metrics["source_RGB_no_outline"]["mean_deltaE00"],5),
+                    "edge_recall",round(metrics["fixed_original_sobel90_recall_composite_1px"],5),
+                    "failed_gates",[k for k,v in metrics["gates"].items() if not v])
+          print("B1R_P2_SOURCE_ONLY_ARTIFACT_SHA_PASS",len(data["file_sha256"]))
+          print("NATIVE_EGRET_GAME32_E4_E5_EXACT_CHALK_NOT_RUN")
+          PY
+      - name: Preserve P2 positive or negative original-derived PNG and raw data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p2-joint-region-original-outline
+          path: ${{ runner.temp }}/engine001-b1r-p2/
+          retention-days: 30
+          if-no-files-found: warn
