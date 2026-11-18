@@ -1,3 +1,8 @@
+## 2026-11-18 — ENGINE-001 B1-R-P2 test-only joint RGB segmentation and source contour
+
+- Added independently preregistered source-only P2-V1 script, 10 synthetic regression guards and bounded GitHub Actions. Immutable original source medoids per region, own source-edge-linked contour previews; forbidden old G32/V44/M1 maps never used as candidate.
+- [CI44259464359](https://github.com/Kiddos19882/AutoDraw/actions/runs/44259464359) E2 10/10/E3 SUCCESS with archived 21/21 hashes, but both source image-quality gates FAIL due faces and p95; no approval for palette32 or production. Negative experiment preserved, next separately versioned original-detail restoration.
+
 ## 2026-11-18 — ENGINE001 B1-R-P1 original-source prefilter and new outline diagnostics
 
 Added test-only B1-R original full200×320 RGB protection from original Sobel/ΔE, two fixed bilateral filters, original-only extracted outline preview, synthetic tests and independent source-only workflow. [CI44244364830](https://github.com/Kiddos19882/AutoDraw/actions/runs/44244364830) 8/8 E2, E3 successful, 14/14 member hashes verified; A_SOFT/A_MID numeric SOURCE_SCREEN_PASS_VISUAL_PENDING, no added chroma excess and no G32/V44/M1 old candidate inputs. Real native brush, new playable contour, game32, exact CHALK NOT_RUN. Source SHA typo first CI FAIL preserved; no production/master changed.
