@@ -327,9 +327,6 @@ def source_quality(original: np.ndarray, rgb: np.ndarray,
     metrics, lab_source, lab_out = delta_metrics(original, rgb)
     c_src = np.linalg.norm(lab_source[..., 1:], axis=2)
     c_out = np.linalg.norm(lab_out[..., 1:], axis=2)
-    hue = color_circular_hue_delta(
-        lab_source, lab_out.reshape(-1, 3)
-    ) if False else None
     hue_source = np.degrees(np.arctan2(lab_source[..., 2], lab_source[..., 1]))
     hue_out = np.degrees(np.arctan2(lab_out[..., 2], lab_out[..., 1]))
     hue_diff = np.abs(((hue_source - hue_out + 180) % 360) - 180)
