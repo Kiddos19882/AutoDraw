@@ -46,3 +46,14 @@ Remote на начало перезапуска: ветка \`feature/image-geom
 - Acceptance новой обработки, native full-game, лимиты, E4/E5, exact run-bound CHALK: \`NOT_RUN\` / \`NOT_VALIDATED\` до нового отдельного прогона. Никаких ретроспективных PASS или изменения production до независимой валидации.
 
 **Итого:** B1-R — новый активный путь из оригинала. Сохранённые G32, P4c1 и V44-B **только сравнение и история**. Перенос на palette32, реальные круговые кисти и split-to-boards — только после получения узнаваемой RGB-основы.
+
+
+## 6. B1-R-P1 начат: проверка существующих функций E1 (2026-11-18; код/новый CI NOT_RUN)
+
+Read-only статический анализ на SHA \`b5f6f78d9fcbe927d63ea37725a3dcccf551a257\`:
+- (ф) \`tests/run_engine001_rgb_visual_mvp_p0.py\`: \`filter_candidate(full, method, raw, protected)\` действительно выполняет bilateral/mean-shift над full-resolution RGB 320×200, затем LANCZOS 150×240, но его \`inputs()\` требует архивов **M1 и V44-B** для \`source_protected_union.png\` и contour; \`run()\` накладывает старый V44-B. **Нельзя запускать P0 runner целиком или копировать его I/O/overlay в новый B1-R**; переиспользовать только чистую original-RGB операцию фильтра, отдельный новый original-derived mask/input contract.
+- (ф) \`tests/run_engine001_color_island_r2_p1_m0.py\`: \`detail_protection(rgb)\` действительно вычисляет из original RGB 4-соседние CIEDE2000 различия, локальную медиану и Sobel original-derived seed mask, без G32 *внутри этой функции*. Однако она принимает только логический RGB 240×150 и поэтому не выполняет требуемую защиту до downscale; её \`pinned_source()\` строит frozen G32 (\`nearest32\` → \`protected_merge\`) для старого эксперимента. **Не заимствовать pinned_source/partition как новую цепочку**.
+- (ф) \`tests/run_engine001_palette32_region_study.py\`: \`read_source()\` сразу масштабирует исходник до 150×240 через LANCZOS. Его можно использовать для эталонного финального ROI, **не** как вход для анализа важных деталей в полном исходном 200×320. \`nearest32\`/историческое game32 не запускать до нового успешного RGB-подготовительного этапа.
+- (ф) \`tests/run_engine001_color_island_r2_p2_p2_b1_p0_game32.py\`: \`pinned_inputs()\` загружает V44-B и M1, \`run()\` содержит G32_FROZEN как сравнение и прежний color32. Это **исторический B1**, НЕ актуальный B1-R runner.
+
+**Следующая техническая задача:** сформировать **новый** test-only B1-R source-bound I/O / protection на full source RGB, отдельное фиксированное до запуска prereg сравнение A soft/mid и новую original-derived карту границ, проверку сохранности лиц/глаз/рук; сохранить RGB/no-outline и RGB/with-new-outline отдельно, пока без game32. Никаких новых PNG B1-R в этом E1 инвентаризационном действии не произведено; старые M1/V44/G32 результаты остаются историческими. Это статический анализ функций, не подтверждение качества output/CI.
