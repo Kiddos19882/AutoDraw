@@ -1,3 +1,11 @@
+## Актуальная очередность ENGINE-001 B1-R после P4B10 (2026-11-18)
+
+1. **P4B10 E2/E3 завершён:** [CI44379894831](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831), native 70/70, 54/70 safety и 0/70 full quality, лучший owner E83.230709% F83.127983% vs99%, [ZIP14462144950](https://github.com/Kiddos19882/AutoDraw/actions/runs/44379894831/artifacts/14462144950). Нельзя считать успех CI успехом качества рисунка.
+2. **P4C0 user-requested visual diagnostic:** [предзарегистрированный full original E/F multicolor Egret](ENGINE001_B1R_P4C0_FULL_SOURCE_MULTICOLOR_NATIVE_PREVIEW_PREREG_2026-11-18.md) из свежего P3D C192, не legacy G32/V44: цвет + новый RGB/source согласованный контур, отдельные native PNG, карты ошибок и один ZIP. E2/E3 до завершения workflow **IN_PROGRESS**, сам полный рисунок **не подтверждён**. Визуальная оценка отдельна от строгих quality gates.
+3. **Следом:** отдельно prereg безопасное спасение пропущенных ~16.8% owner115 через резку/разделение ранее удалённых длинных штрихов; затем остальные три P2D, все владельцы и согласованная native обводка, E4/E5 и game-run-bound CHALK. Производство/default/границы не менять без proof.
+
+*Ниже — предшествовавшая P4B10 очередность, сохранена для истории.*
+
 ## Очередность ENGINE-001 / B1-R после P4B9 (2026-11-18)
 
 1. **P4B9 native forensic complete:** [P4B9 native CI44376627412](https://github.com/Kiddos19882/AutoDraw/actions/runs/44376627412) 6 out-of-bound backing pixels fully attributable to three short thick original-source correction strokes; 12 P4B9 E2, 26/14 grouped E/F native, 2/1 leave-one-out confirmed, 205 manifest hashes CI PASS. Source owner coverage still83.23/83.13% and 99 gate failed. [P4B9 real Egret evidence ZIP14461319592](https://github.com/Kiddos19882/AutoDraw/actions/runs/44376627412/artifacts/14461319592).
