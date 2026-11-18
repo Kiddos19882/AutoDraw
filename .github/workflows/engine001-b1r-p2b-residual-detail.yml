@@ -1,0 +1,89 @@
+name: ENGINE-001 B1-R P2B original-source residual detail ink
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p2b-residual-detail.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-b1r-p2b-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p2b-original-only-detail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original-only reproducible math dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Verify source-only contracts, compile and documentation index
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py AutoDraw_Stage20/tests/test_engine001_b1r_p2b_residual_ink.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p2b_residual_ink.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Run original-derived region medoids plus source-exact residual variants
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-b1r-p2b"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p2b"
+          report=json.loads((d/"report.json").read_text(encoding="utf8"))
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["candidate_source"]=="original_RGB"
+          for k in ("legacy_G32_used_as_candidate","legacy_V44_used_as_candidate",
+                    "legacy_M1_mask_used_as_candidate","frozen_P2V1_artifacts_as_input"):
+              assert report[k] is False,k
+          assert report["historical_comparison_input_count"]==0
+          assert report["game32_projection"]=="NOT_RUN" and report["exact_game_CHALK"] is None
+          assert report["native_Egret"]=="NOT_RUN" and report["human_visual"]=="PENDING"
+          assert set(report["metrics"])=={"K_RESTRAINED","K_DETAIL"}
+          for filename,want in report["file_sha256"].items():
+              assert hashlib.sha256((d/filename).read_bytes()).hexdigest()==want,filename
+          for name,m in report["metrics"].items():
+              assert m["gates"]["source_exact_residual_ink"]
+              assert m["gates"]["source_detail_original_only"]
+              assert m["status"] in ("SOURCE_SCREEN_PASS_VISUAL_PENDING","SOURCE_GATE_FAIL")
+              print(name,m["status"],
+                    "composite_meanDE",round(m["residual_own_source_composite"]["mean_deltaE00"],4),
+                    "composite_p95",round(m["residual_own_source_composite"]["p95_deltaE00"],4),
+                    "face_female",round(m["residual_own_source_composite"]["female_face_eyes_mean_deltaE00"],4),
+                    "face_male",round(m["residual_own_source_composite"]["male_face_eyes_mean_deltaE00"],4),
+                    "original_ink_fraction",round(m["full_source_ink"]["source_residual_original_ratio"],5),
+                    "failed",[k for k,v in m["gates"].items() if not v])
+          print("B1R_P2B_ARCHIVE_MEMBER_SHA_PASS",len(report["file_sha256"]))
+          print("NO_NATIVE_EGRET_PALETTE32_E4_E5_CHALK_PROOF")
+          PY
+      - name: Preserve all P2B raw original, flat and residual outputs including failed variants
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p2b-original-rgb-detail-residual
+          path: ${{ runner.temp }}/engine001-b1r-p2b/
+          retention-days: 30
+          if-no-files-found: warn
