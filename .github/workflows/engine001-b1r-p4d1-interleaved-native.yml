@@ -1,0 +1,143 @@
+name: ENGINE-001 B1-R P4D1 interleaved fill and contour true Egret
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d1-interleaved-native.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d1_interleaved_fill_contour_native.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d1_interleaved_fill_contour_native.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D1_INTERLEAVED_FILL_CONTOUR_NATIVE_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d1-native-interleaved
+  cancel-in-progress: true
+jobs:
+  unchanged-source-strokes-different-order:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install native replay dependencies already used in P4D0
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E2 P4D1 deterministic ordering, P4D0 regressions and pinned renderer
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d1_interleaved_fill_contour_native.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d1_interleaved_fill_contour_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d1_interleaved_fill_contour_native.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4c0_full_multicolor_native_preview.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Verify and restore original pinned game engine renderer and P4D0 script bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+              "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+              "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+              "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+              "AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py":"cf4f0b0b8a1fef5879067f41901f2806758e81bd",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("P4D1_SOURCE_BLOB",path,actual)
+          png=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(png).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: Native Egret paint-contour interleaved and baseline same strokes E F
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d1_interleaved_fill_contour_native.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d1-work
+      - name: Independent manifest and native screenshot comparison checks
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from collections import Counter
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d1-work")
+          report=json.loads((root/"report.json").read_text("utf8"))
+          assert report["experiment"]=="ENGINE001_B1R_P4D1_INTERLEAVED_SOURCE_OUTLINE_EGRET_V1"
+          assert report["result"]=="E3_TRUE_NATIVE_EF_INTERLEAVED_VS_BASELINE_COMPLETE"
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["original_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert report["source_original_recomputed_same_run"]
+          assert report["source_is_original_RGB_p3d"]
+          assert report["native_scenes_rendered"]==8 and report["blank_native_zero"]
+          assert report["production_promotion"] is False
+          assert report["E4_live"]=="NOT_RUN" and report["E5_independent_live"]=="NOT_RUN"
+          assert report["exact_run_bound_CHALK"] is None
+          assert report["frozen_99_0protected_3logical"]=="NOT_MEASURED_COMPOSITE_ONLY"
+          assert report["renderer_test_only_dynamic_quota"]["original_renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert report["renderer_test_only_dynamic_quota"]["board_quota_dynamic"] is True
+          assert set(report["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          names=("BASELINE_FILL_THEN_CONTOUR","INTERLEAVED_LOCAL")
+          for method,data in report["methods"].items():
+              assert data["original_source_only"] is True
+              assert data["legacy_G32_V44_as_inputs"] is False
+              assert data["contour_strokes"]==358
+              assert set(data["arms"])=={"ADAPTIVE_UNBOUNDED","FIRST_SCANLINE"}
+              for arm,r in data["arms"].items():
+                  folder=root/method/arm
+                  assert r["same_exact_stroke_multiset"]
+                  assert r["ordering"]["source_paint_order_identical"]
+                  assert r["ordering"]["contour_paint_transitions"]>=2
+                  assert set(r["stages"])==set(names)
+                  with Image.open(folder/"COMPARE_SOURCE_BASELINE_INTERLEAVED.png") as img:
+                      assert img.size==(1800,770)
+                  for stage in names:
+                      with Image.open(folder/(stage+"_REAL_EGRET_NATIVE.png")) as img:
+                          assert img.size==(1380,720)
+                      with Image.open(folder/(stage+"_REAL_EGRET_CROP.png")) as img:
+                          assert img.size==(450,720)
+                      snap=r["stages"][stage]
+                      assert snap["real_native"]
+                      assert snap["schema"]=="ENGINE001_B1R_P4A2_NATIVE_1_TO_10"
+                      assert snap["renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+                      assert snap["accepted_stroke_count"]==r["total_strokes"]
+                      assert snap["accepted_vertices_NOT_CHALK"]==r["total_synthetic_vertices_NOT_CHALK"]
+                      assert (folder/(stage+"_MISSING_ANY_INK_ALPHA24.png")).is_file()
+                      assert (folder/(stage+"_COMPOSITE_RGB_DELTA_GT32.png")).is_file()
+                  print("P4D1_NATIVE_PAIR",method,arm,r["numeric_candidate"],
+                        r["change_from_baseline"])
+          assert len(report["members_sha256"])>=55
+          for path,hash_ in report["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==hash_,path
+          print("P4D1_ALL_NATIVE_SCENES_PASS")
+          print("P4D1_MANIFEST_HASH_PASS",len(report["members_sha256"]))
+          PY
+      - name: One archive all real Egret source versus interleaved evidence and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d1-original-EF-interleaved-fill-contour-native
+          path: AutoDraw_Stage20/.p4d1-work/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
