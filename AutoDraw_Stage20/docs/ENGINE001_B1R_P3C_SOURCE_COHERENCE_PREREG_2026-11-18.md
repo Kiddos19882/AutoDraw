@@ -31,3 +31,18 @@ Both methods cap changed pixels at **360 logical pixels (1% of 36,000)** per ima
 For each source: original, frozen P2D source, P3B M0, S_STRICT, T_LOCAL RGB/index PNG; original-source protected and changed-pixel masks, enlarged face/hand crops and full comparison sheets. At least 12 synthetic regression tests: deterministic connectivity & 4-neighbor donor, protected ROI/boundary, white, source-unsupported rejection, no palette expansion, shape fail-closed, complete component cap, thresholds, method distinction, untouched control, no old artifacts and output overwrite; actual image screen in GitHub Actions with pinned Python3.11 and same versions as P3B. One ZIP artifact (including report.json, all PNG, detailed rejected reasons, input SHA, file SHA256, GitHub commit/run IDs) independent integrity check. No raw captures/frozen P3B overwrite. Prior P3B CI44282755427 remains valid independent control. This is offline E2/E3 only; Egret/BoardPane E4/E5/exact CHALK `NOT_RUN`; palette128 live accessibility `UNKNOWN`.
 
 **Initial status:** E0 PREREG REGISTERED; E1 algorithm inspection done; P3C E2/E3 `NOT_RUN`, quality `UNKNOWN`, visual user review `PENDING`. Next commit may add only P3C experimental runner, regression tests and bounded CI workflow after this freeze.
+
+## P3C frozen outcome after prereg (2026-11-18)
+
+**First technical failure preserved:** [CI44287768479](https://github.com/Kiddos19882/AutoDraw/actions/runs/44287768479) SHA `af2dfdbb124e25264a52b8ce0a5928dc8ecb53b8`, E2 FAIL with 9 errors/2 failures (CIEDE scalar LAB array broadcasting; missing swatch range; inaccurate AST test); real-image step NOT_RUN. Only technical implementation/tests corrected, no change to frozen methods or gates at `829e6a9a8c3518099d4d8259ac6a4a6c03fdb392`.
+
+**Valid run:** [CI44288257200](https://github.com/Kiddos19882/AutoDraw/actions/runs/44288257200) at exact `829e6a9a8c3518099d4d8259ac6a4a6c03fdb392`: E2 13/13 PASS, E3 SUCCESS, Markdown audit PASS, P3B original-only recomputed and A/B exact map identity for each source. Single ZIP [artifact14420167853](https://github.com/Kiddos19882/AutoDraw/actions/runs/44288257200/artifacts/14420167853) independently downloaded and checked: **1,798,979 bytes, SHA256 `f6f24fa046a5f46a11a419ecb3449fc5bc2fa466b769aeb5c973bbf67ebb494c`, ZIP CRC PASS, 55/55 report-member SHA256 PASS, 56 ZIP members incl report**. All eight SOURCE QUALITY nonregression gates PASS (including face, hands, original edges, authentic engine32, saturation/hue), **but 8/8 `NO_MATERIAL_ISLAND_GAIN`** at frozen ≥5% reduction threshold. Never reinterpret technical CI SUCCESS as image improvement.
+
+| Source | M0 tiny | S_STRICT tiny after | T_LOCAL tiny after | T changed pixels |
+|---|---:|---:|---:|---:|
+| C_096_D_BORDER | 4921 | 4916 | 4750 | 174 |
+| C_096_D_COMPONENT24 | 4918 | 4913 | 4748 | 172 |
+| C_192_D_BORDER | 4934 | 4923 | 4792 | 127 |
+| C_192_D_COMPONENT24 | 4931 | 4920 | 4790 | 125 |
+
+T reduction 2.86–3.47%, S reduces 5–11 tiny components only. Source original protected core covers **31,974/36,000 logical pixels=88.82%**, S expanded33,965; T blocked4,674–4,721 of ~4.9k tiny components due protection. This is evidence of masking dominance, **not proof every blocked island is a false artifact**. To isolate root cause, preregister independent [P3D source-edge protection mask-only ablation](ENGINE001_B1R_P3D_SOURCE_EDGE_MASK_ABLATION_PREREG_2026-11-18.md). Frozen P3C outcome unchanged, no production/master, static palette128 runtime UNKNOWN, no Egret/E4/E5 or run-bound CHALK.
