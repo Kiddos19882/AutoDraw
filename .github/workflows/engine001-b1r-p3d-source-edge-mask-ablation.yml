@@ -1,0 +1,108 @@
+name: ENGINE-001 B1-R P3D source-edge protection mask-only ablation
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p3d-source-edge-mask-ablation.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p3d_source_edge_mask_ablation.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3c_source_coherence.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p3b_engine128_adaptive32.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2d_background_halo_guard.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2c_source_ink_palette.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2b_residual_ink.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p2_joint_region_outline.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p1_fullrgb_edge_aware.py'
+      - 'AutoDraw_Stage20/gameEngine/main.min_653f95bc.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p3d-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  p3d-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Bounded checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned offline source math
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: P3D source-edge-only synthetic E2, compile and docs integrity
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py AutoDraw_Stage20/tests/test_engine001_b1r_p3d_source_edge_mask_ablation.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p3d_source_edge_mask_ablation.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: P3B fresh original via P3C, two P3D source masks and one full result
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --output "$RUNNER_TEMP/engine001-b1r-p3d"
+          python - <<'PY'
+          import os, json, hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-b1r-p3d"
+          r=json.loads((root/"report.json").read_text(encoding="utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P3D_SOURCE_EDGE_MASK_ABLATION_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["engine_git_blob_sha1"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["engine_palette_static_colors"]==128
+          assert r["parent_p3c_T_LOCAL_algorithm_changed"] is False
+          assert r["P3B_original_recomputed_in_current_run"] is True
+          assert r["read_frozen_ZIP_as_source"] is False
+          assert r["legacy_G32_V44_M1_used_as_source"] is False
+          assert r["one_variable"]=="source_original_protection_mask_only"
+          assert r["source_mask_counts"]["E_is_subset_of_F"] is True
+          assert r["engine128_runtime_access_E4"]=="UNKNOWN"
+          assert r["native_game_Egret"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          assert r["new_user_visual_approval"]=="PENDING"
+          assert r["production_promotion"] is False
+          assert len(r["all_results"])==4
+          checked=0
+          for key,src in r["all_results"].items():
+              assert src["P3B_A_B_exact"] is True
+              assert len(set(src["selected_engine_indices"]))==32
+              assert all(src["source_rgb_baseline"]["gates"].values())
+              assert set(src["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+              for method,item in src["methods"].items():
+                  assert item["status"] in {
+                      "SOURCE_GATE_FAIL","NO_MATERIAL_ISLAND_GAIN",
+                      "SOURCE_SCREEN_PASS_VISUAL_PENDING_RUNTIME_ACCESS_UNVERIFIED"}
+                  assert item["changes"]["changed_pixels"]<=360
+                  assert item["changes"]["all_changes_complete_components_from_M0"]
+                  print("P3D",key,method,item["status"],
+                        "changed",item["changes"]["changed_pixels"],
+                        "tiny",item["tiny_before"],"to",item["tiny_after"],
+                        "failed",[n for n,v in item["gates"].items() if not v])
+                  checked+=1
+          assert checked==8
+          for filename,expected in r["file_sha256"].items():
+              assert hashlib.sha256((root/filename).read_bytes()).hexdigest()==expected
+          print("P3D_MEMBER_SHA_PASS",len(r["file_sha256"]))
+          print("E4_E5_EXACT_CHALK_NOT_RUN_STATIC_ENGINE128_UNVERIFIED")
+          PY
+      - name: Always upload one source/RGB/P3B/P3D visual evidence ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b1r-p3d-all-source-masks-visual-review-one-zip
+          path: ${{ runner.temp }}/engine001-b1r-p3d/
+          retention-days: 30
+          if-no-files-found: warn
