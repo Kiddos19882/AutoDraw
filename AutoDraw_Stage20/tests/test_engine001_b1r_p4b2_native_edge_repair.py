@@ -63,7 +63,7 @@ class P4B2Contracts(unittest.TestCase):
 
     def test_05_source_boundary_only_not_original_interior(self):
         comp,full,game,native,strokes=fixture()
-        native[:,:,:,3]=0
+        native[:,:,3]=0
         weights,elig,missing,meta=p.boundary_missing(native,comp)
         self.assertTrue(elig[65,70])
         self.assertFalse(elig[90,70])
