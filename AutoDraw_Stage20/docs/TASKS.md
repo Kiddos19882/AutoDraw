@@ -1,3 +1,5 @@
+**ENGINE-001 next P2B prereg 2026-11-18:** [Frozen source-only residual ink protocol](ENGINE001_B1R_P2B_RGB_RESIDUAL_INK_PREREG_2026-11-18.md) recorded before processing: K_RESTRAINED/K_DETAIL use ORIGINAL RGB source-detail selection over recomputed J_FINE region medoids (never archived P2 masks). New test-only runner/synthetic contracts committed; E2/E3 experiment PENDING until independently verified CI, visual acceptance PENDING; no palette32/game/native/CHALK.
+
 ## ENGINE-001 B1-R-P2 V1 completed FAIL / next P2-B source-detail restoration (2026-11-18)
 
 - [x] P2 joint original RGB SLIC + in-region source medoid + own outline prereg *before* execution, isolated runner/10 source contracts/new CI. [CI44259464359](https://github.com/Kiddos19882/AutoDraw/actions/runs/44259464359) SHA `ee9f492d51eb81a449697b67d5d4f814c5b46c1e`, 10/10 E2, E3 SUCCESS, artifact ZIP CRC and 21/21 SHA PASS. Result **both SOURCE_GATE_FAIL**: J_FINE 682 regions /252 colors/meanΔE5.113/p95 25.475, J_COARSE371/163/mean5.301/p95 26.241; both face/eyes ROI means >8 and visibly damaged thin details. Frozen V1 data/thresholds unchanged.
