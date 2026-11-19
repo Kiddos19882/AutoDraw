@@ -9,12 +9,15 @@ import run_engine001_b1r_p4d7_native_width1_phase_feasibility as d
 
 def fixture():
     a=np.full((240,150),6,np.uint8)
-    for owner in range(1,20):
-        a[45:69,39+owner]=owner
-    a[46:51,60:63]=20  # 5x3, with one true source clearance>1
+    # White is the ACTUAL engine palette index 6. A synthetic fixture
+    # must not count owner 6 among its 20 nonwhite source-color owners.
+    for slot in range(1,20):
+        owner=slot if slot<6 else slot+1
+        a[45:69,39+slot]=owner
+    a[46:51,60:63]=21  # 5x3, with one true source clearance>1
     palette=np.zeros((128,3),np.uint8)
     palette[6]=(255,255,255)
-    for owner in range(1,21):
+    for owner in range(1,22):
         palette[owner]=(owner*9,owner*7,owner*5)
     return a,palette
 
