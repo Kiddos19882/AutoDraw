@@ -138,7 +138,7 @@ def render_case(driver,source_js:str,folder:Path,
     result={
         "case":case,"width":width,"angle_deg":angle,"length_logical":length,
         "source_image_sha256":metadata["source_png_sha256"],
-        "native_image_sha256":meta["source_png_sha256"],
+        "native_image_sha256":meta["source_sha256"],
         "source_native_graphics_bounds":metadata["node"],
         "source_texture_dimensions":[metadata["canvasWidth"],metadata["canvasHeight"]],
         "source_texture_transform":metadata["transform"],
