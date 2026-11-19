@@ -1,3 +1,12 @@
+## ENGINE-001 B1-R after native 0/1 owner-color pilot P4D5/P4D6 (2026-11-19)
+
+1. [P4D5 native E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44424883298) built actual original B1-R E/F pixel-state planner in experimental test runner with real position-specific brush and native feedback. On source-critical small face ROI, 240 probes each, **9 safe, 10/307 correct**, while W1 scanline307/307 but contaminates white264 and outside52 native pixels: strict owner foreign0 at alpha24 is too conservative for visually correct complete fill; artwork FAIL despite technical E3 PASS. [Verified ZIP](https://github.com/Kiddos19882/AutoDraw/actions/runs/44424883298/artifacts/14484520872).
+2. [P4D6 native E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44426078599) unchanged solver, source and gates with centered control-point fractional geometry. Safe candidates **1**, correct **1/307**, negative H1; [verified ZIP](https://github.com/Kiddos19882/AutoDraw/actions/runs/44426078599/artifacts/14484402529), failure preserved. E/F crop index maps happen to be identical, so variants not independent visual sources.
+3. **NEXT:** true per-owner native state and masked foreign-risk attribution with original **protected foreign0** and **outside3logical0** hard gates. Allow repairable overpaint only if frozen protection and final correct-color gates still hold, score true new correct target zeros against damage to previously correct ones, cross-check white halo, choose width1 only when larger candidates unsafe; pre-register separate experiment ID. Validate a second E/F ROI where source maps actually differ then whole original before any deployment.
+4. Later actual E4 game/independent E5 and exact run-bound CHALK; never treat Egret E3 as live or let quality degrade for cost. No global black outline, no production defaults/master change.
+
+*Older roadmap snapshots below remain historical.*
+
 ## ENGINE-001 B1-R — after measured brush behavior P4D3/P4D4 (2026-11-19)
 
 1. [P4D3 full native E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44417716689) fixed SHA77e9ddd8: 10 widths×24 angles×2 lengths×10 separated strokes +ten overlaps, 1121 native PNG+blank. Same scene replay480/480 identical, 10 moved identical line footprints292/480 exact, edge/other-color stress80/80 exact, angle reverse240/240 exact. Overlay changes actual RGBA480/480, alpha24 area increases all480. Art-native coverage gates NOT_PROVEN. [Verified ZIP14480461909](https://github.com/Kiddos19882/AutoDraw/actions/runs/44417716689/artifacts/14480461909) CRC+1686/1686.
