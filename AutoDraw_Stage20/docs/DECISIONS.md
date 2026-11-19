@@ -1,9 +1,19 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-040`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-041`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
+
+## DEC-041. ENGINE-001 / BPRED-001: сначала предсказатель кисти, затем планировщик
+
+**Дата:** 2026-11-20. **Статус:** ACCEPTED PRIORITY/PLAN, **NOT IMPLEMENTED**. Пользователь утвердил [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) после обсуждения отказа от бесконечного точечного ремонта; в текущей ветке вместо следующего масштабного P4D19-патча приоритет — построить научно проверенный предсказатель следа кисти Egret/Canvas2D/WebGL для widths1..10 и уже на его основе строить новый whole-image adaptive planner. Последовательность: physical geometry/phase → Canvas alpha/RGBA → source-over/owner interference → независимая native validation/false-safe/unknown → source E/F global plan → только после успешного качества сокращение/объединение штрихов. Это **согласование плана и документации**, не разрешение автоматически менять код, запускать тесты или production.
+
+**Текущий baseline:** remote feature branch HEAD `ba0f609ab15e982e37ddece674fee3809890dce9`, исходные E/F original B1-R P4D18 pinned; P4D18 5/9 logical E/F100% по исследовательскому gate, при этом original-white4415/4445 и protected2250/2261 physical alpha24 → **FULL QUALITY FAIL**. Исходные P4D3/P4D14/P4D15/P4D16 native данные используются с сохранением ограничений. `G32` и `V44` нельзя использовать как активные source inputs.
+
+**Приоритет и история:** [P4D19](ENGINE001_B1R_P4D19_NATIVE_OWNER_RGBA_ATTRIBUTION_PREREG_2026-11-20.md) (frozen prereg `3ff24b0f`, E2/E3 NOT_RUN) переведён в **DEFERRED**, а не удалён, исправлен постфактум или назван неуспешным экспериментом. Его per-owner attribution можно переиспользовать диагностически в BPRED при новом E0. Исторические отрицательные P4D и старые quality gates сохраняются.
+
+**Неизменные ограничения:** actual Egret validation для brush-dependent claims, protected foreign0, ≤3logical far leakage, source-owner≥99% с визуально критическими областями, отсутствие автоматической production-подмены. CHALK exact только run-bound `post.pointCount - pre.pointCount`; stroke count и path length — самостоятельные экспериментальные метрики. Master/production, game renderer, Stage6, Monitor/Bridge, CHALK defaults не изменены этим решением. Отдельные E0+разрешения до разработки, тестов и live.
 
 ## DEC-040. Допуск более 3 px разрешён лишь как отдельный исследовательский опыт
 

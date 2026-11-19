@@ -1,7 +1,15 @@
+## CURRENT ENGINE-001 — BPRED-001: prediction-first roadmap (2026-11-20)
+
+User-accepted [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) / [DEC-041](DECISIONS.md#dec-041-engine-001--bpred-001-сначала-предсказатель-кисти-потом-планировщик), baseline `ba0f609ab15e982e37ddece674fee3809890dce9`, **только план**, BPRED E2/E3/E4/E5 NOT_RUN. Следующий **первый** незавершённый шаг: **BPRED-S0** (pinned source/artifact inventory + независимое разделение native корпуса и отдельный E0 до исследований). Далее **S1** Egret geometry/transforms widths1..10 → **S2** Canvas physical alpha / phase M0/M1/M2 → **S3** RGBA source-over ordered composition → **S4** held-out native false-safe validation & uncertainty → **S5** experimental global original E/F adaptive planner → **S6** quality-preserving stroke/cost optimization. Stage gates и evidence см. в единственном [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); не добавлять повторную полную методику в ROADMAP.
+
+[P4D19 frozen E0](ENGINE001_B1R_P4D19_NATIVE_OWNER_RGBA_ATTRIBUTION_PREREG_2026-11-20.md) остаётся **DEFERRED диагностикой**, не отменён задним числом. P4D18 current source physical improvement сохраняется как baseline **protected quality FAIL**. E4/E5/run-bound CHALK отдельно, master/production/Stage6/Bridge не менять.
+
+*Ниже прежний roadmap после P4D18 (сохранённая история); его NEXT P4D19 заменён новым приоритетом выше.*
+
 ## CURRENT ENGINE-001 — post P4D18 physical source-owner native repaint (2026-11-19)
 
 1. **DONE** [P4D17/P4D18 E/F true Egret results](ENGINE001_B1R_P4D17_P4D18_NATIVE_FULL_REPAINT_RESULTS_2026-11-19.md) with separate E0, [CI44575816229](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816229) E2/E3 PASS; E95→24/F96→25 interior alpha0, unchanged 5/9 all original owners, unchanged original white/protected alpha24 (still FAIL), no production changes. General CI required5/5 PASS at SHA746639c1.
-2. **NEXT** implement and validate frozen [P4D19 E0](ENGINE001_B1R_P4D19_NATIVE_OWNER_RGBA_ATTRIBUTION_PREREG_2026-11-20.md) (commit `3ff24b0f`): native per-owner ablation/prefix/owner-only attribution on exact P4D18 E/F, remaining24/25 physical holes and wrong-color/source-white cases. E0 frozen; E2/E3 **NOT_RUN**. No new repair or weaker protected gate before genuine evidence.
+2. **HISTORICAL NEXT / DEFERRED by DEC-041** implement and validate frozen [P4D19 E0](ENGINE001_B1R_P4D19_NATIVE_OWNER_RGBA_ATTRIBUTION_PREREG_2026-11-20.md) (commit `3ff24b0f`): native per-owner ablation/prefix/owner-only attribution on exact P4D18 E/F, remaining24/25 physical holes and wrong-color/source-white cases. E0 frozen; E2/E3 **NOT_RUN**. No new repair or weaker protected gate before genuine evidence.
 3. **THEN** evaluate new original E/F full visual, contours/eyes and source original protected quality, run game E4 independent validation, run-bound exact CHALK before any production decision. Keep P4D13 historical and no G32/V44 sources.
 
 *Старые roadmap snapshots ниже сохранены как история.*

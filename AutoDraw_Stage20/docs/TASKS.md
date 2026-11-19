@@ -1,9 +1,20 @@
+## CURRENT ENGINE-001 — BPRED-001 prediction-first, план принят (2026-11-20)
+
+- [x] Пользователь утвердил [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); решение [DEC-041](DECISIONS.md#dec-041-engine-001--bpred-001-сначала-предсказатель-кисти-потом-планировщик) — **документация принята**, никакой разработки/тестов BPRED ещё не было. Baseline `ba0f609ab15e982e37ddece674fee3809890dce9`.
+- [ ] **NEXT единственный:** BPRED-S0 — inventory pinned Egret/Canvas/WebGL source, frozen P4D3/P4D4/P4D14/P4D15/P4D16 artifacts and native E/F, holders/train/calibration/holdout split; отдельный E0 prereg **до** любого кода или нового native теста, проверить current consumers/source hashes. Следующее разрешение отдельно на разработку и тесты.
+- [ ] BPRED-S1/S2: геометрия widths1..10, source translation, physical alpha prediction; M0/M1/M2 сравнение на отдельно замороженном native holdout, без model-only PASS.
+- [ ] BPRED-S3/S4: source-over color compositing, owner/white/protected risk, independent native validation, uncertainty/UNKNOWN fallback и false-safe раздельно.
+- [ ] BPRED-S5/S6: построение целого original E/F плана и далее оптимизация числа штрихов **после** quality gates (original owner≥99%, protected foreign0, max3logical, critical visual); E4/E5 и exact run-bound CHALK отдельно.
+- [ ] P4D19: [frozen E0](ENGINE001_B1R_P4D19_NATIVE_OWNER_RGBA_ATTRIBUTION_PREREG_2026-11-20.md) **DEFERRED**, не отменён, не реализован; source-owner attribution может служить BPRED диагностикой с отдельным E0. Исторический P4D18 protected quality FAIL остаётся.
+
+*Ниже предыдущий backlog P4D17/P4D18/P4D19 на 2026-11-19; записи сохранены, но их прежний NEXT не является текущим приоритетом.*
+
 ## CURRENT ENGINE-001 — full original E/F physically improved, remaining source-owner gaps OPEN (2026-11-19)
 
 - [x] [P4D17 E0 and native E3](ENGINE001_B1R_P4D17_P4D18_NATIVE_FULL_REPAINT_RESULTS_2026-11-19.md): strict 3×3 source-owner physical correction 33 E/30 F real Egret width1 dots, original5/9 preserved, real alpha0 interior95→85 /96→87; simple owner grouping 5/9 regressions preserved as negative.
 - [x] [P4D18 native EDT physical owner mask](ENGINE001_B1R_P4D17_P4D18_NATIVE_FULL_REPAINT_RESULTS_2026-11-19.md): [CI44575816229](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816229) PASS, best preregistered margin **1.6 physical backing pixels**; additional358 E/357 F dots, original5/9 unchanged; alpha0 source interior **24/25**, owner physical +915/+901 vs original P4D13; original-white source/protected ink unchanged **4415/4445, 2250/2261** (NOT quality PASS). General validation5/5 PASS.
 - [x] **P4D19 E0 frozen (2026-11-20):** [P4D19 E0](ENGINE001_B1R_P4D19_NATIVE_OWNER_RGBA_ATTRIBUTION_PREREG_2026-11-20.md), commit `3ff24b0f75903d4c2da58fbbd8491acc60563001`, original P4D18 E/F pinned native RGBA, source-only owner attribution sample and max43 real Egret scenes fixed **before implementation**. E1 protocol; E2/E3/E4/E5 **NOT_RUN**, existing protected quality FAIL.
-- [ ] **NEXT one:** implement P4D19 read-only native attribution with deterministic selected samples, replay exact parent RGBA, full-minus-owner/owner-only/prefix controls, regression tests and separate CI; report unclassified pixels without relaxing original protected white0. Region-aware repairs require a later separate E0; E4/E5 and exact run-bound CHALK remain open.
+- [ ] **DEFERRED / прежний NEXT:** implement P4D19 read-only native attribution with deterministic selected samples, replay exact parent RGBA, full-minus-owner/owner-only/prefix controls, regression tests and separate CI; report unclassified pixels without relaxing original protected white0. Region-aware repairs require a later separate E0; E4/E5 and exact run-bound CHALK remain open.
 
 *Далее — предыдущий TASKS backlog на момент P4D16 и раньше.*
 
