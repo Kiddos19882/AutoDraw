@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 / B1-R — after P4D7 native isolated phase feasibility (2026-11-19)
+
+1. **DONE P4D7:** [CI44428805429](https://github.com/Kiddos19882/AutoDraw/actions/runs/44428805429), exact SHA `fe036d43ad7c28f060c6f032ef81c583e63d5fe2`, E2/E3 technical PASS: для всех **21/21** фиксированных защищённых исходных пикселей найдена хотя бы одна owner-safe width1 Egret фаза из66 (1386 stroke scenes + blank). [Artifact14485647346](https://github.com/Kiddos19882/AutoDraw/actions/runs/44428805429/artifacts/14485647346); не считать полной покраской.
+2. **NEXT:** отдельно prereg ограниченный *последовательный* 0/1 фазовый планировщик на настоящей позиционно-зависимой кисти Egret с проверкой каждой cumulative board, damage/repair, white/foreign owner и frozen protected0/far>3logical0, сравнением с P4D5/P4D6. Сначала исходный protected face ROI, затем ROI с отличающимися E/F цветами. Пороги не менять ради PASS, не использовать сдвинутую универсальную маску кисти.
+3. **THEN:** полные original RGB E/F, все владельцы≥99%, protected foreign0, far>3logical0, лица/глаза/руки/visual quality, затем игра E4, независимый E5 и exact CHALK с run-bound pre/post. Production/renderer/master/defaults только после самостоятельного решения и доказательств.
+
+*Ниже исторический roadmap P4D5/P4D6 и предшественников; его NEXT-пункты не действуют вместо указанного выше.*
+
 ## ENGINE-001 B1-R after native 0/1 owner-color pilot P4D5/P4D6 (2026-11-19)
 
 1. [P4D5 native E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44424883298) built actual original B1-R E/F pixel-state planner in experimental test runner with real position-specific brush and native feedback. On source-critical small face ROI, 240 probes each, **9 safe, 10/307 correct**, while W1 scanline307/307 but contaminates white264 and outside52 native pixels: strict owner foreign0 at alpha24 is too conservative for visually correct complete fill; artwork FAIL despite technical E3 PASS. [Verified ZIP](https://github.com/Kiddos19882/AutoDraw/actions/runs/44424883298/artifacts/14484520872).
