@@ -125,9 +125,7 @@ def do_arm(driver,folder:Path,arm:str,
             if (stroke["width"]!=row["width"] or
                 stroke["colorIndex"]!=row["colorIndex"] or
                 stroke["colorRgb"]!=row["colorRgb"] or
-                stroke["points"]!=(
-                    row["stroke_points"] if row["variant"]==FINE_VARIANT
-                    else row["points"])):
+                stroke["points"]!=row["points"]):
                 raise ValueError("BLOCKED_P4D12_NON_NATIVE_STROKE_PARAMS")
             n=len(records)+1
             native,meta=p4d5._native(

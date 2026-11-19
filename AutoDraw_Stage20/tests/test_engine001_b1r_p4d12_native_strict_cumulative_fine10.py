@@ -54,6 +54,10 @@ class P4D12NativeStrictFine(unittest.TestCase):
         self.assertEqual(sum(x["variant"]==d.FINE_VARIANT for x in swapped),10)
         self.assertEqual(swapped[-1],ordinary[-1])
         self.assertEqual(swapped[0]["native_png_sha256"],"fine0")
+        # The substituted row normalizes native P4D10 stroke_points to
+        # the P4D8 points schema used by the cumulative renderer.
+        self.assertEqual(swapped[0]["points"],fine_rows()[0]["stroke_points"])
+        self.assertNotIn("stroke_points",swapped[0])
 
     def test_03_any_unsafe_fine_phase_fail_closed(self):
         a=fine_rows()
