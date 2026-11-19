@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — post P4D18 physical source-owner native repaint (2026-11-19)
+
+1. **DONE** [P4D17/P4D18 E/F true Egret results](ENGINE001_B1R_P4D17_P4D18_NATIVE_FULL_REPAINT_RESULTS_2026-11-19.md) with separate E0, [CI44575816229](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816229) E2/E3 PASS; E95→24/F96→25 interior alpha0, unchanged 5/9 all original owners, unchanged original white/protected alpha24 (still FAIL), no production changes. General CI required5/5 PASS at SHA746639c1.
+2. **NEXT** P4D19 prereg native per-owner contribution/alpha/overwrite attribution at remaining source-interior24/25 holes and color-incorrect owner pixels, with protected white0 retained; use original Egret, not a synthetic capsule, to rank proposed boundary adjustments. Avoid additional unvalidated algorithms.
+3. **THEN** evaluate new original E/F full visual, contours/eyes and source original protected quality, run game E4 independent validation, run-bound exact CHALK before any production decision. Keep P4D13 historical and no G32/V44 sources.
+
+*Старые roadmap snapshots ниже сохранены как история.*
+
 ## CURRENT ENGINE-001 — after P4D15 exact source Canvas stage localization (2026-11-19)
 
 1. **DONE:** [P4D15 original Egret true Canvas vs WebGL E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224), pinned SHA176fc822; native 34 scenes; Canvas18 exact/12 different under integer translation, WebGL same; direct raw Canvas→WebGL source crop 30/30 exact after offset6 px. [ZIP14549505133](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224/artifacts/14549505133) CRC+103 hashes PASS. Thus focus Canvas2D diagonal/absolute coordinate numerical AA behavior, not replacing the P4D14 centroid finding.

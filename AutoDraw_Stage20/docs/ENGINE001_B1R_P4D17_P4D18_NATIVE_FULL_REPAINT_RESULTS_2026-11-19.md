@@ -1,0 +1,35 @@
+# ENGINE-001 B1-R — P4D17/P4D18 результат повторной отрисовки исходного E/F настоящим Egret
+
+**19.11.2026, статус: experiment E2/E3 технический PASS; protected quality всё ещё FAIL.** Source-only original wV6VeZI9S1Y SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, original B1-R E `E_SOBEL90` and F `F_SOBEL90_LAB12` C192; все engine game128 owners из исходной карты. Источники [P4D13 E0](ENGINE001_B1R_P4D13_FULL_ORIGINAL_RELAXED_FINISH_PREREG_2026-11-19.md), [root cause E1/E2](ENGINE001_B1R_P4D13_WHITE_HOLE_ROOT_CAUSE_DIAG_2026-11-19.md) и исследовательский поиск [WHATWG Canvas](https://html.spec.whatwg.org/multipage/canvas.html#drawing-paths-to-the-canvas) / [MDN source-over](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation) / [round cap](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineCap).
+
+## P4D17 — owner grouping и безопасный physical residual
+
+Frozen [P4D17 E0](ENGINE001_B1R_P4D17_OWNER_PHYSICAL_REPAIR_PREREG_2026-11-19.md), CI [44573841891](https://github.com/Kiddos19882/AutoDraw/actions/runs/44573841891) **SUCCESS** на код SHA `de3e3610c12e8202bed8fa249803c3a91b4f3cad`; prior SHA `55984654b8...` E2 FAIL из-за неверного ожидаемого source-safe центра в unit-test, исходный алгоритм не менялся, отрицательный CI сохранён. 9 genuine Egret BoardPane native scenes: blank + 4 arms× E/F, original full 150×240, logical X0=155, backing real 1380×720, Firefox159.0, pinned frozen game blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, renderer blob `76d950e0a8911888a9df3b675b866519ecf7bba4`. Original [P4D13 artifact14537095764](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475/artifacts/14537095764) untouched CRC+39 hash PASS.
+- Arms: native baseline original 6228/6254 strokes, stable grouping by first owner and reverse, 3×3 same-owner physical correction. Owner regrouping alone increased 9/9 but degraded 5/9 source owner (E13868→13806 first grouping, F13863→13802), **not accepted**; reversed even worse for 5/9. Source white remained same.
+- Accepted **experimental** safe 3×3 physical repair added 33 E and 30 F width1 real strokes, native correct physical E110432→110541, F110179→110275; logical 9/9 E7582→7621,F7525→7562. Interior nonwhite alpha0 (distance≥2 logical from source white) E95→85, F96→87, no increase in original-white E4415/F4445 and protected-white E2250/F2261. Raw [ZIP artifact14555557270](https://github.com/Kiddos19882/AutoDraw/actions/runs/44573841891/artifacts/14555557270) independent CRC and34/34 SHA PASS; no E4/CHALK.
+- Strict 3×3 source-owner safety covered only 2836/2833 logical cells of13868/13863 source nonwhite; therefore further geometric margin study required (not loosen frozen acceptance).
+
+## P4D18 — физический EDT owner-safe boundary, лучший вариант 1.6 physical
+
+Frozen [P4D18 E0](ENGINE001_B1R_P4D18_EDT_PHYSICAL_OWNER_REPAIR_PREREG_2026-11-19.md), code SHA **`746639c1d0d3ac49be58e2a8379ff28c569bec4e`**, real E3 [CI44575816229](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816229) **SUCCESS**, common [validation44575816310](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816310) **5/5 required jobs PASS**, optional3 SKIPPED. 9 real Egret native scenes, blank+4 arms× E/F, strictly original B1-R color index, Firefox159.0, baseline from P4D17 immutable archive34/34 SHA PASS. Added only width1 physical microdots with Egret .5 logical shift to physical target subpixel; candidate eligible if physical source owner's Euclidean distance to different owner/source-white >2.7,>2.1,>1.6 physical backing pixels; each arm independent parent baseline. Three prereg margins assessed with same actual Egret, no unmeasured extrapolation. Best empirical arm **EDT_MARGIN_1P6**, bounded600 proposed per method, actually added358(E)/357(F) E3 native strokes. Filename `EDT_MARGIN_1P6_REAL_NATIVE.png` per method in [ZIP artifact14557770111](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816229/artifacts/14557770111) independently downloaded, ZIP CRC PASS, 34/34 member SHA PASS.
+
+| Сравнение настоящего Egret | E P4D13 | E P4D17 | E P4D18 best | F P4D13 | F P4D17 | F P4D18 best |
+|---|---:|---:|---:|---:|---:|---:|
+| Owner correct backing physical (alpha24/RGB32) | 110432 | 110541 | **111347** | 110179 | 110275 | **111080** |
+| Nonwhite logical owner correct ≥5/9 | 13868 | 13868 | **13868** | 13863 | 13863 | **13863** |
+| Nonwhite logical owner correct ≥7/9 | 11334 | 11366 | **11585** | 11245 | 11273 | **11490** |
+| Nonwhite logical owner correct exactly 9/9 | 7582 | 7621 | **7876** | 7525 | 7562 | **7815** |
+| Real alpha=0 interior backing distance≥2 | 95 | 85 | **24** | 96 | 87 | **25** |
+| Original white painted alpha≥24 physical | 4415 | 4415 | **4415** | 4445 | 4445 | **4445** |
+| Protected original white painted alpha≥24 physical | 2250 | 2250 | **2250** | 2261 | 2261 | **2261** |
+| Far>3 logical native alpha24 diagnostic | 0 | 0 | **0** | 0 | 0 | **0** |
+| E3 native stroke count (NOT CHALK) | 6228 | 6261 | **6619** | 6254 | 6284 | **6641** |
+
+Improvement vs frozen full P4D13: source interior actual alpha0 **E −71/95 (~74.7%)** and **F −71/96 (~74.0%)**; source correct physical pixels E+915, F+901 without more source-white ink. 1.6 vs2.1 vs2.7 samples all preserved measured 5/9 and white, but 1.6 produced most native owner-correct. Individual actual native side-by-side visual inspection can be done from artifacts. Native stored plans show new offset dots; no path length/brush-model estimate substituted for quality or CHALK.
+
+## Evidence and limits
+
+**E0** pre-registered P4D17 and P4D18 separately; **E1** source and geometry; **E2** runner/E2 units/sha and common validation; **E3** original pinned BoardPane true native PNG on full E/F (not synthetic line/capsule), Firefox159.0, raw plans and complete visual contact sheets; **E4** live game NOT_RUN; **E5** independent quality gate NOT_RUN; **run-bound exact CHALK** NOT_RUN. This is real reproducible scientific improvement under measured criteria, **NOT proof of protected foreign0, not original visual 100%, not game live CHALK**. No frozen acceptance threshold changed. Existing source-white/protected contamination is nonzero and **QUALITY FAIL** (E4415/F4445 original-white backing), even if not worsened. Original G32/V44 not used as input. Original source/game/renderer/Stage6 executor/Game Monitor/Bridge, production brush/CHALK defaults, and master untouched; only new isolated experiment files, CI, docs on feature branch.
+
+## Next single step
+Source-aware native per-owner color attribution at remaining **E24/F25 interior alpha0** and thousands alpha24 incorrect-source RGB physical cells, including near heterogeneous borders; pre-register E0 before further planner changes. Distinguish true transparent miss vs foreign overpaint vs AA partial color under original-white and protected foreign0 constraints. Do not make 1.6 physical a production tolerance; independent native and E4/E5 remain necessary.

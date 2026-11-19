@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — full original E/F physically improved, remaining source-owner gaps OPEN (2026-11-19)
+
+- [x] [P4D17 E0 and native E3](ENGINE001_B1R_P4D17_P4D18_NATIVE_FULL_REPAINT_RESULTS_2026-11-19.md): strict 3×3 source-owner physical correction 33 E/30 F real Egret width1 dots, original5/9 preserved, real alpha0 interior95→85 /96→87; simple owner grouping 5/9 regressions preserved as negative.
+- [x] [P4D18 native EDT physical owner mask](ENGINE001_B1R_P4D17_P4D18_NATIVE_FULL_REPAINT_RESULTS_2026-11-19.md): [CI44575816229](https://github.com/Kiddos19882/AutoDraw/actions/runs/44575816229) PASS, best preregistered margin **1.6 physical backing pixels**; additional358 E/357 F dots, original5/9 unchanged; alpha0 source interior **24/25**, owner physical +915/+901 vs original P4D13; original-white source/protected ink unchanged **4415/4445, 2250/2261** (NOT quality PASS). General validation5/5 PASS.
+- [ ] **NEXT one:** independent frozen E0 for actual per-owner native color contribution & remaining E24/F25 physical holes, detailed wrong RGB/alpha source-over analysis and region-aware border repairs that do NOT add original white/protected foreign ink. Then E3 full original E/F visual, required protected0/far3 gates, E4/E5 actual runtime, exact run-bound CHALK separately.
+
+*Далее — предыдущий TASKS backlog на момент P4D16 и раньше.*
+
 ## CURRENT ENGINE-001 — исходная задача: объяснить и устранить белые прорехи P4D13 (2026-11-19)
 
 - [x] Post-hoc true-native [E/F geometry and RGBA forensic](ENGINE001_B1R_P4D13_WHITE_HOLE_ROOT_CAUSE_DIAG_2026-11-19.md): Stage01→03 interior alpha0 E95/F96 стоят в logical cells, прошедших5/9, и их центры геометрически вне всех stroke capsules; ещё E14103/F14303 native color-incorrect owner pixels alpha≥24. Старые P4D13/P4D16 native E3 immutable, no production changes.
