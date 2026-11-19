@@ -45,9 +45,18 @@ class SourceTextureTranslationContracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.compare_copies([z]*9+[np.zeros((1,1,4),np.uint8)])
         with self.assertRaises(ValueError):
-            d.crop_source(np.zeros((100,100,4),np.uint8),
+            d.crop_source(np.zeros((1,1,4),np.uint8),
                           {"x":0,"y":0},58,40)
-    def test_07_all_coords_from_frozen_original_grid(self):
+
+    def test_07_transparent_padding_outside_real_node_bounds(self):
+        source=np.full((100,100,4),255,np.uint8)
+        cropped=d.crop_source(source,{"x":0,"y":0},58,40)
+        self.assertEqual(cropped.shape,(162,162,4))
+        self.assertEqual(int(cropped[0,0,3]),255)
+        self.assertEqual(int(cropped[-1,-1,3]),0)
+
+    def test_08_all_coords_from_frozen_original_grid(self):
+
         import run_engine001_b1r_p4d3_native_brush_repeatability as old
         self.assertEqual(d.CASE_COUNT,len(d.WIDTHS)*len(d.ANGLES)*len(d.LENGTHS))
         self.assertEqual(len(old.CENTERS),12)

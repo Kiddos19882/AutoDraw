@@ -68,10 +68,18 @@ def crop_source(rgba:np.ndarray,node:dict,cx:int,cy:int)->np.ndarray:
         raise ValueError("BLOCKED_P4D15_BAD_SOURCE_RGBA")
     left=int(round(SCALE*(cx-p4d3.HALF-node["x"])))
     top=int(round(SCALE*(cy-p4d3.HALF-node["y"])))
-    if (left<0 or top<0 or left+SIDE>rgba.shape[1] or
-        top+SIDE>rgba.shape[0]):
-        raise ValueError("BLOCKED_P4D15_SOURCE_CROP_OUT_OF_BOUNDS")
-    return rgba[top:top+SIDE,left:left+SIDE,:]
+    # The genuine Canvas texture contains only the GraphicsNode bounds.
+    # The 54-logical-unit measurement ROI may extend outside that texture;
+    # the missing region is transparent, not an invalid native source.
+    sx0=max(0,left)
+    sy0=max(0,top)
+    sx1=min(rgba.shape[1],left+SIDE)
+    sy1=min(rgba.shape[0],top+SIDE)
+    if sx1<=sx0 or sy1<=sy0:
+        raise ValueError("BLOCKED_P4D15_SOURCE_CROP_NO_TEXTURE_OVERLAP")
+    padded=np.zeros((SIDE,SIDE,4),np.uint8)
+    padded[sy0-top:sy1-top,sx0-left:sx1-left,:]=rgba[sy0:sy1,sx0:sx1,:]
+    return padded
 
 
 def compare_copies(roi_list:list[np.ndarray])->dict:
