@@ -124,7 +124,8 @@ jobs:
           with Image.open(root/"REAL_EGRET_BLANK.png") as im:
               assert im.size==(1380,720)
               assert im.getchannel("A").getbbox() is None
-          assert len(list(root.rglob("*.png")))==1388
+          # 1386 native phase cases + 1 blank + 1 phase heatmap + 2 indexed source maps
+          assert len(list(root.rglob("*.png")))==1390
           assert len(data["members_sha256"])>=1389
           for filename,hash_ in data["members_sha256"].items():
               assert hashlib.sha256((root/filename).read_bytes()).hexdigest()==hash_,filename
