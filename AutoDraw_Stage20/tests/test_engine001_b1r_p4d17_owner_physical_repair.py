@@ -72,11 +72,11 @@ class P4D17Contracts(unittest.TestCase):
         native=np.zeros((720,1380,4),np.uint8)
         strokes,_=p.repair_plan(idx,pal,native)
         self.assertEqual(len(strokes),1)
-        # Picked subpixel (0,0), native path center after +0.5 is at 20+1/6.
+        # Central safe source cell is (21,21), target physical subpixel (0,0).
         got=(strokes[0]["points"][0]["x"]+
              strokes[0]["points"][1]["x"])/2-p.X0+.5
-        self.assertAlmostEqual(got,20.+1./6.)
-        self.assertAlmostEqual(strokes[0]["points"][0]["y"]+.5,20.+1./6.)
+        self.assertAlmostEqual(got,21.+1./6.)
+        self.assertAlmostEqual(strokes[0]["points"][0]["y"]+.5,21.+1./6.)
     def test_07_no_other_owner_neighborhood(self):
         idx=np.full((240,150),p.WHITE,np.uint8)
         idx[20:23,20:23]=9
