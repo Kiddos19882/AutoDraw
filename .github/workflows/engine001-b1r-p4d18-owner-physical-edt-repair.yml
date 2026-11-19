@@ -1,0 +1,155 @@
+name: ENGINE-001 P4D18 original E F physical owner EDT native improvement
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d18-owner-physical-edt-repair.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d18_physical_owner_edt_repair.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d18_physical_owner_edt_repair.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D18_EDT_PHYSICAL_OWNER_REPAIR_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-p4d18-original-native-ef
+  cancel-in-progress: true
+jobs:
+  full-original-e-f:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original source-browser Firefox 159.0
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install archived true-Egret analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Restore exact game and test harness frozen blobs on Windows
+        shell: pwsh
+        env:
+          AUTODRAW_PINNED_FIREFOX: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:AUTODRAW_PINNED_FIREFOX -PathType Leaf)) { throw "Firefox159 pin missing" }
+          & $env:AUTODRAW_PINNED_FIREFOX --version
+          @'
+          import subprocess,hashlib
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+          }
+          for file,sha in pins.items():
+              data=subprocess.check_output(["git","show","HEAD:"+file])
+              got=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
+              assert got==sha,(file,got,sha)
+              Path(file).write_bytes(data)
+              assert Path(file).read_bytes()==data
+          print("P4D18_PINNED_GAME_RENDERER_AND_PARENT_GIT_BLOBS_PASS")
+          '@ | python -
+      - name: E2 source-owner ordering, halfpixel positioning and safety contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d18_physical_owner_edt_repair.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d18_physical_owner_edt_repair.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d18_physical_owner_edt_repair.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d16_canvas_aa_density.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore original frozen P4D13 source plans E F and native reference
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44573841891 -R Kiddos19882/AutoDraw -n engine001-p4d17-original-EF-four-arm-owner-physical-native-visual -D AutoDraw_Stage20/.p4d18-frozen-original
+      - name: E3 genuine Egret BoardPane four arm full original redraw
+        shell: pwsh
+        env:
+          AUTODRAW_PINNED_FIREFOX: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          @'
+          import os,sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path("AutoDraw_Stage20/tests").resolve()))
+          import run_engine001_b1r_p4b7_native_stroke_attribution as p4b7
+          real_constructor=p4b7.webdriver.Firefox
+          pin=os.environ["AUTODRAW_PINNED_FIREFOX"]
+          if not Path(pin).is_file():
+              raise ValueError("BLOCKED_P4D18_FIREFOX_PIN_MISSING")
+          def pinned_firefox(*args,**kwargs):
+              options=kwargs.get("options")
+              if options is None:
+                  raise ValueError("BLOCKED_P4D18_BROWSER_OPTIONS_MISSING")
+              options.binary_location=pin
+              return real_constructor(*args,**kwargs)
+          p4b7.webdriver.Firefox=pinned_firefox
+          import run_engine001_b1r_p4d18_physical_owner_edt_repair as p4d18
+          try:
+              report=p4d18.run(
+                  Path("."),Path("AutoDraw_Stage20/gameEngine/main.min_653f95bc.js"),
+                  Path("AutoDraw_Stage20/tests/game_renderer_reference.js"),
+                  Path("AutoDraw_Stage20/.p4d18-frozen-original"),
+                  Path("AutoDraw_Stage20/.p4d18-true-native"))
+          finally:
+              p4b7.webdriver.Firefox=real_constructor
+          print("P4D18_BROWSER_ACTUAL",report["native_browser"])
+          if not str(report["native_browser"]["browserVersion"]).startswith("159."):
+              raise ValueError("BLOCKED_P4D18_EXPECTED_SOURCE_FIREFOX159")
+          '@ | python -
+      - name: Verify original P4D17 parent, true Egret 9 scenes, E F metrics and hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          root=Path("AutoDraw_Stage20/.p4d18-true-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D18_PHYSICAL_OWNER_EDT_REPAIR_V1"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["p4d17_manifest_members_verified"]==34
+          assert r["native_full_scenes"]==9 and r["blank_true_native_alpha0"]
+          assert r["native_browser"]["browserVersion"].startswith("159.")
+          assert r["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["game_bundle_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert not r["production_promotion"] and r["exact_run_bound_CHALK"] is None
+          assert r["protected_foreign_zero"]=="NOT_PROVEN"
+          for method in ("E_SOBEL90","F_SOBEL90_LAB12"):
+              x=r["method_results"][method]
+              original=x["results"]["BASE_P4D17"]
+              assert x["best_eligible_arm"] in r["all_arms"]
+              for arm in r["all_arms"]:
+                  a=x["results"][arm]
+                  assert a["strokes"]<=original["strokes"]+600
+                  assert (root/method/(arm+"_REAL_NATIVE.png")).exists()
+                  assert a["target_nonwhite_logical"]==original["target_nonwhite_logical"]
+              for margin in ("EDT_MARGIN_2P7","EDT_MARGIN_2P1","EDT_MARGIN_1P6"):
+                  assert x["plans"][margin]["new_width1_strokes"]<=600
+              assert (root/method/"P4D18_ORIGINAL_VS_4_EGRET_NATIVE_PHYSICAL_ARMS.png").exists()
+          for name,sha in r["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print("P4D18_TRUE_EGRET_EF_NINE_SCENES_TECHNICAL_PASS")
+          print("P4D18_SHA256_MANIFEST_PASS",len(r["members_sha256"]))
+          PY
+      - name: Preserve genuine full art PNG, all plans, negative outcomes and contact sheets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d18-original-EF-EDT-physical-native-visual
+          path: AutoDraw_Stage20/.p4d18-true-native/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30
