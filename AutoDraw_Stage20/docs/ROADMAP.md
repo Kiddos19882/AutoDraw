@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — native color-owner geometry after P4D9 (2026-11-19)
+
+1. [P4D9 E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536) exact SHA `de397cab6b04a9447949f7d011e89e3892d570fe` technical PASS; baseline and both fixed order-only alternatives **16/21 samples,17/307 target owner correct,290 residual,16 accepted21 attempted**; all order hypotheses FAIL. [Artifact14505485973](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536/artifacts/14505485973), CRC/1470 member SHA independent PASS.
+2. **NEXT:** prereg [P4D10 10 conflicting source-owner pixels ×25 near-zero real brush1 phase samples](ENGINE001_B1R_P4D10_NATIVE_FINE_PHASE_CONFLICT10_PREREG_2026-11-19.md), no full-art acceptance, report if any safe alternatives exist; if positive, separate cumulative whole-board test using extra native variants; if negative, investigate path geometry and coupled original owner planning without changing safety gate.
+3. Later second source ROI with actual E/F contrast, all original 307 then entire image/all widths1..10, visual face/eyes/hands and strict owner99/foreign0/far3, real E4 independent E5 exact game CHALK. No production/master until verified.
+
+*Below is P4D8/P4D7 roadmaps retained as historical snapshots.*
+
 ## CURRENT ENGINE-001 — after P4D8 cumulative phase owner 0/1 experiment (2026-11-19)
 
 1. **P4D8 done, E2/E3 technical PASS, H2 FAIL:** [CI44470625000](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000), 16/21 samples,17/307 owner correct,16 accepted21 attempts, five source-foreign alpha24 rejects (1–2 backing), zero accepted safety violations. [Raw ZIP14504232392](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000/artifacts/14504232392) CRC/1420 SHA independently PASS. No full picture validation.

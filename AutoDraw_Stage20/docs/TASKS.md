@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — P4D9 order-only three-arm negative; P4D10 native fine-phase next (2026-11-19)
+
+- [x] P4D9 [pre-registered order-only study](ENGINE001_B1R_P4D9_NATIVE_CUMULATIVE_ORDER_AUDIT_PREREG_2026-11-19.md), [CI44472742536](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536) at `de397cab6b04a9447949f7d011e89e3892d570fe` E2/E3 technical PASS and original P4D8 baseline parity. All three genuine Egret orders 16/21 samples, 17/307 correct and16/21 trial accepted; H1/H2/H3 FAIL, rejected sample identities shift with order. Independent [ZIP14505485973](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536/artifacts/14505485973) CRC+1470 SHA PASS, source/gates unchanged.
+- [ ] **NEXT:** [P4D10 E0 prereg fine-phase](ENGINE001_B1R_P4D10_NATIVE_FINE_PHASE_CONFLICT10_PREREG_2026-11-19.md): native width1 5×5 dx/dy grid 1/32 step near 0 for frozen union of 10 conflicting owner pixels; 250 actual isolated Egret strokes plus blank, actual source foreign0 and 5/9 color, no shifted stamp proxy or post-hoc tolerance. E2/E3 P4D10 NOT_RUN at prereg.
+- [ ] After P4D10 and next cumulative ROI: original owner per-color coverage≥99%, protected foreign0 and far>3logical0 on whole E/F image, critical face/hands/eyes visual, actual game E4, E5 and run-bound exact CHALK; no production/master modifications.
+
+*Ниже — P4D8/P4D7 historical backlog; их старые NEXT не текущий приоритет.*
+
 ## CURRENT ENGINE-001 — P4D8 measured, order-sensitive cumulative follow-up P4D9 (2026-11-19)
 
 - [x] [P4D8 pre-registered cumulative native phase trial](ENGINE001_B1R_P4D8_NATIVE_CUMULATIVE_PHASE_PIXEL_STATE_PREREG_2026-11-19.md) completed [CI44470625000](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000) at `834ddab49c6a67c09a0e3c7b56d2028e3094965b`, E2/E3 technical PASS;21/21 prior isolated safe, cumulative final **16/21 samples and17/307 correct**,16 accepted/21 attempted,290 residual; no accepted wrong-color alpha24 or lost1→0, five rejected from new foreign alpha24 (1–2 backing px). Historical P4D5/P4D6 failures unchanged. [ZIP14504232392](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000/artifacts/14504232392) independently CRC/1420 member SHA PASS. H2 all sample coverage FAIL, full picture NOT_VALIDATED.

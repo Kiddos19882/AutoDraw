@@ -1,3 +1,17 @@
+## ENGINE-001 B1-R P4D9 — three true-native stroke order controls, zero scientific improvement (2026-11-19)
+
+[CI44472742536](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536), SHA `de397cab6b04a9447949f7d011e89e3892d570fe`, job `real-egret-3-prespecified-orders` **SUCCESS** (E2 P4D9, inherited P4D8/P4D7/P4D5, Node and Markdown PASS). E3 real pinned original Egret5.4.1 BoardPane/WebGL P4D7 fixed 21×66 isolated cases +blank **21/21 isolated safe again**; all three actual cumulative arms of same underlying source, palette, native geometry, thresholds and pool:
+
+| Preregistered arm | Fixed sample correct | Source target correct | Residual0 | Accepted/attempted | Hypothesis |
+|---|---:|---:|---:|---:|---|
+| BASELINE_P4D8 | 16/21 | 17/307 | 290 | 16/21 | P4D8 exact parity PASS |
+| FIVE_FAILED_SAMPLES_FIRST | 16/21 | 17/307 | 290 | 16/21 | no improvement |
+| SOURCE_OWNER_DESCENDING | 16/21 | 17/307 | 290 | 16/21 | no improvement |
+
+**True native failure attribution:** baseline rejected sample owners 011,113,116,123,127 (alpha24 foreign delta1,2,1,1,2 backing); five-priority rejected 010,013,015,079,115 (each1 backing); descending rejected115,079,015,013,010 (each1 backing). Reordering changes who becomes unsafe, not target coverage; no new foreign/lost/white in accepted strokes. H1 samples>16, H2 correct>17, H3 all21 **ALL FAIL**. Correct behavior on protected face remains hard alpha24 source-foreign zero, no tolerance relaxation or production promotion.
+
+[One ZIP14505485973](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536/artifacts/14505485973), 1,229,467 bytes, independently downloaded; ZIP CRC PASS, **1470/1470 SHA256 manifest members PASS**. [E0 frozen prereg](ENGINE001_B1R_P4D9_NATIVE_CUMULATIVE_ORDER_AUDIT_PREREG_2026-11-19.md). Next source-geometry test [P4D10 prereg](ENGINE001_B1R_P4D10_NATIVE_FINE_PHASE_CONFLICT10_PREREG_2026-11-19.md). Full original E/F owner≥99%, protected foreign0/far3logical0, E4/E5, exact CHALK NOT_RUN.
+
 ## ENGINE-001 B1-R P4D8 — native cumulative phase feedback on protected owner pixels (2026-11-19)
 
 [CI44470625000](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000), SHA `834ddab49c6a67c09a0e3c7b56d2028e3094965b`, job native-owner-cumulative-phase **SUCCESS**, E2 10/10 new, inherited P4D7/P4D5, JS20/20 and Markdown audit PASS (one old frozen P4D7 historical link warning), E3 genuine original Egret5.4.1 BoardPane/WebGL with 1386 isolated phase strokes + blank, **21/21 isolated safe/correct** reproduced, then exactly **21 cumulative full-scene native trials**. True after-each-step 0/1 (5/9 alpha24+RGB delta32) on unchanged original protected E/F-identical face24×24 source, target307 nonwhite/269 white,20 owner IDs,21 sample IDs. **16 trials accepted**,5 rejected; final **16/21 samples correct, 17/307 target correct, 290 residual**. Historical P4D5=10/307, P4D6=1/307; H1 >10 PASS on this ROI, H2 21/21 FAIL, no production quality acceptance.
