@@ -75,9 +75,16 @@ def actual_foreign_impact(before:np.ndarray,after:np.ndarray,
         for by,bx in zip(ys.tolist(),xs.tolist()):
             xx=bx//p4d5.SCALE-p4d5.X0
             yy=by//p4d5.SCALE
-            delta=int(np.max(np.abs(
-                before_rgb[by,bx].astype(np.int16)-
-                after_rgb[by,bx].astype(np.int16))))
+            # real_composite_rgb is SOURCE-CROPPED (720x450), while native
+            # RGBA is the FULL 720x1380 board: transform backing X exactly.
+            local_bx=bx-p4d5.X0*p4d5.SCALE
+            if 0<=local_bx<before_rgb.shape[1] and 0<=by<before_rgb.shape[0]:
+                delta=int(np.max(np.abs(
+                    before_rgb[by,local_bx].astype(np.int16)-
+                    after_rgb[by,local_bx].astype(np.int16))))
+            else:
+                # Outboard source changes are never accepted by any arm.
+                delta=255
             maxrgb=max(maxrgb,delta)
             near=max(abs(xx-sample["x"]),abs(yy-sample["y"]))
             max_cheby=max(max_cheby,near)
