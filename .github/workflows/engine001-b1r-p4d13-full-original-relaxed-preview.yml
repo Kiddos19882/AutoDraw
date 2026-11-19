@@ -1,0 +1,138 @@
+name: ENGINE-001 B1-R P4D13 full original E F relaxed native completion preview
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d13-full-original-relaxed-preview.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d13_full_original_relaxed_finish.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d13_full_original_relaxed_finish.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D13_FULL_ORIGINAL_RELAXED_FINISH_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4d13-full-relaxed-native-preview
+  cancel-in-progress: true
+jobs:
+  genuine-original-source-full-relaxed-native:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen Egret WebGL and original B1-R source dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Pin original game and renderer plus existing uncapped P4D0 planner
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b1_hybrid_zone_coverage.py":"b95aa361cf2ec94d5fa28e7309bd3e4af15eca93",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py":"cf4f0b0b8a1fef5879067f41901f2806758e81bd",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py":"c350fb9a890de9bbe9f9e24eeea0eb6645f414f1",
+          }
+          for name,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+name])
+              found=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert found==expected,(name,found,expected)
+              Path(name).write_bytes(raw)
+              print("P4D13_PIN",name,found)
+          raw=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: E2 full-original residual contracts and inherited native pilot regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d13_full_original_relaxed_finish.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d13_full_original_relaxed_finish.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d13_full_original_relaxed_finish.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 true Egret full original E F relaxed completion and source 0 1 feedback
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d13_full_original_relaxed_finish.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d13-relaxed-full
+      - name: Audit original image native scenes, E F complete, every artifact SHA
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d13-relaxed-full")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D13_FULL_ORIGINAL_RELAXED_FINISH_V1"
+          assert r["technical_result"]=="P4D13_FULL_SOURCE_EF_TRUE_NATIVE_RELAXED_FINISH"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["source_original_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["source_B1R_P3D_fresh"] and r["original_EF_full_index_distinct"]
+          assert r["source_methods"]==["E_SOBEL90","F_SOBEL90_LAB12"]
+          assert r["actual_renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+          assert r["native_blank_alpha0"] and r["max_repair_rounds"]==3
+          assert r["native_overlap_policy"]=="UNRESTRICTED_DIAGNOSTIC_RECORD_ALL_DAMAGE"
+          assert not r["production_promotion"] and r["exact_run_bound_CHALK"] is None
+          assert r["E4_live"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["expected_native_scenes"]==11 and r["full_game_board_native_shape"]==[720,1380,4]
+          assert len(r["methods"])==2
+          with Image.open(root/"REAL_EGRET_BLANK.png") as im:
+              assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
+          for method,m in r["methods"].items():
+              folder=root/method
+              assert m["native_full_scene_captures"]==5
+              assert m["nonwhite_target"]>0 and m["final_repair_rounds"]==3
+              assert len(m["stages"])==4 and m["final_overlaps_not_rejected"]
+              final=m["stages"]["STAGE_03_RELAXED_REPAIR"]["native"]
+              assert m["final_owner_correct"]+m["final_owner_remaining"]==m["nonwhite_target"]
+              assert final["target_nonwhite_logical"]==m["nonwhite_target"]
+              assert final["correct_owner_logical_5of9"]==m["final_owner_correct"]
+              for prefix in ("STAGE_00_INITIAL_ADAPTIVE_NATIVE",
+                             "STAGE_01_RELAXED_REPAIR_NATIVE",
+                             "STAGE_02_RELAXED_REPAIR_NATIVE",
+                             "STAGE_03_RELAXED_REPAIR_NATIVE",
+                             "SCANLINE_CONTROL_REAL_NATIVE"):
+                  with Image.open(folder/(prefix+".png")) as im:
+                      assert im.size==(1380,720)
+              for preview in ("P4D13_VISUAL_FULL_ORIGINAL_VS_RELAXED_EGRET.png",
+                              "P4D13_VISUAL_FACE_EYES_5WAY.png",
+                              "P4D13_NATIVE_MEASURED_STATE_GREEN_RED.png"):
+                  assert (folder/preview).exists()
+              print("P4D13_REAL_EGRET_METHOD",method,
+                    "initial",m["stages"]["STAGE_00_INITIAL"]["native"]["correct_owner_logical_5of9"],
+                    "final",m["final_owner_correct"],"/",m["nonwhite_target"],
+                    "white_ink",final["original_white_ink_alpha24_backing"])
+          for filename,sha in r["members_sha256"].items():
+              assert hashlib.sha256((root/filename).read_bytes()).hexdigest()==sha,filename
+          print("P4D13_E3_REAL_FULL_EF_PASS")
+          print("P4D13_MANIFEST_SHA_PASS",len(r["members_sha256"]))
+          PY
+      - name: Save all E F full native boards, source and user visual comparisons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d13-original-EF-full-relaxed-finish-native-visual
+          path: AutoDraw_Stage20/.p4d13-relaxed-full/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
