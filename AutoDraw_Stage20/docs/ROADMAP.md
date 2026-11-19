@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — after P4D8 cumulative phase owner 0/1 experiment (2026-11-19)
+
+1. **P4D8 done, E2/E3 technical PASS, H2 FAIL:** [CI44470625000](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000), 16/21 samples,17/307 owner correct,16 accepted21 attempts, five source-foreign alpha24 rejects (1–2 backing), zero accepted safety violations. [Raw ZIP14504232392](https://github.com/Kiddos19882/AutoDraw/actions/runs/44470625000/artifacts/14504232392) CRC/1420 SHA independently PASS. No full picture validation.
+2. **NEXT P4D9:** [preregistered 3-arm native cumulative order study](ENGINE001_B1R_P4D9_NATIVE_CUMULATIVE_ORDER_AUDIT_PREREG_2026-11-19.md), original source and candidate phase footprints/safety unchanged. Compare original P4D8 order versus five high-conflict samples first versus descending owner index, all with fresh Egret feedback; evaluate actual 1→0/foreign and sample coverage. No gate relaxation.
+3. **THEN:** if order alone fails, provenance-aware micro-geometry and multi-owner scheduling, second ROI where original E/F differ, all pixels and widths1..10; full artwork gates owner99%/protected0/far3, visual face/eyes/hands, eventual E4, E5 and run-bound CHALK; no production/master upgrade until independently validated.
+
+*Ниже roadmap после P4D7 и раньше — исторические планы, не действующий NEXT.*
+
 ## CURRENT ENGINE-001 / B1-R — after P4D7 native isolated phase feasibility (2026-11-19)
 
 1. **DONE P4D7:** [CI44428805429](https://github.com/Kiddos19882/AutoDraw/actions/runs/44428805429), exact SHA `fe036d43ad7c28f060c6f032ef81c583e63d5fe2`, E2/E3 technical PASS: для всех **21/21** фиксированных защищённых исходных пикселей найдена хотя бы одна owner-safe width1 Egret фаза из66 (1386 stroke scenes + blank). [Artifact14485647346](https://github.com/Kiddos19882/AutoDraw/actions/runs/44428805429/artifacts/14485647346); не считать полной покраской.
