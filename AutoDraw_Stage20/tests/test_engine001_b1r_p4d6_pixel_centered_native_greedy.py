@@ -104,7 +104,8 @@ class P4D6NativeCenteredE2(unittest.TestCase):
         self.assertIn("result=parent.run(workspace,source,engine_js,renderer,output)",src)
         self.assertIn("with scoped_centered_trial():",src)
         self.assertIn('PILOT_NO_SAFE_COVERAGE_IMPROVEMENT',src)
-        self.assertIn('production_promotion',src)
+        self.assertIn('"production_promotion":False',
+                      Path(parent.__file__).read_text("utf8"))
         self.assertNotIn("source_joint_outline(",src)
         self.assertNotIn("import run_engine001_color32_p4c1",src)
         self.assertEqual(parent.ALPHA,24)
