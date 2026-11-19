@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — after P4D11 measured soft/adaptive Egret (2026-11-19)
+
+1. **DONE:** [P4D11 native CI44479727697](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479727697), E2/E3 PASS, strict16/21 &17/307 vs SOFT1 19/21 &20/307, SOFT2/3/ADAPTIVE21/21 &22/307; 3 or7 accepted foreign backing pixels in protected face, so **SOFT/ADAPTIVE FROZEN PROTECTED QUALITY FAIL**. [ZIP14507448658](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479727697/artifacts/14507448658) CRC+1520 SHA independent PASS. Do not relax game default or apply to protected.
+2. **NEXT:** [existing E0 P4D10](ENGINE001_B1R_P4D10_NATIVE_FINE_PHASE_CONFLICT10_PREREG_2026-11-19.md) true native 10×25 fine spatial phases for conflicting pixels, strict no original foreign. If positive, new prereg strict cumulative local owner scheduling; else new original RGB coupled strokes/geometry test instead of making unsafe native tolerance accepted.
+3. **THEN:** non-protected ROI with E/F source differences, original full image quality protected0/far3logical0/owner99 and manual face/hand/eye visuals, E4 live, E5 independent, exact CHALK; no master/production change absent evidence and decision.
+
+*Следующие исторические ROADMAP секции — прежние планы после P4D9 и более ранних шагов.*
+
 ## CURRENT ENGINE-001 — native color-owner geometry after P4D9 (2026-11-19)
 
 1. [P4D9 E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536) exact SHA `de397cab6b04a9447949f7d011e89e3892d570fe` technical PASS; baseline and both fixed order-only alternatives **16/21 samples,17/307 target owner correct,290 residual,16 accepted21 attempted**; all order hypotheses FAIL. [Artifact14505485973](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536/artifacts/14505485973), CRC/1470 member SHA independent PASS.

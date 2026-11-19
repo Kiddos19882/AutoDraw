@@ -1,3 +1,19 @@
+## ENGINE-001 B1-R P4D11 — soft / adaptive physical backing touch, real Egret (2026-11-19)
+
+**Commit** `5827b6bb6e5cd6cd7aa96b87e3db8bf6fb24e457`; [native CI44479727697](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479727697) **E2 new9/9 PASS + inherited native state, Node20/20, markdown integrity PASS**, E3 true Egret5.4.1 BoardPane/WebGL SUCCESS. Fresh P4D7 21×66=1386 isolated native stroke PNG + blank and five sequential arms, frozen original RGB SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, 24×24 protected face ROI E/F index equal (307 owner target,269 white,20 nonwhite owners). Strict P4D8 exact baseline parity frozen; all trial images and actual 0/1 feedback native. No shifted brush stamp, no model-only quality claims.
+
+| Arm (max original-foreign alpha24 changed backing/stroke) | Fixed samples | Native owner-correct | Accepted/trials | Sum protected foreign alpha24 touched | Maximum accepted incremental composite RGB channel delta | Approved protected foreign0 |
+|---|---:|---:|---:|---:|---:|---|
+| STRICT 0 | 16/21 | 17/307 | 16/21 | 0 | 0 | PASS |
+| SOFT 1 | 19/21 | 20/307 | 19/21 | 3 | 5 | FAIL |
+| SOFT 2 | 21/21 | 22/307 | 21/21 | 7 | 6 | FAIL |
+| SOFT 3 | 21/21 | 22/307 | 21/21 | 7 | 6 | FAIL |
+| ADAPTIVE 2 + RGB<=12 + repair sample <=1logical | 21/21 | 22/307 | 21/21 | 7 | 6 | FAIL |
+
+**Scientific H1/H2/H3 numeric PASS**; no source-white alpha24 or correct1→0 loss in any accepted trial, 5 P4D8 failures allowed by SOFT2/ADAPTIVE, resulting **285 source target zeros remain** (not whole painting). ADAPTIVE repairable=sample-neighbor candidate only, not proven safe repair; exactly same 7 protected touches as SOFT2 and no demonstrated risk reduction. All nonstrict arms explicitly violate project's **protected original owner foreign0**, regardless of small visible RGB change; E3 quality **FAIL**, production NOT_ACCEPTED. [Artifact14507448658](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479727697/artifacts/14507448658) **1,312,351 bytes**, independently downloaded and audited: ZIP CRC PASS, **1520/1520** internal file SHA256 PASS, 1521 ZIP members total. No E4 actual game, E5 independent visual/native source validation or run-bound exact CHALK; full per-owner≥99%, protected0, far3logical0 not measured.
+
+**Failed pilot preserved:** [CI44479473481](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479473481) failed E2 2 tests because full native RGB column `x=588` was indexed into already-cropped 450-column RGB; commit `5827b6bb` applies `backing_x−X0×3` correction before true native analysis, without changing alpha/RGB gates. Earlier preflight CI44479389191 cancelled by scoped correction. [P4D11 E0 frozen](ENGINE001_B1R_P4D11_SOFT_ADAPTIVE_NATIVE_FOREIGN_TOUCH_PREREG_2026-11-19.md).
+
 ## ENGINE-001 B1-R P4D9 — three true-native stroke order controls, zero scientific improvement (2026-11-19)
 
 [CI44472742536](https://github.com/Kiddos19882/AutoDraw/actions/runs/44472742536), SHA `de397cab6b04a9447949f7d011e89e3892d570fe`, job `real-egret-3-prespecified-orders` **SUCCESS** (E2 P4D9, inherited P4D8/P4D7/P4D5, Node and Markdown PASS). E3 real pinned original Egret5.4.1 BoardPane/WebGL P4D7 fixed 21×66 isolated cases +blank **21/21 isolated safe again**; all three actual cumulative arms of same underlying source, palette, native geometry, thresholds and pool:
