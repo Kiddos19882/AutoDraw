@@ -1,0 +1,121 @@
+name: ENGINE-001 B1-R P4D14 source-derived Egret halfpixel math model
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d14-egret-halfpixel-math.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d14_egret_halfpixel_centroid.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d14_egret_halfpixel_centroid.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D14_EGRET_GRAPHICS_HALFPIXEL_CENTROID_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4d14-egret-halfpixel-math
+  cancel-in-progress: true
+jobs:
+  source-derived-native-centroid:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned original native Egret and image-analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify frozen original Egret and parent P4D3 Git blobs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==expected,(path,got,expected)
+              Path(path).write_bytes(raw)
+              print("P4D14_SOURCE_PIN",path,got)
+          PY
+      - name: E2 center model math tests plus unchanged Egret renderer tests
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d14_egret_halfpixel_centroid.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d14_egret_halfpixel_centroid.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d14_egret_halfpixel_centroid.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d3_native_brush_repeatability.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 160 true Egret BoardPane cases plus 10 same-scene replays and blank
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d14_egret_halfpixel_centroid.py \
+            --workspace . \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d14-native-math
+      - name: Audit source-derived numeric contracts and full raw native evidence hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d14-native-math")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D14_EGRET_GRAPHICS_HALFPIXEL_CENTROID_MODEL_V1"
+          assert r["technical_result"]=="P4D14_TRUE_EGRET_MATH_CENTROID_160_NATIVE_SCENES"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"] and r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+          assert r["renderer_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["game_bundle_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["P4D3_unchanged_git_blob"]=="3437a9326b381d9c94d6ade80059d40adf233d09"
+          assert r["native_blank_alpha0"] and r["case_angles_deg"]==[0,15,30,45,60,90,135,165]
+          assert r["case_lengths_logical"]==[4,34] and r["case_widths"]==list(range(1,11))
+          assert r["cases_native"]==160 and r["exact_native_replays"]==10 and r["native_png_scenes"]==171
+          assert r["native_relative_alpha_centroid_measured_samples"]==1600
+          assert r["model0_no_shift_other_widths"]==r["model1_source_shift_other_widths"]
+          assert r["scientific_scope"]=="centroid only; native RGBA remains authoritative"
+          assert r["full_pixel_exact_brush_model"]=="NOT_PROVEN"
+          assert r["E4_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None and not r["production_promotion"]
+          rows=[json.loads(line) for line in (root/"NATIVE_CASES_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==160 and all(len(x["cells"])==10 for x in rows)
+          assert len(list((root/"native").rglob("*.png")))==170
+          assert len(list((root/"native").rglob("*_PLAN.json")))==160
+          with Image.open(root/"REAL_EGRET_BLANK.png") as im:
+              assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
+          assert (root/"P4D14_NATIVE_CENTROID_MODEL_ERROR.png").exists()
+          for path,sha in r["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==sha,path
+          print("P4D14_E3_NATIVE_171_SCENES_PASS")
+          print("P4D14_ERROR_M0_M1",
+                r["model0_no_shift_widths_1_3"]["mean"],r["model1_source_shift_widths_1_3"]["mean"])
+          print("P4D14_H1_H2_H3",r["H1_shift_w1_w3_reduces_centroid_mean_error"],
+                r["H2_other_widths_same_model"],r["H3_translation_rgba_invariance_not_complete"])
+          print("P4D14_SHA256_PASS",len(r["members_sha256"]))
+          PY
+      - name: Preserve all original native scenes, source model and negative diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d14-egret-real-source-math-centroid-171scenes
+          path: AutoDraw_Stage20/.p4d14-native-math/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
