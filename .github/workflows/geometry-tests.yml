@@ -209,10 +209,27 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.11"
+      - name: Install source-manifest Firefox 159.0 for original Egret reference
+        id: pinned-firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
+        with:
+          firefox-version: "159.0"
       - name: Install Firefox WebDriver harness dependency
         run: python -m pip install "selenium>=4.27"
+      - name: Verify pinned Firefox binary and fail-closed selector
+        shell: pwsh
+        env:
+          AUTODRAW_PINNED_FIREFOX: ${{ steps.pinned-firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:AUTODRAW_PINNED_FIREFOX -PathType Leaf)) {
+            throw "Pinned Firefox binary does not exist."
+          }
+          & $env:AUTODRAW_PINNED_FIREFOX --version
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_egret_firefox_pin.py -v
       - name: Run Egret CanvasRenderer reference harness and Firefox Stage A-D probe
         shell: pwsh
+        env:
+          AUTODRAW_PINNED_FIREFOX: ${{ steps.pinned-firefox.outputs.firefox-path }}
         run: ./AutoDraw_Stage20/tests/run_egret_renderer_reference.ps1
       - name: Upload Egret renderer reference PNG fixtures and diagnostics
         if: always()

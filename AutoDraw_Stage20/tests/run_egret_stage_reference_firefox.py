@@ -62,6 +62,14 @@ def discover_additional_cases(experiment_root: Path, workspace: Path) -> list[di
 
 
 def find_firefox() -> Path:
+    # Source-manifest paired-renderer CI MUST use a pinned executable.
+    # Never silently fall back to runner Firefox after version drift.
+    pinned = os.environ.get("AUTODRAW_PINNED_FIREFOX")
+    if pinned is not None:
+        path = Path(pinned)
+        if not path.is_file():
+            raise FileNotFoundError("Pinned Firefox binary missing: AUTODRAW_PINNED_FIREFOX")
+        return path
     candidates = [
         shutil.which("firefox"),
         Path(os.environ.get("ProgramFiles", "")) / "Mozilla Firefox/firefox.exe",
