@@ -115,6 +115,12 @@ class P4D8CumulativeContracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.eligible_rows([bad],{"A"})
 
+    def test_10_unknown_phase_or_owner_cannot_enter_oracle(self):
+        with self.assertRaises(ValueError):
+            d.eligible_rows([{"sample_id":"UNKNOWN"}],{"A"})
+        with self.assertRaises(ValueError):
+            d.eligible_rows([{"sample_id":"A","variant":"UNREGISTERED"}],{"A"})
+
     def test_09_fail_closed_shapes_and_unmatched_owner(self):
         with self.assertRaises(ValueError):
             d.trial_metrics(np.zeros((1,1,4),np.uint8),self.blank,
