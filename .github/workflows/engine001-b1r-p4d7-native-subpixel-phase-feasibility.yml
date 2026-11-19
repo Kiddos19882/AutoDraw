@@ -1,0 +1,144 @@
+name: ENGINE-001 B1-R P4D7 real Egret width1 source-pixel phase feasibility
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d7-native-subpixel-phase-feasibility.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d7_native_width1_phase_feasibility.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d7_native_width1_phase_feasibility.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D7_NATIVE_SUBPIXEL_PHASE_FEASIBILITY_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d7-native-phase
+  cancel-in-progress: true
+jobs:
+  native-source-owner-phase-grid:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact archived Egret and native pixel-analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Restore frozen raw source blobs before tests on Windows
+        shell: bash
+        run: |
+          python - <<'PY'
+          import subprocess,hashlib
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d5_pixel_state_native_feedback.py":"147f4c2ec439bac72228b6828c67bfd45b49b28e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py":"c350fb9a890de9bbe9f9e24eeea0eb6645f414f1",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==expected,(path,got,expected)
+              Path(path).write_bytes(raw)
+              print("P4D7_GIT_BLOB_PIN",path,got)
+          png=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(png).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: E2 frozen 21 owner pixels 66 native placements and inherited state-contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d7_native_width1_phase_feasibility.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d7_native_width1_phase_feasibility.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d7_native_width1_phase_feasibility.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d5_pixel_state_native_feedback.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 real archived Egret 21 original color owner pixels x66 subpixel phases plus blank
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d7_native_width1_phase_feasibility.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d7-native
+      - name: Independently verify 1387 real native scenes, 21 samples all 66 placements and hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from collections import Counter
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d7-native")
+          data=json.loads((root/"report.json").read_text("utf8"))
+          assert data["experiment"]=="ENGINE001_B1R_P4D7_NATIVE_WIDTH1_SUBPIXEL_PHASE_FEASIBILITY_V1"
+          assert data["technical_result"]=="ALL_1387_TRUE_NATIVE_EGRET_PHASE_IMAGES_CAPTURED"
+          assert data["github_sha"]==os.environ["GITHUB_SHA"]
+          assert data["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert data["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert data["current_EF_source_original_only"]
+          assert data["original_EF_frozen_ROI_index_exact_identical"]
+          assert data["source_owner_20_and_fixed_samples_21"]
+          assert data["protected_roi"]=="female_face_eyes"
+          assert data["protected_roi_source_fully_covers_test_crop"]
+          assert data["crop_xyxy"]==[40,45,64,69]
+          assert data["owners"]==20 and data["samples"]==21
+          assert data["phases_grid"]==[0,.125,.25,.375,.5,.625,.75,.875]
+          assert data["variants_per_sample"]==66
+          assert data["native_scene_capture_total"]==1387
+          assert data["blank_native_zero"]
+          assert data["native_true_renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+          assert data["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert data["game_bundle_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert data["native_alpha24_foreign_owner_gate"]==0
+          assert data["native_logical_color_5of9_gate"]==5
+          assert data["E4_live"]=="NOT_RUN" and data["E5_independent"]=="NOT_RUN"
+          assert data["exact_run_bound_CHALK"] is None and not data["production_promotion"]
+          assert data["full_art_native_owner99_protected0_far3"]=="NOT_MEASURED"
+          rows=[json.loads(x) for x in (root/"NATIVE_PHASE_RESULTS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==1386
+          assert len(data["sample_results"])==21
+          counts=Counter(r["sample_id"] for r in rows)
+          assert len(counts)==21 and set(counts.values())=={66}
+          assert set(r["width"] for r in rows)=={1}
+          assert all(r["real_Egret_renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+                     for r in rows)
+          assert sum(bool(r["has_safe_correct_native_phase"]) for r in data["sample_results"])==data["safe_and_correct_samples"]
+          assert data["impossible_in_sampled_phase_set"]+data["safe_and_correct_samples"]==21
+          for path in ("REAL_EGRET_BLANK.png","REAL_EGRET_NATIVE_PHASE_FEASIBILITY_MAP.png"):
+              with Image.open(root/path) as im:
+                  assert im.width>0 and im.height>0
+          with Image.open(root/"REAL_EGRET_BLANK.png") as im:
+              assert im.size==(1380,720)
+              assert im.getchannel("A").getbbox() is None
+          assert len(list(root.rglob("*.png")))==1388
+          assert len(data["members_sha256"])>=1389
+          for filename,hash_ in data["members_sha256"].items():
+              assert hashlib.sha256((root/filename).read_bytes()).hexdigest()==hash_,filename
+          print("P4D7_E3_REAL_EGRET_1387_NATIVE_PNG_PASS")
+          print("P4D7_NATIVE_FEASIBLE_PROTECTED_OWNER_PIXELS",
+                data["safe_and_correct_samples"],"/21")
+          print("P4D7_MANIFEST_SHA_PASS",len(data["members_sha256"]))
+          PY
+      - name: One archive raw native PNG per phase plus source and full negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d7-native-width1-protected-owner-subpixel-8x8
+          path: AutoDraw_Stage20/.p4d7-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
