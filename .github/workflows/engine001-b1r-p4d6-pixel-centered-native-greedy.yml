@@ -35,6 +35,13 @@ jobs:
       - name: E2 P4D6 test only position change, P4D5 parent and markdown
         shell: bash
         run: |
+          # On Windows, restore raw parent blob bytes before E2 scope-guard hashes it.
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          path="AutoDraw_Stage20/tests/run_engine001_b1r_p4d5_pixel_state_native_feedback.py"
+          Path(path).write_bytes(subprocess.check_output(["git","show","HEAD:"+path]))
+          PY
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d6_pixel_centered_native_greedy.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d6_pixel_centered_native_greedy.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d6_pixel_centered_native_greedy.py -v
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d5_pixel_state_native_feedback.py -v
