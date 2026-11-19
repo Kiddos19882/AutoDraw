@@ -56,6 +56,12 @@ jobs:
               raw=subprocess.check_output(["git","show","HEAD:"+f])
               actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
               assert actual==want,(f,actual,want)
+              # Restore original repository blob bytes in Windows checkout, as
+              # established by P4D15. Git may materialize CRLF on checkout;
+              # research renderer/runner must be byte-identical to frozen E3.
+              from pathlib import Path
+              Path(f).write_bytes(raw)
+              assert Path(f).read_bytes()==raw
           print("P4D16_PINNED_EGRET_SOURCE_PASS")
           '@ | python -
       - name: E2 alpha24 mask, source composite and source-halfpixel unit tests
