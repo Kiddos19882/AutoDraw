@@ -1,0 +1,141 @@
+name: ENGINE-001 B1-R P4D6 exact native pixel-centered brush pilot
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d6-pixel-centered-native-greedy.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d6_pixel_centered_native_greedy.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d6_pixel_centered_native_greedy.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D6_PIXEL_CENTERED_NATIVE_BRUSH_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d6-pixel-centered
+  cancel-in-progress: true
+jobs:
+  native-pixel-center-controlled-repeat:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install unchanged P4D5 native Egret dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E2 P4D6 test only position change, P4D5 parent and markdown
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d6_pixel_centered_native_greedy.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d6_pixel_centered_native_greedy.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d6_pixel_centered_native_greedy.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d5_pixel_state_native_feedback.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Verify and restore raw frozen original game P4D5 and BoardPane source bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d5_pixel_state_native_feedback.py":"147f4c2ec439bac72228b6828c67bfd45b49b28e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d0_unbounded_adaptive_vs_scanline_native.py":"cf4f0b0b8a1fef5879067f41901f2806758e81bd",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("P4D6_FROZEN_SOURCE_BLOB",path,actual)
+          png=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()
+          assert hashlib.sha256(png).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: P4D6 real Egret owner-colored centered native candidate probes and every cumulative feedback
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d6_pixel_centered_native_greedy.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d6-work
+      - name: Independent real Egret pixel-center 0-1 provenance safety and manifest audit
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d6-work")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D6_PIXEL_CENTERED_NATIVE_GREEDY_V1"
+          assert r["technical_result"]=="P4D6_EF_NATIVE_PIXEL_CENTERED_FULL_ORACLE_AND_FEEDBACK"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["original_recomputed_current_run"]
+          assert r["source_active"]=="C_192_D_COMPONENT24"
+          assert r["no_global_dark_contour"] and r["native_blank_alpha0"]
+          assert r["game_renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["parent_P4D5_git_blob"]=="147f4c2ec439bac72228b6828c67bfd45b49b28e"
+          assert r["P4D5_original_E3_run"]==44424883298
+          assert r["changed_variable"]=="source-pixel-center input control points only"
+          assert r["native_point_position_2pt_micro"]=={"x_delta_start":0.49,"x_delta_end":0.51,"y_delta":0.5}
+          assert r["native_point_position_long"]=={"x_delta":0.5,"y_delta":0.5}
+          assert r["global_99_protected0_max3"]=="NOT_MEASURED"
+          assert r["E4_live_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None and not r["production_promotion"]
+          assert set(r["methods"])=={"E_SOBEL90","F_SOBEL90_LAB12"}
+          for method,s in r["methods"].items():
+              assert s["crop_xyxy"]==[40,45,64,69]
+              assert s["target_nonwhite_pixels"]==307
+              assert s["P4D5_previous_safe_candidates"]==9
+              assert s["P4D5_previous_correct_owner_pixels"]==10
+              assert s["same_original_index_as_P4D5"]
+              assert s["changed_only_native_candidate_point_centers"]
+              assert 0<s["oracle_single_native_probes"]<=240
+              assert s["isolated_native_safe_candidates"]+s["isolated_native_unsafe_candidates"]==s["oracle_single_native_probes"]
+              assert s["native_final_replay_equal"] and s["accepted_candidate_native_foreign_alpha24_zero"]
+              assert s["source_owner_correct_zero_to_one_native_greedy"]["white_target_ink_alpha24_backing"]==0
+              assert s["source_owner_correct_zero_to_one_native_greedy"]["any_ink_outside_crop_alpha24_backing"]==0
+              assert s["source_owner_correct_zero_to_one_native_baseline"]["correct_logical_native_5_of_9"]==307
+              assert s["source_owner_correct_zero_to_one_native_baseline"]["white_target_ink_alpha24_backing"]==264
+              assert s["source_owner_correct_zero_to_one_native_baseline"]["any_ink_outside_crop_alpha24_backing"]==52
+              assert 0<=s["source_owner_correct_zero_to_one_native_greedy"]["correct_logical_native_5_of_9"]<=307
+              for name in ("COMPARISON_REAL_NATIVE.png","NATIVE_GREEDY_PIXEL_STATE_FINAL.png","NATIVE_SCANLINE_W1_CONTROL.png"):
+                  with Image.open(root/method/name) as im:
+                      assert im.width>0 and im.height>0
+              print("P4D6_EF_RESULT",method,"safe",s["isolated_native_safe_candidates"],
+                    "accepted",s["accepted_real_cumulative_native"],
+                    "correct",s["source_owner_correct_zero_to_one_native_greedy"]["correct_logical_native_5_of_9"],
+                    "remaining",s["source_owner_correct_zero_to_one_native_greedy"]["remaining_zero_logical"],
+                    "improved",s["P4D6_improved_safe_coverage"])
+          assert len(r["members_sha256"])>30
+          for path,want in r["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==want,path
+          print("P4D6_EF_REAL_NATIVE_AND_MANIFEST_PASS",len(r["members_sha256"]))
+          PY
+      - name: Archive all original Egret images, source and negative probes regardless of outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d6-pixel-centered-native-greedy-EF
+          path: AutoDraw_Stage20/.p4d6-work/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
