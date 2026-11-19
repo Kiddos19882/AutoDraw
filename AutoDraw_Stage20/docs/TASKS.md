@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — P4D15 original Canvas vs WebGL E3 completed, P4D16 OPEN (2026-11-19)
+
+- [x] P4D15 prereg [Canvas→WebGL stage audit](ENGINE001_B1R_P4D15_CANVAS_TEXTURE_TRANSLATION_PREREG_2026-11-19.md) before code, based on external web sources and Egret5.4.1. [Final E3 CI44560216224](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224) SHA176fc822 E2/E3 technical PASS 34 real scenes, 30 origin-relative comparisons: Canvas18 exact/12 mismatched, WebGL18 exact/12 mismatched, direct full Canvas→WebGL **30/30 byte-equal** with origin -2 scaled3, 44 alpha24 XOR copied strokes. ZIP14549505133 verified independent CRC/103 SHA. Initial [CI44559709261](https://github.com/Kiddos19882/AutoDraw/actions/runs/44559709261) E3 FAIL recorder metadata key, subsequently fixed, failure preserved.
+- [ ] **NEXT:** original Canvas2D source-path numerical/AA subpixel model study for widths1..10 and orientation-phase, compare actual alpha1/24 and 7/9,9/9 native physical density on P4D13 full E/F. Before new test prereg frozen E0 and keep original source owner protections. User visual observation of white microholes remains open.
+- [ ] Then native reduced original-white spill E/F with preserved real per-color density and protected0/far3; game E4/E5 and exact run-bound CHALK not run. No production changes.
+
+*Prior P4D14 and P4D13 task snapshots follow.*
+
 ## CURRENT ENGINE-001 — P4D14 source-derived Egret математический центр DONE, пиксельная математика OPEN (2026-11-19)
 
 - [x] [Prereg P4D14](ENGINE001_B1R_P4D14_EGRET_GRAPHICS_HALFPIXEL_CENTROID_PREREG_2026-11-19.md) ДО runner, математический M0/M1 из официального Egret5.4.1 CanvasRenderer+WebGLRenderer, [native CI44553609729](https://github.com/Kiddos19882/AutoDraw/actions/runs/44553609729) SHA16de0c6a E2/E3 **PASS**, 171 native scenes/1600 measured alpha centers, width1/3 centroid MAE0.71134→0.03763, other widths unchanged, 10/10 exact replay, 97/160 integer translations identical (63 fail), 292 alpha24 XOR, archive14544372165 independent CRC+334 SHA PASS. Это centroid model, не полноценный simulated native footprint и не P4D13 art-quality PASS.

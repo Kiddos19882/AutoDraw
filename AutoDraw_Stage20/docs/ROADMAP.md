@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — after P4D15 exact source Canvas stage localization (2026-11-19)
+
+1. **DONE:** [P4D15 original Egret true Canvas vs WebGL E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224), pinned SHA176fc822; native 34 scenes; Canvas18 exact/12 different under integer translation, WebGL same; direct raw Canvas→WebGL source crop 30/30 exact after offset6 px. [ZIP14549505133](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224/artifacts/14549505133) CRC+103 hashes PASS. Thus focus Canvas2D diagonal/absolute coordinate numerical AA behavior, not replacing the P4D14 centroid finding.
+2. **NEXT:** E0 prereg controlled Canvas subpixel/diagonal stroke study and alpha1/24 raster footprint with held-out validation; measure physical fill density7/9,9/9 and original-white holes for P4D13, without weakening old 5/9 measurement label or protected limits.
+3. **THEN:** safer whole-image source-aware fill with protected source/contour quality, game E4, independent E5, exact CHALK; no master/executor defaults modifications without evidence.
+
+*Previous roadmap snapshots follow.*
+
 ## CURRENT ENGINE-001 — после проверенной source-based математической поправки Egret P4D14 (2026-11-19)
 
 1. **DONE:** [P4D14 CI44553609729](https://github.com/Kiddos19882/AutoDraw/actions/runs/44553609729) native E2/E3 PASS, fixed width1/3 extra 0.5 logical both axes, numeric alpha centroid MAE0.711337→0.037627, 171 real Egret scenes; 97/160 pixel RGBA translation-equal only, archive14544372165 CRC+334/334 SHA. Original official Egret5.4.1 source: Canvas2D stroke → texture → WebGL; P4D3/P4D4 and P4D13 immutable.

@@ -1,3 +1,7 @@
+## 2026-11-19 — ENGINE-001 P4D15 locate original Canvas2D raster source of translated brush discrepancy
+
+- After external sources, prereg [P4D15](ENGINE001_B1R_P4D15_CANVAS_TEXTURE_TRANSLATION_PREREG_2026-11-19.md) ahead of code; isolated JS wrapper test-only, native runner/8 E2 tests and dedicated Actions. [Final CI44560216224](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224) SHA176fc822 E2/E3 technical PASS,34 Egret scenes, Canvas2D intermediate copy nonidentical12/30; WebGL nonidentical same12/30. Direct raw intermediate→final board exactly30/30 RGBA after6px crop. Independent ZIP CRC and103 SHA PASS. Initial metadata report failure [44559709261](https://github.com/Kiddos19882/AutoDraw/actions/runs/44559709261) preserved. Remaining Canvas AA subpixel explanation, native density/protected color still OPEN; production/master/executor/frozen engine not changed; E4/E5/exact CHALK not measured.
+
 ## 2026-11-19 — ENGINE-001 B1-R P4D14 Egret native brush mathematical centroid source discovery
 
 - Source research Egret5.4.1 `CanvasRenderer.renderGraphics`: width1/3 offset (+0.5,+0.5) logical, texture blit path via `WebGLRenderer`. Introduced *experimental only* P4D14 math model/10 unit tests/native Windows CI, preregistration before code.
