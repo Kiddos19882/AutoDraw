@@ -1,0 +1,115 @@
+name: ENGINE-001 B1-R P4D15 true Canvas2D versus WebGL translation
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d15-canvas-webgl-stage.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d15_native_canvas_webgl_stage.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d15_native_canvas_webgl_stage.py'
+      - 'AutoDraw_Stage20/tests/engine001_p4d15_intermediate_capture.js'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D15_CANVAS_TEXTURE_TRANSLATION_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-p4d15-canvas-webgl
+  cancel-in-progress: true
+jobs:
+  original-native-canvas-webgl:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned original native Egret dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Pin original game, archived reference and parent runner
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,subprocess
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+          }
+          for f,pin in pins.items():
+              data=subprocess.check_output(["git","show","HEAD:"+f])
+              sha=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
+              assert sha==pin,(f,sha,pin)
+              Path(f).write_bytes(data)
+          PY
+      - name: E2 mathematical source ROI and classification regression; JS syntax
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d15_native_canvas_webgl_stage.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d15_native_canvas_webgl_stage.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d15_native_canvas_webgl_stage.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d14_egret_halfpixel_centroid.py -v
+          node --check AutoDraw_Stage20/tests/engine001_p4d15_intermediate_capture.js
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 original Egret CanvasRenderer intermediate versus WebGL raw masks
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d15_native_canvas_webgl_stage.py \
+            --workspace . \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --injection-js AutoDraw_Stage20/tests/engine001_p4d15_intermediate_capture.js \
+            --output AutoDraw_Stage20/.p4d15-true-native
+      - name: Validate original Canvas source, final WebGL counts and sha manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          from PIL import Image
+          p=Path("AutoDraw_Stage20/.p4d15-true-native")
+          r=json.loads((p/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D15_CANVAS_TEXTURE_VS_WEBGL_TRANSLATION_V1"
+          assert r["technical_result"]=="P4D15_REAL_CANVAS_GRAPHICS_SOURCE_VS_FINAL_WEBGL"
+          assert r["github_sha"]==os.getenv("GITHUB_SHA")
+          assert r["github_run_id"]==os.getenv("GITHUB_RUN_ID")
+          assert r["native_scenes_including_blank_repeats"]==34
+          assert r["native_canvas_source_pngs"]==33
+          assert r["cases"]==30 and r["native_blank_alpha_zero"]
+          assert r["original_engine_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["original_renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert sum(r["classification"].values())==30
+          assert r["canvas_rgba_noninvariant_cases"]>=0
+          assert r["final_webgl_rgba_noninvariant_cases"]>=0
+          assert r["research_only_no_production"] and r["exact_run_bound_CHALK"] is None
+          assert r["E4_live"]=="NOT_RUN"
+          assert len(list(p.rglob("*_CANVAS_SOURCE.png")))==33
+          assert len(list(p.rglob("*_REAL_EGRET.png")))==33
+          assert (p/"P4D15_NATIVE_CANVAS_VS_WEBGL_FIRST_CASE.png").exists()
+          with Image.open(p/"REAL_EGRET_BLANK.png") as img:
+              assert img.size==(1380,720) and img.getchannel("A").getbbox() is None
+          for file,sha in r["members_sha256"].items():
+              assert hashlib.sha256((p/file).read_bytes()).hexdigest()==sha,file
+          print("P4D15_E3_NATIVE_INTERMEDIATE_FINAL_PASS",r["classification"])
+          print("P4D15_SHA_MANIFEST_PASS",len(r["members_sha256"]))
+          PY
+      - name: Preserve every native intermediate and final image incl failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d15-real-canvas-webgl-source-vs-final-34scenes
+          path: AutoDraw_Stage20/.p4d15-true-native/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30
