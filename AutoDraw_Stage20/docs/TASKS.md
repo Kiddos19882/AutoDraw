@@ -1,6 +1,6 @@
 ## CURRENT ENGINE-001 — BPRED-001 prediction-first, план принят (2026-11-20)
 
-- [x] Пользователь утвердил [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); решение [DEC-041](DECISIONS.md#dec-041-engine-001--bpred-001-сначала-предсказатель-кисти-потом-планировщик) — **документация принята**, никакой разработки/тестов BPRED ещё не было. Baseline `ba0f609ab15e982e37ddece674fee3809890dce9`.
+- [x] Пользователь утвердил [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); решение [DEC-041](DECISIONS.md) — **документация принята**, никакой разработки/тестов BPRED ещё не было. Baseline `ba0f609ab15e982e37ddece674fee3809890dce9`.
 - [ ] **NEXT единственный:** BPRED-S0 — inventory pinned Egret/Canvas/WebGL source, frozen P4D3/P4D4/P4D14/P4D15/P4D16 artifacts and native E/F, holders/train/calibration/holdout split; отдельный E0 prereg **до** любого кода или нового native теста, проверить current consumers/source hashes. Следующее разрешение отдельно на разработку и тесты.
 - [ ] BPRED-S1/S2: геометрия widths1..10, source translation, physical alpha prediction; M0/M1/M2 сравнение на отдельно замороженном native holdout, без model-only PASS.
 - [ ] BPRED-S3/S4: source-over color compositing, owner/white/protected risk, independent native validation, uncertainty/UNKNOWN fallback и false-safe раздельно.

@@ -1,6 +1,6 @@
 ## 2026-11-20 — ENGINE-001 BPRED-001 prediction-first plan (documentation only)
 
-- User-approved [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) and [DEC-041](DECISIONS.md#dec-041-engine-001--bpred-001-сначала-предсказатель-кисти-потом-планировщик): source-faithful Egret geometry, Canvas physical alpha/RGBA, ordered source-over, native heldout false-safe, whole-original adaptive planner, then quality-preserving stroke optimization. P4D19 prereg archived intact / DEFERRED, no renaming prior P4D failures as success.
+- User-approved [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) and [DEC-041](DECISIONS.md): source-faithful Egret geometry, Canvas physical alpha/RGBA, ordered source-over, native heldout false-safe, whole-original adaptive planner, then quality-preserving stroke optimization. P4D19 prereg archived intact / DEFERRED, no renaming prior P4D failures as success.
 - New research development **NOT_RUN**. P4D18 actual native full protected quality FAIL remains. No code/test/workflow/production/master or exact CHALK changes.
 
 ## 2026-11-19 — ENGINE-001 P4D17/P4D18 source-owner subpixel native repaint (research only)
