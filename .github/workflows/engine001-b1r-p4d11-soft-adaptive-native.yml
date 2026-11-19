@@ -1,0 +1,151 @@
+name: ENGINE-001 B1-R P4D11 native soft adaptive foreign-touch pilot
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d11-soft-adaptive-native.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d11_soft_adaptive_native_foreign_touch.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d11_soft_adaptive_native_foreign_touch.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D11_SOFT_ADAPTIVE_NATIVE_FOREIGN_TOUCH_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d11-native-touch
+  cancel-in-progress: true
+jobs:
+  five-arm-true-native-soft-adaptive:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact Egret scientific dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Freeze original source and inherited modules by Git object
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d5_pixel_state_native_feedback.py":"147f4c2ec439bac72228b6828c67bfd45b49b28e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d7_native_width1_phase_feasibility.py":"dc707709e55069897e2bbef465a4ed1668e8a679",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d8_native_cumulative_phase_pixel_state.py":"3f5c5d84dda856d9dd1479a6113f1e65dfc0c43a",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d9_native_cumulative_order_audit.py":"f8c11751ca313ff206d734477cf70f321c0ceba0",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py":"c350fb9a890de9bbe9f9e24eeea0eb6645f414f1",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("P4D11_PIN",path,actual)
+          assert hashlib.sha256(Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: E2 five policies plus frozen parent native-state contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d11_soft_adaptive_native_foreign_touch.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d11_soft_adaptive_native_foreign_touch.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d11_soft_adaptive_native_foreign_touch.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d9_native_cumulative_order_audit.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d8_native_cumulative_phase_pixel_state.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d7_native_width1_phase_feasibility.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 native P4D7 1386 strokes plus five cumulative arms
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d11_soft_adaptive_native_foreign_touch.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d11-native
+      - name: Audit five actual native arm results, baseline parity, and raw manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d11-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D11_SOFT_ADAPTIVE_NATIVE_FOREIGN_TOUCH_V1"
+          assert r["technical_result"]=="REAL_EGRET_5_ARM_SOFT_AND_ADAPTIVE_CUMULATIVE"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["fresh_original_P3D_B1R_not_G32_V44"]
+          assert r["same_P4D7_21_samples_66_phases"]
+          assert r["P4D7_remeasured_native_scene_count"]==1387
+          assert r["source_EF_original_index_crop_equal"]
+          assert r["protected_face_full_crop"] and r["crop_xyxy"]==[40,45,64,69]
+          assert r["target_nonwhite"]==307
+          assert r["hard_alpha_threshold"]==24 and r["logical_good_required_5_of_9"]==5
+          assert r["soft_budgets_backing"]=={
+           "STRICT_P4D8":0,"SOFT_1_BACKING":1,"SOFT_2_BACKING":2,
+           "SOFT_3_BACKING":3,"ADAPTIVE_RGB12_REPAIRABLE":2}
+          assert r["adaptive_visible_RGB_delta_max"]==12
+          assert r["P4D8_strict_parity"]
+          assert len(r["pre_registered_arms"])==5
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["game_engine_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert not r["production_promotion"]
+          assert r["E4_live"]=="NOT_RUN" and r["E5_external"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          base=r["results"]["STRICT_P4D8"]
+          assert (base["fixed_sample_correct"],base["source_owner_correct"],
+                  base["remaining"],base["accepted"],base["attempts"])==(16,17,290,16,21)
+          assert base["approved_protected0_gate_PASS"]
+          for arm in r["pre_registered_arms"]:
+              x=r["results"][arm]
+              assert x["source_owner_correct"]+x["remaining"]==307
+              assert x["accepted"]+x["rejected"]==x["attempts"]
+              assert x["accepted_source_white_alpha24_zero"] and x["accepted_native_1_to_0_zero"]
+              assert x["real_native_final_replay_equal"]
+              if x["accepted_protected_foreign_alpha24_touch_sum"]>0:
+                  assert not x["approved_protected0_gate_PASS"]
+              ledger=[json.loads(s) for s in (root/arm/"NATIVE_TRIALS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+              assert len(ledger)==x["attempts"]
+              assert sum(bool(s["experimental_policy_accept"]) for s in ledger)==x["accepted"]
+              assert len(list((root/arm/"REAL_EGRET_ALL_FULL_CUMULATIVE_TRIALS").glob("*.png")))==x["attempts"]
+              with Image.open(root/arm/"REAL_EGRET_BLANK.png") as im:
+                  assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
+              assert (root/arm/"P4D8_ACTUAL_NATIVE_ROI_COMPARISON.png").exists()
+              print("P4D11_ARM",arm,x["fixed_sample_correct"],x["source_owner_correct"],
+                    x["accepted"],x["accepted_protected_foreign_alpha24_touch_sum"],
+                    x["approved_protected0_gate_PASS"])
+          assert len(list((root/"P4D7_FRESH_NATIVE_PHASES"/"REAL_EGRET_WIDTH1_PHASE_SCENES").rglob("*.png")))==1386
+          for f,hash_ in r["members_sha256"].items():
+              assert hashlib.sha256((root/f).read_bytes()).hexdigest()==hash_,f
+          print("P4D11_NATIVE_E3_MANIFEST_SHA_PASS",len(r["members_sha256"]))
+          print("P4D11_SCIENTIFIC_H1_H2_H3",r["H1_soft2_improves_both"],
+                r["H2_adaptive_improves_both"],
+                r["H3_adaptive_at_least_soft2_coverage_with_less_risk"])
+          PY
+      - name: Archive all five complete Egret cumulative arm and source PNG files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d11-five-native-soft-adaptive-owner-touch
+          path: AutoDraw_Stage20/.p4d11-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
