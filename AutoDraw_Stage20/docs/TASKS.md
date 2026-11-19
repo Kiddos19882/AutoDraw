@@ -1,3 +1,8 @@
+## CURRENT ENGINE-001 — исходная задача: объяснить и устранить белые прорехи P4D13 (2026-11-19)
+
+- [x] Post-hoc true-native [E/F geometry and RGBA forensic](ENGINE001_B1R_P4D13_WHITE_HOLE_ROOT_CAUSE_DIAG_2026-11-19.md): Stage01→03 interior alpha0 E95/F96 стоят в logical cells, прошедших5/9, и их центры геометрически вне всех stroke capsules; ещё E14103/F14303 native color-incorrect owner pixels alpha≥24. Старые P4D13/P4D16 native E3 immutable, no production changes.
+- [ ] **NEXT:** отдельное E0 для оригинального E/F планирования **на уровне физических 3× пикселей** плюс native per-owner stroke/color attribution, делить непокрытое и поверх чужого/AA, и не увеличивать source-white paint E4415/F4445. Проверять обязательный Egret original, визуальный результат, existing foreign0/far3 без ослабления, E4/E5/CHALK separately.
+
 ## CURRENT CI — source-bound Firefox 159 reference restored (2026-11-19)
 
 - [x] Incident: [validation44560216313](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216313) browser reference **FAIL**, actual Firefox160 vs frozen159.0, not P4D15 model regression. Minimal tested workflow/browser selector fix [commit73270097](https://github.com/Kiddos19882/AutoDraw/commit/73270097bc30a48ab3f0cd7c05da06ca2f78e870): install Firefox159.0 via pinned action SHA only in Stage reference job; 3 unit fail-closed cases; no baseline manifest edits. [Validation44562387801](https://github.com/Kiddos19882/AutoDraw/actions/runs/44562387801) **mandatory5/5 PASS**, optional SKIPPED.
