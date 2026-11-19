@@ -1,0 +1,139 @@
+name: ENGINE-001 B1-R P4D9 native order-only cumulative audit
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d9-native-order-audit.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d9_native_cumulative_order_audit.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d9_native_cumulative_order_audit.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D9_NATIVE_CUMULATIVE_ORDER_AUDIT_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d9-native-order
+  cancel-in-progress: true
+jobs:
+  real-egret-3-prespecified-orders:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact native Egret analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Pin immutable parent source modules and original image
+        shell: bash
+        run: |
+          python - <<'PY'
+          import subprocess,hashlib
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d5_pixel_state_native_feedback.py":"147f4c2ec439bac72228b6828c67bfd45b49b28e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d7_native_width1_phase_feasibility.py":"dc707709e55069897e2bbef465a4ed1668e8a679",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d8_native_cumulative_phase_pixel_state.py":"3f5c5d84dda856d9dd1479a6113f1e65dfc0c43a",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py":"c350fb9a890de9bbe9f9e24eeea0eb6645f414f1",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("P4D9_SOURCE_BLOB",path,actual)
+          assert hashlib.sha256(Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: E2 check exact arm order and inherited zero-foreign cumulative contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d9_native_cumulative_order_audit.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d9_native_cumulative_order_audit.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d9_native_cumulative_order_audit.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d8_native_cumulative_phase_pixel_state.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d7_native_width1_phase_feasibility.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d5_pixel_state_native_feedback.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 true Egret same actual source phase pool with 3 native cumulative order arms
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d9_native_cumulative_order_audit.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d9-native
+      - name: Verify baseline parity, real native scenes and all member hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d9-native")
+          data=json.loads((root/"report.json").read_text("utf8"))
+          assert data["experiment"]=="ENGINE001_B1R_P4D9_NATIVE_CUMULATIVE_ORDER_AUDIT_V1"
+          assert data["technical_result"]=="TRUE_NATIVE_3_ARM_ORDER_ONLY_CUMULATIVE_EGRET"
+          assert data["github_sha"]==os.environ["GITHUB_SHA"] and data["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert data["pre_registered_arms"]==["BASELINE_P4D8","FIVE_FAILED_SAMPLES_FIRST","SOURCE_OWNER_DESCENDING"]
+          assert data["same_21_samples_66_positions_and_20_owners"] and data["source_EF_ROI_indices_identical"]
+          assert data["target_nonwhite"]==307 and data["protected_crop_xyxy"]==[40,45,64,69]
+          assert data["p4d7_native_isolated_count"]==1387 and data["p4d7_safe_samples"]==21
+          assert data["baseline_P4D8_native_exact_parity"]
+          assert data["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert data["game_engine_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert data["E4_live"]=="NOT_RUN" and data["E5_independent"]=="NOT_RUN"
+          assert data["exact_run_bound_CHALK"] is None and not data["production_promotion"]
+          for name in data["pre_registered_arms"]:
+              r=data["results"][name]
+              assert 0<=r["fixed_sample_correct"]<=21
+              assert r["source_owner_correct"]+r["remaining"]==307
+              assert r["accepted"]+r["rejected"]==r["attempts"]
+              assert r["accepted_native_foreign_alpha24_zero"] and r["accepted_native_lost_zero"]
+              assert r["accepted_source_white_alpha24_zero"] and r["full_native_replay_rgba_exact"]
+              rows=[json.loads(x) for x in (root/name/"NATIVE_ATTEMPT_LEDGER_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+              assert len(rows)==r["attempts"] and sum(x["accepted"] for x in rows)==r["accepted"]
+              assert all(x["native_changed_foreign_alpha24_backing"]==0 and
+                         x["native_lost_correct_1_to_0"]==0 and
+                         x["native_original_white_alpha24_backing"]==0
+                         for x in rows if x["accepted"])
+              with Image.open(root/name/"REAL_EGRET_BLANK.png") as im:
+                  assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
+              assert len(list((root/name/"NATIVE_FULL_SCENE_TRIALS").glob("*.png")))==r["attempts"]
+          assert data["results"]["BASELINE_P4D8"]["fixed_sample_correct"]==16
+          assert data["results"]["BASELINE_P4D8"]["source_owner_correct"]==17
+          assert len(list((root/"FRESH_P4D7_REAL_EGRET_PHASES"/"REAL_EGRET_WIDTH1_PHASE_SCENES").rglob("*.png")))==1386
+          for filename,sha in data["members_sha256"].items():
+              assert hashlib.sha256((root/filename).read_bytes()).hexdigest()==sha,filename
+          print("P4D9_THREE_ARM_NATIVE_AND_MANIFEST_PASS")
+          for arm in data["pre_registered_arms"]:
+              r=data["results"][arm]
+              print("P4D9_ARM",arm,r["fixed_sample_correct"],r["source_owner_correct"],
+                    r["accepted"],r["attempts"])
+          print("P4D9_H1_H2_H3",data["H1_any_alternative_samples_gt16"],
+                data["H2_any_alternative_owner_correct_gt17"],
+                data["H3_any_alternative_all21"])
+          PY
+      - name: Save all raw native PNG and negative trials as one archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d9-three-order-native-cumulative-owner-safety
+          path: AutoDraw_Stage20/.p4d9-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
