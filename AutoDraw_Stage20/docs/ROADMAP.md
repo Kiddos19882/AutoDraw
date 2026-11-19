@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 / B1-R — P4D13 whole-image relaxed native result (2026-11-19)
+
+1. **DONE** [P4D13 original full E/F relaxed native E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475), SHA `1f8b4dd13a0d74896643e6fc82c9a56d9ef65574`, original E/F source fully painted after 3 residual passes (E13868/13868; F13863/13863 correct native logical 5/9, RGB32). [ZIP14537095764](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475/artifacts/14537095764) independent ZIP CRC+39 SHA PASS. Initial adaptive E13133/F13132, final 0 residual; native white ink E4415/F4445, protected white E2250/F2261: image quality FAIL, not production.
+2. **NEXT:** сохранить достигнутую source-owner-color полноту и локально уменьшить фактическое пересечение с исходно-белыми, особенно protected female face, по реальному Egret alpha; сравнить с оригиналом глазами и native E3, не смягчая frozen protected foreign0 для принятия; prereg будущего изменения.
+3. **THEN:** E/F differing ROI, original-art features/contours/face/hands, per-owner≥99% AND protected foreign0 AND max3logical0 по действующей методике, E4 live/E5 independent, exact run-bound CHALK; только затем отдельное production решение. Stage6 executor/game/Bridge defaults и master не менялись.
+
+*Ниже прежние roadmap snapshots: P4D11, P4D12 и более ранние работы.*
+
 ## CURRENT ENGINE-001 — after P4D11 measured soft/adaptive Egret (2026-11-19)
 
 1. **DONE:** [P4D11 native CI44479727697](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479727697), E2/E3 PASS, strict16/21 &17/307 vs SOFT1 19/21 &20/307, SOFT2/3/ADAPTIVE21/21 &22/307; 3 or7 accepted foreign backing pixels in protected face, so **SOFT/ADAPTIVE FROZEN PROTECTED QUALITY FAIL**. [ZIP14507448658](https://github.com/Kiddos19882/AutoDraw/actions/runs/44479727697/artifacts/14507448658) CRC+1520 SHA independent PASS. Do not relax game default or apply to protected.
