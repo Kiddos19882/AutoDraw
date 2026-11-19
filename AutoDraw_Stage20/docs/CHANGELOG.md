@@ -1,3 +1,9 @@
+## 2026-11-19 — ENGINE-001 B1-R P4D14 Egret native brush mathematical centroid source discovery
+
+- Source research Egret5.4.1 `CanvasRenderer.renderGraphics`: width1/3 offset (+0.5,+0.5) logical, texture blit path via `WebGLRenderer`. Introduced *experimental only* P4D14 math model/10 unit tests/native Windows CI, preregistration before code.
+- [CI44553609729](https://github.com/Kiddos19882/AutoDraw/actions/runs/44553609729) SHA16de0c6a: E2/E3 PASS 171 actual BoardPane scenes; width1/3 alpha centroid error 0.711337→0.037627 logical,10 exact replays,63/160 translated RGBA cases remain unequal, 292 alpha24 XOR. [ZIP14544372165](https://github.com/Kiddos19882/AutoDraw/actions/runs/44553609729/artifacts/14544372165) verified CRC,334/334 SHA manifest.
+- Original P4D13 visual protected quality FAIL, P4D3/P4D4 negatives, production/game renderer/Stage6/master/CHALK estimator unchanged. Full pixel-perfect model and E4/E5/exact CHALK pending.
+
 ## 2026-11-19 — ENGINE-001 / B1-R P4D13 full original relaxed-finish scientific test
 
 - [E0 frozen prereg](ENGINE001_B1R_P4D13_FULL_ORIGINAL_RELAXED_FINISH_PREREG_2026-11-19.md) and test runner, E2 unit tests, dedicated GitHub Actions: [CI44536042475](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475) at `1f8b4dd13a0d74896643e6fc82c9a56d9ef65574`, technical PASS. Real B1-R original E/F Egret paint initial+3 residual rounds, final E13868/13868/F13863/13863 native source-nonwhite-correct (RGB32 5/9). Saved raw/comparison + single [ZIP artifact14537095764](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475/artifacts/14537095764) checked CRC+39 SHA256.

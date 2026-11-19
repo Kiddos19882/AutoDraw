@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — после проверенной source-based математической поправки Egret P4D14 (2026-11-19)
+
+1. **DONE:** [P4D14 CI44553609729](https://github.com/Kiddos19882/AutoDraw/actions/runs/44553609729) native E2/E3 PASS, fixed width1/3 extra 0.5 logical both axes, numeric alpha centroid MAE0.711337→0.037627, 171 real Egret scenes; 97/160 pixel RGBA translation-equal only, archive14544372165 CRC+334/334 SHA. Original official Egret5.4.1 source: Canvas2D stroke → texture → WebGL; P4D3/P4D4 and P4D13 immutable.
+2. **NEXT:** экспериментально восстановить геометрию полного footprint `Graphics`/Canvas temporary bounds+ceil+half pixel+Canvas2D antialiasing+texture, измерить alpha/цвет в каждой клетке и позиционный drift, не считать центр всей геометрией. Frozen prereg до кода, E3 реальный Egret, без production default.
+3. **THEN:** при доказанном footprint перенести только разрешённую математику в source-based adaptive planner, повторить P4D13 full original E/F по плотности 7/9 и 9/9, белым прорехам/выходам, лицу и контурам, E4 runtime/E5 independent/exact CHALK после gate. Production/Stage6/master остаются неизменны.
+
+*Ниже более ранние дорожные карты P4D13 и P4D11–P4D12 — история.*
+
 ## CURRENT ENGINE-001 / B1-R — P4D13 whole-image relaxed native result (2026-11-19)
 
 1. **DONE** [P4D13 original full E/F relaxed native E3](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475), SHA `1f8b4dd13a0d74896643e6fc82c9a56d9ef65574`, original E/F source fully painted after 3 residual passes (E13868/13868; F13863/13863 correct native logical 5/9, RGB32). [ZIP14537095764](https://github.com/Kiddos19882/AutoDraw/actions/runs/44536042475/artifacts/14537095764) independent ZIP CRC+39 SHA PASS. Initial adaptive E13133/F13132, final 0 residual; native white ink E4415/F4445, protected white E2250/F2261: image quality FAIL, not production.
