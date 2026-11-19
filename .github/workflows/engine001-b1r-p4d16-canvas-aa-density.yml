@@ -1,0 +1,119 @@
+name: ENGINE-001 P4D16 native Canvas AA and P4D13 density
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d16-canvas-aa-density.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d16_canvas_aa_density.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D16_CANVAS_AA_DENSITY_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-p4d16-source-native-density
+  cancel-in-progress: true
+jobs:
+  original-native-density-and-phase:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Firefox 159.0 reference browser
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install pinned original Egret and array dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify Firefox and source renderer/game/parent SHA
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw 'Missing pinned Firefox' }
+          & $env:BROWSER_PATH --version
+          @'
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+          }
+          for f,want in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+f])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==want,(f,actual,want)
+          print("P4D16_PINNED_EGRET_SOURCE_PASS")
+          '@ | python -
+      - name: E2 alpha24 mask, source composite and source-halfpixel unit tests
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d16_canvas_aa_density.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d16_canvas_aa_density.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d14_egret_halfpixel_centroid.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download immutable P4D13 whole-E/F real native 39-member artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44536042475 -R Kiddos19882/AutoDraw -n engine001-p4d13-original-EF-full-relaxed-finish-native-visual -D AutoDraw_Stage20/.p4d16-frozen
+      - name: Native source-owner physical density and 156 Egret phase scenes
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py --source-artifact AutoDraw_Stage20/.p4d16-frozen --output AutoDraw_Stage20/.p4d16-result --workspace . --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js
+      - name: Verify frozen original density and new real Egret scene hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,hashlib,os
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.p4d16-result")
+          x=json.loads((root/"report.json").read_text("utf8"))
+          assert x["experiment"]=="ENGINE001_B1R_P4D16_CANVAS_AA_DENSITY_V1"
+          assert x["technical_result"]=="P4D16_FULL_TRUE_NATIVE_AND_ARCHIVED_E3"
+          assert x["github_sha"]==os.getenv("GITHUB_SHA")
+          assert x["archived_p4d13_members_sha256_verified"]==39
+          a=x["new_native_phase"]
+          assert a["native_scene_count"]==156 and a["native_case_count"]==150
+          assert a["exact_scene_replays"]==5 and a["native_blank_zero_alpha"]
+          assert a["all"]["n"]==150
+          assert sum(a["by_width"][w]["n"] for w in ("1","2","3","5","10"))==150
+          assert x["new_native_E3"]=="PASS_TECHNICAL_ONLY"
+          for method,total,white in (("E_SOBEL90",13868,4415),("F_SOBEL90_LAB12",13863,4445)):
+              s=x["native_artwork_density"][method]["stages"]["STAGE_03_RELAXED_REPAIR"]
+              counts=s["correct_owner_by_threshold"]
+              assert counts["5"]==total and counts["9"]<=counts["7"]<=counts["5"]
+              assert s["native_ink_on_original_white_alpha24_physical"]==white
+          for file,sha in x["members_sha256"].items():
+              assert hashlib.sha256((root/file).read_bytes()).hexdigest()==sha,file
+          assert x["exact_run_bound_CHALK"] is None and not x["production_promotion"]
+          print("P4D16_NATIVE_156_AND_P4D13_ARTWORK_DENSITY_PASS")
+          print("P4D16_OUTPUT_HASHES_PASS",len(x["members_sha256"]))
+          PY
+      - name: Preserve all original Egret scene PNG and physical density panels
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d16-156real-native-scenes-and-ef-density
+          path: AutoDraw_Stage20/.p4d16-result/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30
