@@ -1,0 +1,138 @@
+name: ENGINE-001 B1-R P4D10 true Egret fine phases 10 conflicts
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-b1r-p4d10-native-fine-phases.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_b1r_p4d10_native_fine_phase_conflict10.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_b1r_p4d10_native_fine_phase_conflict10.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_B1R_P4D10_NATIVE_FINE_PHASE_CONFLICT10_PREREG_2026-11-19.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-b1r-p4d10-native-fine-phases
+  cancel-in-progress: true
+jobs:
+  real-egret-10-conflicts-25-phases:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact pinned Egret and analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Check frozen P4D7 original source, native scripts, image and engine
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d5_pixel_state_native_feedback.py":"147f4c2ec439bac72228b6828c67bfd45b49b28e",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d7_native_width1_phase_feasibility.py":"dc707709e55069897e2bbef465a4ed1668e8a679",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b4_boundary_tolerance_sweep.py":"6f67edcb942018bb006ed60b853470e4a202408d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p3d_source_edge_mask_ablation.py":"c350fb9a890de9bbe9f9e24eeea0eb6645f414f1",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==expected,(path,got,expected)
+              Path(path).write_bytes(raw)
+              print("P4D10_ORIGINAL_PIN",path,got)
+          assert hashlib.sha256(Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png").read_bytes()).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+      - name: E2 exact fine 5x5 native geometry and parent-safe regression contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_b1r_p4d10_native_fine_phase_conflict10.py AutoDraw_Stage20/tests/test_engine001_b1r_p4d10_native_fine_phase_conflict10.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d10_native_fine_phase_conflict10.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d7_native_width1_phase_feasibility.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 real Egret 10 protected conflict pixels x 25 exact subpixel phases
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_b1r_p4d10_native_fine_phase_conflict10.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.p4d10-native
+      - name: Audit 251 original true Egret scenes, strict source-protected alpha24 and SHA
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          root=Path("AutoDraw_Stage20/.p4d10-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_B1R_P4D10_NATIVE_FINE_PHASE_CONFLICT10_V1"
+          assert r["technical_result"]=="REAL_EGRET_250_NATIVE_FINE_PHASES_PLUS_BLANK"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["original_P3D_fresh_B1R_not_G32_V44"]
+          assert r["E_F_index_crop_identical"]
+          assert r["protected_original_source_CROP"]==[40,45,64,69]
+          assert r["original_nonwhite_target"]==307
+          assert len(r["fixed_conflict_sample_ids"])==10
+          assert r["sample_count"]==10
+          assert r["fine_phase_deltas"]==[0,.03125,.0625,.09375,.125]
+          assert r["phases_per_sample"]==25 and r["native_stroke_scene_count"]==250
+          assert r["native_blank_count"]==1 and r["native_blank_alpha_zero"]
+          assert r["original_grid_zero_control_feasible_count"]==10
+          assert r["H3_all_ten_original_controls_safe"]
+          assert r["approved_native_source_foreign_alpha24"]==0
+          assert r["required_correct_5of9"]==5
+          assert r["native_renderer"]=="real Egret 5.4.1 BoardPane/WebGLRenderer"
+          assert r["renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["game_engine_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["no_import_of_P4D11_relaxed_foreign"]
+          assert r["E4_live"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None and not r["production_promotion"]
+          rows=[json.loads(s) for s in (root/"NATIVE_FINE_PHASES_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==250 and all(row["width"]==1 for row in rows)
+          assert len({(row["sample_id"],row["variant"]) for row in rows})==250
+          assert len(r["sample_results"])==10
+          assert sum(v["additional_safe_correct_fine_phases"]>0 for v in r["sample_results"])==r["samples_with_additional_strict_safe_correct_phases"]
+          assert sum(v["additional_safe_correct_fine_phases"] for v in r["sample_results"])==r["total_additional_strict_safe_correct_fine_phases"]
+          assert r["H1_any_of_ten_gains_safe_phase"]==(r["samples_with_additional_strict_safe_correct_phases"]>=1)
+          assert r["H2_at_least_five_gain_safe_phase"]==(r["samples_with_additional_strict_safe_correct_phases"]>=5)
+          with Image.open(root/"REAL_EGRET_BLANK.png") as im:
+              assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
+          assert len(list((root/"REAL_EGRET_WIDTH1_FINE_PHASE_SCENES").rglob("*.png")))==250
+          assert len(list(root.rglob("*.png")))==254
+          for f,h in r["members_sha256"].items():
+              assert hashlib.sha256((root/f).read_bytes()).hexdigest()==h,f
+          print("P4D10_REAL_NATIVE_250_SAMPLES_AND_BLANK_PASS")
+          print("P4D10_EXTRA_SAFE",r["samples_with_additional_strict_safe_correct_phases"],"/10")
+          print("P4D10_TOTAL_EXTRA_PHASES",r["total_additional_strict_safe_correct_fine_phases"])
+          print("P4D10_H1_H2",r["H1_any_of_ten_gains_safe_phase"],r["H2_at_least_five_gain_safe_phase"])
+          print("P4D10_MANIFEST_SHA_PASS",len(r["members_sha256"]))
+          PY
+      - name: One archive all original native fine-phase PNG and negative scenes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4d10-10-conflict-source-owner-fine-phases
+          path: AutoDraw_Stage20/.p4d10-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
