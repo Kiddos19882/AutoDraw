@@ -26,9 +26,10 @@ def paint(native,index,palette,x,y,owner=None,alpha=255,amount=9):
     if owner is None:
         owner=int(index[y,x])
     column=(p4d5.X0+x)*3
-    block=result[y*3:y*3+3,column:column+3].reshape(9,4)
-    block[:amount,:3]=palette[owner]
-    block[:amount,3]=alpha
+    for k in range(amount):
+        dy,dx=divmod(k,3)
+        result[y*3+dy,column+dx,:3]=palette[owner]
+        result[y*3+dy,column+dx,3]=alpha
     return result
 
 

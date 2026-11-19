@@ -115,7 +115,6 @@ jobs:
                      for r in rows if r["accepted"])
           with Image.open(root/"REAL_EGRET_CUMULATIVE_BLANK.png") as im:
               assert im.size==(1380,720) and im.getchannel("A").getbbox() is None
-          assert len(list((root/"P4D7_FRESH_NATIVE_ISOLATED").rglob("REAL_EGRET_WIDTH1_PHASE_SCENES/**/*.png")))==0 if False else True
           native_iso=list((root/"P4D7_FRESH_NATIVE_ISOLATED"/"REAL_EGRET_WIDTH1_PHASE_SCENES").rglob("*.png"))
           assert len(native_iso)==1386
           assert len(list((root/"REAL_EGRET_CUMULATIVE_TRIALS").rglob("*.png")))==len(rows)
