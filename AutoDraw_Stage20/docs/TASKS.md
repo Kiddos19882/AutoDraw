@@ -1,3 +1,12 @@
+## CURRENT ENGINE-001 — BPRED-S0 source inventory E1 PARTIAL (2026-11-20)
+
+- [x] [BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md) E1 static inventory of P4D3/4/14/15/16, native E/F, pinned source refs, original CI artifacts, model limitations.
+- [x] E0 до будущих BPRED-E3 фиксирует historical development vs **120 NEW_CALIBRATION**, **120 NEW_BLIND**, **11 CONTROL**. Пустые будущие выборки не выдавать за полученные результаты.
+- [ ] **NEXT one:** завершить S0: raw archived ZIP CRC/individual member SHA audit, immutable historical/future sample manifests и provenance/fail-closed group split на GitHub runner; новые код/тесты/native CI только в отдельно разрешённых границах. **S0 PARTIAL; BPRED E2/E3/E4/E5 NOT_RUN.**
+- [ ] BPRED-S1..S6 остаются OPEN по [плану](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); P4D19 frozen E0 DEFERRED, P4D18 full protected quality FAIL.
+
+*Ниже предыдущий BPRED-S0 NEXT на момент принятия плана — историческое состояние до инвентаризации.*
+
 ## CURRENT ENGINE-001 — BPRED-001 prediction-first, план принят (2026-11-20)
 
 - [x] Пользователь утвердил [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); решение [DEC-041](DECISIONS.md) — **документация принята**, никакой разработки/тестов BPRED ещё не было. Baseline `ba0f609ab15e982e37ddece674fee3809890dce9`.

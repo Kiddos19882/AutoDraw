@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 — BPRED-S0 partially completed source/corpus inventory (2026-11-20)
+
+[BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md) (baseline `6bb28b50`): E1 source/matrix/native archive review и prospective E0 split 120 calibration+120 blind+11 controls выполнены. **Следующий один шаг:** S0 raw artifact materialization with complete CRC/SHA, deterministic manifest, group-isolation E2 validation; E2/E3 BPRED NOT_RUN, permission needed for development/tests. Затем S1 source geometry → S2 physical alpha → S3 ordered RGBA → S4 blind native safety → S5 global original E/F plan → S6 quality-preserving stroke optimization по [плану](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md). P4D19 DEFERRED; production/master untouched.
+
+*Ниже предыдущий roadmap непосредственно после принятия BPRED-001.*
+
 ## CURRENT ENGINE-001 — BPRED-001: prediction-first roadmap (2026-11-20)
 
 User-accepted [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) / [DEC-041](DECISIONS.md), baseline `ba0f609ab15e982e37ddece674fee3809890dce9`, **только план**, BPRED E2/E3/E4/E5 NOT_RUN. Следующий **первый** незавершённый шаг: **BPRED-S0** (pinned source/artifact inventory + независимое разделение native корпуса и отдельный E0 до исследований). Далее **S1** Egret geometry/transforms widths1..10 → **S2** Canvas physical alpha / phase M0/M1/M2 → **S3** RGBA source-over ordered composition → **S4** held-out native false-safe validation & uncertainty → **S5** experimental global original E/F adaptive planner → **S6** quality-preserving stroke/cost optimization. Stage gates и evidence см. в единственном [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); не добавлять повторную полную методику в ROADMAP.

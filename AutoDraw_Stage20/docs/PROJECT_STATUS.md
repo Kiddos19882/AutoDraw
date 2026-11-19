@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 / BPRED-S0 — source audit E1 PARTIAL (2026-11-20)
+
+[BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md): проверены архивные E3 CI SHA, native artifact metadata, действующие source functions, существенные ограничения модели P4D16 (только two-point и widths1/2/3/5/10 для независимых dx/dy phases); frozen E0 будущих 120 calibration /120 blind /11 control сцен до разработки. Архивные member hashes и новый BPRED raw corpus в этом чате **NOT_RUN**, следовательно **S0 PARTIAL**, E2/E3/E4/E5 BPRED NOT_RUN. P4D19 DEFERRED, P4D18 protected-quality FAIL. NEXT: материализация/audit raw с разрешёнными кодом/тестами; production/master не изменены.
+
+*Ниже предыдущий действующий план BPRED до фактического аудита S0.*
+
 ## CURRENT ENGINE-001 / BPRED-001 — приоритет prediction-first (2026-11-20)
 
 **ACCEPTED PLAN / DOCUMENTATION ONLY:** [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md), [DEC-041](DECISIONS.md). Пользователь согласовал смену фокуса: сначала прогноз реального Egret Canvas2D/WebGL RGBA отпечатка кистей1–10 и их композиции, затем глобальный adaptive planner и лишь после принятого качества — оптимизация штрихов. Baseline remote `ba0f609ab15e982e37ddece674fee3809890dce9`; BPRED-S0 E0/исследовательская инвентаризация следующий шаг, реализация, E2/E3/E4/E5 **NOT_RUN**. P4D19 frozen E0 сохранён как **DEFERRED**, не реализован и не переименован в FAIL/PASS; source/renderer/production/master не менялись. Последний E3 P4D18: E/F interior alpha0 24/25, original-white ink 4415/4445, protected 2250/2261, full quality **FAIL**.

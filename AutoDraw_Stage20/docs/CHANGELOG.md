@@ -1,3 +1,7 @@
+## 2026-11-20 — ENGINE-001 / BPRED-S0 native corpus source inventory (documentation only)
+
+- Recorded [BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md): pinned original P4D3/P4D4/P4D14/P4D15/P4D16/E/F evidence, native artifacts and explicit model limitations; froze future distinct angle-family calibration/holdout definition (120/120/11) before any new tests. S0 source E1 PARTIAL, data materialization and all new E2/E3/E4/E5 NOT_RUN; no production changes or altered historical results.
+
 ## 2026-11-20 — ENGINE-001 BPRED-001 prediction-first plan (documentation only)
 
 - User-approved [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) and [DEC-041](DECISIONS.md): source-faithful Egret geometry, Canvas physical alpha/RGBA, ordered source-over, native heldout false-safe, whole-original adaptive planner, then quality-preserving stroke optimization. P4D19 prereg archived intact / DEFERRED, no renaming prior P4D failures as success.
