@@ -1,3 +1,8 @@
+## CURRENT CI — source-bound Firefox 159 reference restored (2026-11-19)
+
+- [x] Incident: [validation44560216313](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216313) browser reference **FAIL**, actual Firefox160 vs frozen159.0, not P4D15 model regression. Minimal tested workflow/browser selector fix [commit73270097](https://github.com/Kiddos19882/AutoDraw/commit/73270097bc30a48ab3f0cd7c05da06ca2f78e870): install Firefox159.0 via pinned action SHA only in Stage reference job; 3 unit fail-closed cases; no baseline manifest edits. [Validation44562387801](https://github.com/Kiddos19882/AutoDraw/actions/runs/44562387801) **mandatory5/5 PASS**, optional SKIPPED.
+- [ ] NEXT ENGINE-001 unchanged: E0 before P4D16 Canvas2D raster math/real backing alpha1/24 and 7/9/9/9 density, protected original-white spill reduction; E4/E5/CHALK OPEN.
+
 ## CURRENT ENGINE-001 — P4D15 original Canvas vs WebGL E3 completed, P4D16 OPEN (2026-11-19)
 
 - [x] P4D15 prereg [Canvas→WebGL stage audit](ENGINE001_B1R_P4D15_CANVAS_TEXTURE_TRANSLATION_PREREG_2026-11-19.md) before code, based on external web sources and Egret5.4.1. [Final E3 CI44560216224](https://github.com/Kiddos19882/AutoDraw/actions/runs/44560216224) SHA176fc822 E2/E3 technical PASS 34 real scenes, 30 origin-relative comparisons: Canvas18 exact/12 mismatched, WebGL18 exact/12 mismatched, direct full Canvas→WebGL **30/30 byte-equal** with origin -2 scaled3, 44 alpha24 XOR copied strokes. ZIP14549505133 verified independent CRC/103 SHA. Initial [CI44559709261](https://github.com/Kiddos19882/AutoDraw/actions/runs/44559709261) E3 FAIL recorder metadata key, subsequently fixed, failure preserved.
