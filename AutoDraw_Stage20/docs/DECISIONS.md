@@ -5,7 +5,7 @@
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
 
-## DEC-041. ENGINE-001 / BPRED-001: сначала предсказатель кисти, затем планировщик
+## DEC-041. ENGINE-001 / BPRED-001: сначала предсказатель кисти, потом планировщик
 
 **Дата:** 2026-11-20. **Статус:** ACCEPTED PRIORITY/PLAN, **NOT IMPLEMENTED**. Пользователь утвердил [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) после обсуждения отказа от бесконечного точечного ремонта; в текущей ветке вместо следующего масштабного P4D19-патча приоритет — построить научно проверенный предсказатель следа кисти Egret/Canvas2D/WebGL для widths1..10 и уже на его основе строить новый whole-image adaptive planner. Последовательность: physical geometry/phase → Canvas alpha/RGBA → source-over/owner interference → независимая native validation/false-safe/unknown → source E/F global plan → только после успешного качества сокращение/объединение штрихов. Это **согласование плана и документации**, не разрешение автоматически менять код, запускать тесты или production.
 
