@@ -117,13 +117,14 @@ def select_by_policy(arm:str,baseline:dict,impact:dict)->bool:
     if arm not in ARMS:
         raise ValueError("BLOCKED_P4D11_UNKNOWN_POLICY")
     foreign=int(impact["foreign_changed_alpha24"])
+    if foreign!=baseline["native_changed_foreign_alpha24_backing"]:
+        raise ValueError("BLOCKED_P4D11_INCONSISTENT_NATIVE_FOREIGN_COUNT")
     if (not baseline["target_sample_after"] or
         baseline["target_sample_before"] or
         baseline["native_new_correct_0_to_1"]<=0 or
         baseline["native_lost_correct_1_to_0"]!=0 or
         baseline["native_original_white_alpha24_backing"]!=0 or
-        impact["foreign_outboard_backing"]!=0 or
-        foreign!=baseline["native_changed_foreign_alpha24_backing"]):
+        impact["foreign_outboard_backing"]!=0):
         return False
     if foreign>BUDGETS[arm]:
         return False
