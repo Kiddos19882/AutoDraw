@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001/BPRED-S3v2m original Egret source-known G1 complete, D2 FAIL (2026-11-20)
+
+- [x] [S3v2m original Egret source results](ENGINE001_BPRED001_S3V2M_FULL_FRACTIONAL_ALPHA_INTEGER_LATTICE_RESULTS_2026-11-20.md), [CI44751330819](https://github.com/Kiddos19882/AutoDraw/actions/runs/44751330819) SHA442fc99c E2 33/33 PASS; original 856 source SHA+3 prior S3v2k+2 prior S3v2l SHA CRC and final [artifact14634888354](https://github.com/Kiddos19882/AutoDraw/actions/runs/44751330819/artifacts/14634888354) 2 SHA PASS. Original isolated source 8648 partial-alpha RGB: **G1 misses0**, all **327/327** old F2 negatives recovered; original opaque owner53752/53752 exact.
+- [x] **Frozen D2 usefulness FAIL**: only6360/7753 (82.03%) alpha16..254 source pixels have all three RGB intervals width≤16, below precommitted90%; no widening or threshold weakening. Original S3v2l F2 FAIL327, S3v2k I1 FAIL3186, S3v2j original C0 WebGL21/40 and owner hidden-alpha0 damage21, original E/F P4D18 FAIL preserved.
+- [ ] **NEXT single S3:** freeze S3v2n E0 on correlated alpha/premult integer transition subintervals, keeping D1 zero misses and D2≥90%, archive all negatives, then separately new original Egret E3 independent holdout. No S0 BLIND/production/Stage6/Bridge/master, E4/E5/exact CHALK NOT_RUN.
+
 ## CURRENT ENGINE-001/BPRED-S3v2m fractional-alpha full integer lattice research-only (2026-11-20)
 
 - [x] [S3v2m full fractional-alpha integer lattice frozen E0](ENGINE001_BPRED001_S3V2M_FULL_FRACTIONAL_ALPHA_INTEGER_LATTICE_PREREG_2026-11-20.md) final frozen blob `33d40233c271bb8086d1d9c01d45eef3b401679e` before new v2m model, E2 or source result; previous F2 FAIL327 native source RGB, S3v2k source owner FAIL3186 and S3v2j isolated top-alpha0 owner harm21 preserved.
