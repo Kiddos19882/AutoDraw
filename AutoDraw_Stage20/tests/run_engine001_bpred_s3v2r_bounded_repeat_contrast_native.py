@@ -26,11 +26,13 @@ import run_engine001_bpred_s3_native_source_over as s3
 import run_engine001_b1r_p4d3_native_brush_repeatability as p4d3
 import run_engine001_b1r_p4b1_hybrid_zone_coverage as p4b1
 
-EXPERIMENT="ENGINE001_BPRED_S3V2R_BOUNDED_NATIVE_CONTRAST_REPEATED_STROKES_V1"
-E0_NAME="ENGINE001_BPRED001_S3V2R_BOUNDED_REPEAT_CONTRAST_NATIVE_PREREG_2026-11-20.md"
-E0_BLOB="1909565e0a9e4fc7b742e88f2324b848d8f9e017"
+EXPERIMENT="ENGINE001_BPRED_S3V2R2_BOUNDED_NATIVE_CONTRAST_REPEATED_STROKES_V2"
+E0_NAME="ENGINE001_BPRED001_S3V2R2_ORIGINAL_EVENT_COUNT_CORRECTION_PREREG_2026-11-20.md"
+E0_BLOB="e98acc22663beb7f8051e7626c95f696e405f5f3"
+FIRST_V1_E0_NAME="ENGINE001_BPRED001_S3V2R_BOUNDED_REPEAT_CONTRAST_NATIVE_PREREG_2026-11-20.md"
+FIRST_V1_E0_BLOB="1909565e0a9e4fc7b742e88f2324b848d8f9e017"
 OBSERVER="engine001_bpred_s3v2r_original_contrast_repeat_observer.js"
-SCHEMA="ENGINE001_BPRED_S3V2R_ORIGINAL_NATIVE_REPEAT_CONTRAST_V1"
+SCHEMA="ENGINE001_BPRED_S3V2R2_ORIGINAL_NATIVE_REPEAT_CONTRAST_V2"
 ROI=p.ROI
 WIDTHS=(3,7,10)
 RELATIONS=("CROSS_ROTATED","NEAR_SKEW")
@@ -40,7 +42,8 @@ TOP=0xD95A83
 ANGLES={3:53,7:171,10:289}
 REPEATS=(1,8)
 SCENE_COUNT=42
-EXPECTED_EVENTS=150
+EXPECTED_SOURCE_STROKES=150
+EXPECTED_EVENTS=192
 
 
 def blocked(message):
@@ -103,13 +106,14 @@ def manifest():
               "parent_sample_id":make_scene(w,r,"DARK_R8")["sample_id"],
               "width":w,"relation":r}
              for w in WIDTHS for r in RELATIONS]
-    if len(scenes)!=SCENE_COUNT or len(replays)!=6 or len({x["sample_id"] for x in scenes})!=SCENE_COUNT or sum(len(x["runtime_strokes"]) for x in scenes)!=EXPECTED_EVENTS:
+    if len(scenes)!=SCENE_COUNT or len(replays)!=6 or len({x["sample_id"] for x in scenes})!=SCENE_COUNT or sum(len(x["runtime_strokes"]) for x in scenes)!=EXPECTED_SOURCE_STROKES:
         blocked("FROZEN_EXPERIMENT_CARDINALITY")
     return {
         "experiment":EXPERIMENT,"E0_blob":E0_BLOB,
         "game_source_blob":p4d3.ENGINE_GIT_BLOB,
         "renderer_source_blob":p4d3.RENDERER_GIT_BLOB,
-        "source_native_scenes":SCENE_COUNT,"original_main_stroke_events":EXPECTED_EVENTS,
+        "source_native_scenes":SCENE_COUNT,"original_input_source_strokes":EXPECTED_SOURCE_STROKES,
+        "original_main_stroke_events":EXPECTED_EVENTS,
         "direct_rgba_expected":2*EXPECTED_EVENTS,"independent_controls":6,"blank":1,
         "native_ROI_node_local_physical":list(ROI),"S0_BLIND_used":False,
         "protected_foreign_policy_unchanged":True,"scenes":scenes,"replays":replays
@@ -120,8 +124,11 @@ def verify_source(workspace,engine,renderer,scripts,observer):
     original_q_observer=workspace/"AutoDraw_Stage20"/"tests"/q.OBSERVER_NAME
     q.verify_source(workspace,engine,renderer,scripts,original_q_observer)
     e0=workspace/"AutoDraw_Stage20"/"docs"/E0_NAME
+    first_e0=workspace/"AutoDraw_Stage20"/"docs"/FIRST_V1_E0_NAME
     if not e0.is_file() or p4b1.git_blob(e0.read_bytes())!=E0_BLOB:
-        blocked("FIRST_FROZEN_E0_MISSING_OR_DRIFT")
+        blocked("NEW_V2_FROZEN_E0_MISSING_OR_DRIFT")
+    if not first_e0.is_file() or p4b1.git_blob(first_e0.read_bytes())!=FIRST_V1_E0_BLOB:
+        blocked("ORIGINAL_V1_E0_MUST_REMAIN_IMMUTABLE")
     if observer.name!=OBSERVER or not observer.is_file():
         blocked("NEW_OBSERVER_MISSING")
 
@@ -163,7 +170,7 @@ def native_scene(driver,scene,output):
             or response.get("roi")!={"x":ROI[0],"y":ROI[1],
                                       "width":ROI[2],"height":ROI[3]}
             or not isinstance(response.get("events"),list)
-            or len(response["events"])!=len(scene["runtime_strokes"])):
+            or len(response["events"])!=len(scene["runtime_strokes"])+1):
         blocked("NATIVE_TRUE_STROKE_EVENT_MISMATCH_"+scene["sample_id"])
     main=response.get("main")
     mask=response.get("mask")
@@ -306,6 +313,7 @@ def analyze(items,output):
                                 "sample_id":source["scene"]["sample_id"],
                                 "background":bg,"width":width,"relation":relation,
                                 "original_top_event_ordinal":k,
+                                "original_event_type":"EXTRA_NATIVE_MAIN_EVENT" if k==len(source["scene"]["runtime_strokes"]) else "SOURCE_INPUT_ALIGNED",
                                 **xy(x,y),
                                 "pre_RGBA":pre[y,x].tolist(),
                                 "post_RGBA":post[y,x].tolist(),
@@ -346,6 +354,8 @@ def analyze(items,output):
                     records[n]={
                         "sample_id":source["scene"]["sample_id"],
                         "original_main_strokes":len(event),
+                        "original_input_strokes":len(source["scene"]["runtime_strokes"]),
+                        "extra_original_native_main_events":len(event)-len(source["scene"]["runtime_strokes"]),
                         "original_lower_vs_first_original_event_RGBA_miss":first_mismatch,
                         "pre_vs_previous_post_gap":gaps,
                         "independent_upper_alpha0_lower_alpha_positive_pixels":int(zone.sum()),
@@ -451,6 +461,7 @@ def run(workspace,engine,renderer,scripts,observer,output):
         "renderer_source_blob":p4d3.RENDERER_GIT_BLOB,
         "new_original_source_scenes":len(items),"native_original_main_PNG":42,
         "native_original_mask_PNG":42,"original_native_webgl_PNG":49,
+        "original_input_source_strokes":sum(len(it["scene"]["runtime_strokes"]) for it in items),
         "original_main_strokes":eventcount,"original_direct_prepost_RGBA":2*eventcount,
         "uninstrumented_replays":len(replay),
         "replay_all_ROI_exact":all(c["uninstrumented_native_webgl_ROI_exact"] for c in replay),
@@ -474,6 +485,7 @@ def run(workspace,engine,renderer,scripts,observer,output):
             sum(r["post_direct_minus_PNG_alpha_changed_pixels"] for it in items for r in it["events_meta"]),
         "T4_original_EF_protected_quality":"FAIL_UNCHANGED",
         "T4_previous_S3v2q_strict_foreign":"FAIL_20",
+        "T4_original_failed_S3v2r_V1_provenance":"FAIL_N_PLUS_ONE_MAIN_EVENTS",
         "T4_previous_S3v2q_G3_usefulness":"FAIL_7653_OF_8633",
         "T4_internal_fractional_alpha":"UNKNOWN",
         "S0_BLIND_used":False,"production_promotion":False,"S4":"NOT_RUN",
