@@ -128,5 +128,5 @@ jobs:
           name: engine001-bpred-s3v2m-full-alpha-native-source-lattice
           path: AutoDraw_Stage20/.bpred-s3v2m-result/
           include-hidden-files: true
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 90
