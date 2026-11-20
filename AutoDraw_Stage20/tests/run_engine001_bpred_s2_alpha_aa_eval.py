@@ -13,6 +13,7 @@ import math
 import os
 from pathlib import Path
 import statistics
+from unittest.mock import patch
 
 import numpy as np
 from PIL import Image
@@ -32,6 +33,23 @@ SOURCE_ARTIFACT = 14589516497
 MODE_MAP = (("M0_NAIVE","naive"),("M1_EGRET_SHIFT","source_halfpixel"),
             ("M2_AREA8","area8"))
 WIDTHS = tuple(range(1,11))
+P16_LEGACY_INPUT_WIDTHS = (1,2,3,5,10)
+
+def predict_p16_all_widths(points,width,left,top,mode):
+    """P4D16 exact formula, opt-in validation for widths 4/6/7/8/9; restore global.
+
+    P4D16 original code and historical WIDTHS remain unchanged. Single-threaded
+    evaluation only; this extends admissible inputs, not the model algorithm.
+    """
+    if tuple(p16.WIDTHS)!=P16_LEGACY_INPUT_WIDTHS or type(width) is not int or width not in WIDTHS:
+        blocked("P16_WIDTH_DOMAIN_DRIFT")
+    if width in P16_LEGACY_INPUT_WIDTHS:
+        return p16.predict_alpha(points,width,left,top,mode)
+    with patch.object(p16,"WIDTHS",WIDTHS):
+        prediction=p16.predict_alpha(points,width,left,top,mode)
+    if tuple(p16.WIDTHS)!=P16_LEGACY_INPUT_WIDTHS:
+        blocked("P16_LEGACY_GATE_NOT_RESTORED")
+    return prediction
 ANGLES = (7,73,166)
 LENGTHS = (7,19)
 PHASES = ((1/16,3/16),(5/16,7/16))
@@ -180,7 +198,7 @@ def score_case(parent,row):
         top=(center[1]-27)*3
         modes={}
         for model,original_mode in MODE_MAP:
-            predicted=p16.predict_alpha(stroke["points"],stroke["width"],left,top,original_mode)
+            predicted=predict_p16_all_widths(stroke["points"],stroke["width"],left,top,original_mode)
             modes[model]=alpha_metrics(predicted,native)
         cells.append({"absolute_logical_center":list(center),"index":ix,
                       "models":modes})
@@ -301,6 +319,7 @@ def run(parent,output,workspace):
       "models":{"M0_NAIVE":"P4D16 naive binary unshifted",
                 "M1_EGRET_SHIFT":"P4D16 source_halfpixel binary shift odd widths",
                 "M2_AREA8":"P4D16 area8 8x8 subpixel integration shifted odd widths"},
+      "legacy_P4D16_width_input_adapter":"Only extends width validation 4/6/7/8/9, original P4D16 formula and WIDTHS restored",
       "hypothesis_thresholds_frozen":{"H1_macro_IoU_min":.985,
                   "H1_vs_M1_delta_min":.005,"H2_MAE_ratio_max":.90,
                   "H3_odd_vs_naive_IoU_delta_min":.025},

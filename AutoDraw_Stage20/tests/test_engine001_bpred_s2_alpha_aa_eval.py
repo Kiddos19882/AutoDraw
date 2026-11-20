@@ -90,6 +90,27 @@ class TestBpredS2(unittest.TestCase):
         z=s2.alpha_metrics(a,a)
         self.assertEqual(z["alpha_MAE_union"],0.)
         self.assertTrue(z["alpha24"]["exact_mask"])
+    def test_12a_p16_pinned_legacy_results_byte_identical(self):
+        base=s0.future_manifest()["calibration"][0]["strokes"][0]["points"]
+        self.assertEqual(tuple(p16.WIDTHS),s2.P16_LEGACY_INPUT_WIDTHS)
+        for width in s2.P16_LEGACY_INPUT_WIDTHS:
+            for mode in ("naive","source_halfpixel","area8"):
+                original=p16.predict_alpha(base,width,93,39,mode)
+                new=s2.predict_p16_all_widths(base,width,93,39,mode)
+                self.assertTrue(np.array_equal(original,new),(width,mode))
+        self.assertEqual(tuple(p16.WIDTHS),s2.P16_LEGACY_INPUT_WIDTHS)
+
+    def test_12b_extension_accepts_unsupported_widths_and_restores_gate(self):
+        base=s0.future_manifest()["calibration"][0]["strokes"][0]["points"]
+        for width in (4,6,7,8,9):
+            predicted=s2.predict_p16_all_widths(base,width,93,39,"area8")
+            self.assertEqual(predicted.shape,(162,162))
+            self.assertEqual(predicted.dtype,np.uint8)
+            self.assertTrue(np.any(predicted>0))
+            self.assertEqual(tuple(p16.WIDTHS),s2.P16_LEGACY_INPUT_WIDTHS)
+            with self.assertRaises(ValueError):
+                p16.predict_alpha(base,width,93,39,"area8")
+
     def test_12_threshold_behavior(self):
         a=np.zeros((162,162),np.uint8)
         b=np.zeros_like(a)
