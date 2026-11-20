@@ -70,7 +70,7 @@ jobs:
               assert Path(path).read_bytes() == raw
           print("BPRED_S3V2_PINNED_EGRET_CANVAS_SOURCE_PASS", len(pins))
           '@ | python -
-      - name: E2 strict deBG-only PNG and original S3/source stage frozen tests
+      - name: E2 strict deBG PNG and source-stage tests with indexed frozen documentation
         shell: bash
         run: |
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py AutoDraw_Stage20/tests/run_engine001_bpred_s3v2b_native_canvas_stage.py AutoDraw_Stage20/tests/engine001_bpred_s3v2b_png_equivalence.py AutoDraw_Stage20/tests/test_engine001_bpred_s3v2b_png_equivalence.py
