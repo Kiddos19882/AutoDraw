@@ -1,0 +1,160 @@
+name: ENGINE-001 BPRED-S3v2o prospective NEW Egret low-alpha source/readback
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2o-new-native-low-alpha-readback.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2o_new_native_low_alpha_readback.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2o_new_native_low_alpha_readback.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2o-new-native-readback
+  cancel-in-progress: true
+jobs:
+  prospective-original-egret-low-alpha:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original native Firefox 159.0
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install source native Egret and exact-rational analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify first frozen E0 and unmodified original Egret source and observer
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw "Missing pinned Firefox 159" }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2O_NEW_NATIVE_LOW_ALPHA_READBACK_PREREG_2026-11-20.md": "72343545d1f8645625085afb36e5fddeda2f91c8",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_PREREG_2026-11-20.md": "6801292e01a650a2b014ffe09256313ebe10562b",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2N_CORRELATED_ALPHA_PREMULT_TRANSITIONS_PREREG_2026-11-20.md": "81f1a18ed5b04265123c337a3cbd63985a835307",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js": "76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js": "250a6f46c12498c15157825664a08ee4f12a2b83",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js": "de3b5c5f956e3de7a71817830874b346904bc9e2",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js": "383e0b25000f4c387687fb38423dce790f149499",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py": "42167e9dbcfad55dcb38216a335f61a0b93989e5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py": "c55e13bbcf9d2786f741a56ee7a6b39873fee89f"
+          }
+          for path,expected in pins.items():
+            raw=subprocess.check_output(["git","show","HEAD:"+path])
+            sha=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\\0"+raw).hexdigest()
+            assert sha==expected,(path,sha,expected)
+            assert Path(path).read_bytes()==raw
+          print("S3V2O_FIRST_FROZEN_E0_AND_PARENT_ORIGINAL_BLOBS_PASS",len(pins))
+          '@ | python -
+      - name: E2 frozen source geometry alpha mode math and provenance
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2o_new_native_low_alpha_readback.py
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2o_new_native_low_alpha_readback.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2n_correlated_alpha_premult.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2i_all_native_stroke_events.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 NEW original Egret 80 source frames and 40 ordered source owner checks
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          $env:AUTODRAW_PINNED_FIREFOX_BINARY = $env:BROWSER_PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2o_new_native_low_alpha_readback.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --selector-js AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js --stroke-js AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js --output AutoDraw_Stage20/.bpred-s3v2o-new-native
+      - name: Independently verify EVERY native source PNG and ALL scientific negative records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          root=Path("AutoDraw_Stage20/.bpred-s3v2o-new-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2O_NEW_NATIVE_LOW_ALPHA_READBACK_V1"
+          assert r["E0_blob"]=="72343545d1f8645625085afb36e5fddeda2f91c8"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert r["browser"]["browserName"]=="firefox" and str(r["browser"]["browserVersion"]).startswith("159.")
+          assert r["original_game_engine_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["original_renderer_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["true_new_native_primary"]==80 and r["isolated_source_frames"]==40
+          assert r["true_main_canvas_PNG"]==80 and r["true_mask_canvas_PNG"]==80
+          assert r["true_final_webgl_PNG"]==91 and r["blank_alpha0"] and r["replays"]==10
+          assert r["P1_G3_new_native_coverage"] in ("PASS_NEW_NATIVE_E3_SOURCE_ONLY","FAIL")
+          assert r["P2_G3_usefulness_frozen90pct"] in ("PASS","FAIL")
+          assert r["P3_model_selection"]=="NOT_ALLOWED_ON_HOLDOUT"
+          assert set(r["P3_modes_diagnostic_only"])=={"floor","nearest_even","ceil"}
+          assert r["P4_foreign_owner_safety"] in ("FAIL","UNKNOWN_NOT_PRODUCTION_SAFE")
+          assert r["P4_first_owner_exact_40"] in ("PASS","FAIL")
+          assert r["P4_last_native_main_exact_80"] in ("PASS","FAIL")
+          assert r["S3v2n_original_D2"]=="FAIL_6851_OF_7753"
+          assert r["original_EF_protected_quality"]=="FAIL_UNCHANGED"
+          assert r["S0_BLIND_used"] is False and r["production_promotion"] is False
+          assert r["E4_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN" and r["exact_game_CHALK"] is None
+          manifest=json.loads((root/"FROZEN_S3V2O_NEW_NATIVE_MANIFEST.json").read_text("utf8"))
+          cases=json.loads((root/"ALL_40_NEW_ISOLATED_RGB_MODES.json").read_text("utf8"))
+          modes=json.loads((root/"NEW_LOW_ALPHA_BUCKETS.json").read_text("utf8"))
+          bad=json.loads((root/"EVERY_NEW_NATIVE_RGB_INTERVAL_MISS.json").read_text("utf8"))
+          ordered=json.loads((root/"ALL_40_ORDERED_TRUE_OWNER_EFFECT.json").read_text("utf8"))
+          changed=json.loads((root/"EVERY_ALPHA0_TOP_OWNER_CHANGED_PIXEL.json").read_text("utf8"))
+          replay=json.loads((root/"REPLAY_CONTROLS.json").read_text("utf8"))
+          assert len(manifest["scenes"])==80 and len({s["sample_id"] for s in manifest["scenes"]})==80
+          assert len(cases)==40 and len({s["sample_id"] for s in cases})==40
+          assert len(ordered)==40 and len({s["sample_id"] for s in ordered})==40
+          assert len(replay)==10 and all(s["RGBA_ROI_exact"] for s in replay)
+          assert len(changed)==r["P4_isolated_top_alpha0_lower_owner_changed_pixels"]
+          assert len(bad)==r["new_RGB_miss_report_records"]
+          assert sum(case["modes"]["G3"]["RGB_misses"] for case in cases)==r["G3_new_source_RGB_misses"]
+          assert sum(case["alpha16_254"] for case in cases)==r["new_source_counts"]["qualified"]
+          assert sum(case["modes"]["G3"]["informative_A16_254"] for case in cases)==r["G3_informative_A16_254"]
+          assert sum(modes[k]["pixels"] for k in modes)==r["new_source_counts"]["partial"]
+          native=root/"native"
+          for pattern,count in [("*_REAL_MAIN_CANVAS.png",80),("*_REAL_MASK_CANVAS.png",80),
+                                ("*_REAL_WEBGL.png",80),
+                                ("*_REAL_STROKE_STEP_*.png",r["true_stroke_snapshots"]),
+                                ("TRUE_NATIVE_PROVENANCE.json",80)]:
+              got=len(list(native.rglob(pattern)))
+              assert got==count,(pattern,got,count)
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==10
+          assert (root/"S3V2O_REAL_EGRET_BLANK.png").is_file()
+          entries={p.relative_to(root).as_posix() for p in root.rglob("*")
+                   if p.is_file() and p.name!="report.json"}
+          assert entries==set(r["members_sha256"])
+          for p,sha in r["members_sha256"].items():
+              assert hashlib.sha256((root/p).read_bytes()).hexdigest()==sha,p
+          print("S3V2O_E3_NATIVE_SOURCE_CRC_SHA_PASS",len(entries))
+          print("S3V2O_G3_HOLDOUT",r["P1_G3_new_native_coverage"],r["P2_G3_usefulness_frozen90pct"],
+                r["G3_informative_A16_254"],r["new_source_counts"]["qualified"])
+          print("S3V2O_OWNER_ALPHA0_RISK",len(changed),r["P4_foreign_owner_safety"])
+          PY
+      - name: Archive all original Egret native PNG, true strokes and ALL negative pixels
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2o-new-native-low-alpha-readback
+          path: AutoDraw_Stage20/.bpred-s3v2o-new-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
