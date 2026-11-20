@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001 / BPRED-S3v2h native structural BLOCKED; S3v2i all-event E3 NEXT (2026-11-20)
+
+- [x] [S3v2h native BLOCKED evidence](ENGINE001_BPRED001_S3V2H_STROKE_STEP_BLOCKED_RESULTS_2026-11-20.md), [CI44716819436](https://github.com/Kiddos19882/AutoDraw/actions/runs/44716819436) source SHA5adf25a2 E2 36/36 PASS, first authentic S3v2f W01 CROSS_ROTATED A_ONLY one source stroke produces **2 genuine main Canvas stroke() calls**, E3 BLOCKED by frozen required1; S1/S2/S3 NOT_RUN, archived raw source counts and method-restoration evidence. Do not change v2h count/threshold to PASS.
+- [x] [S3v2i new frozen E0](ENGINE001_BPRED001_S3V2I_ALL_NATIVE_STROKE_EVENTS_PREREG_2026-11-20.md) source SHA9350e69c, BEFORE new S3v2i implementation. Same 24 original source-native scenes, unfiltered real 1..32 main stroke calls/event, no assumed owner mapping, strict original main/mask/WebGL source and parent 655 SHA.
+- [ ] **NEXT one S3 step:** finish scoped S3v2i native CI and archive all true per-call original Canvas PNG/metadata and each per-event RGBA delta, report observed call count per variant and last-to-final exact; then one separate preregistered mechanism based on actual events, NEVER silently switch to fill/rect and NEVER S4 without safe S3.
+- [ ] Parent S3v2f owner H2 FAIL, S3v2g P2 FAIL and P4D18 original E/F protected FAIL remain. S0 BLIND sealed; E4/E5/run-exact CHALK NOT_RUN; production/Stage6/Bridge/master untouched.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2h per-stroke native trace frozen, implementation NEXT (2026-11-20)
 
 - [x] [S3v2h frozen E0](ENGINE001_BPRED001_S3V2H_NATIVE_CANVAS_STROKE_STEP_PREREG_2026-11-20.md) frozen **before** any new S3v2h code or native trace, 24 unchanged original S3v2f source scenes, true first/second Canvas `stroke()` capture expected 36 snapshots, isolated owner and ordered semantic comparison without modifying game or image, native main/mask/WebGL source provenance mandatory. The strict operation count is a hypothesis, not yet measured; on mismatch report BLOCKED.
