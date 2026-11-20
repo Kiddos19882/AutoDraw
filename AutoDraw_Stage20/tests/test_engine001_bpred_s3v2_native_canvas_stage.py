@@ -110,5 +110,37 @@ class BpredS3v2Contracts(unittest.TestCase):
                 s3v2.verify_parent(Path(tmp))
 
 
+    def test_11_v2b_original_scoped_capture_kept(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / Path(s3v2.RENDERER_JS).name
+            source.write_text("/* original S3v2 */", encoding="utf8")
+            self.assertIsNone(s3v2.verify_capture_script(source, "v2b"))
+
+    def test_12_v2d_frozen_main_node_selector_allowed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            selector = Path(tmp) / "engine001_bpred_s3v2d_source_node_selector.js"
+            selector.write_text("/* S3v2d source node */", encoding="utf8")
+            self.assertIsNone(s3v2.verify_capture_script(selector, "v2d"))
+
+    def test_13_cross_version_capture_names_fail_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old = Path(tmp) / Path(s3v2.RENDERER_JS).name
+            new = Path(tmp) / "engine001_bpred_s3v2d_source_node_selector.js"
+            old.write_text("/* old */", encoding="utf8")
+            new.write_text("/* new */", encoding="utf8")
+            with self.assertRaisesRegex(ValueError, "MISSING_SCOPED_P4D15_REUSE_JS"):
+                s3v2.verify_capture_script(old, "v2d")
+            with self.assertRaisesRegex(ValueError, "MISSING_SCOPED_P4D15_REUSE_JS"):
+                s3v2.verify_capture_script(new, "v2b")
+
+    def test_14_missing_capture_and_unknown_version_fail_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "engine001_bpred_s3v2d_source_node_selector.js"
+            with self.assertRaisesRegex(ValueError, "MISSING_SCOPED_P4D15_REUSE_JS"):
+                s3v2.verify_capture_script(missing, "v2d")
+            with self.assertRaisesRegex(ValueError, "UNPREREGISTERED_STAGE_VERSION"):
+                s3v2.verify_capture_script(missing, "v2z")
+
+
 if __name__ == "__main__":
     unittest.main()
