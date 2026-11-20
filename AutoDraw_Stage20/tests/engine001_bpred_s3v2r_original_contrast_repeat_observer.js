@@ -98,7 +98,20 @@
       native.strokeCount!==strokes.length||
       native.syntheticAcceptedVerticesNotChalk!==2*strokes.length||
       events.length!==strokes.length||captures.length!==2) {
-      throw new Error("BLOCKED_BPRED_S3V2R_RESTORE_OR_ORIGINAL_STROKE_PROVENANCE");
+      throw new Error("BLOCKED_BPRED_S3V2R_RESTORE_OR_ORIGINAL_STROKE_PROVENANCE "+JSON.stringify({
+        restoredRender:renderProto.renderGraphics===render,
+        restoredStroke:proto.stroke===stroke,
+        nativeSchema:native&&native.schema,
+        nativeRenderer:native&&native.renderer,
+        nativeStrokeCount:native&&native.strokeCount,
+        nativeSyntheticVertices:native&&native.syntheticAcceptedVerticesNotChalk,
+        requested:strokes.length,
+        observedMainEvents:events.length,
+        observedRenderCaptures:captures.length,
+        captureNodes:captures.map(c=>({
+          node:c.node,drawDataCount:c.drawDataCount,size:c.size,transform:c.transform
+        }))
+      }));
     }
     function match(c,node,count,size,transform) {
       return c && c.node && c.node.x===node[0]&&c.node.y===node[1]&&
