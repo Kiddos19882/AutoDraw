@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001/BPRED-S3v2k low-alpha source uncertainty E0 frozen (2026-11-20)
+
+- [x] [S3v2j independent real Egret evidence](ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_RESULTS_2026-11-20.md): source RGBA first/last exact, QH stage0, 21 owner RGB modifications where second isolated alpha0, full source-over WebGL21/40 FAIL (original criterion unchanged).
+- [x] [S3v2k source-owner alpha interval E0](ENGINE001_BPRED001_S3V2K_SOURCE_OWNER_ALPHA_INTERVAL_PREREG_2026-11-20.md) Git blob `3ae0356c353b89249ad636fa03cdd094e3d3e713` registered BEFORE new v2k code/E2; first pre-code draft design vacuity corrected and recorded in Git history. Predeclares I0 original frozen C0, I1 ownerRGB+unobserved alpha byte interval, I2 geometric distance/UNKNOWN conservative classifier with zero false-safe and ≥50% useful unchanged diagnostic; no production-safe decision.
+- [ ] **NEXT one S3 task:** implement scoped v2k E2 math interval evaluation on *known* S3v2j source PNG and original true stroke path SHA, record full all80/40 negative pixel maps and non-vacuous abstention by width; do not tune after outcome; then separately freeze independent *new native* validation E0 before claiming source-safe prediction.
+- [ ] S4 reserved BLIND only after actual owner prediction safety, S5 original E/F hard protection, S6 stroke cost after quality; E4/E5/exact game CHALK NOT_RUN, production/Stage6/Bridge/master untouched.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2j new owner RGB harm confirmed, S3 uncertainty mechanism NEXT (2026-11-20)
 
 - [x] [S3v2j new-native results](ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_RESULTS_2026-11-20.md), [CI44721915503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44721915503) original new 80 Egret scenes, 200 true per-`stroke()` PNG, E2 55 PASS, original source and raw [raw14621923148](https://github.com/Kiddos19882/AutoDraw/actions/runs/44721915503/artifacts/14621923148) ZIP CRC /856 report-member SHA PASS. Frozen first-owner40/40 and last native80/80 exact PASS, QH stage zero physical RGB/alpha mismatch on new real Egret.
