@@ -128,6 +128,9 @@ def generic_source_maps(
         delta[:, 1:] = np.maximum(delta[:, 1:], horizontal)
     gray = color.rgb2gray(rgb.astype(np.float64) / 255.0)
     sobel = filters.sobel(gray)
+    # A constant source must not become an all-edge mask from FP roundoff.
+    # This is a numerical zero guard, NOT a visual/safety acceptance threshold.
+    sobel = np.where(sobel <= 1e-12, 0.0, sobel)
     positive = sobel[sobel > 0]
     sobel_threshold = (float(np.percentile(positive, SOBEL_PERCENTILE))
                        if len(positive) else None)
