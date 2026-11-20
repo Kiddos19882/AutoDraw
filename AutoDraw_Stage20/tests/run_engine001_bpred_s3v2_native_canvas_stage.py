@@ -273,6 +273,18 @@ def row_for(width, relation, intermediate, final):
     return row
 
 
+def verify_capture_script(capture_js, stage_version):
+    """Version-scoped research entrypoint: preserve v2b, admit frozen v2d selector."""
+    names = {
+        "v2b": Path(RENDERER_JS).name,
+        "v2d": "engine001_bpred_s3v2d_source_node_selector.js",
+    }
+    if stage_version not in names:
+        blocked("UNPREREGISTERED_STAGE_VERSION")
+    if not capture_js.is_file() or capture_js.name != names[stage_version]:
+        blocked("MISSING_SCOPED_P4D15_REUSE_JS")
+
+
 def run(workspace, engine, renderer, parent, capture_js, output, policy="strict", stage_version="v2b", pre_js=None, native_session=None):
     if policy not in ("strict", "debg-only"):
         blocked("UNPREREGISTERED_COMPARISON_POLICY")
@@ -297,8 +309,7 @@ def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"
     for path, sha in pins:
         if not path.is_file() or p4b1.git_blob(path.read_bytes()) != sha:
             blocked("PINNED_SOURCE_" + path.name)
-    if not capture_js.is_file() or capture_js.name != Path(RENDERER_JS).name:
-        blocked("MISSING_SCOPED_P4D15_REUSE_JS")
+    verify_capture_script(capture_js, stage_version)
     previous = verify_parent(parent)
     plan = s3.manifest()
     output.mkdir(parents=True)
