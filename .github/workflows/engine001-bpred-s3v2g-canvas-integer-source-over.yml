@@ -1,0 +1,121 @@
+name: ENGINE-001 BPRED-S3v2g Canvas integer premul source-over on known Egret
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2g-canvas-integer-source-over.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2g_canvas_integer_source_over.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2g_canvas_integer_source_over.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2g-original-source-integer-c0
+  cancel-in-progress: true
+jobs:
+  known-source-original-egret-canvas-C0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source maths dependencies
+        run: |
+          python -m pip install numpy==2.2.6 Pillow==11.3.0 opencv-python-headless==4.11.0.86 scikit-image==0.25.2 scipy==1.15.3 selenium==4.38.0 requests==2.32.5
+      - name: Validate and restore immutable source Git blobs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2G_CANVAS_INTEGER_SOURCE_OVER_PREREG_2026-11-20.md":"9dd47155d284f63c81cbb525ad757b137c287f11",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2f_prospective_native_rgba8.py":"0c3b799f6bc22958911d35420a30fef1950813dd",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py":"1bf56df9507f2a34fd16e68eef190229c3184ce5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py":"82f8e0c3f3e10fb30ea61d1beb52edf98696563c"
+          }
+          for name,expected in pins.items():
+              data=subprocess.check_output(["git","show","HEAD:"+name])
+              got=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
+              assert got==expected,(name,got,expected)
+              Path(name).write_bytes(data)
+              assert Path(name).read_bytes()==data
+          print("BPRED_S3V2G_FROZEN_CODE_AND_E0_PASS",len(pins))
+          PY
+      - name: E2 10 integer arithmetic fail-closed and old S3 science regression tests
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2g_canvas_integer_source_over.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2g_canvas_integer_source_over.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2f_prospective_native_rgba8.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3_native_source_over.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download immutable real S3v2f 80 main and ordered native Canvas without S0 BLIND
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44710870514 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2f-prospective-80-main-mask-webgl -D AutoDraw_Stage20/.bpred-s3v2g-source
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile,ZIP_DEFLATED
+          parent=Path("AutoDraw_Stage20/.bpred-s3v2g-source")
+          paths=sorted(p for p in parent.rglob("*") if p.is_file())
+          assert len(paths)==656 and (parent/"report.json").is_file()
+          zfile=Path("AutoDraw_Stage20/.bpred-s3v2g-source.zip")
+          with ZipFile(zfile,"x",compression=ZIP_DEFLATED) as z:
+              for p in paths:
+                  z.write(p,p.relative_to(parent).as_posix())
+          with ZipFile(zfile) as z:
+              assert z.testzip() is None and len(z.namelist())==656
+          print("S3V2G_REAL_NATIVE_SOURCE_REPACKED_CRC_PASS",len(paths))
+          PY
+      - name: Calculate preregistered P0 P1 P2 P3 C0 on known original Egret raw
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2g_canvas_integer_source_over.py --workspace . --source-zip AutoDraw_Stage20/.bpred-s3v2g-source.zip --output AutoDraw_Stage20/.bpred-s3v2g-result
+      - name: Independently audit source baseline scientific FAIL and output hashes
+        run: |
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.bpred-s3v2g-result")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2G_KNOWN_SOURCE_CANVAS_INTEGER_C0_V1"
+          assert r["E0_blob"]=="9dd47155d284f63c81cbb525ad757b137c287f11"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"] and str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert r["parent_run"]=="44710870514" and r["parent_sha"]=="819b7fd20272e5ac87ead72ce0610687fa51cbf4"
+          assert r["source_original_s3v2f_H1"]=="PASS_UNCHANGED"
+          assert r["source_original_s3v2f_H2"]=="FAIL_UNCHANGED"
+          assert r["D1_canvas_C0_pass_by_mode_40"]["P0"]==23
+          assert r["D2_QH_corrected_WebGL_C0_pass_by_mode_40"]["P0"]==14
+          assert r["diagnostic_H1_P2_canvas_at_least30of40"] in ("PASS","FAIL")
+          assert r["diagnostic_H2_P2_webgl_at_least30of40"] in ("PASS","FAIL")
+          assert r["source_authentic_native"] and not r["new_native_E3"]
+          assert r["research_model_only"] and not r["production_promotion"] and not r["S0_BLIND_used"]
+          assert r["original_S3_H1"]=="FAIL_UNCHANGED" and r["original_EF_protected_quality"]=="FAIL_UNCHANGED"
+          assert r["E4_live_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN" and r["exact_game_CHALK"] is None
+          pair=json.loads((root/"C0_ALL_40_VARIANTS.json").read_text("utf8"))
+          unknown=json.loads((root/"D3_SOURCE_REPRESENTABILITY.json").read_text("utf8"))
+          assert len(pair)==20 and len({x["pair_id"] for x in pair})==20
+          assert len(unknown)==40
+          assert len(r["members_sha256"])==2
+          for name,sha in r["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print("BPRED_S3V2G_ORIGINAL_EGRET_KNOWN_SOURCE_PASS",r["D1_canvas_C0_pass_by_mode_40"])
+          print("BPRED_S3V2G_SCIENCE",r["diagnostic_H1_P2_canvas_at_least30of40"],r["diagnostic_H2_P2_webgl_at_least30of40"])
+          PY
+      - name: Archive all integer Canvas errors and UNKNOWN provenance, no threshold revisions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2g-native-source-integer-c0
+          path: AutoDraw_Stage20/.bpred-s3v2g-result/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
