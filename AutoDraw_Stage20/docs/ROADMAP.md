@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 — BPRED-S2v2 negative; S2v3 fail-closed alpha uncertainty NEXT (2026-11-20)
+
+[BPRED-S2v2 — отрицательный isotonic результат](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESULTS_2026-11-20.md) outcome: [CI44652423011](https://github.com/Kiddos19882/AutoDraw/actions/runs/44652423011) technical PASS SHA4656b62e, frozen alpha M3 isotonic correction **fails H1/H2** (MAE worsens, false negatives more than double), H3 IoU PASS; MODEL_ONLY unsafe. **NEXT:** [BPRED-S2v3 — frozen E0 risk-aware alpha/UNKNOWN](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_PREREG_2026-11-20.md) then code/E2/CI on S1 true-native **CALIBRATION only**, 99.5th-percentile error guard for trusted positives, other pixels UNKNOWN; measure per-angle/generalization and preserve all negatives. Only after S2 conclusion: S3 source-over → S4 independent BLIND → S5 original full global planner → S6 quality-preserving optimization. No relaxation of protected quality gates, no production/master/E4/CHALK claims.
+
+*Ниже предыдущий S2v1/S2v2 snapshot — история.*
+
 ## CURRENT ENGINE-001 — BPRED-S2v1 pixel alpha measured, S2v2 calibrated residual NEXT (2026-11-20)
 
 [BPRED-S2v1 native alpha результат](ENGINE001_BPRED001_S2V1_ALPHA_AA_RESULTS_2026-11-20.md): genuine S1 native 120 CALIBRATION ROI analysis at [CI44651134628](https://github.com/Kiddos19882/AutoDraw/actions/runs/44651134628), code4d2c7991; M2 area8 macro alpha24 IoU=.98930 and MAE2.47051, but 2167 FP and 559 FN → still MODEL_ONLY and **not eligible for production**. [BPRED-S2v2 residual prereg](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESIDUAL_PREREG_2026-11-20.md) froze three leave-one-angle-out folds and H1/H2/H3 criteria before new model code. **NEXT:** S2v2 weighted isotonic alpha residual correction on CALIBRATION only → source-over S3 after S2 conclusions → independent BLIND S4 → global E/F S5 → safe stroke optimization S6. P4D18 protected FAIL and exact E4 CHALK not resolved.

@@ -1,3 +1,12 @@
+## CURRENT ENGINE-001 — BPRED-S2v2 FAILED science, S2v3 E0 frozen (2026-11-20)
+
+- [x] [BPRED-S2v2 — отрицательный isotonic результат](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESULTS_2026-11-20.md): [CI44652423011](https://github.com/Kiddos19882/AutoDraw/actions/runs/44652423011) SHA4656b62e technical E2/CI PASS, but **H1 FAIL/H2 FAIL/H3 PASS**; M3 improves FP2167→1315 at cost FN559→1237 and MAE2.4705→2.5062, **not accepted**. 3-fold group heldout CALIBRATION, no new Egret, no S0 BLIND.
+- [x] [BPRED-S2v3 — frozen E0 risk-aware alpha/UNKNOWN](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_PREREG_2026-11-20.md) registered before new code: M4 positive-only confidence guard per width 99.5% train residual in fixed 3 angle folds, all otherwise UNKNOWN; H1 FP≤10% M2, H2 TP≥90% M2, H3 each fold FP≤10%/TP≥80%, zero-FP safety gate separate.
+- [ ] **NEXT единственный:** implement S2v3 reusable native-sourced evaluator + synthetic E2 and isolated GitHub CI with all raw residual errors, source SHA, FP/TP/FN/UNKNOWN, artifact; do not substitute CI success for H success or change thresholds.
+- [ ] S3 source-over, S4 independent blind, S5 full E/F and S6 optimizations OPEN; P4D18 source protected FAIL, P4D19 deferred, E4/E5/CHALK unknown, production/master untouched.
+
+*Ниже предыдущий S2v2 planned snapshot — история.*
+
 ## CURRENT ENGINE-001 — S2v1 M2 alpha calibrated but pixel-unsafe; S2v2 E0 NEXT (2026-11-20)
 
 - [x] [BPRED-S2v1 native alpha результат](ENGINE001_BPRED001_S2V1_ALPHA_AA_RESULTS_2026-11-20.md): [CI44651134628](https://github.com/Kiddos19882/AutoDraw/actions/runs/44651134628) SHA4d2c7991 frozen S1 120/120 native calibration, 360 ROI, all H1/H2/H3 PASS, M2 IoU alpha24=.98929861 and FP2167/FN559 -> **unsafe, MODEL_ONLY**. E2 14+10 PASS, archive14589809874 verified; no new Egret rendering; all technical FAIL/history preserved.
