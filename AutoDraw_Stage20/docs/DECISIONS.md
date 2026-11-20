@@ -1,9 +1,19 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-041`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-042`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
+
+## DEC-042. ENGINE-001: адаптивные критерии применимости штриха, неизменные hard quality gates
+
+**2026-11-20. Статус: ACCEPTED RESEARCH POLICY, NOT PRODUCTION.** Пользователь согласовал дополнить [план BPRED-001](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) **возможностью** адаптивных критериев выбора штриха на основе его физических последствий. Последовательность S0→S1→S2→S3→S4→S5→S6 остаётся неизменной, сначала prediction, потом source-over/owners и только затем whole-image planning. Подробнее: [адаптивный риск штриха](ENGINE001_BPRED001_ADAPTIVE_STROKE_RISK_POLICY_2026-11-20.md).
+
+**Разграничение:** S2 M2/M4/M5 model FP/FN/IoU и frozen E0 scientific gates неизменны: S2v4 H1=FAIL, H2=PASS, H3=FAIL; сокращение FP до трёх не превращает его в PASS. Перспективный другой уровень — контекстная admissibility конкретного stroke с учётом допустимого owner, расстояния до границ, protected source pixels, ширины, angle, phase, color/RGBA source-over, uncertainty и UNKNOWN-fallback. **Ошибки предсказания альфы не эквивалентны вреду изображению**, но безопасное следствие требует отдельного настоящего multi-color native evidence и независимой validation, не только модели alpha.
+
+**Hard-gates:** защищённые foreign/protected pixels=0, прежний far leakage <=3 logical px, source-owner coverage≥99% и важные визуальные детали/узнаваемость НЕ ослабляются; изменение любого допустимо лишь по отдельному явному решению и prereg для *будущего* эксперимента, не posthoc. Трёхсостояний experimental `ADMISSIBLE_CANDIDATE / UNKNOWN / FORBIDDEN` без уверенного отрицательного от M5; при invalid/missing calibration, возможном защищённом ущербе или непроверенной uncertainty — UNKNOWN/FORBIDDEN и fail-closed без executor. Прежде чем применять адаптивность, отдельный frozen E0 с метриками false-safe/abstention, физическими последствиями per owner и quality gates.
+
+**Следующий S2:** [S2v5 E0](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_PREREG_2026-11-20.md), read-only источник Egret S2v4 131 PNG, 3 M5 FP и H3 deficient strata без поправки порогов; затем S3 RGB composition, S4 BLIND, S5 глобальный адаптивный planner, S6 оптимизация. E4/CHALK только run-bound, никакого production/master/Bridge/Stage6 изменения в этом решении.
 
 ## DEC-041. ENGINE-001 / BPRED-001: сначала предсказатель кисти, потом планировщик
 

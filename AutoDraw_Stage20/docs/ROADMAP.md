@@ -1,3 +1,9 @@
+## CURRENT BPRED-001 — после S2v4, DEC-042 accepted research extension (2026-11-20)
+
+**S2v4 completed native E3 but scientific safety FAIL:** [результаты S2v4](ENGINE001_BPRED001_S2V4_REAL_NATIVE_CORE_RESULTS_2026-11-20.md), frozen cut128 gave FP3 on new 131 Egret PNG and H3 per-width/angle fail, do not weaken. [DEC-042](DECISIONS.md)/[адаптивный риск штриха](ENGINE001_BPRED001_ADAPTIVE_STROKE_RISK_POLICY_2026-11-20.md): адаптивная *допустимость последствий* только после RGB owner/source-over, with UNKNOWN/fail-closed, no retroactive thresholds. **NEXT S2v5:** [S2v5 E0](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_PREREG_2026-11-20.md) audit the 3 false-safe physical pixels and H3 deficient strata on pinned raw. Далее S3 source-over multi-owner → S4 reserved independent BLIND → S5 global original E/F adaptive planner (possibly context-risk-aware) → S6 strokes optimization after quality gates. No CHALK live/master/production. Protected source E/F P4D18 FAIL.
+
+*Ниже roadmap до S2v4 эксперимента — история.*
+
 ## CURRENT ENGINE-001 — S2v3 guarded alpha promising but not safe; S2v4 native stress NEXT (2026-11-20)
 
 [BPRED-S2v3 — результаты risk-aware alpha](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_RESULTS_2026-11-20.md) [CI44657226273](https://github.com/Kiddos19882/AutoDraw/actions/runs/44657226273) on SHAfe39bba: FP2167→63/TP ret.98.39% alpha24, all pre-registered H1–H3 PASS, **zero-FP safety FAIL**. No S0 BLIND leakage; no S3 owner composition yet. **NEXT:** [BPRED-S2v4 — E0 новых native-сцен](ENGINE001_BPRED001_S2V4_NEW_NATIVE_CORE_VALIDATION_PREREG_2026-11-20.md) frozen BEFORE new native: M5 candidate alpha>=128 from posthoc S2v3 bins, new angles22/111/241, lengths9/23, independent XY phases, 120 primary/10 repeats/blank real Egret; H1 zero FP and coverage H2/H3, archival all failures. Then if S2 evidence adequate proceed sequentially S3 compositing→S4 BLIND→S5 global E/F→S6 cost. P4D18 quality still FAIL, game E4/CHALK unknown.

@@ -1,5 +1,12 @@
 # ENGINE-001 / BPRED-001 — прогноз фактического следа кисти Egret/Canvas2D/WebGL
 
+## Дополнение 2026-11-20 — DEC-042: адаптивная допустимость штриха (принято, ещё НЕ внедрено)
+
+В дополнение к original прогнозу alpha/RGBA рассматривается **контекстный риск последствий**: model FP != damage. После S2 (geometric/alpha uncertainty) и S3 (source-over RGB/owner) исследовать пер-штриховые `ADMISSIBLE_CANDIDATE / UNKNOWN / FORBIDDEN` по owner, protected source, distance to border, angle, width1..10, phase, возможному RGBA footprint и uncertainty envelope; при сомнении запрет/уменьшение кисти или настоящая native-проверка. Оригинальные S2 FP/FN/IoU, frozen H1/H2/H3 и S2v4 scientific **FAIL** не пересчитывать. **Protected foreign=0, far>3logical=0, owner coverage≥99%, важные детали/визуальные gates** остаются обязательными и не ослаблены. До implementation отдельный E0 и native/E5 evidence; риск неизвестного не выдавать за безопасность. Подробное принятое дополнение [адаптивный риск штриха](ENGINE001_BPRED001_ADAPTIVE_STROKE_RISK_POLICY_2026-11-20.md), решение [DEC-042](DECISIONS.md).
+
+**Текущее достижение:** [результаты S2v4](ENGINE001_BPRED001_S2V4_REAL_NATIVE_CORE_RESULTS_2026-11-20.md), CI [44659022526](https://github.com/Kiddos19882/AutoDraw/actions/runs/44659022526) SHA `2faf01de`: 131 true Egret PNG, M5 FP=3/TP=383505, H1 FAIL/H2 PASS/H3 FAIL; сохранён S0 BLIND120. **NEXT:** [S2v5 E0](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_PREREG_2026-11-20.md), только audit existing raw, затем строго S3→S4→S5→S6. Исторический текст о BPRED «NOT_RUN» ниже относится к дате принятия первоначального плана, не к состоянию текущего HEAD.
+
+
 **Дата принятия плана:** 2026-11-20. **Решение:** [DEC-041](DECISIONS.md). **Статус:** ACCEPTED PLAN / DOCUMENTATION ONLY. Этапы BPRED ещё НЕ реализованы; E1 — анализ исходников и предыдущих результатов, E2/E3/E4/E5 по BPRED **NOT_RUN**. Это рабочий план и требования к будущим отдельным экспериментам, **не** prereg конкретного статистического теста; перед каждым native-экспериментом замораживать отдельный E0, выборку и численные критерии.
 
 ## 1. Цель, baseline и область

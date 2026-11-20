@@ -1,3 +1,13 @@
+## CURRENT ENGINE-001 — S2v4 measured FAIL, S2v5 source audit NEXT (2026-11-20)
+
+- [x] [результаты S2v4](ENGINE001_BPRED001_S2V4_REAL_NATIVE_CORE_RESULTS_2026-11-20.md): real source [CI44659022526](https://github.com/Kiddos19882/AutoDraw/actions/runs/44659022526) SHA `2faf01de`, 120+10 replay+blank true Egret; E2 44 focused tests PASS, archive hash376, M2 TP402639/FP2379 vs M5 TP383505/FP**3**, **H1 FAIL, H2 PASS, H3 FAIL**; no accepted pixel-safe shortcut.
+- [x] [DEC-042](DECISIONS.md) + [адаптивный риск штриха](ENGINE001_BPRED001_ADAPTIVE_STROKE_RISK_POLICY_2026-11-20.md): пользователь принял возможную будущую *адаптивную admissibility штриха*, не разрешение ослабить original quality hard gates/признать S2v4 PASS. Не изменены frozen E0, owner protection и BLIND S4.
+- [x] [S2v5 E0](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_PREREG_2026-11-20.md) закреплён **до нового S2v5 diagnostic code/analysis** на baseline `2faf01de`: exact 3 physical false-safe coords и deficient H3 strata, все archive SHA, никаких новых порогов.
+- [ ] **NEXT единственный:** S2v5 read-only audit frozen S2v4 131 native PNG, exact pixel localization and H3 by width/angle/phase/position, E2 tests+CI with immutable raw report; затем отдельно оценить неопределённость и только после S3 owner effects возможность адаптивного gate.
+- [ ] S3/S4/S5/S6, E4/E5/exact CHALK NOT_RUN; P4D18 protected FAIL, P4D19 DEFERRED, production/master unchanged.
+
+*Ниже прежнее состояние до результатов S2v4 — история.*
+
 ## CURRENT ENGINE-001 — BPRED-S2v3 measured; S2v4 E0 frozen (2026-11-20)
 
 - [x] [BPRED-S2v3 — результаты risk-aware alpha](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_RESULTS_2026-11-20.md): [CI44657226273](https://github.com/Kiddos19882/AutoDraw/actions/runs/44657226273) `fe39bba1` 16 new+10 parent+14 regression E2 PASS, H1/H2/H3 PASS, M2 FP2167→M4 FP63, M2 TP346712→M4 TP341139; **critical zero FP FAIL**, still MODEL_ONLY. First CI44657070988 FAIL due missing synthetic phase values, fixed only tests.
