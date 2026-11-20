@@ -15,16 +15,18 @@ import run_engine001_bpred_s3_native_source_over as s3
 
 class FrozenS3v2rNative(unittest.TestCase):
     def test_01_frozen_e0_before_tests_and_original_source(self):
-        self.assertEqual(r.E0_BLOB,"1909565e0a9e4fc7b742e88f2324b848d8f9e017")
+        self.assertEqual(r.E0_BLOB,"e98acc22663beb7f8051e7626c95f696e405f5f3")
+        self.assertEqual(r.FIRST_V1_E0_BLOB,"1909565e0a9e4fc7b742e88f2324b848d8f9e017")
         self.assertEqual(r.ROI,(400,220,270,270))
-        self.assertEqual(r.SCHEMA,"ENGINE001_BPRED_S3V2R_ORIGINAL_NATIVE_REPEAT_CONTRAST_V1")
+        self.assertEqual(r.SCHEMA,"ENGINE001_BPRED_S3V2R2_ORIGINAL_NATIVE_REPEAT_CONTRAST_V2")
 
     def test_02_prereg_manifest_exact_42_and_150_real_strokes(self):
         m=r.manifest()
         self.assertEqual(m["experiment"],r.EXPERIMENT)
         self.assertEqual(m["source_native_scenes"],42)
-        self.assertEqual(m["original_main_stroke_events"],150)
-        self.assertEqual(m["direct_rgba_expected"],300)
+        self.assertEqual(m["original_input_source_strokes"],150)
+        self.assertEqual(m["original_main_stroke_events"],192)
+        self.assertEqual(m["direct_rgba_expected"],384)
         self.assertEqual(len(m["scenes"]),42)
         self.assertEqual(len({x["sample_id"] for x in m["scenes"]}),42)
         self.assertEqual(len(m["replays"]),6)
