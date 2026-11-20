@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001 / BPRED-S3v2p source-native Canvas getImageData-vs-PNG and owner risk (2026-11-20)
+
+- [x] [S3v2p E0 frozen before code](ENGINE001_BPRED001_S3V2P_NATIVE_CANVAS_READBACK_VS_COMPOSITION_PREREG_2026-11-20.md) blob `44d6f3d72ed6c62f38054d11f050ee16cab50bc2`. New source geometry/colors, original Egret widths1..10, A/B/AB/BA, 80 authentic main+mask+WebGL, each original post-`stroke()` PNG and same-context raw getImageData ROI, 20 uninstrumented replay controls and blank. Preserve all outcomes; untouched original foreign owner zero and G3 >=90% informative hard gates.
+- [x] Research implementation: (ф) `tests/engine001_bpred_s3v2p_canvas_readback_observer.js`, (ф) `tests/run_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py`, (ф) `tests/test_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py`, (ф) `.github/workflows/engine001-bpred-s3v2p-native-canvas-readback-vs-composition.yml`. Original S3v2j true-stroke harness reused and production untouched.
+- [ ] **NEXT SINGLE S3 STEP:** finish exact-SHA E2/E3 and independently verify raw CRC/SHA, ALL readback mismatches and PNG/getImageData owner effects; classify frozen H0-H4 PASS/FAIL/BLOCKED. If scientific fail, preserve all data and freeze NEXT distinct E0, do not tune old gates or model to these new examples.
+- [ ] Old S3v2o P1 PASS0/9666, P2 FAIL7602/8614, source alpha0 harm17 in9 scenes, Canvas C0 25/40 WebGL8/40 and S3v2n P2 FAIL unchanged. No S0 BLIND/S4, original E/F P4D18 protected FAIL; E4/E5/exact game CHALK NOT_RUN, no production/master/Stage6/Bridge/Monitor.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2o independent source-native E3 measured, owner safety still blocked (2026-11-20)
 
 - [x] [S3v2o E0 frozen](ENGINE001_BPRED001_S3V2O_NEW_NATIVE_LOW_ALPHA_READBACK_PREREG_2026-11-20.md) blob72343545 before code; 80 prospective new original Egret source frames and 10 replays+blank with exact P1/P2/P3/P4 fixed, no accepted threshold changes.
