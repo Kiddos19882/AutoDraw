@@ -150,15 +150,17 @@ def difference(pred, actual):
 def stage_row(scene, original, webgl):
     if not np.array_equal(original[:, :, 3], webgl[:, :, 3]):
         blocked("SOURCE_STAGE_ALPHA_DRIFT")
+    predictions = {mode: quantize_stage(original, mode) for mode in NAMES}
+    rgb_disparities = {
+        mode: np.any(pred[:, :, :3] != webgl[:, :, :3], axis=2)
+        for mode, pred in predictions.items()}
     bands = {}
     for lo, hi in BINS:
         mask = (original[:, :, 3] >= lo) & (original[:, :, 3] <= hi)
-        bands[str(lo) + "_" + str(hi)] = {}
-        for mode in NAMES:
-            pred = quantize_stage(original, mode)
-            dc = np.any(pred[:, :, :3] != webgl[:, :, :3], axis=2)
-            bands[str(lo) + "_" + str(hi)][mode] = int(np.count_nonzero(dc & mask))
-    metrics = {mode: difference(quantize_stage(original, mode), webgl) for mode in NAMES}
+        bands[str(lo) + "_" + str(hi)] = {
+            mode: int(np.count_nonzero(rgb_disparities[mode] & mask))
+            for mode in NAMES}
+    metrics = {mode: difference(pred, webgl) for mode, pred in predictions.items()}
     return {"sample_id": scene["sample_id"], "width": scene["width"],
             "relation": scene["relation"], "variant": scene["variant"],
             "mode_metrics": metrics, "alpha_bins_rgb_mismatch": bands}
@@ -220,7 +222,7 @@ def run(source_zip, workspace, output):
     q_h2 = d2["QC"] > 10
     report = {"experiment": EXPERIMENT, "E0_blob": E0_BLOB,
               "source_run_id": SOURCE_RUN, "source_sha": SOURCE_SHA,
-              "source_parent_report_sha256": sha(json.dumps(parent, sort_keys=True).encode("utf8")),
+              "source_s3v2d_report_canonical_sha256": sha(json.dumps(parent, sort_keys=True).encode("utf8")),
               "github_sha": os.getenv("GITHUB_SHA"),
               "github_run_id": os.getenv("GITHUB_RUN_ID"),
               "source_80_scene_real_Egret_only": True,
