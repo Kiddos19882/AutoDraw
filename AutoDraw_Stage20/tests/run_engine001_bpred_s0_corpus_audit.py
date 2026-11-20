@@ -17,6 +17,7 @@ from pathlib import Path, PurePosixPath
 import re
 import stat
 import zipfile
+import zlib
 
 SCHEMA = "ENGINE001_BPRED_S0_CORPUS_V1"
 PREREG = "ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md"
@@ -241,8 +242,11 @@ def audit_zip(path, source):
             blocked("DUPLICATE_ZIP_MEMBERS")
         if any(stat.S_ISLNK((x.external_attr >> 16) & 0xffff) for x in infos):
             blocked("ZIP_SYMLINK")
-        if zf.testzip() is not None:
-            blocked("ZIP_CRC")
+        try:
+            if zf.testzip() is not None:
+                blocked("ZIP_CRC")
+        except (zipfile.BadZipFile, EOFError, OSError, zlib.error) as exc:
+            blocked("ZIP_DEFLATE_CORRUPTION")
         if "report.json" not in names:
             blocked("MISSING_REPORT")
         rep = json.loads(zf.read("report.json"))
