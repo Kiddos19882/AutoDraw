@@ -28,6 +28,18 @@ The offline posthoc audit used only raw event PNG and `ALL_NATIVE_STROKE_COMPARI
 
 Actual event `globalCompositeOperation` = `source-over`, `globalAlpha` = 1, `lineCap` = `round`, `lineJoin` = `round` in all60 raw events. **Subpixel geometric distinction:** true `getTransform()` inside stroke width1 = `[3,0,0,3,7.5,7.5]` (all width1 events), whereas widths5 and10 = `[3,0,0,3,6,6]`. The original Canvas main node final source transform is `[3,0,0,3,6,6]` for all. This shows width1 native stroke subpixel-offset handling, **not** independently proven causal explanation for source-over RGB discrepancy; keep source physical vs logical distinct.
 
+## 2b. Posthoc edge evidence: second stroke can change RGB outside isolated top-alpha support
+
+A separate **posthoc E1 physical-pixel audit** of all12 ordered Canvas ROI using unchanged original `s3.source_over` against actual true ordered main Canvas found **605** differing physical pixel occurrences in the ROI, **601** within the intersection `isolated_A.alpha>0 AND isolated_B.alpha>0`, but **4** outside it. RGB differences total604 pixel occurrences, alpha differences29 (counts by channel not exclusive). Source-over discrepancies are NOT guaranteed to be limited to pixels whose independently captured source alpha is nonzero.
+
+The four outside-intersection occurrences are all **width10** and at **fully opaque existing-owner pixels**, with the other isolated owner's PNG alpha exactly0, and actual native ordered RGBA changed by 1 in one or two RGB channels:
+
+- `CROSS_ROTATED/A_THEN_B` native physical board `(517,380)`: A-only `[19,182,226,255]`, B-only `[0,0,0,0]`, actual ordered `[19,181,225,255]`.
+- `CROSS_ROTATED/B_THEN_A` `(517,337)` and `(521,380)`: B-only `[244,163,29,255]`, A-only `[0,0,0,0]`, actual ordered `[243,163,29,255]` at each.
+- `NEAR_SKEW/B_THEN_A` `(517,337)`: same B-only/A-only bytes and actual `[243,163,29,255]`.
+
+All24 first snapshots already matched the appropriate isolated first-owner source exactly; 12 ordered second calls caused observed changes. This is evidence that **quantized alpha0 in independently captured second-owner PNG does not guarantee an unchanged underlying owner on the original Canvas** at a subpixel edge. The microscopic physical coverage and premultiplied channel rounding that produce this are **not independently identified**; no original protected-owner risk tolerance is relaxed. These four negative cases must remain in any future source-owner pixel-safety test, and the planned next independent experiments should measure otherwise invisible sub-byte influence. See normative [CSS Compositing and Blending](https://drafts.csswg.org/compositing/) for ideal `source-over`; the specification alone does not prove browser byte-rounding behavior.
+
 ## 3. The original failure is not solved by this observation
 
 Using unchanged original S3 C0 straight-sRGB source-over on **12 ordered** A/B variants from these six selected pairs:
