@@ -24,6 +24,9 @@ import run_engine001_b1r_p4b7_native_stroke_attribution as p4b7
 
 EXPERIMENT = "ENGINE001_BPRED_S3V2_CANVAS_WEBGL_ORIGINAL_STAGE_V1"
 S3V2B_EXPERIMENT = "ENGINE001_BPRED_S3V2B_DEBG_PROVENANCE_CANVAS_STAGE_V1"
+S3V2D_EXPERIMENT = "ENGINE001_BPRED_S3V2D_TRUE_MAIN_CANVAS_VS_WEBGL_V1"
+S3V2D_E0_FILE = "ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_PREREG_2026-11-20.md"
+S3V2D_E0_BLOB = "1eb60858facc4d208f238ca9bb1c39e2f937ca1b"
 S3V2B_E0_FILE = "ENGINE001_BPRED001_S3V2B_DEBG_EQUIVALENCE_PREREG_2026-11-20.md"
 S3V2B_E0_BLOB = "23c5772e9193c760c0611287a44c877b8f10ab7f"
 E0_FILE = "ENGINE001_BPRED001_S3V2_NATIVE_CANVAS_COMPOSITING_DIAGNOSTIC_PREREG_2026-11-20.md"
@@ -166,7 +169,7 @@ def verify_parent_pixel_png(parent_png, new_png, policy, collected, sample_id):
     return bool(result["raw_byte_identical"])
 
 
-def capture(driver, scene, output, parent, policy="strict", collected=None):
+def capture(driver, scene, output, parent, policy="strict", collected=None, stage_version="v2b"):
     sid = scene["sample_id"]
     root = output / "native" / sid
     root.mkdir(parents=True, exist_ok=False)
@@ -181,6 +184,27 @@ def capture(driver, scene, output, parent, policy="strict", collected=None):
             result.get("sourceStrokeCount") != len(scene["runtime_strokes"]) or
             len(result.get("captures", [])) != 1):
         blocked("INSTRUMENTATION_NOT_RESTORED_OR_AMBIGUOUS")
+    if stage_version == "v2d":
+        if (result.get("structuralSelectionVersion") !=
+                "S3V2D_SOURCE_NODE_GEOMETRY_FROZEN_V1" or
+                result.get("originalCaptureCount") != 2 or
+                not isinstance(result.get("mask_capture"), dict)):
+            blocked("ORIGINAL_SOURCE_MASK_NOT_CAPTURED_" + sid)
+        mask = result["mask_capture"]
+        if (mask.get("node") != {"x": 0, "y": 0, "width": 460, "height": 240}
+                or mask.get("canvasSize") != [1380, 720] or
+                mask.get("drawDataCount") != 1 or
+                mask.get("transform") != [3, 0, 0, 3, 0, 0]):
+            blocked("ORIGINAL_MASK_NODE_DRIFT_" + sid)
+        raw_mask, mask_sha = read_png_data_url(
+            mask.pop("originalCanvasPngDataUrl"),
+            root / (sid + "_REAL_CANVAS_MASK.png"))
+        if raw_mask.shape != BOARD_SHAPE:
+            blocked("MASK_CANVAS_RGBA_SHAPE_" + sid)
+        write_json(root / "ORIGINAL_MASK_PROVENANCE.json", {
+            "sample_id": sid, "raw_mask_sha256": mask_sha,
+            "mask_native_metadata": mask,
+            "not_selected_for_source_over": True})
     stage = result["captures"][0]
     img, raw_sha = read_png_data_url(stage.pop("originalCanvasPngDataUrl"),
                                      root / (sid + "_REAL_CANVAS_INTERMEDIATE.png"))
@@ -249,9 +273,15 @@ def row_for(width, relation, intermediate, final):
     return row
 
 
-def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"):
+def run(workspace, engine, renderer, parent, capture_js, output, policy="strict", stage_version="v2b", pre_js=None, native_session=None):
     if policy not in ("strict", "debg-only"):
         blocked("UNPREREGISTERED_COMPARISON_POLICY")
+    if stage_version not in ("v2b", "v2d"):
+        blocked("UNPREREGISTERED_STAGE_VERSION")
+    if stage_version == "v2d" and (
+            policy != "debg-only" or pre_js is None or not pre_js.is_file()
+            or native_session is None):
+        blocked("SOURCE_STAGE_V2D_PRECONDITIONS")
     if output.exists():
         blocked("OUTPUT_EXISTS")
     pins = [
@@ -261,6 +291,9 @@ def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"
     if policy == "debg-only":
         pins.append((workspace / "AutoDraw_Stage20" / "docs" / S3V2B_E0_FILE,
                      S3V2B_E0_BLOB))
+    if stage_version == "v2d":
+        pins.append((workspace / "AutoDraw_Stage20" / "docs" / S3V2D_E0_FILE,
+                     S3V2D_E0_BLOB))
     for path, sha in pins:
         if not path.is_file() or p4b1.git_blob(path.read_bytes()) != sha:
             blocked("PINNED_SOURCE_" + path.name)
@@ -272,11 +305,13 @@ def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"
     write_json(output / "FROZEN_SOURCE_MANIFEST.json", plan)
     meta_rows, rows, repeats, comparisons = [], [], [], []
     canvas_frames, webgl_frames = {}, {}
-    with p4b7.native_egret_session(workspace) as driver:
+    with (native_session or p4b7.native_egret_session)(workspace) as driver:
         caps = {k: driver.capabilities.get(k)
                 for k in ("browserName", "browserVersion", "platformName")}
         if caps["browserName"] != "firefox" or not str(caps["browserVersion"]).startswith("159."):
             blocked("BROWSER_NOT_PINNED")
+        if stage_version == "v2d":
+            driver.execute_script(pre_js.read_text("utf8"))
         driver.execute_script(capture_js.read_text("utf8"))
         present = driver.execute_script(
             "return typeof window.AutoDrawBPRED_S3v2CanvasCapture;")
@@ -301,7 +336,7 @@ def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"
                     for variant in s3.VARIANTS:
                         scene = s3.plans_for(width, relation)[variant]
                         ca, we, change = capture(
-                            driver, scene, output, parent, policy, comparisons)
+                            driver, scene, output, parent, policy, comparisons, stage_version)
                         c[variant], w[variant] = ca, we
                         meta_rows.append({"sample_id": scene["sample_id"],
                                           "intermediate_to_final": change})
@@ -349,7 +384,11 @@ def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"
     if webgl_pass != 10:
         blocked("ORIGINAL_S3_H1_DRIFT_NO_RETUNE")
     report = {
-        "experiment": S3V2B_EXPERIMENT if policy == "debg-only" else EXPERIMENT,
+        "experiment": (S3V2D_EXPERIMENT if stage_version == "v2d"
+                       else S3V2B_EXPERIMENT if policy == "debg-only" else EXPERIMENT),
+        "S3v2d_frozen_E0_blob": S3V2D_E0_BLOB if stage_version == "v2d" else None,
+        "S3v2d_original_node_source_proven": stage_version == "v2d",
+        "true_native_mask_canvas_PNG": 80 if stage_version == "v2d" else 0,
         "original_S3v2_raw_byte_gate": "FAIL_ARCHIVED_44684709364" if policy == "debg-only" else "STRICT_ORIGINAL",
         "S3v2b_frozen_E0_blob": S3V2B_E0_BLOB if policy == "debg-only" else None,
         "new_S3v2b_deBG_equivalence_validated_91": len(comparisons) == 91 if policy == "debg-only" else None,
