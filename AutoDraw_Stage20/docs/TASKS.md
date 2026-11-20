@@ -1,3 +1,12 @@
+## CURRENT ENGINE-001 — S2v1 M2 alpha calibrated but pixel-unsafe; S2v2 E0 NEXT (2026-11-20)
+
+- [x] [BPRED-S2v1 native alpha результат](ENGINE001_BPRED001_S2V1_ALPHA_AA_RESULTS_2026-11-20.md): [CI44651134628](https://github.com/Kiddos19882/AutoDraw/actions/runs/44651134628) SHA4d2c7991 frozen S1 120/120 native calibration, 360 ROI, all H1/H2/H3 PASS, M2 IoU alpha24=.98929861 and FP2167/FN559 -> **unsafe, MODEL_ONLY**. E2 14+10 PASS, archive14589809874 verified; no new Egret rendering; all technical FAIL/history preserved.
+- [x] [BPRED-S2v2 residual prereg](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESIDUAL_PREREG_2026-11-20.md) E0 frozen **before any S2v2 algorithm code/test**, no blind exposure; 3 disjoint held-out angle family folds, weighted PAVA mapping alpha M2 to native per width, fixed H1/H2/H3 and safety gate.
+- [ ] **NEXT один:** S2v2 implement read-only PAVA calibration/evaluation harness, synthetic E2, pinned archive E3 analysis/CI, preserve all residual errors; do not weaken safe-alpha gates or use BLIND.
+- [ ] S3 source-over colors, S4 independent blind, S5 original E/F plan, S6 optimization OPEN; original P4D18 protected FAIL and P4D19 DEFERRED. Production/Stage6/game/master unchanged.
+
+*Ниже прежний S2v1 E0, S1, S0 статусы — история.*
+
 ## CURRENT ENGINE-001 / BPRED-S2v1 E0 frozen BEFORE implementation (2026-11-20)
 
 - [x] [S2 prereg](ENGINE001_BPRED001_S2_PHYSICAL_ALPHA_AA_CALIBRATION_PREREG_2026-11-20.md) locked on HEAD `0dfe1bbd57e8bd70de742f14b2805157b4a0326d`: immutable S1 120 CALIBRATION native source, M0/M1/M2 unchanged P4D16, H1/H2/H3 thresholds, per physical alpha1/24 FP/FN and MAE, no new native renders and S4 BLIND untouched. E2/E3 S2 NOT_RUN when frozen.

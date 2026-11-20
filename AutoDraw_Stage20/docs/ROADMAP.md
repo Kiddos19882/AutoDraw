@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 — BPRED-S2v1 pixel alpha measured, S2v2 calibrated residual NEXT (2026-11-20)
+
+[BPRED-S2v1 native alpha результат](ENGINE001_BPRED001_S2V1_ALPHA_AA_RESULTS_2026-11-20.md): genuine S1 native 120 CALIBRATION ROI analysis at [CI44651134628](https://github.com/Kiddos19882/AutoDraw/actions/runs/44651134628), code4d2c7991; M2 area8 macro alpha24 IoU=.98930 and MAE2.47051, but 2167 FP and 559 FN → still MODEL_ONLY and **not eligible for production**. [BPRED-S2v2 residual prereg](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESIDUAL_PREREG_2026-11-20.md) froze three leave-one-angle-out folds and H1/H2/H3 criteria before new model code. **NEXT:** S2v2 weighted isotonic alpha residual correction on CALIBRATION only → source-over S3 after S2 conclusions → independent BLIND S4 → global E/F S5 → safe stroke optimization S6. P4D18 protected FAIL and exact E4 CHALK not resolved.
+
+*Ниже предыдущий S2 pending roadmap — история.*
+
 ## CURRENT ENGINE-001 — S1 geometric model native PASS; S2 physical alpha predictor NEXT (2026-11-20)
 
 **S1 DONE:** [BPRED-S1 — результаты настоящей кисти](ENGINE001_BPRED001_S1_NATIVE_SOURCE_GEOMETRY_RESULTS_2026-11-20.md) [CI44646682797](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797) SHA `f38f2dbf`: 120 new real Egret CALIBRATION scenes, alpha-centroid M0 odd mean0.71975 vs source M1 0.03204 logical, H1/H2 PASS; source-based bounds alpha24 false negative0 **on calibration only**, do NOT promote native pixel-safety. [Raw native ZIP14589516497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797/artifacts/14589516497). **NEXT S2:** prereg M0/M1/M2 subpixel physical alpha/AA prediction, calibration/native comparison, later S3 color compositing, S4 independent BLIND, S5 global original E/F, S6 quality-preserving cost. No new blind renders/E4/CHALK; P4D18 protected FAIL, P4D19 deferred.
