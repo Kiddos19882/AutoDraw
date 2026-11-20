@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001/BPRED-S3v2r one bounded original native repeated-brush study (2026-11-20)
+
+- [x] [DEC-043 bounded research/visual-quality plan](ENGINE001_BPRED001_BOUNDED_RESEARCH_AND_VISUAL_QUALITY_PLAN_2026-11-20.md) accepted; original old scientific owner-zero and fixed G3>=90% FAIL results preserved; prioritize native gap-spacing/coverage later instead of indefinite RGB byte tests.
+- [x] [New first frozen S3v2r E0](ENGINE001_BPRED001_S3V2R_BOUNDED_REPEAT_CONTRAST_NATIVE_PREREG_2026-11-20.md) Git blob `1909565e0a9e4fc7b742e88f2324b848d8f9e017` committed BEFORE test code, 42 original source scenes with widths3/7/10, two relations, DARK/LIGHT owner, top1 vs8 true original Egret strokes; exact source/controls and first E0, no S0 BLIND.
+- [x] Research-only original Canvas (ф) `tests/engine001_bpred_s3v2r_original_contrast_repeat_observer.js` + (ф) `tests/run_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py` +12 E2 (ф) `tests/test_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py`; new (ф) `.github/workflows/engine001-bpred-s3v2r-bounded-repeat-contrast.yml`, no production change.
+- [ ] **NEXT ONE STEP:** establish S3v2r E2/E3 exact source SHA, 150 true original strokes,300 RGBA bytes+PNG,6 independent original replay+blank, download ZIP CRC+member SHA, preserve T1 owner-negatives/T2 accumulated >2 or alpha changes; write ONE scientific result and decision whether to stop further microprecision. Any old S3v2q owner20, G3 88.65% and protected E/F original FAIL still FAIL. No threshold retune or blind S4; E4/E5/exact CHALK NOT_RUN.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2q true original incremental source micro-alpha measured; owner model still unsafe (2026-11-20)
 
 - [x] Freeze first independent [S3v2q E0](ENGINE001_BPRED001_S3V2Q_NATIVE_INCREMENTAL_MICROALPHA_OWNER_PREREG_2026-11-20.md) blob `ac0bd08ee45058e890ef16c75efea58ca27bec47` before code, retain 80 original Egret true native cases,20 uninstrumented repeat+blank, every real main pre/post/repeat `getImageData` and post-stroke PNG, fixed zero foreign owner, G3 >=90% usefulness and no new model selection.
