@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 — S1 geometric model native PASS; S2 physical alpha predictor NEXT (2026-11-20)
+
+**S1 DONE:** [BPRED-S1 — результаты настоящей кисти](ENGINE001_BPRED001_S1_NATIVE_SOURCE_GEOMETRY_RESULTS_2026-11-20.md) [CI44646682797](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797) SHA `f38f2dbf`: 120 new real Egret CALIBRATION scenes, alpha-centroid M0 odd mean0.71975 vs source M1 0.03204 logical, H1/H2 PASS; source-based bounds alpha24 false negative0 **on calibration only**, do NOT promote native pixel-safety. [Raw native ZIP14589516497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797/artifacts/14589516497). **NEXT S2:** prereg M0/M1/M2 subpixel physical alpha/AA prediction, calibration/native comparison, later S3 color compositing, S4 independent BLIND, S5 global original E/F, S6 quality-preserving cost. No new blind renders/E4/CHALK; P4D18 protected FAIL, P4D19 deferred.
+
+*Ниже предыдущий BPRED-S0 и S1 prereg status — история.*
+
 ## CURRENT ENGINE-001 — S0 complete, BPRED-S1 first unfinished (2026-11-20)
 
 **DONE:** [BPRED-S0 результаты](ENGINE001_BPRED001_S0_CORPUS_MATERIALIZATION_RESULTS_2026-11-20.md) from [CI44644039555](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555) SHA5b6ed18a: archived seven Egret corpora audited for CRC/3961 SHA, E2 17/17 PASS and [consolidated artifact14586574667](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555/artifacts/14586574667); `BPRED001_CORPUS_V1` 251 frozen prospective scenes, **none rendered**. **NEXT:** S1 prereg quantified M0/M1 true Egret geometry/coordinate phase experiment, then source-faithful predictor; S2 alpha, S3 compositing, S4 blind, S5 whole E/F, S6 safe stroke optimisation per [plan](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md). P4D18 quality FAIL; no game/master/production changes.

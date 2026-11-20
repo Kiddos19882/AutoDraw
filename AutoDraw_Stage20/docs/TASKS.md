@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — BPRED-S1 geometry E3 PASS, BPRED-S2 NEXT (2026-11-20)
+
+- [x] [BPRED-S1 — результаты настоящей кисти](ENGINE001_BPRED001_S1_NATIVE_SOURCE_GEOMETRY_RESULTS_2026-11-20.md); prereg [S1 E0](ENGINE001_BPRED001_S1_SOURCE_GEOMETRY_NATIVE_PREREG_2026-11-20.md) committed before tests, SHA `606e3f8e`. Research SHA `f38f2dbf`: native Egret Firefox159 [CI44646682797](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797) 120/120 calibration+blank, 360 centroid observations, H1 mean0.7197485571→0.0320447431 widths1/3 PASS, H2 unchanged other widths PASS, ideal bbox alpha24 false-negative=0 **only calibration**. E2 S1 12/12 + archived P4D14 10/10, 363/363 member SHA, [artifact14589516497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797/artifacts/14589516497); [general validation](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682725) required5/5 PASS.
+- [ ] **NEXT единственный:** BPRED-S2 E0 до нового кода/нативных тестов для physical alpha/AA model M0/M1/M2, затем развитие и проверка на той же calibration; сохранить S0 blind120 и10 blind replay до S4, никаких production gates по centroid.
+- [ ] S3 source-over, S4 blind, S5 whole E/F, S6 safe optimization OPEN. Original protected P4D18 FAIL, P4D19 DEFERRED; E4/E5/run-bound exact CHALK NOT_RUN.
+
+*Ниже прежний S0/S1 backlog — история.*
+
 ## CURRENT ENGINE-001 — BPRED-S1 frozen E0, implementation/testing NEXT (2026-11-20)
 
 - [x] [BPRED-S1 prereg](ENGINE001_BPRED001_S1_SOURCE_GEOMETRY_NATIVE_PREREG_2026-11-20.md) fixed **before new native** at HEAD `e211c58c441a53fbdd9050871aaab6c78ca5ddf9`: frozen S0 120 CALIBRATION only, 3 copy/stroke, H1 M1 odd widths mean logical error ≤0.5 M0 and ≤0.20; H2 other widths identical, full SHA/raw and Firefox159 requirements. S0 BLIND120 remains held out.
