@@ -1,0 +1,150 @@
+name: ENGINE-001 BPRED-S2v4 new original Egret high-alpha-core stress
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s2v4-native-core.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s2v4_native_core.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s2v4_native_core.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-bpred-s2v4-native-core
+  cancel-in-progress: true
+
+jobs:
+  pinned-original-egret-new-native-core:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Firefox 159.0 true Egret Canvas/WebGL
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install pinned existing native reference analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Restore byte-exact E0, original game/renderer and prior model sources
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw 'Pinned Firefox159 not found' }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S2V4_NEW_NATIVE_CORE_VALIDATION_PREREG_2026-11-20.md":"68f34975e9bb6b2262af8d38ba033bece289059e",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py":"ed29df1d559409d5a5783556a12c30d24df7118d",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s2v3_risk_aware_alpha.py":"5e527afa17e975459af937bb277593c53b71f1d9",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==expected,(path,got,expected)
+              Path(path).write_bytes(raw)
+              assert Path(path).read_bytes()==raw
+          print("BPRED_S2V4_FROZEN_NATIVE_SOURCE_PASS",len(pins))
+          '@ | python -
+      - name: E2 distinct new input matrix and original M2 regression tests
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s2v4_native_core.py AutoDraw_Stage20/tests/test_engine001_bpred_s2v4_native_core.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2v4_native_core.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2v3_risk_aware_alpha.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2_alpha_aa_eval.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact original S2v3 guard table; NEVER S0 BLIND
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44657226273 -R Kiddos19882/AutoDraw -n engine001-bpred-s2v3-risk-aware-alpha-calibration -D AutoDraw_Stage20/.bpred-s2v4-frozen-S2v3
+          test -f AutoDraw_Stage20/.bpred-s2v4-frozen-S2v3/report.json
+          test -f AutoDraw_Stage20/.bpred-s2v4-frozen-S2v3/M4_FOLD_WIDTH_GUARDS.json
+      - name: E3 genuinely NEW 120 pinned Egret scenes +10 replays + blank
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s2v4_native_core.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --source-v3 AutoDraw_Stage20/.bpred-s2v4-frozen-S2v3 --output AutoDraw_Stage20/.bpred-s2v4-native
+      - name: Independently audit 131 native PNG and frozen science without relaxing criteria
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path("AutoDraw_Stage20/.bpred-s2v4-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S2V4_NEW_NATIVE_CORE_V1"
+          assert r["github_sha"]==os.getenv("GITHUB_SHA") and r["github_run_id"]==os.getenv("GITHUB_RUN_ID")
+          assert r["new_native_primary_scenes"]==120
+          assert r["new_native_replay_controls"]==10 and r["new_native_blank_scenes"]==1
+          assert r["new_native_total_PNG"]==131
+          assert r["native_blank_alpha0"] and r["all_replay_RGBA_exact"]
+          assert r["native_browser"]["browserVersion"].startswith("159.")
+          assert r["source_parent_S2v3_run"]=="44657226273"
+          assert not r["S0_reserved_BLIND_used"]
+          assert r["threshold_M5_trusted_positive"]==128 and r["threshold_M2_positive"]==24
+          assert r["fixed_gates"]=={
+            "H1_M5_FP_required":0,"H2_M5_TP_retention_min":.90,
+            "H3_width_TP_retention_min":.80,"H3_angle_TP_retention_min":.85}
+          m=r["metrics"]
+          assert m["primary_scene_count"]==120 and m["native_calibration_ROIs"]==360
+          assert all(m[k] in ("PASS","FAIL") for k in (
+            "H1_zero_FP","H2_90pct_TP_retention",
+            "H3_each_width_and_angle_retention","safety_gate_zero_FP"))
+          assert not m["M5_pixel_exact_safe"] and not r["M5_production_promotion"]
+          assert r["E4_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_run_bound_CHALK"] is None
+          rows=[json.loads(z) for z in (root/"CASE_ROWS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==120 and len({x["sample_id"] for x in rows})==120
+          assert set(x["angle_deg"] for x in rows)=={22,111,241}
+          assert all(len(x["cells"])==3 for x in rows)
+          repeat=json.loads((root/"REPLAY_CONTROLS.json").read_text("utf8"))
+          assert len(repeat)==10 and all(x["rgba_exact"] for x in repeat)
+          plans=json.loads((root/"FROZEN_NEW_SCENE_MANIFEST.json").read_text("utf8"))
+          assert plans["total_native_png_planned"]==131
+          assert len(plans["scenes"])==120
+          assert len(list((root/"native").rglob("*_REAL_EGRET.png")))==120
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==10
+          assert (root/"S2V4_REAL_EGRET_BLANK.png").is_file()
+          for name,digest in r["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name
+          print("BPRED_S2V4_NEW_REAL_EGRET_E3_131_PASS",len(r["members_sha256"]))
+          print("BPRED_S2V4_H1_H2_H3",
+                m["H1_zero_FP"],m["H2_90pct_TP_retention"],
+                m["H3_each_width_and_angle_retention"])
+          print("BPRED_S2V4_FP",m["M5_HIGH_ALPHA_CORE"]["FP"])
+          PY
+      - name: Preserve all new native raw PNG, controls, plans, model failures and SHA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s2v4-new-egret-core-131
+          path: AutoDraw_Stage20/.bpred-s2v4-native/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
