@@ -1,0 +1,119 @@
+name: ENGINE-001 BPRED-S2v2 angle-heldout isotonic alpha residual calibration
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s2v2-isotonic.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s2v2_isotonic_eval.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s2v2_isotonic_eval.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-bpred-s2v2-isotonic-calibration
+  cancel-in-progress: true
+
+jobs:
+  source-native-residual-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned original native analytics dependencies
+        run: python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Check E0, source math and frozen parent blobs before training
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESIDUAL_PREREG_2026-11-20.md":"420a9502b665d6405adb8de177d1ea11fe2409f6",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py":"ed29df1d559409d5a5783556a12c30d24df7118d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py":"9f30dbe7cd2e2cb913db1d4f816e74b80668125d",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s1_native_geometry.py":"546f417c4dbddd0974db86b9015bd670326bb2d5",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+          }
+          for path,sha in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==sha,(path,got,sha)
+              Path(path).write_bytes(raw)
+          print("BPRED_S2V2_FROZEN_E0_AND_SOURCE_PINS_PASS",len(pins))
+          PY
+      - name: E2 train-only PAVA, split and old area8 regression
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s2v2_isotonic_eval.py AutoDraw_Stage20/tests/test_engine001_bpred_s2v2_isotonic_eval.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2v2_isotonic_eval.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2_alpha_aa_eval.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact S1 native and S2v1 science raw archives, NOT BLIND
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44646682797 -R Kiddos19882/AutoDraw -n engine001-bpred-s1-real-egret-geometry-calibration-120 -D AutoDraw_Stage20/.bpred-s2v2-native-source
+          gh run download 44651134628 -R Kiddos19882/AutoDraw -n engine001-bpred-s2-native-alpha-aa-calibration-120 -D AutoDraw_Stage20/.bpred-s2v2-v1-source
+          test -f AutoDraw_Stage20/.bpred-s2v2-native-source/report.json
+          test -f AutoDraw_Stage20/.bpred-s2v2-v1-source/report.json
+      - name: Fit only other two angle families, test heldout angle, archive all negatives
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s2v2_isotonic_eval.py \
+            --workspace . \
+            --source-native AutoDraw_Stage20/.bpred-s2v2-native-source \
+            --source-s2v1 AutoDraw_Stage20/.bpred-s2v2-v1-source \
+            --output AutoDraw_Stage20/.bpred-s2v2-result
+      - name: Independently check frozen folds and model-only safety
+        run: |
+          python - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          d=Path("AutoDraw_Stage20/.bpred-s2v2-result")
+          x=json.loads((d/"report.json").read_text("utf8"))
+          assert x["experiment"]=="ENGINE001_BPRED_S2V2_ANGLE_HOLDOUT_ISOTONIC_ALPHA_V1"
+          assert x["github_sha"]==os.getenv("GITHUB_SHA") and x["github_run_id"]==os.getenv("GITHUB_RUN_ID")
+          assert x["source_native_members_verified"]==363 and x["parent_S2v1_run"]=="44651134628"
+          assert x["source_calibration_cases"]==120 and x["validation_scenes"]==120
+          assert x["angle_heldout_fold_count"]==3 and x["trained_width_tables"]==30
+          assert x["new_native_scenes_rendered"]==0 and x["blind_S0_cases_evaluated"]==0
+          assert not x["production_promotion"] and x["exact_run_bound_CHALK"] is None
+          assert x["fixed_thresholds"]=={
+            "H1_MAE_ratio_max":.97,"H2_FP_ratio_max":.90,
+            "H2_FN_ratio_max":1.25,"H3_IoU_max_loss":.002}
+          m=x["metrics"]
+          assert all(m[f] in ("PASS","FAIL") for f in (
+            "hypothesis_H1_M3_MAE_improvement",
+            "hypothesis_H2_M3_FP_reduction_FN_bound",
+            "hypothesis_H3_M3_IoU_noninferiority"))
+          entries=[json.loads(z) for z in (d/"CASE_ROWS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(entries)==120 and len({r["sample_id"] for r in entries})==120
+          assert all(r["fold_heldout_angle"]==r["angle_deg"] for r in entries)
+          knots=json.loads((d/"M3_FOLD_WIDTH_KNOTS.json").read_text("utf8"))
+          assert len(knots["knot_tables"])==30
+          assert set(knots["folds"])=={7,73,166}
+          for path,sha in x["members_sha256"].items():
+              assert hashlib.sha256((d/path).read_bytes()).hexdigest()==sha,path
+          assert len(x["members_sha256"])==2
+          print("BPRED_S2V2_E2_CI_TRUE_NATIVE_SOURCE_AUDIT_PASS",len(entries))
+          print("BPRED_S2V2_SCIENCE",m["hypothesis_H1_M3_MAE_improvement"],
+                m["hypothesis_H2_M3_FP_reduction_FN_bound"],
+                m["hypothesis_H3_M3_IoU_noninferiority"])
+          PY
+      - name: Preserve complete model-only output including scientific failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s2v2-isotonic-angle-heldout-calibration
+          path: AutoDraw_Stage20/.bpred-s2v2-result/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
