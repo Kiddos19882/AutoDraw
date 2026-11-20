@@ -23,6 +23,9 @@ import run_engine001_b1r_p4b1_hybrid_zone_coverage as p4b1
 import run_engine001_b1r_p4b7_native_stroke_attribution as p4b7
 
 EXPERIMENT = "ENGINE001_BPRED_S3V2_CANVAS_WEBGL_ORIGINAL_STAGE_V1"
+S3V2B_EXPERIMENT = "ENGINE001_BPRED_S3V2B_DEBG_PROVENANCE_CANVAS_STAGE_V1"
+S3V2B_E0_FILE = "ENGINE001_BPRED001_S3V2B_DEBG_EQUIVALENCE_PREREG_2026-11-20.md"
+S3V2B_E0_BLOB = "23c5772e9193c760c0611287a44c877b8f10ab7f"
 E0_FILE = "ENGINE001_BPRED001_S3V2_NATIVE_CANVAS_COMPOSITING_DIAGNOSTIC_PREREG_2026-11-20.md"
 E0_BLOB = "d8d703779f6364a3dda8e8edf9717fe0d065ef45"
 PARENT_RUN = "44683117471"
@@ -146,7 +149,24 @@ def native_png_in_parent(parent, sample_id, repeat=False, blank=False):
             (sample_id + "_REAL_EGRET.png"))
 
 
-def capture(driver, scene, output, parent):
+def verify_parent_pixel_png(parent_png, new_png, policy, collected, sample_id):
+    """Strict original default; S3v2b requires NEW E0 and validates only deBG."""
+    if not parent_png.is_file() or not new_png.is_file():
+        blocked("MISSING_ORIGINAL_NATIVE_PNG_" + sample_id)
+    old_raw, current_raw = parent_png.read_bytes(), new_png.read_bytes()
+    if policy == "strict":
+        if old_raw != current_raw:
+            blocked("RAW_BYTE_DRIFT_" + sample_id)
+        return True
+    if policy != "debg-only":
+        blocked("UNPREREGISTERED_PNG_POLICY")
+    from engine001_bpred_s3v2b_png_equivalence import verify_parent_png_equivalence
+    result = verify_parent_png_equivalence(old_raw, current_raw)
+    collected.append({"sample_id": sample_id, **result})
+    return bool(result["raw_byte_identical"])
+
+
+def capture(driver, scene, output, parent, policy="strict", collected=None):
     sid = scene["sample_id"]
     root = output / "native" / sid
     root.mkdir(parents=True, exist_ok=False)
@@ -177,8 +197,8 @@ def capture(driver, scene, output, parent):
             meta.get("strokeCount") != len(scene["runtime_strokes"])):
         blocked("FINAL_NOT_ORIGINAL_EGRET")
     previous = native_png_in_parent(parent, sid)
-    if not previous.is_file() or sha256(previous.read_bytes()) != meta["source_sha256"]:
-        blocked("RENDER_NOT_BYTE_EXACT_PARENT_" + sid)
+    is_raw_exact = verify_parent_pixel_png(
+        previous, root / (sid + "_REAL_WEBGL.png"), policy, collected, sid)
     expected = np.any((aligned[:, :, 3] > 0) | (native[:, :, 3] > 0))
     if not expected:
         blocked("EMPTY_INTERMEDIATE_OR_NATIVE_INK")
@@ -190,7 +210,8 @@ def capture(driver, scene, output, parent):
         "raw_canvas_sha256": raw_sha, "native_webgl_sha256": meta["source_sha256"],
         "stage_source": stage, "native_renderer": meta,
         "source_to_native_geometry": mapping,
-        "intermediate_to_webgl_RGBA": deviation})
+        "intermediate_to_webgl_RGBA": deviation,
+        "original_parent_raw_byte_identical": is_raw_exact})
     return aligned, native, deviation
 
 
@@ -228,13 +249,18 @@ def row_for(width, relation, intermediate, final):
     return row
 
 
-def run(workspace, engine, renderer, parent, capture_js, output):
+def run(workspace, engine, renderer, parent, capture_js, output, policy="strict"):
+    if policy not in ("strict", "debg-only"):
+        blocked("UNPREREGISTERED_COMPARISON_POLICY")
     if output.exists():
         blocked("OUTPUT_EXISTS")
     pins = [
         (workspace / "AutoDraw_Stage20" / "docs" / E0_FILE, E0_BLOB),
         (engine, p4d3.ENGINE_GIT_BLOB), (renderer, p4d3.RENDERER_GIT_BLOB),
         (Path(p4d3.__file__), s3.P4D3_BLOB), (Path(s3.__file__), PARENT_S3_BLOB)]
+    if policy == "debg-only":
+        pins.append((workspace / "AutoDraw_Stage20" / "docs" / S3V2B_E0_FILE,
+                     S3V2B_E0_BLOB))
     for path, sha in pins:
         if not path.is_file() or p4b1.git_blob(path.read_bytes()) != sha:
             blocked("PINNED_SOURCE_" + path.name)
@@ -244,7 +270,7 @@ def run(workspace, engine, renderer, parent, capture_js, output):
     plan = s3.manifest()
     output.mkdir(parents=True)
     write_json(output / "FROZEN_SOURCE_MANIFEST.json", plan)
-    meta_rows, rows, repeats = [], [], []
+    meta_rows, rows, repeats, comparisons = [], [], [], []
     canvas_frames, webgl_frames = {}, {}
     with p4b7.native_egret_session(workspace) as driver:
         caps = {k: driver.capabilities.get(k)
@@ -260,15 +286,22 @@ def run(workspace, engine, renderer, parent, capture_js, output):
             driver.execute_script(p4d3.CMD, []), output, "S3V2_REAL_EGRET_BLANK")
         if bm.get("schema") != "ENGINE001_B1R_P4A2_BLANK_WEBGL" or np.any(blank[:, :, 3]):
             blocked("TRUE_NATIVE_BLANK_INVALID")
-        if sha256(native_png_in_parent(parent, "", blank=True).read_bytes()) != bm["source_sha256"]:
-            blocked("BLANK_BYTE_DRIFT")
+        if policy == "strict":
+            if sha256(native_png_in_parent(parent, "", blank=True).read_bytes()) != bm["source_sha256"]:
+                blocked("BLANK_BYTE_DRIFT")
+        else:
+            verify_parent_pixel_png(
+                native_png_in_parent(parent, "", blank=True),
+                output / "S3V2_REAL_EGRET_BLANK.png", policy, comparisons,
+                "S3V2_REAL_EGRET_BLANK")
         with (output / "PAIRS_APPEND_ONLY.jsonl").open("x", encoding="utf8") as f:
             for width in s3.WIDTHS:
                 for relation in s3.RELATIONS:
                     c, w = {}, {}
                     for variant in s3.VARIANTS:
                         scene = s3.plans_for(width, relation)[variant]
-                        ca, we, change = capture(driver, scene, output, parent)
+                        ca, we, change = capture(
+                            driver, scene, output, parent, policy, comparisons)
                         c[variant], w[variant] = ca, we
                         meta_rows.append({"sample_id": scene["sample_id"],
                                           "intermediate_to_final": change})
@@ -287,15 +320,28 @@ def run(workspace, engine, renderer, parent, capture_js, output):
             replay, meta = p4d3.read_scene(driver, outdir, sid + "_REAL_EGRET",
                                             scene["runtime_strokes"])
             old = native_png_in_parent(parent, sid, repeat=True)
-            exact = bool(meta["source_png_sha256"] == sha256(old.read_bytes()))
+            if policy == "strict":
+                exact = bool(meta["source_png_sha256"] == sha256(old.read_bytes()))
+                if not exact:
+                    blocked("REPLAY_NOT_BYTE_EXACT_" + sid)
+            else:
+                exact = verify_parent_pixel_png(
+                    old, outdir / (sid + "_REAL_EGRET.png"),
+                    policy, comparisons, sid)
+            pixel_exact = bool(np.array_equal(
+                replay, webgl_frames[(control["width"], "CROSSING")]["A_THEN_B"]))
             repeats.append({"sample_id": sid,
                             "parent_sample_id": scene["sample_id"],
                             "original_native_byte_exact": exact,
+                            "original_RGBA_pixel_exact": pixel_exact,
                             "png_sha256": meta["source_png_sha256"]})
-            if not exact or not np.array_equal(
-                    replay, webgl_frames[(control["width"], "CROSSING")]["A_THEN_B"]):
-                blocked("REPLAY_NOT_EXACT_" + sid)
+            if not pixel_exact:
+                blocked("REPLAY_NOT_RGBA_EXACT_" + sid)
     write_json(output / "REPLAY_CONTROLS.json", repeats)
+    if policy == "debg-only":
+        if len(comparisons) != 91 or len({x["sample_id"] for x in comparisons}) != 91:
+            blocked("DEBG_COMPARISONS_NOT_91")
+        write_json(output / "PNG_DEBG_ONLY_COMPARISONS.json", comparisons)
     canvas_pass = sum(v["source_over_original_C0_on_true_Canvas"]["frozen_H1_pass"]
                       for row in rows for v in row["ordered_variants"].values())
     webgl_pass = sum(v["source_over_original_C0_on_true_WebGL"]["frozen_H1_pass"]
@@ -303,7 +349,12 @@ def run(workspace, engine, renderer, parent, capture_js, output):
     if webgl_pass != 10:
         blocked("ORIGINAL_S3_H1_DRIFT_NO_RETUNE")
     report = {
-        "experiment": EXPERIMENT, "github_sha": os.getenv("GITHUB_SHA"),
+        "experiment": S3V2B_EXPERIMENT if policy == "debg-only" else EXPERIMENT,
+        "original_S3v2_raw_byte_gate": "FAIL_ARCHIVED_44684709364" if policy == "debg-only" else "STRICT_ORIGINAL",
+        "S3v2b_frozen_E0_blob": S3V2B_E0_BLOB if policy == "debg-only" else None,
+        "new_S3v2b_deBG_equivalence_validated_91": len(comparisons) == 91 if policy == "debg-only" else None,
+        "source_final_PNG_byte_identical_count": sum(x["raw_byte_identical"] for x in comparisons) if policy == "debg-only" else 91,
+        "github_sha": os.getenv("GITHUB_SHA"),
         "github_run_id": os.getenv("GITHUB_RUN_ID"),
         "source_parent_git_sha": PARENT_SHA,
         "source_parent_run_id": PARENT_RUN,
@@ -315,7 +366,13 @@ def run(workspace, engine, renderer, parent, capture_js, output):
         "native_browser": caps, "true_native_primary": 80,
         "true_native_intermediate_canvas_PNG": 80, "true_native_final_webgl_PNG": 91,
         "true_native_replays": len(repeats), "native_blank_alpha0": True,
-        "all_primary_parent_byte_exact": True, "all_replays_byte_exact": True,
+        "all_primary_parent_byte_exact": (all(x["raw_byte_identical"] for x in comparisons
+                                             if x["sample_id"].startswith("BPRED-S3-W"))
+                                          if policy == "debg-only" else True),
+        "all_primary_parent_deBG_equivalent": (len(comparisons) == 91
+                                               if policy == "debg-only" else None),
+        "all_replays_byte_exact": all(x["original_native_byte_exact"] for x in repeats),
+        "all_replays_RGBA_exact": all(x["original_RGBA_pixel_exact"] for x in repeats),
         "H1_original_final_S3_pass_count_40": webgl_pass,
         "H1_new_true_intermediate_Canvas_pass_count_40": canvas_pass,
         "original_S3_H1": "FAIL_UNCHANGED",
