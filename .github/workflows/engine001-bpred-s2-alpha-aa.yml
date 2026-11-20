@@ -92,7 +92,7 @@ jobs:
             "H2_MAE_ratio_max":.90,"H3_odd_vs_naive_IoU_delta_min":.025}
           m=r["metrics"]
           assert m["n_cases"]==120 and m["n_correlated_location_rois"]==360
-          assert sorted(m["per_width"].keys())==list(map(str,range(1,11)))
+          assert sorted(m["per_width"].keys(),key=int)==list(map(str,range(1,11)))
           assert set(m["per_angle"])=={"7","73","166"}
           assert all(m[k] in ("PASS","FAIL") for k in (
              "hypothesis_H1_M2_alpha24_macro_vs_M1",
