@@ -117,8 +117,6 @@ def verify_parent(z):
             blocked("PARENT_PLAN_SHA")
         sample = row["sample_id"]
         stem = "native/" + sample + "/" + sample
-        if (json.loads(z.read(stem + "_REAL_WEBGL.png")) if False else False):
-            blocked("UNREACHABLE")  # no reinterpretation of PNG
         folder = "native/" + sample + "/"
         if (json.loads(z.read(folder + "SOURCE_PLAN.json")) != row["source_strokes"]
                 or json.loads(z.read(folder + "RUNTIME_PLAN.json")) != row["runtime_strokes"]):
