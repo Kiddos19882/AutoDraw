@@ -33,16 +33,23 @@ class S3v2lFrozenRgbLattice(unittest.TestCase):
         self.assertTrue(all(p.shape==(3,3) and p.dtype==np.uint8 for p in predicted))
         self.assertTrue(any(not np.array_equal(predicted[0],p) for p in predicted[1:]))
 
-    def test_04_F2_all_three_F1_candidates_inside_bounds(self):
+    def test_04_F2_endpoint_rounding_is_not_a_guaranteed_F1_superset(self):
+        # Frozen F2 checks alpha endpoints only. At intermediate A, floor/ceil
+        # integer premultiplied p can jump across a discretization threshold.
+        # Preserve this negative mathematical counterexample; do NOT widen F2.
         color=[228,77,156]
         a=np.array([1.,2.,13.,32.,63.,127.,254.])
         lo,hi=l.f2_lattice_interval(color,a)
         self.assertEqual(lo.shape,(7,3))
         self.assertTrue(np.all(lo>=0) and np.all(hi<=255))
-        for mode in l.F1_MODES:
-            fixed=l.premul_roundtrip(color,a,mode)
-            self.assertTrue(np.all(fixed>=lo-1e-9))
-            self.assertTrue(np.all(fixed<=hi+1e-9))
+        nearest=l.premul_roundtrip(color,a,"nearest_even")
+        self.assertTrue(np.all((nearest>=lo-1e-9)&(nearest<=hi+1e-9)))
+        floor=l.premul_roundtrip(color,a,"floor")
+        self.assertEqual(int(floor[1,0]),128)
+        self.assertGreater(float(lo[1,0]),128)
+        self.assertTrue(np.any((floor<lo-1e-9)|(floor>hi+1e-9)))
+        ceil=l.premul_roundtrip(color,a,"ceil")
+        self.assertTrue(np.any((ceil<lo-1e-9)|(ceil>hi+1e-9)))
 
     def test_05_F2_uses_fixed_plus_minus_two_RGB_not_new_quality_threshold(self):
         self.assertEqual(l.RGB_PADDING,2.)
