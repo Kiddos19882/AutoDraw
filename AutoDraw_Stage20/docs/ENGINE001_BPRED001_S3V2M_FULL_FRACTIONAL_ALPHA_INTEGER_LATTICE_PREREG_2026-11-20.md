@@ -1,0 +1,29 @@
+# ENGINE-001 / BPRED-S3v2m — E0 FROZEN: полный диапазон физической альфы и целочисленная решётка premult RGB
+
+**Дата 2026-11-20; prereg до кода, E2, вычисления на данных и CI.** Только следующий S3 диагностический шаг, без S0 BLIND, S4–S6, production, master, оригинального Egret/Stage6/Bridge/Monitor. Не менять прежние scientific FAIL, H1 max≤2/mean≤1, foreign-owner0 и оригинальные E/F quality gates.
+
+## 1. Неподвижный baseline
+
+[Результаты S3v2l](ENGINE001_BPRED001_S3V2L_ISOLATED_RGB_PREMULT_LATTICE_RESULTS_2026-11-20.md) original E2 [CI44743578450](https://github.com/Kiddos19882/AutoDraw/actions/runs/44743578450) source SHA `bc4d45e8ad5d1d063bbb750ce78c19452fff7e09`, frozen E0 blob `85ea039ad6b1683b40297ed307ec750c021b4630`: 40 genuine original isolated owner PNG, 8648 partial alpha pixels, F2 endpoint-only interval ±2 **D2 FAIL327**, D3 useful7131/7753 PASS; alpha255 original source exact53752/53752. 327 negatives include alpha1..15=172, alpha16..63=155; no alpha≥64. Original S3v2k owner interval **FAIL3186**, 21 true owner RGB changes at top isolated alpha0; source C0 Canvas31/40 and WebGL QH21/40 scientific FAIL. F2 endpoint-only misses an interior discontinuity: `C=[228,77,156],A=2` floor integer premult R128 at interior, F2 endpoint lower168. Never revise F2 result.
+
+Input immutable S3v2j original [CI44721915503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44721915503) SHA `ad1fa7fd66d4df563d729b7faae27651ca8279ea`, original raw 857 ZIP entries /856 SHA, 80 scenes, 40 isolated A/B genuine PNG; original S3v2l diagnostic [artifact14630989895](https://github.com/Kiddos19882/AutoDraw/actions/runs/44743578450/artifacts/14630989895) 3 entries/2 SHA, 327 frozen physical negative pixels; original S3v2k negative [artifact14630379548](https://github.com/Kiddos19882/AutoDraw/actions/runs/44741517301/artifacts/14630379548) 3186 negative pixels/3 SHA. Verify all three ZIP CRC+SHA, original source provenance and all original negative counts **before** new calculations. No regenerate source plan angles, no use of S0 BLIND.
+
+## 2. Exact frozen G0/G1/G2 arithmetic
+
+For each true original isolated owner pixel where native exported alpha byte `A∈[1,254]`, original declared owner source channel `C∈[0,255]`, true observed original exported RGB `R`, define latent **physical alpha in byte units** `a∈[a_min,a_max]=[A−0.5,A+0.5]` (strictly positive for A≥1), as a **hypothesis** of nearest-byte alpha rounding, NOT a proven Firefox raster guarantee. Define candidate integer premultiplied byte `p` from `floor(C*a/255)`, nearest-even `rint(C*a/255)` or `ceil(C*a/255)`, clipped to 0..255. For fixed `C≥0`, all such p across continuous alpha interval are conservatively bounded by `p_min=floor(C*a_min/255)`, `p_max=ceil(C*a_max/255)`. **G1 full interval:** `R_min=clip(floor(255*p_min/a_max+0.5)−2,0,255)`; `R_max=clip(floor(255*p_max/a_min+0.5)+2,0,255)`. The 2-byte padding is the unchanged previous F2 *diagnostic envelope*, NOT new permissible owner damage or H1 acceptance. Evaluate all 3 RGB channels independently; no fitted parameter, no selecting best p per pixel. `G0` is unchanged F2 endpoint-only and its 327 misses. `G2` marks `UNKNOWN_LOW_ALPHA` for A≤15, or any G1 RGB channel width>16; otherwise `INFORMATIVE_INTERVAL` only, NEVER safe/protected/accepted. Native alpha0 is UNKNOWN and alpha255 must match original declared source exactly as an independent unchanged control.
+
+This G1 bound is mathematically complete **only conditional on the chosen continuous-alpha/byte-p rounding family**; it does not establish that Firefox's native export follows that family, nor bound the actual source-over blending, hidden alpha0 effects or arbitrary GPU/CPU rasterization. Do not label G1 `exact native model` even if all original observed pixels fall within.
+
+## 3. Frozen outcomes and reporting
+
+**D0 provenance:** verify original native 856 SHA+CRC, previous S3v2l 2 SHA+CRC, previous S3v2k 3 SHA+CRC, exact original S3v2l F2 327 negatives, source isolated 40 and original source plans. Any mismatch BLOCKED.
+
+**D1 G1 source RGB coverage:** all 8648 original isolated partial-alpha pixels must be contained by G1 RGB intervals; **zero** outside -> scientific `PASS_SOURCE_KNOWN_ONLY`, else `FAIL`. Preserve every miss with source ID, physical pixel x/y, owner RGB, original RGBA, G0 and G1 bounds. Report separate recovery of original **327 F2 negative** physical coordinates and counts, not just overall. Never pad more after observing result.
+
+**D2 nonvacuity:** among original isolated native A∈[16,254] (previously7753), G1 interval width≤16 for **all three channels in ≥90%**; else `FAIL`. Record width/alpha bin and UNKNOWN counts including all A1..15; do not drop uncertain pixels.
+
+**D3 native controls:** source alpha255 owner color exact53752/53752, original source C0 Canvas31/40, QH WebGL21/40, S3v2k 3186, hidden alpha0 damage21 and S3v2l F2 misses327 all unchanged. If any baseline drift, BLOCKED. Scientific G1 PASS does not fix original source-over, foreign owner0, or protected E/F P4D18 FAIL.
+
+**D4 monotonic bounds:** synthetic unit tests for all C∈0..255 and A∈1..254 at low/high and interior alpha samples (A−0.5,A−0.25,A,A+0.25,A+0.5) and 3 rounding modes must lie in G1 interval **before running on original data**; include counterexample C228 A2 floor pR128. Fail closed on invalid shape/alpha, source provenance, stale E0, output existing, empty/duplicate ZIP or missing negative. Do not assert mathematical completeness for untested native implementation.
+
+**Next after this E2 diagnostic:** separately preregister *new original native Egret E3* held-out scenes (new colors/phase/angles, not S3v2j known data), test G1 source export and protected owner effects before considering pixel-safe. If G1 fails, preserve negative and revisit assumptions in separately versioned E0. No S0 BLIND until S3 independently source-safe; E4/E5/exact CHALK NOT_RUN.
