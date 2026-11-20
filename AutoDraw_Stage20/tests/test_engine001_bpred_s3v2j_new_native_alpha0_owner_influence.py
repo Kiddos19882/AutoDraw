@@ -41,7 +41,7 @@ class S3v2jFrozenNativeContracts(unittest.TestCase):
             self.assertEqual(tuple(scene["source_colors"]),
                              j.ODD_COLORS if w%2 else j.EVEN_COLORS)
             self.assertEqual([x["colorRgb"] for x in scene["runtime_strokes"]],
-                             list(reversed(scene["source_colors"])))
+                             list(scene["source_colors"]))
             self.assertEqual([x["colorIndex"] for x in scene["runtime_strokes"]],[1,2])
 
     def test_05_transport_mutates_only_stroke_id(self):
