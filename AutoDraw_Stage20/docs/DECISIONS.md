@@ -1,9 +1,19 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-042`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-043`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
+
+## DEC-043. ENGINE-001: ограничить микроскопические исследования; визуальная полезность отдельно от научной pixel-safe точности
+
+**2026-11-20. Статус: ACCEPTED RESEARCH DIRECTION; NOT PRODUCTION/NOT NEW ACCEPTANCE.** Пользователь подтвердил, что изменения RGB, неразличимые человеком, в принципе простительны; согласовал более точную очередность полезных математических/native испытаний и продолжение S3 без фанатичного поиска нулевой погрешности. [Детальный ограниченный план](ENGINE001_BPRED001_BOUNDED_RESEARCH_AND_VISUAL_QUALITY_PLAN_2026-11-20.md) дополняет, но не заменяет [BPRED-S0..S6](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) и DEC-042.
+
+**Ключевое разделение:** `pixel-exact/scientific E0` и `image-visible/conditional admissibility` — разные критерии. S3v2q 20 true second-stroke owner changes, G3 useful7653/8633<90%, старые S3v2p harms17 и P4D18 E/F protected FAIL **остаются FAIL**. Изменение канала RGB на1–2 байта — лишь **предварительно исследуемая** визуальная гипотеза: без accumulated RGB harm, alpha/contour/white/protected leakage, по original target map. Никакого автоматического разрешения protected foreign>0, сдвига 3 logical px, ухудшения деталей или изменения исторического threshold. Чтобы принять новый future visual gate, отдельно E0/новый native holdout/решение, без подгонки S3v2q.
+
+**Приоритет и stop rule:** ровно один ограниченный source-native S3v2r опыт на повторных original strokes и контрастных подложках с raw pre/post; один decision report. Если отличие ограничено невидимыми цветами, без накопления/перекрашивания/alpha harm, **остановить поиск внутреннего округления** (не объявляя его понятым) и переходить по утверждённому маршруту к независимой validation/физическим тестам spacing/overdraw для whole-image S5. Если вред значим, адресный E0 только по причине, не бесконечные v2x. В S5 больше пользы у native spacing, реальные alpha0 holes, кратность перекрытий, phase/angle/endpoints, реальный multicolor order; WebGL фокус только при новом подтверждённом stage mismatch. S6 — после качества, CHALK только E4 `post.pointCount-pre.pointCount`.
+
+**Разрешения:** исследовательский план и эта политика не позволяют production/master/Stage6/Bridge/Monitor правок, S0 BLIND не вскрывается из-за одного CI. Все прежние реестры исходных raw и негативных результатов сохраняются.
 
 ## DEC-042. ENGINE-001: адаптивные критерии применимости штриха, неизменные hard quality gates
 
