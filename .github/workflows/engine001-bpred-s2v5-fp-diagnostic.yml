@@ -1,0 +1,108 @@
+name: ENGINE-001 BPRED-S2v5 original native FP3 diagnostic
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s2v5-fp-diagnostic.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s2v5_fp_diagnostic.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s2v5_fp_diagnostic.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-bpred-s2v5-frozen-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  frozen-raw-source-diagnostic:
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          lfs: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen native geometry dependencies (offline analytics only)
+        shell: bash
+        run: python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Pin frozen E0 and source math blobs before audit
+        shell: bash
+        run: |
+          python - <<'PY'
+          import subprocess,hashlib
+          expect={
+            'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_PREREG_2026-11-20.md':'05b4caded0264b643d6748fd19bc9ffd39acb532',
+            'AutoDraw_Stage20/tests/run_engine001_bpred_s2v4_native_core.py':'366ee70961ea97622c18dc639475aa6548829cb2',
+            'AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py':'ed29df1d559409d5a5783556a12c30d24df7118d',
+            'AutoDraw_Stage20/tests/game_renderer_reference.js':'76d950e0a8911888a9df3b675b866519ecf7bba4',
+            'AutoDraw_Stage20/gameEngine/main.min_653f95bc.js':'46cc74de00b6cb5d207b1e1a2ffcd81613b6d388'
+          }
+          for path,sha in expect.items():
+              raw=subprocess.check_output(['git','show','HEAD:'+path])
+              calc=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+              assert calc==sha,(path,calc,sha)
+          print('BPRED_S2V5_E0_AND_SOURCE_PINS_PASS',len(expect))
+          PY
+      - name: Synthetic E2 diagnostic regressions and docs integrity
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s2v5_fp_diagnostic.py AutoDraw_Stage20/tests/test_engine001_bpred_s2v5_fp_diagnostic.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2v5_fp_diagnostic.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2v4_native_core.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download ORIGINAL frozen S2v4 Egret raw archive; never S0 BLIND
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44659022526 -R Kiddos19882/AutoDraw -n engine001-bpred-s2v4-new-egret-core-131 -D AutoDraw_Stage20/.bpred-s2v5-original-source
+          test -f AutoDraw_Stage20/.bpred-s2v5-original-source/report.json
+          test -f AutoDraw_Stage20/.bpred-s2v5-original-source/FROZEN_NEW_SCENE_MANIFEST.json
+      - name: Reconstruct exact three alpha false positives and failed H3 strata
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s2v5_fp_diagnostic.py --workspace . --source AutoDraw_Stage20/.bpred-s2v5-original-source --output AutoDraw_Stage20/.bpred-s2v5-results
+      - name: Independently check diagnostics match original scientific FAIL
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path('AutoDraw_Stage20/.bpred-s2v5-results')
+          r=json.loads((root/'report.json').read_text('utf8'))
+          assert r['github_sha']==os.environ['GITHUB_SHA']
+          assert r['source_sha']=='2faf01de258da005edec5b4d59a6ca5d48d63e74'
+          assert r['source_artifact_id']==14593824723
+          assert r['original_raw_members_reverified']==376
+          assert r['real_original_native_png_count']==131
+          assert r['reconstructed_original_families']==120 and r['physical_ROIs']==360
+          assert (r['original_H1'],r['original_H2'],r['original_H3'])==('FAIL','PASS','FAIL')
+          assert r['M5_false_positive_count']==3 and len(r['strata_failing'])>=1
+          assert not r['evidence']['S2v4_pixel_safe']
+          assert r['evidence']['S0_BLIND_source_read'] is False
+          assert r['evidence']['native_E3_new']=='NOT_RUN'
+          assert r['evidence']['production_promotion'] is False
+          assert len((root/'SAMPLE_STRATA.jsonl').read_text('utf8').splitlines())==120
+          for name,sha in r['members_sha256'].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print('BPRED_S2V5_RECONSTRUCTED_FP3',r['M5_false_positive_count'])
+          print('BPRED_S2V5_DIAGNOSTIC_FAILING_GROUPS',r['strata_failing'])
+          print('BPRED_S2V5_NO_SAFETY_PROMOTION')
+          PY
+      - name: Preserve immutable diagnostic report and original failure coordinates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s2v5-original-fp3-H3-diagnostic
+          path: AutoDraw_Stage20/.bpred-s2v5-results/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
