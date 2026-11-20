@@ -87,6 +87,7 @@ jobs:
         env:
           BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
         run: |
+          $env:AUTODRAW_PINNED_FIREFOX_BINARY = $env:BROWSER_PATH
           $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
           python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2c_multicapture_trace.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --parent AutoDraw_Stage20/.bpred-s3-source --output AutoDraw_Stage20/.bpred-s3v2c-trace
       - name: Independently verify original eight scenes and all multi-stage PNG hashes
