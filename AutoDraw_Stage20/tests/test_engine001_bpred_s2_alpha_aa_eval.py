@@ -66,8 +66,9 @@ class TestBpredS2(unittest.TestCase):
         cases=[]
         for w in range(1,11):
             for k in range(12):
-                cases.append({"width":w,"angle_deg":7,"length_logical":7,
-                    "phase_x":1/16,"phase_y":3/16,
+                cases.append({"width":w,"angle_deg":s2.ANGLES[k//4],
+                    "length_logical":s2.LENGTHS[(k//2)%2],
+                    "phase_x":s2.PHASES[k%2][0],"phase_y":s2.PHASES[k%2][1],
                     "cells":[{"models":{name:metric(.9) for name,_ in s2.MODE_MAP}} for _ in range(3)]})
         out=s2.aggregate(cases)
         self.assertEqual(out["hypothesis_H1_M2_alpha24_macro_vs_M1"],"FAIL")
