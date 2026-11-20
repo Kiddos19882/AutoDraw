@@ -1,0 +1,188 @@
+name: ENGINE-001 BPRED-S3v2p actual Canvas getImageData versus PNG source readback
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2p-native-canvas-readback-vs-composition.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2p-canvas-readback
+  cancel-in-progress: true
+jobs:
+  true-original-egret-main-readback:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original native Firefox 159.0
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install source native Egret and exact-rational analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify frozen S3v2p E0 and full untouched native original Egret source
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw "Missing pinned Firefox 159" }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2O_NEW_NATIVE_LOW_ALPHA_READBACK_PREREG_2026-11-20.md": "72343545d1f8645625085afb36e5fddeda2f91c8",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_PREREG_2026-11-20.md": "6801292e01a650a2b014ffe09256313ebe10562b",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2N_CORRELATED_ALPHA_PREMULT_TRANSITIONS_PREREG_2026-11-20.md": "81f1a18ed5b04265123c337a3cbd63985a835307",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js": "76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js": "250a6f46c12498c15157825664a08ee4f12a2b83",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js": "de3b5c5f956e3de7a71817830874b346904bc9e2",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js": "383e0b25000f4c387687fb38423dce790f149499",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py": "42167e9dbcfad55dcb38216a335f61a0b93989e5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py": "c55e13bbcf9d2786f741a56ee7a6b39873fee89f",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2P_NATIVE_CANVAS_READBACK_VS_COMPOSITION_PREREG_2026-11-20.md": "44d6f3d72ed6c62f38054d11f050ee16cab50bc2",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2p_canvas_readback_observer.js": "137638cde42ce36e14abb917994f1cbb12bac0b2",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2I_ALL_NATIVE_STROKE_EVENTS_PREREG_2026-11-20.md": "9350e69c5f83747a46c71eeb9142065be928a7a5",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2H_NATIVE_CANVAS_STROKE_STEP_PREREG_2026-11-20.md": "75255a7f48d5be00a34a164edb2bcf03e6349d76",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py": "1bf56df9507f2a34fd16e68eef190229c3184ce5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "511e81a362c4340e0dfdc36a292faa9cb2ef1e83",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2c_multicapture_trace.py": "974de6a86359e9ff49e2e77ee1f420dffa08064b",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2f_prospective_native_rgba8.py": "0c3b799f6bc22958911d35420a30fef1950813dd",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2i_all_native_stroke_events.py": "fdb1542437d645875c305f94bfddef007b4c3e40",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2h_native_stroke_steps.py": "4ae040c6f3720a5ee8fba43e0e4e9acd640264cd",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py": "3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py": "82f8e0c3f3e10fb30ea61d1beb52edf98696563c"
+          }
+          for path,expected in pins.items():
+            raw=subprocess.check_output(["git","show","HEAD:"+path])
+            sha=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+            assert sha==expected,(path,sha,expected)
+            Path(path).write_bytes(raw)
+            assert Path(path).read_bytes()==raw
+          print("S3V2O_FIRST_FROZEN_E0_AND_PARENT_ORIGINAL_BLOBS_PASS",len(pins))
+          '@ | python -
+      - name: E2 new independent geometry and native true Canvas readback exact-byte tests
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2p_canvas_readback_observer.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2n_correlated_alpha_premult.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2i_all_native_stroke_events.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 new true original Egret Canvas post-stroke PNG and getImageData same-context observation
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          $env:AUTODRAW_PINNED_FIREFOX_BINARY = $env:BROWSER_PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --selector-js AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js --stroke-js AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js --readback-js AutoDraw_Stage20/tests/engine001_bpred_s3v2p_canvas_readback_observer.js --output AutoDraw_Stage20/.bpred-s3v2p-native-readback
+      - name: Independently verify all original same-context readbacks and every foreign-owner negative
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os,collections
+          root=Path("AutoDraw_Stage20/.bpred-s3v2p-native-readback")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2P_TRUE_CANVAS_READBACK_VS_COMPOSITION_V1"
+          assert r["E0_blob"]=="44d6f3d72ed6c62f38054d11f050ee16cab50bc2"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert r["browser"]["browserName"]=="firefox"
+          assert str(r["browser"]["browserVersion"]).startswith("159.")
+          assert r["original_game_engine_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["original_renderer_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["new_native_primary"]==80 and r["native_main_canvas_PNG"]==80
+          assert r["native_mask_canvas_PNG"]==80 and r["native_final_webgl_PNG"]==101
+          assert r["blank_alpha0"] and r["native_uninstrumented_replays"]==20
+          assert r["native_uninstrumented_replays_all_ROI_exact"] is True
+          assert r["H0_provenance"]=="PASS"
+          assert r["H1_PNG_vs_getImageData"] in ("SAME_OBSERVED_READBACK","DIFFERENT_OBSERVED_READBACK")
+          assert r["H2_source_owner_foreign_safe"] in ("FAIL","NO_EFFECT_IN_TEST_ONLY")
+          assert r["H3_first_actual_owner_40"] in ("PASS","FAIL")
+          assert r["H3_last_true_main_80"] in ("PASS","FAIL")
+          assert r["H4_G3_coverage"] in ("PASS_SOURCE_ONLY","FAIL")
+          assert r["H4_G3_usefulness"] in ("PASS","FAIL")
+          assert r["H4_single_mode_selection"]=="FORBIDDEN"
+          assert r["source_baseline_S3v2n_D2"]=="FAIL_6851_OF_7753"
+          assert r["source_baseline_S3v2o_D2"]=="FAIL_7602_OF_8614"
+          assert r["source_baseline_S3v2o_alpha0_owner_harm"]==17
+          assert r["original_EF_protected_quality"]=="FAIL_UNCHANGED"
+          assert r["source_owner_safety"]=="NOT_PROMOTED"
+          assert r["S0_BLIND_used"] is False and r["production_promotion"] is False
+          assert r["E4_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN" and r["exact_game_CHALK"] is None
+          manifest=json.loads((root/"FROZEN_S3V2P_MANIFEST.json").read_text("utf8"))
+          steps=json.loads((root/"ALL_ORIGINAL_READBACK_STROKE_STEPS.json").read_text("utf8"))
+          readback_misses=json.loads((root/"EVERY_TRUE_MAIN_READBACK_VS_PNG_DIFFERENT_PIXEL.json").read_text("utf8"))
+          owner=json.loads((root/"EVERY_TWO_READBACK_FOREIGN_OWNER_PIXEL.json").read_text("utf8"))
+          png_owner=json.loads((root/"EVERY_ALPHA0_TOP_OWNER_CHANGED_PIXEL.json").read_text("utf8"))
+          ordered=json.loads((root/"ALL_40_NEW_ORDERED_TWO_READBACK_OWNER_EFFECTS.json").read_text("utf8"))
+          original_rows=json.loads((root/"ALL_40_ORDERED_TRUE_OWNER_EFFECT.json").read_text("utf8"))
+          replay=json.loads((root/"REPLAY_CONTROLS.json").read_text("utf8"))
+          cases=json.loads((root/"ALL_40_NEW_ISOLATED_RGB_MODES.json").read_text("utf8"))
+          assert len(manifest["scenes"])==80 and len({c["sample_id"] for c in manifest["scenes"]})==80
+          assert len(manifest["controls"])==20
+          assert len(steps)==r["native_main_stroke_steps"]==r["direct_getImageData_snapshots"]
+          assert len(readback_misses)==r["H1_different_pixel_occurrences"]
+          assert len(owner)==r["owner_risk_union"]
+          assert len(png_owner)==r["H2_original_ordered_owner_PNG_changed"]
+          assert len(ordered)==40 and len(original_rows)==40 and len(cases)==40
+          assert len(replay)==20 and all(c["uninstrumented_original_webgl_ROI_RGBA_exact"] for c in replay)
+          assert sum(int(c["PNG_risk"]) for c in owner)==r["H2_original_ordered_owner_PNG_changed"]
+          assert sum(int(c["getImageData_risk"]) for c in owner)==r["H2_original_ordered_owner_getImageData_changed"]
+          assert sum(c["modes"]["G3"]["RGB_misses"] for c in cases)==r["H4_G3_source_misses"]
+          assert sum(c["modes"]["G3"]["informative_A16_254"] for c in cases)==r["H4_G3_informative_A16_254"]
+          assert sum(c["alpha16_254"] for c in cases)==r["H4_new_source_counts"]["qualified"]
+          native=root/"native"
+          for pattern,count in [
+            ("*_REAL_MAIN_CANVAS.png",80),("*_REAL_MASK_CANVAS.png",80),
+            ("*_REAL_WEBGL.png",80),("*_REAL_STROKE_STEP_*.png",r["native_main_stroke_steps"]),
+            ("*_REAL_GETIMAGEDATA_STEP_*.rgba",r["direct_getImageData_snapshots"]),
+            ("TRUE_NATIVE_PROVENANCE.json",80)
+          ]:
+            observed=len(list(native.rglob(pattern)))
+            assert observed==count,(pattern,observed,count)
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==20
+          assert (root/"S3V2P_REAL_EGRET_BLANK.png").is_file()
+          entries={p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file() and p.name!="report.json"}
+          assert entries==set(r["members_sha256"])
+          for name,sha in r["members_sha256"].items():
+            assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha,name
+          print("S3V2P_NATIVE_READBACK_ALL_SHA_PASS",len(entries))
+          print("S3V2P_DIFFERENT_READBACK_PIXELS",len(readback_misses),r["H1_PNG_vs_getImageData"])
+          print("S3V2P_OWNER_PNG_GETIMAGEDATA",r["H2_original_ordered_owner_PNG_changed"],
+                r["H2_original_ordered_owner_getImageData_changed"],r["H2_owner_risk_classification"])
+          print("S3V2P_G3",r["H4_G3_coverage"],r["H4_G3_usefulness"],
+                r["H4_G3_informative_A16_254"],r["H4_new_source_counts"]["qualified"])
+          PY
+      - name: Archive complete true Egret same-context PNG and native getImageData and ALL negatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2p-true-canvas-readback-vs-composition
+          path: AutoDraw_Stage20/.bpred-s3v2p-native-readback/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
