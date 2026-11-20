@@ -99,5 +99,6 @@ jobs:
         with:
           name: engine001-bpred-s3v2e-rgba8-native-source-diagnostic
           path: AutoDraw_Stage20/.bpred-s3v2e-result/
-          if-no-files-found: warn
+          if-no-files-found: error
+          include-hidden-files: true
           retention-days: 90
