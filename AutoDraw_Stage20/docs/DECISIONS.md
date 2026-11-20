@@ -1,9 +1,17 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-043`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-044`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
+
+## DEC-044. ENGINE-001 / BPRED-S4: строгая независимая validation пока BLOCKED, допускается только source-known visual-safety preflight
+
+**2026-11-20. Статус: READINESS DECISION / E1; NOT NEW VISUAL SAFETY ACCEPTANCE.** Согласно [детальному решению S4](ENGINE001_BPRED001_S4_ELIGIBILITY_AND_VISUAL_SAFETY_DECISION_2026-11-20.md), после native S3v2r2 42 сцен/192 настоящих main events/384 RGBA, E2/E3 technical PASS, **18 собственно событий изменения двух чужих owner-пикселей** до RGB−8 после восьми B-проходов. Scientific protected-owner zero остаётся FAIL, старый S3v2q owner20/G3 usefulness88.65% FAIL, S2v4 M5 FP3 H1/H3 FAIL, original E/F P4D18 protected-white E2250/F2261 FAIL. **Не открывать зарезервированные BPRED-S0 BLIND120 и не объявлять S4 validated.**
+
+**Новый ограниченный исследовательский маршрут внутри прежних S0→S6, без замены порядка:** только отдельная source-known проверка готовности `BPRED-S4 R0` по [замороженному E0](ENGINE001_BPRED001_S4R0_SOURCE_KNOWN_VISUAL_SAFETY_PREFLIGHT_PREREG_2026-11-20.md) с имеющимися неизменяемыми P4D18 source owners/исходно-белой и критической маской, оригинальным Egret native и provenance; не новая попытка точного Canvas RGB. Критические маски P4B4 — три прямоугольных ROI лица/глаз/рук, **не полная проверенная semantic coverage**, за их пределами `UNKNOWN`, а не «безопасно». Малое отклонение RGB и стабильная alpha не превращаются в blanket safety: обоснование будущей визуальной допустимости только по финальному image-level RGB и контексту original target + protected boundary; научные прежние zero-foreign и usefulness thresholds не меняются. Если исходные источники/калибровка/protected semantics/uncertainty неполны, stop/fail-closed.
+
+**После R0:** решение о prospective native owner/visual false-safe gate на новых данных только при подтверждённой маске, достаточном coverage и separate future E0/approval. До тех пор S4 strict BLOCKED, original E/F S5 acceptance и S6 quality-first minimization BLOCKED; S3 микропоиск остановлен DEC-043. No S0 BLIND, production/master/Stage6/Bridge/Monitor, E4/E5/exact CHALK.
 
 ## DEC-043. ENGINE-001: ограничить микроскопические исследования; визуальная полезность отдельно от научной pixel-safe точности
 
