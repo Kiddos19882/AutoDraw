@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 / BPRED-S3v2d full native done; next S3 RGB texture-stage E0 (2026-11-20)
+
+- [x] [S3v2d frozen E0](ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_PREREG_2026-11-20.md) before implementation; [true Canvas-vs-WebGL evidence](ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_RESULTS_2026-11-20.md) [CI44697386598](https://github.com/Kiddos19882/AutoDraw/actions/runs/44697386598) code SHA2ba4241b original Egret technical PASS E2 43 and E3 80 true Canvas main+80 mask+91 WebGL with all source SHA/91 parent RGBA exact.
+- [x] Exact frozen C0 H1 at original Canvas **38/40** (2 FAIL), at original WebGL **10/40** (30 FAIL); all 12,694 posthoc main→final physical RGBA disparity positions differ **RGB only**, alpha identical, all alpha1..254. Evidence does NOT identify exact cause or justify acceptance.
+- [x] S3v2d initial CI44688742268 technical fail old JS guard resolved by version-scoped selector+4 regression tests and pinned CI runner. Original S3 H1 FAIL, earlier S3v2/S3v2b technical negatives preserved.
+- [ ] **NEXT single S3 step:** freeze a separate E0 for WebGL stage RGB quantization/representation hypothesis, deterministic controls/negative cases and strict unchanged original H1; no model retrain, no S0 BLIND; THEN run only separately allowed scope. Main Canvas residual two cases retained.
+- [ ] S4 independent BLIND → S5 original E/F global adaptive → S6 stroke optimisation only after source protection gates. P4D18 protected FAIL, E4/E5/exact CHALK NOT_RUN, production/master untouched.
+
 ## CURRENT ENGINE-001 — S3 native science negative; S3v2 Canvas-stage forensic NEXT (2026-11-20)
 
 - [x] [S3 native result](ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_RESULTS_2026-11-20.md), [CI44683117471](https://github.com/Kiddos19882/AutoDraw/actions/runs/44683117471) SHA6dedf6dd original real Egret: 80 S3 A/B source-owner/ordered +10 replay +blank =91 PNG, native source RGB proof, E2 42/42, 294 member SHA and independent ZIP CRC PASS; S0 BLIND unopened.
