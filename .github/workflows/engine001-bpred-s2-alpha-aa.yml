@@ -1,0 +1,120 @@
+name: ENGINE-001 BPRED-S2 physical alpha AA frozen native reanalysis
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s2-alpha-aa.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s2_alpha_aa_eval.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-bpred-s2-native-alpha-eval
+  cancel-in-progress: true
+
+jobs:
+  source-native-alpha-model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned original P4D16 analytics dependencies
+        run: python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E1 source pin and prereg evidence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,subprocess
+          pins={
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py":"9f30dbe7cd2e2cb913db1d4f816e74b80668125d",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s1_native_geometry.py":"546f417c4dbddd0974db86b9015bd670326bb2d5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s0_corpus_audit.py":"4b4166dafce7d04d8b34976734cf775cec748024",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==expected,(path,got,expected)
+              Path(path).write_bytes(raw)
+          assert Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S2_PHYSICAL_ALPHA_AA_CALIBRATION_PREREG_2026-11-20.md").is_file()
+          print("BPRED_S2_FROZEN_SOURCE_PREREG_PASS")
+          PY
+      - name: E2 synthetic precision, FP FN and non-drifting P4D16 regression
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py AutoDraw_Stage20/tests/test_engine001_bpred_s2_alpha_aa_eval.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2_alpha_aa_eval.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_b1r_p4d16_canvas_aa_density.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Retrieve the exact frozen 120 true Egret S1 calibration scenes (no BLIND)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44646682797 -R Kiddos19882/AutoDraw -n engine001-bpred-s1-real-egret-geometry-calibration-120 -D AutoDraw_Stage20/.bpred-s2-frozen-s1
+          test -f AutoDraw_Stage20/.bpred-s2-frozen-s1/report.json
+          test -f AutoDraw_Stage20/.bpred-s2-frozen-s1/CASE_ROWS_APPEND_ONLY.jsonl
+      - name: Compare fixed M0 M1 M2 on 360 ROIs, publish scientific FAILs too
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py \
+            --workspace . \
+            --source-artifact AutoDraw_Stage20/.bpred-s2-frozen-s1 \
+            --output AutoDraw_Stage20/.bpred-s2-results
+      - name: Audit every S2 result member and preserve frozen hypotheses
+        run: |
+          python - <<'PY'
+          import json,hashlib,os
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.bpred-s2-results")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S2_ALPHA_AA_CALIBRATION_V1"
+          assert r["github_sha"]==os.getenv("GITHUB_SHA")
+          assert r["github_run_id"]==os.getenv("GITHUB_RUN_ID")
+          assert r["source_native_sha"]=="f38f2dbfe8dcb45ea57cdcc7cba2302a848286c1"
+          assert r["source_native_member_sha256_verified"]==363
+          assert r["calibration_cases"]==120 and r["calibration_physical_ROIs"]==360
+          assert r["new_Egret_render_count"]==0 and r["blind_case_count_evaluated"]==0
+          assert r["native_BLIND_status"]=="NOT_RUN"
+          assert r["hypothesis_thresholds_frozen"]=={
+            "H1_macro_IoU_min":.985,"H1_vs_M1_delta_min":.005,
+            "H2_MAE_ratio_max":.90,"H3_odd_vs_naive_IoU_delta_min":.025}
+          m=r["metrics"]
+          assert m["n_cases"]==120 and m["n_correlated_location_rois"]==360
+          assert sorted(m["per_width"].keys())==list(map(str,range(1,11)))
+          assert set(m["per_angle"])=={"7","73","166"}
+          assert all(m[k] in ("PASS","FAIL") for k in (
+             "hypothesis_H1_M2_alpha24_macro_vs_M1",
+             "hypothesis_H2_M2_alphaMAE_union_vs_M1",
+             "hypothesis_H3_M1_odd_alpha24_vs_M0"))
+          assert not r["production_promotion"] and r["exact_run_bound_CHALK"] is None
+          rows=[json.loads(x) for x in (root/"CASE_ROWS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==120 and len({x["sample_id"] for x in rows})==120
+          assert len(r["members_sha256"])==2
+          for path,expected in r["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==expected,path
+          print("BPRED_S2_TRUE_NATIVE_ARCHIVED_ALPHA_ANALYSIS_E3_TECH_PASS")
+          print("BPRED_S2_SCIENCE",m["hypothesis_H1_M2_alpha24_macro_vs_M1"],
+                m["hypothesis_H2_M2_alphaMAE_union_vs_M1"],
+                m["hypothesis_H3_M1_odd_alpha24_vs_M0"])
+          PY
+      - name: Preserve S2 model-only errors and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s2-native-alpha-aa-calibration-120
+          path: AutoDraw_Stage20/.bpred-s2-results/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
