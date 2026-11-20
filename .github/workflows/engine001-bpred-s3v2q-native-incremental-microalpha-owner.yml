@@ -1,0 +1,200 @@
+name: ENGINE-001 BPRED-S3v2q genuine native incremental micro-alpha owner
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2q-native-incremental-microalpha-owner.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2q_incremental_microalpha_owner.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2q_incremental_microalpha_owner.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2q-incremental-microalpha
+  cancel-in-progress: true
+jobs:
+  original-egret-incremental-microalpha:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original native Firefox 159.0
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install source native Egret and exact-rational analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify first frozen S3v2q E0 plus ALL original Egret parent source Git blobs
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw "Missing pinned Firefox 159" }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2O_NEW_NATIVE_LOW_ALPHA_READBACK_PREREG_2026-11-20.md": "72343545d1f8645625085afb36e5fddeda2f91c8",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_PREREG_2026-11-20.md": "6801292e01a650a2b014ffe09256313ebe10562b",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2N_CORRELATED_ALPHA_PREMULT_TRANSITIONS_PREREG_2026-11-20.md": "81f1a18ed5b04265123c337a3cbd63985a835307",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js": "76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js": "250a6f46c12498c15157825664a08ee4f12a2b83",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js": "de3b5c5f956e3de7a71817830874b346904bc9e2",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js": "383e0b25000f4c387687fb38423dce790f149499",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py": "42167e9dbcfad55dcb38216a335f61a0b93989e5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py": "c55e13bbcf9d2786f741a56ee7a6b39873fee89f",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2P_NATIVE_CANVAS_READBACK_VS_COMPOSITION_PREREG_2026-11-20.md": "44d6f3d72ed6c62f38054d11f050ee16cab50bc2",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2p_canvas_readback_observer.js": "137638cde42ce36e14abb917994f1cbb12bac0b2",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py": "ee6c947a20faff3f85413862d3bdf1a0d830be40",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2Q_NATIVE_INCREMENTAL_MICROALPHA_OWNER_PREREG_2026-11-20.md": "ac0bd08ee45058e890ef16c75efea58ca27bec47",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2q_incremental_canvas_microalpha.js": "e975ab15f7f4b5646b6d53c8f55fe6bd1f8e6911",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2I_ALL_NATIVE_STROKE_EVENTS_PREREG_2026-11-20.md": "9350e69c5f83747a46c71eeb9142065be928a7a5",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2H_NATIVE_CANVAS_STROKE_STEP_PREREG_2026-11-20.md": "75255a7f48d5be00a34a164edb2bcf03e6349d76",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py": "1bf56df9507f2a34fd16e68eef190229c3184ce5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "511e81a362c4340e0dfdc36a292faa9cb2ef1e83",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2c_multicapture_trace.py": "974de6a86359e9ff49e2e77ee1f420dffa08064b",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2f_prospective_native_rgba8.py": "0c3b799f6bc22958911d35420a30fef1950813dd",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2i_all_native_stroke_events.py": "fdb1542437d645875c305f94bfddef007b4c3e40",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2h_native_stroke_steps.py": "4ae040c6f3720a5ee8fba43e0e4e9acd640264cd",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py": "3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py": "82f8e0c3f3e10fb30ea61d1beb52edf98696563c"
+          }
+          for path,expected in pins.items():
+            raw=subprocess.check_output(["git","show","HEAD:"+path])
+            sha=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+            assert sha==expected,(path,sha,expected)
+            Path(path).write_bytes(raw)
+            assert Path(path).read_bytes()==raw
+          print("S3V2Q_FIRST_FROZEN_E0_AND_PARENT_ORIGINAL_BLOBS_PASS",len(pins))
+          '@ | python -
+      - name: E2 frozen prospective incremental geometry and original observer contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2q_incremental_microalpha_owner.py
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2q_incremental_canvas_microalpha.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2q_incremental_microalpha_owner.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2p_native_canvas_readback_vs_composition.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2n_correlated_alpha_premult.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2i_all_native_stroke_events.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 original Egret true same-stroke pre/post/repeat native Canvas with owner timeline
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          $env:AUTODRAW_PINNED_FIREFOX_BINARY = $env:BROWSER_PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2q_incremental_microalpha_owner.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --selector-js AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js --stroke-js AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js --incremental-js AutoDraw_Stage20/tests/engine001_bpred_s3v2q_incremental_canvas_microalpha.js --output AutoDraw_Stage20/.bpred-s3v2q-incremental-microalpha
+      - name: Independently verify all original native pre post repeat and every negative SHA
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path("AutoDraw_Stage20/.bpred-s3v2q-incremental-microalpha")
+          report=json.loads((root/"report.json").read_text("utf8"))
+          assert report["experiment"]=="ENGINE001_BPRED_S3V2Q_INCREMENTAL_MICROALPHA_NATIVE_SOURCE_V1"
+          assert report["E0_blob"]=="ac0bd08ee45058e890ef16c75efea58ca27bec47"
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert str(report["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert report["browser"]["browserName"]=="firefox" and str(report["browser"]["browserVersion"]).startswith("159.")
+          assert report["original_game_engine_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert report["original_renderer_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert report["Q0_source_integrity"]=="PASS"
+          assert report["new_original_native_sources"]==80 and report["native_main_PNG"]==80
+          assert report["native_mask_PNG"]==80 and report["native_final_WebGL_PNG"]==101
+          assert report["raw_direct_rgba_captures"]==3*report["real_main_stroke_events"]
+          assert report["uninstrumented_replay_count"]==20
+          assert report["all_uninstrumented_replays_ROI_RGBA_exact"] is True
+          assert report["blank_alpha0"] is True and report["node_local_roi"]==[400,220,270,270]
+          assert report["Q1_repeated_post_getImageData"] in ("PASS","FAIL")
+          assert report["Q2_source_owner_safety"] in ("FAIL","NO_HARM_OBSERVED_SAMPLE_ONLY")
+          assert report["Q2_scientific_interpretation"] in ("SOURCE_NATIVE_OBSERVATION_ONLY","BLOCKED_UNSTABLE_READBACK")
+          assert report["Q3_first_owner_40"] in ("PASS","FAIL")
+          assert report["Q3_last_original_stroke_80"] in ("PASS","FAIL")
+          assert report["Q4_G3_RGB_envelope"] in ("PASS_SOURCE_ONLY","FAIL")
+          assert report["Q4_G3_informative_gate"] in ("PASS","FAIL")
+          assert report["Q4_original_G3_model_unchanged"] is True
+          assert report["source_baseline_S3v2p_owner_harm"]==17
+          assert report["source_baseline_S3v2p_readback_difference"]==51275
+          assert report["source_baseline_S3v2p_G3_usefulness"]=="FAIL_7725_OF_8690"
+          assert report["original_EF_P4D18_quality"]=="FAIL_UNCHANGED"
+          assert report["source_owner_safety"]=="NOT_PROMOTED"
+          assert report["S0_BLIND_used"] is False and report["S4"]=="NOT_RUN"
+          assert report["E4_game"]=="NOT_RUN" and report["E5_independent_game"]=="NOT_RUN"
+          assert report["exact_game_CHALK"] is None and report["production_promotion"] is False
+          manifest=json.loads((root/"FROZEN_S3V2Q_MANIFEST.json").read_text("utf8"))
+          assert len(manifest["scenes"])==80 and len({x["sample_id"] for x in manifest["scenes"]})==80
+          assert len(manifest["controls"])==20
+          meta=json.loads((root/"ALL_NATIVE_INCREMENTAL_STROKE_READBACK_METADATA.json").read_text("utf8"))
+          assert len(meta)==report["real_main_stroke_events"]
+          repeat=json.loads((root/"EVERY_REPEATED_READBACK_DIFFERENT_PIXEL.json").read_text("utf8"))
+          timelines=json.loads((root/"ALL_40_ORDERED_INCREMENTAL_OWNER_TIMELINES.json").read_text("utf8"))
+          negatives=json.loads((root/"EVERY_TRUE_STROKE_PRE_POST_OWNER_CHANGED_PIXEL.json").read_text("utf8"))
+          gaps=json.loads((root/"EVERY_TRUE_STROKE_PREVIOUS_POST_TO_NEXT_PRE_GAP.json").read_text("utf8"))
+          old_png=json.loads((root/"EVERY_ALPHA0_TOP_OWNER_CHANGED_PIXEL.json").read_text("utf8"))
+          owner=json.loads((root/"EVERY_TWO_READBACK_FOREIGN_OWNER_PIXEL.json").read_text("utf8"))
+          source=json.loads((root/"ALL_40_NEW_ISOLATED_RGB_MODES.json").read_text("utf8"))
+          exporter=json.loads((root/"EVERY_TRUE_MAIN_READBACK_VS_PNG_DIFFERENT_PIXEL.json").read_text("utf8"))
+          control=json.loads((root/"REPLAY_CONTROLS.json").read_text("utf8"))
+          assert len(repeat)==report["Q1_same_event_repeat_changed_pixel_occurrences"]
+          assert len(timelines)==40 and len(negatives)==report["all_owner_incremental_negative_records"]
+          assert len(gaps)==report["Q3_pre_vs_previous_post_discontinuities"]
+          assert len(old_png)==report["Q2_final_PNG_lower_owner_alpha0_harm"]
+          assert len(owner)==sum(report["Q2_final_owner_classification"].values())
+          assert len(source)==40 and len(exporter)==report["Q5_PNG_vs_getImageData_different_pixels"]
+          assert sum(x["modes"]["G3"]["RGB_misses"] for x in source)==report["Q4_G3_source_misses"]
+          assert sum(x["modes"]["G3"]["informative_A16_254"] for x in source)==report["Q4_G3_informative_A16_254"]
+          assert sum(x["alpha16_254"] for x in source)==report["Q4_new_source_counts"]["qualified"]
+          assert len(control)==20 and all(x["uninstrumented_original_webgl_ROI_exact"] for x in control)
+          native=root/"native"
+          for pattern,n in [
+              ("*_REAL_MAIN_CANVAS.png",80),("*_REAL_MASK_CANVAS.png",80),
+              ("*_REAL_WEBGL.png",80),
+              ("*_REAL_STROKE_STEP_*.png",report["real_main_stroke_events"]),
+              ("*_REAL_PRE_STROKE_*.rgba",report["real_main_stroke_events"]),
+              ("*_REAL_POST_STROKE_*.rgba",report["real_main_stroke_events"]),
+              ("*_REAL_REPEAT_POST_STROKE_*.rgba",report["real_main_stroke_events"]),
+              ("TRUE_NATIVE_PROVENANCE.json",80)
+          ]:
+              observed=len(list(native.rglob(pattern)))
+              assert observed==n,(pattern,observed,n)
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==20
+          assert (root/"S3V2Q_REAL_EGRET_BLANK.png").is_file()
+          paths={f.relative_to(root).as_posix() for f in root.rglob("*") if f.is_file() and f.name!="report.json"}
+          assert paths==set(report["members_sha256"])
+          for path,expected in report["members_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==expected,path
+          print("S3V2Q_NATIVE_ALL_SIGNED_MEMBERS_PASS",len(paths))
+          print("S3V2Q_REPEAT_STABILITY",report["Q1_repeated_post_getImageData"],len(repeat))
+          print("S3V2Q_INCREMENTAL_OWNER_HARM",len(negatives),report["Q2_incremental_owner_changed_pixel_occurrences_after_first"],
+                "FINAL",len(old_png))
+          print("S3V2Q_G3",report["Q4_G3_RGB_envelope"],report["Q4_G3_informative_gate"],
+                report["Q4_G3_informative_A16_254"],report["Q4_new_source_counts"]["qualified"])
+          PY
+      - name: Archive ALL genuine Egret incremental pre post repeat raw and scientific negatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2q-genuine-native-incremental-microalpha-owner
+          path: AutoDraw_Stage20/.bpred-s3v2q-incremental-microalpha/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
