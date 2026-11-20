@@ -1,0 +1,148 @@
+name: ENGINE-001 BPRED-S3v2b deBG-pinned Canvas2D versus WebGL forensic
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2b-native-canvas-stage.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s3v2_canvas_capture.js'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2b_native_canvas_stage.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2b_png_equivalence.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-bpred-s3v2b-native-canvas-stage
+  cancel-in-progress: true
+
+jobs:
+  original-canvas-vs-webgl-true-native:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin authentic Firefox 159.0
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install original Egret harness dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Restore original plus new frozen S3v2b E0 and authentic Egret Git blobs
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw 'Pinned Firefox159 unavailable' }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import subprocess, hashlib
+          pins = {
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2_NATIVE_CANVAS_COMPOSITING_DIAGNOSTIC_PREREG_2026-11-20.md": "d8d703779f6364a3dda8e8edf9717fe0d065ef45",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2B_DEBG_EQUIVALENCE_PREREG_2026-11-20.md": "23c5772e9193c760c0611287a44c877b8f10ab7f",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "0a14757ca4a412f86f561164cda15b1c389513c1", 
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js": "76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py": "3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py": "1bf56df9507f2a34fd16e68eef190229c3184ce5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py": "ed29df1d559409d5a5783556a12c30d24df7118d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py": "9f30dbe7cd2e2cb913db1d4f816e74b80668125d",
+          }
+          for path, expected in pins.items():
+              raw = subprocess.check_output(["git", "show", "HEAD:" + path])
+              got = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+              assert got == expected, (path, got, expected)
+              Path(path).write_bytes(raw)
+              assert Path(path).read_bytes() == raw
+          print("BPRED_S3V2_PINNED_EGRET_CANVAS_SOURCE_PASS", len(pins))
+          '@ | python -
+      - name: E2 strict deBG-only PNG and original S3/source stage frozen tests
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py AutoDraw_Stage20/tests/run_engine001_bpred_s3v2b_native_canvas_stage.py AutoDraw_Stage20/tests/engine001_bpred_s3v2b_png_equivalence.py AutoDraw_Stage20/tests/test_engine001_bpred_s3v2b_png_equivalence.py
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2_canvas_capture.js
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2b_png_equivalence.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2_native_canvas_stage.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3_native_source_over.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download frozen real S3 native artifact (NOT S0 BLIND)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44683117471 -R Kiddos19882/AutoDraw -n engine001-bpred-s3-native-two-owner-91 -D AutoDraw_Stage20/.bpred-s3-source
+          test -f AutoDraw_Stage20/.bpred-s3-source/report.json
+          test -f AutoDraw_Stage20/.bpred-s3-source/FROZEN_S3_MANIFEST.json
+      - name: E3 original BoardPane Canvas and deBG-only equivalent 91 WebGL PNG
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2b_native_canvas_stage.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --capture-js AutoDraw_Stage20/tests/engine001_bpred_s3v2_canvas_capture.js --parent AutoDraw_Stage20/.bpred-s3-source --output AutoDraw_Stage20/.bpred-s3v2b-stage
+      - name: Independently verify deBG-only provenance and 80 real Canvas/91 WebGL PNG
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os
+          root=Path("AutoDraw_Stage20/.bpred-s3v2b-stage")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2B_DEBG_PROVENANCE_CANVAS_STAGE_V1"
+          assert r["original_S3v2_raw_byte_gate"]=="FAIL_ARCHIVED_44684709364"
+          assert r["S3v2b_frozen_E0_blob"]=="23c5772e9193c760c0611287a44c877b8f10ab7f"
+          assert r["new_S3v2b_deBG_equivalence_validated_91"]
+          assert r["github_sha"]==os.getenv("GITHUB_SHA") and str(r["github_run_id"])==os.getenv("GITHUB_RUN_ID")
+          assert r["source_parent_run_id"]=="44683117471"
+          assert r["source_parent_git_sha"]=="6dedf6ddfde36db17f07fc0aa00dd463dc525ca8"
+          assert r["E0_frozen_blob"]=="d8d703779f6364a3dda8e8edf9717fe0d065ef45"
+          assert r["native_browser"]["browserVersion"].startswith("159.")
+          assert r["true_native_primary"]==80 and r["true_native_intermediate_canvas_PNG"]==80
+          assert r["true_native_final_webgl_PNG"]==91 and r["true_native_replays"]==10
+          assert r["native_blank_alpha0"] and r["all_primary_parent_deBG_equivalent"]
+          assert r["all_replays_RGBA_exact"] and r["source_original_s3_science"]=="FAIL"
+          evidence=json.loads((root/"PNG_DEBG_ONLY_COMPARISONS.json").read_text("utf8"))
+          assert len(evidence)==91 and all(e["allowed_deBG_only"] and e["original_RGBA_pixel_exact"] for e in evidence)
+          assert len({e["sample_id"] for e in evidence})==91
+          assert r["H1_original_final_S3_pass_count_40"]==10 and r["original_S3_H1"]=="FAIL_UNCHANGED"
+          assert 0<=r["H1_new_true_intermediate_Canvas_pass_count_40"]<=40
+          assert not r["S0_BLIND_used"] and not r["production_promotion"]
+          assert r["E4_live_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_game_CHALK"] is None
+          rows=[json.loads(z) for z in (root/"PAIRS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==20 and len({x["pair_id"] for x in rows})==20
+          assert all(set(x["ordered_variants"])=={"A_THEN_B","B_THEN_A"} for x in rows)
+          assert len(list((root/"native").rglob("*_REAL_CANVAS_INTERMEDIATE.png")))==80
+          assert len(list((root/"native").rglob("*_REAL_WEBGL.png")))==80
+          assert len(list((root/"native").rglob("*_ALIGNED_MODEL_ONLY.png")))==80
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==10
+          assert (root/"S3V2_REAL_EGRET_BLANK.png").is_file()
+          for name,expected in r["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("BPRED_S3V2B_DEBG_ONLY_80_CANVAS_91_REAL_WEBGL_PASS",len(r["members_sha256"]))
+          print("BPRED_S3V2B_STAGE_H1_CANVAS_VS_FINAL",r["H1_new_true_intermediate_Canvas_pass_count_40"],r["H1_original_final_S3_pass_count_40"])
+          PY
+      - name: Archive S3v2b raw Canvas and WebGL preserving S3v2 FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2b-native-canvas-webgl-91
+          path: AutoDraw_Stage20/.bpred-s3v2b-stage/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
