@@ -1,0 +1,168 @@
+name: ENGINE-001 BPRED-S3v2h original Canvas per-stroke E3 forensic
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2h-native-stroke-steps.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2h_native_stroke_steps.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2h_native_stroke_steps.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2h-true-stroke
+  cancel-in-progress: true
+jobs:
+  original-native-per-stroke:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin authentic Firefox 159.0
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install frozen Egret reference math and WebDriver dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Restore frozen original engine/research source bytes and verify Git blob SHA
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw 'Pinned Firefox159 unavailable' }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2H_NATIVE_CANVAS_STROKE_STEP_PREREG_2026-11-20.md": "75255a7f48d5be00a34a164edb2bcf03e6349d76",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js": "76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py": "1bf56df9507f2a34fd16e68eef190229c3184ce5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "511e81a362c4340e0dfdc36a292faa9cb2ef1e83",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2c_multicapture_trace.py": "974de6a86359e9ff49e2e77ee1f420dffa08064b",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2f_prospective_native_rgba8.py": "0c3b799f6bc22958911d35420a30fef1950813dd",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py": "3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js": "250a6f46c12498c15157825664a08ee4f12a2b83",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js": "de3b5c5f956e3de7a71817830874b346904bc9e2",
+            "AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js": "383e0b25000f4c387687fb38423dce790f149499"
+          }
+          for p,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+p])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(p,actual,expected)
+              Path(p).write_bytes(raw)
+              assert Path(p).read_bytes()==raw
+          print("BPRED_S3V2H_IMMUTABLE_SOURCE_GIT_BLOBS_PASS",len(pins))
+          '@ | python -
+      - name: E2 strict source and original-method restoration regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2h_native_stroke_steps.py
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js
+          node --check AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2h_native_stroke_steps.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2f_prospective_native_rgba8.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3_native_source_over.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Fetch immutable original S3v2f Egret E3 archive, never S0 BLIND
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44710870514 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2f-prospective-80-main-mask-webgl -D AutoDraw_Stage20/.bpred-s3v2h-source
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile,ZIP_DEFLATED
+          root=Path("AutoDraw_Stage20/.bpred-s3v2h-source")
+          files=sorted(p for p in root.rglob("*") if p.is_file())
+          assert len(files)==656 and (root/"report.json").is_file()
+          out=Path("AutoDraw_Stage20/.bpred-s3v2h-source.zip")
+          with ZipFile(out,"x",compression=ZIP_DEFLATED) as z:
+              for p in files:
+                  z.write(p,p.relative_to(root).as_posix())
+          with ZipFile(out) as z:
+              assert z.testzip() is None and len(z.namelist())==656
+          print("S3V2H_FROZEN_PARENT_656_SOURCE_MEMBERS_CRC_PASS")
+          PY
+      - name: E3 24 real Egret source-proven Canvas stroke() sequences and controls
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          $env:AUTODRAW_PINNED_FIREFOX_BINARY = $env:BROWSER_PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2h_native_stroke_steps.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --selector-js AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js --stroke-js AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js --source-zip AutoDraw_Stage20/.bpred-s3v2h-source.zip --output AutoDraw_Stage20/.bpred-s3v2h-real-native
+      - name: Independently verify true original stroke images, controls and report hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.bpred-s3v2h-real-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2H_REAL_STROKE_STEP_CAPTURE_V1"
+          assert r["E0_blob"]=="75255a7f48d5be00a34a164edb2bcf03e6349d76"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"] and str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert r["source_original_E3_run"]=="44710870514"
+          assert r["source_original_E3_sha"]=="819b7fd20272e5ac87ead72ce0610687fa51cbf4"
+          assert r["source_original_E3_members_sha_verified"]==655
+          assert r["browser"]["browserName"]=="firefox" and str(r["browser"]["browserVersion"]).startswith("159.")
+          assert r["true_native_cases"]==24 and r["true_main_canvas_PNG"]==24 and r["true_mask_canvas_PNG"]==24
+          assert r["true_webgl_PNG"]==28 and r["true_main_stroke_step_PNG"]==36
+          assert r["true_replays"]==3 and r["blank_alpha0"]
+          assert r["S1_first_stroke_exact"] in ("PASS","FAIL")
+          assert r["S2_last_stroke_exact"] in ("PASS","FAIL")
+          assert r["original_S3v2f_H2"]=="FAIL_UNCHANGED"
+          assert r["original_S3v2g_P2"]=="FAIL_UNCHANGED"
+          assert not r["scientific_S3_safe"] and not r["S0_BLIND_used"] and not r["production_promotion"]
+          assert r["E4_live_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN" and r["exact_game_CHALK"] is None
+          scenes=json.loads((root/"SELECTED_FROZEN_S3V2F_24.json").read_text("utf8"))
+          comp=json.loads((root/"S1_S2_S3_ORIGINAL_NATIVE_COMPARISONS_24.json").read_text("utf8"))
+          ctrls=json.loads((root/"REPLAY_CONTROLS.json").read_text("utf8"))
+          assert len(scenes)==24 and len({x["sample_id"] for x in scenes})==24
+          assert len(comp)==24 and len({x["sample_id"] for x in comp})==24
+          assert len(ctrls)==3 and all(x["RGBA_ROI_exact"] for x in ctrls)
+          native=root/"native"
+          for pattern,n in [
+              ("*_REAL_MAIN_CANVAS.png",24),("*_REAL_MASK_CANVAS.png",24),
+              ("*_REAL_WEBGL.png",24),("*_ORIGINAL_STROKE_STEP_*.png",36),
+              ("STEP_FIRST_TO_ISOLATED_DELTA.png",24),
+              ("STEP_LAST_TO_FINAL_MAIN_DELTA.png",24),
+              ("STEP_FIRST_TO_SECOND_EFFECT_RGBA.png",12),
+              ("STRUCTURE_COUNTS.json",24)]:
+              assert len(list(native.rglob(pattern)))==n,(pattern,len(list(native.rglob(pattern))))
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==3
+          assert (root/"S3V2H_REAL_EGRET_BLANK.png").is_file()
+          recorded=r["members_sha256"]
+          actual={p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file() and p.name!="report.json"}
+          assert set(recorded)==actual
+          for name,signed in recorded.items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==signed,name
+          print("S3V2H_REAL_NATIVE_CRC_SHA_PASS",len(recorded),"STEP_IMAGES",r["true_main_stroke_step_PNG"])
+          print("S3V2H_SCIENCE_S1_S2",r["S1_first_stroke_exact"],r["S2_last_stroke_exact"])
+          PY
+      - name: Archive all actual source PNG or partial failure observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2h-original-native-24-stroke-steps
+          path: AutoDraw_Stage20/.bpred-s3v2h-real-native/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
