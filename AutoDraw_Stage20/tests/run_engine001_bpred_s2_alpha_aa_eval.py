@@ -23,6 +23,7 @@ import run_engine001_b1r_p4d16_canvas_aa_density as p16
 
 EXPERIMENT = "ENGINE001_BPRED_S2_ALPHA_AA_CALIBRATION_V1"
 PREREG = "ENGINE001_BPRED001_S2_PHYSICAL_ALPHA_AA_CALIBRATION_PREREG_2026-11-20.md"
+PREREG_FROZEN_GIT_BLOB = "2c8ee61cfd29939bdef29d6ba6c9cdeefa317dd3"
 P16_BLOB = "9f30dbe7cd2e2cb913db1d4f816e74b80668125d"
 S1_BLOB = "546f417c4dbddd0974db86b9015bd670326bb2d5"
 SOURCE_SHA = "f38f2dbfe8dcb45ea57cdcc7cba2302a848286c1"
@@ -261,8 +262,8 @@ def run(parent,output,workspace):
     if output.exists():
         blocked("OUTPUT_ALREADY_EXISTS")
     prereg=workspace/"AutoDraw_Stage20/docs"/PREREG
-    if not prereg.is_file() or EXPERIMENT not in prereg.read_text("utf8"):
-        blocked("PREREG_MISSING")
+    if not prereg.is_file() or s0.git_blob(prereg.read_bytes()) != PREREG_FROZEN_GIT_BLOB:
+        blocked("PREREG_BLOB_DRIFT")
     if (s0.git_blob(Path(s1.__file__).read_bytes())!=S1_BLOB or
         s0.git_blob(Path(p16.__file__).read_bytes())!=P16_BLOB):
         blocked("PINNED_SOURCE_DRIFT")
