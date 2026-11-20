@@ -1,0 +1,103 @@
+name: ENGINE-001 BPRED-S3v2e frozen RGBA8 source-stage diagnostic
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2e-rgba8-quantization.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2e_rgba8_quantization.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2e-rgba8-quantization
+  cancel-in-progress: true
+jobs:
+  frozen-native-source-offline-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source-composition dependencies
+        run: |
+          python -m pip install numpy==2.2.6 Pillow==11.3.0 opencv-python-headless==4.11.0.86 scikit-image==0.25.2 scipy==1.15.3 selenium==4.38.0 requests==2.32.5
+      - name: E2 source math and fail-closed contracts
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2e_rgba8_quantization.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2_native_canvas_stage.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3_native_source_over.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download original immutable S3v2d native artifact, never S0 BLIND
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44697386598 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2d-native-main-mask-webgl-91 -D AutoDraw_Stage20/.bpred-s3v2e-source
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          source=Path("AutoDraw_Stage20/.bpred-s3v2e-source")
+          members=sorted(p for p in source.rglob("*") if p.is_file())
+          assert len(members)==656 and (source/"report.json").is_file()
+          target=Path("AutoDraw_Stage20/.bpred-s3v2e-source.zip")
+          with ZipFile(target,"x",compression=ZIP_DEFLATED) as z:
+              for p in members:
+                  z.write(p,p.relative_to(source).as_posix())
+          with ZipFile(target) as z:
+              assert z.testzip() is None and len(z.namelist())==656
+          print("BPRED_S3V2E_SOURCE_ARCHIVE_REPACKED_CRC_PASS",len(members))
+          PY
+      - name: Calculate frozen Q0 QF QR QC on 80 real original Egret main and final PNG
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py --workspace . --source-zip AutoDraw_Stage20/.bpred-s3v2e-source.zip --output AutoDraw_Stage20/.bpred-s3v2e-result
+      - name: Independently audit frozen H1 H2 diagnostic and archive hashes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          root=Path("AutoDraw_Stage20/.bpred-s3v2e-result")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2E_RGBA8_ROUNDTRIP_DIAGNOSTIC_V1"
+          assert r["E0_blob"]=="cab7f2d0867e87201913d588357bc1adc045e8ef"
+          assert r["source_sha"]=="2ba4241be547cb14bfc0a180633ce7bfe6a9ab9a"
+          assert r["source_run_id"]=="44697386598"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"] and str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert r["source_d1_RGB_mismatch_by_mode"]["Q0"]==12694
+          assert r["source_d1_alpha_mismatch"]==0
+          assert r["original_C0_H1_main_Canvas_40"]==38
+          assert r["original_C0_H1_WebGL_40"]==10
+          assert r["diagnostic_H1_QC_less_RGB_mismatch"] in ("PASS","FAIL")
+          assert r["diagnostic_H2_QC_more_frozen_C0_PASS"] in ("PASS","FAIL")
+          assert r["source_80_scene_real_Egret_only"] and not r["new_native_E3"]
+          assert not r["S0_BLIND_used"] and not r["production_promotion"]
+          assert r["original_s3_science"]=="FAIL_UNCHANGED"
+          assert r["E4_live_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN"
+          assert r["exact_game_CHALK"] is None
+          rows=json.loads((root/"D1_SOURCE_STAGE_80.json").read_text("utf8"))
+          c0=json.loads((root/"D2_C0_ORDERED_40.json").read_text("utf8"))
+          assert len(rows)==80 and len({x["sample_id"] for x in rows})==80
+          assert len(c0)==20 and len({x["pair_id"] for x in c0})==20
+          assert len(r["members_sha256"])==2
+          for name,expected in r["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("BPRED_S3V2E_SOURCE_METRICS_PASS",r["source_d1_RGB_mismatch_by_mode"])
+          print("BPRED_S3V2E_ORDERED_C0",r["source_d2_frozen_H1_pass_by_mode_40"])
+          PY
+      - name: Archive all 80 original-native source diagnostic rows plus 40 C0 variants
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2e-rgba8-native-source-diagnostic
+          path: AutoDraw_Stage20/.bpred-s3v2e-result/
+          if-no-files-found: warn
+          retention-days: 90
