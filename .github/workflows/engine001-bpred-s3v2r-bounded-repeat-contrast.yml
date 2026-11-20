@@ -3,11 +3,12 @@ on:
   push:
     branches: ['feature/image-geometry-optimization']
     paths:
-      - '.github/workflows/engine001-bpred-s3v2r2-bounded-repeat-contrast.yml'
+      - '.github/workflows/engine001-bpred-s3v2r-bounded-repeat-contrast.yml'
       - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py'
       - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py'
       - 'AutoDraw_Stage20/tests/engine001_bpred_s3v2r_original_contrast_repeat_observer.js'
       - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2R_BOUNDED_REPEAT_CONTRAST_NATIVE_PREREG_2026-11-20.md'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2R2_ORIGINAL_EVENT_COUNT_CORRECTION_PREREG_2026-11-20.md'
   workflow_dispatch:
 permissions:
   contents: read
