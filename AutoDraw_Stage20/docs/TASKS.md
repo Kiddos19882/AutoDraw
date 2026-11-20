@@ -1,3 +1,13 @@
+## CURRENT ENGINE-001 — S2v5 diagnostic closed; S3 source-over E0 frozen (2026-11-20)
+
+- [x] [результат S2v5](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_RESULTS_2026-11-20.md) [CI44663535886](https://github.com/Kiddos19882/AutoDraw/actions/runs/44663535886) SHA `9d2aee51575b81de36a05f2bfcc6c3b6e9209f12`: audit original real Egret S2v4: 376/376 member SHA, 120×3 physical ROI, source M2/M5 TP/FP exactly reconstructed, width7 angle111 length23 one repeated FP family with 3 pixels native alpha21/pred128, H3 failure only width1 **5445/6876=79.1885%**. 14+14 unit E2 PASS, artifact14596516744.
+- [x] S2v4 historic H1 FAIL/H2 PASS/H3 FAIL preserved; first S2v5 CI44663275087 technical checkout CRLF FAIL, repair only CI byte restore; [DEC-042](DECISIONS.md) adaptive stroke-risk option and strict protected/coverage gates still intact.
+- [x] [BPRED-S3 frozen E0](ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_PREREG_2026-11-20.md) native 2-color source-over plan preregistered **before S3 code or new native evidence**: 80 variants +10 repeats+blank, owner/order/alpha composition with fixed source-over, distinct scientific/technical gates. **S3 NOT_RUN at prereg.**
+- [ ] **NEXT один:** implement research-only S3 native/compositor fixture and E2 tests using pinned P4D3 + game renderer; evaluate C0 native isolated RGBA compositing vs true AB/BA and C1 M2 model-only RGBA, per-owner false-safe, archive actual 91 PNG, NEVER S0 BLIND. No executor/production.
+- [ ] S4 independent BLIND, S5 E/F original RGB adaptive global planner, S6 cost optimization not started. P4D18 protected FAIL, P4D19 DEFERRED, E4/E5/CHALK NOT_RUN.
+
+*Ниже прежний S2v4 NEXT до S2v5 диагностики — история.*
+
 ## CURRENT ENGINE-001 — S2v4 measured FAIL, S2v5 source audit NEXT (2026-11-20)
 
 - [x] [результаты S2v4](ENGINE001_BPRED001_S2V4_REAL_NATIVE_CORE_RESULTS_2026-11-20.md): real source [CI44659022526](https://github.com/Kiddos19882/AutoDraw/actions/runs/44659022526) SHA `2faf01de`, 120+10 replay+blank true Egret; E2 44 focused tests PASS, archive hash376, M2 TP402639/FP2379 vs M5 TP383505/FP**3**, **H1 FAIL, H2 PASS, H3 FAIL**; no accepted pixel-safe shortcut.

@@ -1,5 +1,10 @@
 # ENGINE-001 / BPRED-001 — прогноз фактического следа кисти Egret/Canvas2D/WebGL
 
+## Текущее состояние после S2v5 (2026-11-20; обновление документа, не новый gate)
+
+[результат S2v5](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_RESULTS_2026-11-20.md) E2/CI [44663535886](https://github.com/Kiddos19882/AutoDraw/actions/runs/44663535886) SHA `9d2aee51575b81de36a05f2bfcc6c3b6e9209f12`: реальная S2v4 alpha error FP3 является одним исходным stroke width7/111° на трёх translated copies, H3 порог нарушила только width1 (79.1885%). Никакой S2v4 scientific FAIL не переклассифицирован. [DEC-042](DECISIONS.md) остаётся *возможным* контекстным критерием последствий, не blanket relaxation. Следующий этап по принятой неизменной очередности — [BPRED-S3 frozen E0](ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_PREREG_2026-11-20.md), source-over A/B настоящим Egret, далее S4 independent BLIND, S5 global original E/F, S6 stroke count. Legacy/прежний NEXT S2v5 в следующем историческом блоке относится к состоянию до выполненного аудита.
+
+
 ## Дополнение 2026-11-20 — DEC-042: адаптивная допустимость штриха (принято, ещё НЕ внедрено)
 
 В дополнение к original прогнозу alpha/RGBA рассматривается **контекстный риск последствий**: model FP != damage. После S2 (geometric/alpha uncertainty) и S3 (source-over RGB/owner) исследовать пер-штриховые `ADMISSIBLE_CANDIDATE / UNKNOWN / FORBIDDEN` по owner, protected source, distance to border, angle, width1..10, phase, возможному RGBA footprint и uncertainty envelope; при сомнении запрет/уменьшение кисти или настоящая native-проверка. Оригинальные S2 FP/FN/IoU, frozen H1/H2/H3 и S2v4 scientific **FAIL** не пересчитывать. **Protected foreign=0, far>3logical=0, owner coverage≥99%, важные детали/визуальные gates** остаются обязательными и не ослаблены. До implementation отдельный E0 и native/E5 evidence; риск неизвестного не выдавать за безопасность. Подробное принятое дополнение [адаптивный риск штриха](ENGINE001_BPRED001_ADAPTIVE_STROKE_RISK_POLICY_2026-11-20.md), решение [DEC-042](DECISIONS.md).

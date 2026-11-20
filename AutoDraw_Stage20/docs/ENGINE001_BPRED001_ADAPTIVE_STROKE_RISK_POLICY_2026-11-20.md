@@ -1,5 +1,8 @@
 # ENGINE-001 / BPRED-001 — принятое дополнение: адаптивная пригодность штриха
 
+**Текущий диагностический факт 2026-11-20:** [результат S2v5](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_RESULTS_2026-11-20.md) установил: S2v4 все 3 FP — один width7/111° штрих, три spatial copies, predicted alpha128 vs native21; H3 нарушает только width1 TP-retention79.1885%. Эти данные **не позволяют автоматически разрешить их как допустимые**, потому что реальный owner-source-over не измерен. До какого-либо `ADMISSIBLE` необходим [BPRED-S3 frozen E0](ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_PREREG_2026-11-20.md) и отдельная future source-protected E0; hard gates unchanged.
+
+
 **2026-11-20. DEC-042, ACCEPTED RESEARCH DIRECTION, NOT PRODUCTION RULE.** Пользователь разрешил дополнить [основной план BPRED](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md) **возможным применением адаптивных критериев**. Последовательность этапов **S0→S1→S2→S3→S4→S5→S6 НЕ меняется**. Прежние scientific E0, H1/H2/H3, исходы S2v4 и pixel-fidelity метрики не пересчитываются по новой политике; `S2v4 H1/H3 FAIL` остаётся.
 
 ## Разделить два независимых вида критерия
