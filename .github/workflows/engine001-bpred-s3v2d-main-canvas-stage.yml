@@ -72,7 +72,7 @@ jobs:
               assert Path(path).read_bytes() == raw
           print("BPRED_S3V2_PINNED_EGRET_CANVAS_SOURCE_PASS", len(pins))
           '@ | python -
-      - name: E2 source-proven node/trace contracts and strict deBG plus unchanged S3 science
+      - name: E2 source-proven node/mask contracts, indexed E3 forensics and original H1
         shell: bash
         run: |
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py AutoDraw_Stage20/tests/run_engine001_bpred_s3v2d_main_canvas_stage.py AutoDraw_Stage20/tests/engine001_bpred_s3v2b_png_equivalence.py
