@@ -296,6 +296,7 @@ def run(workspace,engine,renderer,js_files,output):
                     native_frames[(width,relation)]=frames
                     pairs.append(ordered_metrics(width,relation,frames))
                     print("BPRED_S3V2F_NATIVE_PAIR",len(pairs),"/20",flush=True)
+        (output/"replays").mkdir(exist_ok=False)
         for control in spec["controls"]:
             sid=control["sample_id"]
             scene=plans_for(control["width"],"CROSS_ROTATED")["A_THEN_B"]
