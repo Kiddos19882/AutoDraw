@@ -1,3 +1,8 @@
+## 2026-11-20 — ENGINE-001/BPRED-S3v2j independent original Egret hidden alpha0 owner harm evidence
+
+- Frozen [S3v2j prereg](ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_PREREG_2026-11-20.md) before native/code; research-only new source runner (ф) `tests/run_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py`, 10 tests (ф) `tests/test_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py`, native CI (ф) `.github/workflows/engine001-bpred-s3v2j-new-native-alpha0-owner-influence.yml`. [CI44721915503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44721915503) technical E2 55 PASS/E3 80 new authentic Egret main+80mask/91 WebGL and 200 true stroke snapshots, [artifact14621923148](https://github.com/Kiddos19882/AutoDraw/actions/runs/44721915503/artifacts/14621923148) original raw CRC/856 SHA PASS.
+- **H2 DETECTED** 21 physical changed existing-owner RGB pixels with second isolated owner alpha0, across14 variants, 8 widths, alpha unchanged; [measured result](ENGINE001_BPRED001_S3V2J_NEW_NATIVE_ALPHA0_OWNER_INFLUENCE_RESULTS_2026-11-20.md) preserves exact each pixel. QH texture stage RGB0 exact, original C0 final WebGL **21/40** scientific FAIL and original E/F protected FAIL. No S4 BLIND/threshold relaxation/production change. Early test-fixture E2 FAIL retained.
+
 ## 2026-11-20 — ENGINE-001 S3v2h strict native structural negative and S3v2i physical observation
 
 - Preserved S3v2h frozen original Egret E2 36 PASS but E3 BLOCKED first A_ONLY original main stroke() count2 vs E0 required1, [CI44716819436](https://github.com/Kiddos19882/AutoDraw/actions/runs/44716819436), [negative evidence](ENGINE001_BPRED001_S3V2H_STROKE_STEP_BLOCKED_RESULTS_2026-11-20.md) and artifact14620185890. No old acceptance modification.
