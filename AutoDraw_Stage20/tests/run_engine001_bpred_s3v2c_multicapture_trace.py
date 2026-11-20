@@ -7,6 +7,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from contextlib import contextmanager
+from unittest.mock import patch
 
 import numpy as np
 
@@ -57,6 +59,26 @@ def compare_snapshots(images, snapshots):
     return out
 
 
+@contextmanager
+def pinned_native_egret_session(workspace):
+    """Reuse existing P4B7 source harness, but bind EXACT Firefox executable."""
+    path = Path(os.environ.get("AUTODRAW_PINNED_FIREFOX_BINARY", ""))
+    if not path.is_file() or path.name.lower() != "firefox.exe":
+        blocked("PINNED_FIREFOX_EXECUTABLE_MISSING")
+    original_firefox = p4b7.webdriver.Firefox
+
+    def exact_binary_firefox(*args, **kwargs):
+        opts = kwargs.get("options")
+        if opts is None or args:
+            blocked("UNEXPECTED_SOURCE_FIREFOX_CONSTRUCTOR")
+        opts.binary_location = str(path.resolve())
+        return original_firefox(*args, **kwargs)
+
+    with patch.object(p4b7.webdriver, "Firefox", exact_binary_firefox):
+        with p4b7.native_egret_session(workspace) as driver:
+            yield driver
+
+
 def run(workspace, engine, renderer, parent, trace_js, output):
     if output.exists():
         blocked("OUTPUT_EXISTS")
@@ -74,11 +96,11 @@ def run(workspace, engine, renderer, parent, trace_js, output):
     output.mkdir(parents=True)
     v2.write_json(output / "FROZEN_EIGHT_NATIVE_CASES.json", scenes)
     rows = []
-    with p4b7.native_egret_session(workspace) as driver:
+    with pinned_native_egret_session(workspace) as driver:
         caps = {k: driver.capabilities.get(k) for k in
                 ("browserName", "browserVersion", "platformName")}
         if caps["browserName"] != "firefox" or not str(caps["browserVersion"]).startswith("159."):
-            blocked("BROWSER_VERSION_DRIFT")
+            blocked("BROWSER_VERSION_DRIFT_" + str(caps))
         driver.execute_script(trace_js.read_text("utf8"))
         if driver.execute_script(
                 "return typeof window.AutoDrawBPRED_S3v2cCaptureTrace;") != "function":
