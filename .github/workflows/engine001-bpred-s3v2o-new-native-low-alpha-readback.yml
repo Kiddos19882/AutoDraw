@@ -63,6 +63,7 @@ jobs:
             raw=subprocess.check_output(["git","show","HEAD:"+path])
             sha=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
             assert sha==expected,(path,sha,expected)
+            Path(path).write_bytes(raw)
             assert Path(path).read_bytes()==raw
           print("S3V2O_FIRST_FROZEN_E0_AND_PARENT_ORIGINAL_BLOBS_PASS",len(pins))
           '@ | python -
