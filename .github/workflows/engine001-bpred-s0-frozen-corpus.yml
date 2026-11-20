@@ -1,0 +1,83 @@
+name: ENGINE-001 BPRED-S0 frozen native corpus audit
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s0-frozen-corpus.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s0_corpus_audit.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s0_corpus_audit.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-bpred-s0-research
+  cancel-in-progress: true
+
+jobs:
+  frozen-corpus-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned download dependency
+        run: python -m pip install requests==2.32.5
+      - name: E2 isolated corpus/family/sha/crc unit tests
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s0_corpus_audit.py AutoDraw_Stage20/tests/test_engine001_bpred_s0_corpus_audit.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s0_corpus_audit.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download seven ORIGINAL raw native archives and independently verify all members
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s0_corpus_audit.py \
+            --workspace . \
+            --output AutoDraw_Stage20/.bpred-s0-corpus
+      - name: Validate combined artifact and prospective corpus contracts
+        run: |
+          python - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.bpred-s0-corpus")
+          x=json.loads((root/"report.json").read_text("utf8"))
+          assert x["github_sha"]==__import__("os").environ["GITHUB_SHA"]
+          assert x["verified_original_artifacts"]==7
+          assert x["original_archives_crc_sha"]=="PASS"
+          assert x["future_calibration_planned"]==120
+          assert x["future_blind_planned"]==120
+          assert x["future_control_planned"]==11
+          assert x["future_scenes_rendered"]==0
+          assert x["BPRED_E3_NEW_NATIVE"]=="NOT_RUN"
+          future=(root/"future_native_scene_plans.json").read_bytes()
+          history=(root/"historical_raw_member_manifest.json").read_bytes()
+          assert hashlib.sha256(future).hexdigest()==x["future_scene_plan_sha256"]
+          assert hashlib.sha256(history).hexdigest()==x["historical_manifest_sha256"]
+          idx=json.loads(history)
+          assert idx["historical_development_only"] and len(idx["archived_sources"])==7
+          zips=list((root/"original_source_zips").glob("*.zip"))
+          assert len(zips)==7
+          for row in idx["archived_sources"]:
+              p=next(p for p in zips if p.name==row["source"]+"_"+str(row["artifact_id"])+".zip")
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==row["zip_sha256"]
+              with zipfile.ZipFile(p) as z:
+                  assert z.testzip() is None
+          print("BPRED_S0_CI_ARCHIVE7_CRC_SHA_PASS", x["verified_member_files"])
+          print("BPRED_S0_CI_PROSPECTIVE_251_PLANNED_ONLY")
+          PY
+      - name: Preserve seven unmodified original ZIPs and new verified manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s0-frozen-native-corpus-v1
+          path: AutoDraw_Stage20/.bpred-s0-corpus/
+          retention-days: 90
+          if-no-files-found: warn
