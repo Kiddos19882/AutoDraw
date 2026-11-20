@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — BPRED-S1 frozen E0, implementation/testing NEXT (2026-11-20)
+
+- [x] [BPRED-S1 prereg](ENGINE001_BPRED001_S1_SOURCE_GEOMETRY_NATIVE_PREREG_2026-11-20.md) fixed **before new native** at HEAD `e211c58c441a53fbdd9050871aaab6c78ca5ddf9`: frozen S0 120 CALIBRATION only, 3 copy/stroke, H1 M1 odd widths mean logical error ≤0.5 M0 and ≤0.20; H2 other widths identical, full SHA/raw and Firefox159 requirements. S0 BLIND120 remains held out.
+- [ ] **NEXT one:** implement research M0/M1 geometry evaluation using P4D14 native centroid and original S0 manifest, add small E2/tests, execute pinned actual Egret 120 calibration + blank with artifact/verification; preserve all results. E2/E3 S1 NOT_RUN at prereg. No production/S2–S6.
+- [ ] P4D18 protected quality FAIL, P4D19 DEFERRED, exact CHALK/E4/E5 NOT_RUN.
+
+*Ниже S0 complete snapshot сохранён как прежнее состояние.*
+
 ## CURRENT ENGINE-001 — BPRED-S0 complete, S1 next (2026-11-20)
 
 - [x] [BPRED-S0 результаты](ENGINE001_BPRED001_S0_CORPUS_MATERIALIZATION_RESULTS_2026-11-20.md): read-only archive/manifest preparation E2/CI PASS at SHA `5b6ed18a`, 17/17 unit PASS; 7 original ZIPs/3961 members with verified CRC+SHA and source provenance, [artifact14586574667](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555/artifacts/14586574667). **S0 CLOSED for data integrity**, no new live/native brush tests.
