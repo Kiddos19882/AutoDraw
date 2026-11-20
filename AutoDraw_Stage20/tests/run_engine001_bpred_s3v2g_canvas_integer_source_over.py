@@ -150,8 +150,40 @@ def verify_native_parent(z, workspace):
         if sha(z.read(name))!=hash_:
             blocked("SOURCE_MEMBER_SHA_"+name)
     src=json.loads(z.read("FROZEN_S3V2F_MANIFEST.json"))
-    if src!=f.manifest():
-        blocked("SOURCE_MANIFEST_DRIFT")
+    if (src.get("experiment")!=PARENT_EXPERIMENT or
+            src.get("E0_blob")!=PARENT_E0 or
+            src.get("S0_BLIND_used") is not False or
+            src.get("source_game_blob")!=f.p4d3.ENGINE_GIT_BLOB or
+            src.get("source_renderer_blob")!=f.p4d3.RENDERER_GIT_BLOB or
+            src.get("new_primary")!=80 or src.get("replays")!=10 or
+            src.get("blank")!=1 or src.get("final_webgl_PNG")!=91 or
+            src.get("main_PNG")!=80 or src.get("mask_PNG")!=80):
+        blocked("SOURCE_MANIFEST_METADATA_DRIFT")
+    scenes=src.get("scenes")
+    controls=src.get("controls")
+    if (not isinstance(scenes,list) or len(scenes)!=80 or
+            not isinstance(controls,list) or len(controls)!=10 or
+            len({x["sample_id"] for x in scenes})!=80):
+        blocked("SOURCE_MANIFEST_CARDINALITY_DRIFT")
+    expected={(width,relation,variant) for width in f.WIDTHS
+              for relation in f.RELATIONS for variant in f.VARIANTS}
+    actual={(row["width"],row["relation"],row["variant"]) for row in scenes}
+    if actual!=expected:
+        blocked("SOURCE_MANIFEST_MATRIX_DRIFT")
+    for row in scenes:
+        sid=f'BPRED-S3V2F-W{row["width"]:02d}-{row["relation"]}-{row["variant"]}'
+        if (row.get("sample_id")!=sid or
+                row.get("source_plan_sha256")!=s3.digest(s3.canonical(row["source_strokes"])) or
+                row.get("runtime_plan_sha256")!=s3.digest(s3.canonical(row["runtime_strokes"])) or
+                json.loads(z.read(f"native/{sid}/SOURCE_PLAN.json"))!=row["source_strokes"] or
+                json.loads(z.read(f"native/{sid}/RUNTIME_PLAN.json"))!=row["runtime_strokes"]):
+            blocked("SOURCE_MANIFEST_PLAN_SHA_OR_BYTES_DRIFT")
+    if {c["sample_id"] for c in controls}!={f"BPRED-S3V2F-REPLAY-W{w:02d}"
+                                                 for w in f.WIDTHS}:
+        blocked("SOURCE_MANIFEST_CONTROLS_DRIFT")
+    # Original source runner is byte-pinned and every parent ZIP member hash is
+    # verified above. Do not recompute original Windows trig on Linux: math.cos/
+    # sin can legitimately vary by the last bit across platforms.
     return r
 
 
