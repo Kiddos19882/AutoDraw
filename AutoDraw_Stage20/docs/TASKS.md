@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001 / BPRED-S3v2q original incremental Canvas micro-alpha safety (2026-11-20)
+
+- [x] New separately [frozen S3v2q E0](ENGINE001_BPRED001_S3V2Q_NATIVE_INCREMENTAL_MICROALPHA_OWNER_PREREG_2026-11-20.md) Git blob `ac0bd08ee45058e890ef16c75efea58ca27bec47`, committed before code; 80 genuinely new original Egret source cases, 20 original uninstrumented repeat controls + blank, true original per-stroke pre/post/repeat RGBA and post-call Canvas PNG, source-owner zero-safe and G3 unchanged >=90% informative.
+- [x] Research-only original Canvas true stroke observer (ф) `tests/engine001_bpred_s3v2q_incremental_canvas_microalpha.js`, research runner (ф) `tests/run_engine001_bpred_s3v2q_incremental_microalpha_owner.py`, 12 independent unit contracts (ф) `tests/test_engine001_bpred_s3v2q_incremental_microalpha_owner.py`, no production changes.
+- [ ] **NEXT ONE STEP:** run frozen S3v2q E2 and authentic original Egret E3 on exact SHA, verify all native original PNG, raw pre/post/repeat `.rgba`, source provenance and complete ZIP CRC/SHA, then publish scientific Q1–Q5 PASS/FAIL/BLOCKED with every original negative. Never alter acceptance or fitted modes to improve results.
+- [ ] Previous S3v2p original readback51275 pixel cases/83494 RGB-channel −1 and foreign-owner17 in both, G3 usefulness7725/8690 FAIL; earlier S3v2o/S3v2n G3 usefulness FAIL and protected original E/F P4D18 FAIL. S0 BLIND/S4/E4/E5/exact game CHALK NOT_RUN, master/production/Stage6/Bridge/Monitor untouched.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2p measured true Canvas readback; owner physics still unsafe (2026-11-20)
 
 - [x] [S3v2p E0 prereg](ENGINE001_BPRED001_S3V2P_NATIVE_CANVAS_READBACK_VS_COMPOSITION_PREREG_2026-11-20.md) blob44d6f3d72 before code, 80 genuinely NEW source scenes, true original main `stroke()` same-context PNG/getImageData,20 uninstrumented original replay+blank, full raw SHA and unchanged scientific gates.
