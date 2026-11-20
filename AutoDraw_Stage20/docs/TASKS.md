@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 / BPRED-S3v2f prospective new Egret E0 frozen before implementation (2026-11-20)
+
+- [x] [New original Egret S3v2f prereg](ENGINE001_BPRED001_S3V2F_PROSPECTIVE_NATIVE_RGBA8_PREREG_2026-11-20.md) frozen as Git blob `24259eeeadb9451c43390bdcf5a01fb67c7cf39a` at baseline `350f297f`: 80 novel native scenes, 10 repeats+blank, Q0/QC/QH stage and original source-over, actual main/mask Canvas + GL texture upload-state provenance, strict scientific H1 zero RGB QH / H2≥30/40 corrected C0, never S0 BLIND.
+- [ ] **NEXT single S3 step:** complete scoped JS observer, native Python runner and E2 tests; run full Windows Firefox159 Egret E3 CI and archive all raw, source SHA, 80 scenes +40 ordered errors and failed cases. No acceptance gate changes or S4.
+- [ ] Later independent S4 BLIND then S5 original E/F quality then S6 stroke cost; protected original E/F quality FAIL, E4/E5/exact CHALK NOT_RUN, production/master/Stage6/Bridge untouched.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2e source-native diagnostic done; new S3 native proof NEXT (2026-11-20)
 
 - [x] [Frozen S3v2e E0](ENGINE001_BPRED001_S3V2E_RGBA8_QUANTIZATION_PREREG_2026-11-20.md) Git blob `cab7f2d0` BEFORE full Q code; [S3v2e audited result](ENGINE001_BPRED001_S3V2E_RGBA8_QUANTIZATION_RESULTS_2026-11-20.md), [CI44699876591](https://github.com/Kiddos19882/AutoDraw/actions/runs/44699876591) source SHA `bf389d37` E2 36/36, original source E3 80 scenes with 655/655 SHA, output [JSON artifact14612491268](https://github.com/Kiddos19882/AutoDraw/actions/runs/44699876591/artifacts/14612491268) with verified JSON SHA. Initial CI44699612034 math PASS but artifact missing; final upload fail-closed corrected.
