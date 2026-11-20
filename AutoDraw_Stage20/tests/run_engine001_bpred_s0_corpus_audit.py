@@ -19,7 +19,7 @@ import stat
 import zipfile
 import zlib
 
-SCHEMA = "ENGINE001_BPRED_S0_CORPUS_V1"
+SCHEMA = "BPRED001_CORPUS_V1"
 PREREG = "ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md"
 GAME_BLOB = "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
 RENDERER_BLOB = "76d950e0a8911888a9df3b675b866519ecf7bba4"
@@ -129,7 +129,7 @@ def prepare_scene(split, width, angle, length, phase_xy):
             "points": points
         })
     px, py = phase_xy
-    sample_id = f"BPRED_{split}_W{width:02d}_A{angle:03d}_L{length:02d}_PX{px:02d}_PY{py:02d}"
+    sample_id = f"BPRED-W{width:02d}-A{angle:03d}-L{length:02d}-PX{px:02d}-PY{py:02d}"
     family = f"W{width:02d}_A{angle % 180:03d}_L{length:02d}"
     return {
         "sample_id": sample_id, "split": split, "family_id": family,
