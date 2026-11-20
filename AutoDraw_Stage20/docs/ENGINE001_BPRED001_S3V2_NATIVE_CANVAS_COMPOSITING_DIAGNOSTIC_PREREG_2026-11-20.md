@@ -1,0 +1,25 @@
+# ENGINE-001 / BPRED-S3v2 — frozen E0: Canvas2D/WebGL localization of C0 H1 failure
+
+**2026-11-20. E0 заморожен ДО новой S3v2 реализации, новых native captures и анализа stage-specific pixels.** Baseline [S3 negative](ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_RESULTS_2026-11-20.md) CI44683117471, SHA **6dedf6ddfde36db17f07fc0aa00dd463dc525ca8**, artifact14604987986 (91 real PNG, 294 member SHA PASS). Исходный S3 scientific H1 **FAIL** (30/40 ordered), H2 PASS20/20, C1 MODEL_ONLY_UNSAFE. S0→S1→S2→S3→S4→S5→S6 остаётся основным планом; S3v2 — диагностика незавершённого S3, а не новая ветка production.
+
+## 1. Цель, fixed sources и гипотезы
+
+Выяснить, появляется ли расхождение между fixed isolated RGBA source-over C0 и real ordered AB/BA **на исходной Canvas2D временной текстуре** ещё до WebGL или между Canvas → WebGL. Проверить тип pre-/un-premultiplication, цветовой readback и byte quantization как механизмы, но **не пересчитывать frozen S3 H1** на новых порогах/формуле и не принимать C1/DEC-042.
+
+Pin original Egret5.4.1 game blob 46cc74de00b6cb5d207b1e1a2ffcd81613b6d388; tests/game_renderer_reference.js blob 76d950e0a8911888a9df3b675b866519ecf7bba4; P4D3 native session/readback blob3437a9326b381d9c94d6ade80059d40adf233d09. Использовать existing P4D15 scoped CanvasRenderer.renderGraphics capture with strict finally restore; Firefox159 Windows + original renderer unchanged. Исходный S3 E0 blob61996b3253c794c5cd16ca989a70628b6609669f, M2 frozen; никаких P4D18/production/executor/G32/V44 side effects.
+
+**D1:** если истинные две isolated Canvas RGBA recomposed по original S3 C0 совпадают с true Canvas ordered, но final WebGL отличается — несоответствие привязано к texture/upload/readback stage. **D2:** если ошибка уже в истинной промежуточной Canvas ordered, localization=Canvas composition/unpremultiply (не доказательство конкретного метода AA). **D3:** отсутствие однозначного snapshot / transform / provenance делает результат BLOCKED, не «Canvas PASS».
+
+## 2. Замороженная матрица и protocol
+
+Ровно **80 первичных S3 scene plans** из frozen manifest artifact14604987986: widths1..10 × CROSSING/NEAR_PARALLEL_OVERLAP × A_ONLY/B_ONLY/A_THEN_B/B_THEN_A; те же координаты, цвета, порядок, strokeId runtime. Для полноты точные **10 repeat controls (CROSSING AB per width)** + **один blank** — всего 91 final native PNG. **80 primary true intermediate Canvas PNG** через opt-in instrumentation метода original egret.CanvasRenderer.prototype.renderGraphics; capture before/context state with original node bounds + canvas size + getTransform + drawData count; wrapper MUST restore original in finally. Нет shadow renderer, нет подмены draw commands. Если original renderer не создаёт одну однозначную capture для каждой из 80 сцен, BLOCKED с raw snapshot, не расширять отбор posthoc.
+
+Определение native физического выравнивания Canvas→WebGL опирается на фактический node/scale/translation/clip, а не на выбранный shift до результата; любые pixels вне валидно выровненной области или неоднозначный stage mapping = BLOCKED. Учитывать logical vs backing×3 vs Canvas texture coords; 91 PNG финальной стадии должны воспроизводить исходную S3 raw-сцену побайтово либо отдельный технический FAIL, но raw S3 не перезаписывать.
+
+## 3. Fixed analysis и decision gates
+
+- На каждой из **40 ordered AB/BA** сравнить исходную формулу source-over C0 отдельно по двум источникам isolated Canvas RGBA против actual ordered Canvas RGBA, а также isolated final WebGL RGBA против actual final native; для каждого report max/mean RGBA channel deviation в union nonzero alpha, maps, count changed overlap/non-overlap, alpha changes и directional bias. Frozen H1 per ordered max≤2/255 AND mean≤1/255 остаётся неизменным для обеих stage comparisons; не объединять их в один PASS.
+- Технический PASS E3: 80 canvas intermediate PNG + 91 original real native WebGL PNG + 10 byte-exact controls + blank alpha0, valid stage alignment, version/schema/source blobs/manifest/trace, per-file SHA256+CRC, complete negative cases; если native image source, Canvas capture or alignment unavailable, BLOCKED/FAIL and archive diagnostics. E2 minimal deterministic tests for trace restoration, alignment, fixed matrix, no S0 BLIND. PASS технического CI ≠ научный H1 PASS.
+- Нет auto fit gamma, new alpha thresholds, repaired RGB, new C2 accepted predictor, owner protected loss acceptance или чередования цветов по новым данным в этой работе. После cause localization и сохранения FAIL отдельный E0/decision для моделей (если требуется), потом S4 independent held-out. Не вскрывать reserved 120 S0 BLIND, не менять production/master, E4/E5/CHALK NOT_RUN.
+
+**Primary evidence:** S3 raw CI44683117471/artifact14604987986 and saved intermediate/new raw in independently named S3v2 artifact. Действовать как native forensic внутри утверждённого этапа S3, не переходить к S4 при UNKNOWN.

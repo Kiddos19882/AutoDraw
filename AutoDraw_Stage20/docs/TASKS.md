@@ -1,3 +1,11 @@
+## CURRENT ENGINE-001 — S3 native science negative; S3v2 Canvas-stage forensic NEXT (2026-11-20)
+
+- [x] [S3 native result](ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_RESULTS_2026-11-20.md), [CI44683117471](https://github.com/Kiddos19882/AutoDraw/actions/runs/44683117471) SHA6dedf6dd original real Egret: 80 S3 A/B source-owner/ordered +10 replay +blank =91 PNG, native source RGB proof, E2 42/42, 294 member SHA and independent ZIP CRC PASS; S0 BLIND unopened.
+- [x] Frozen S3 C0 **H1 FAIL 30/40** (max6 vs2 bytes); H2 20/20 PASS; C1 M2 alpha24 TP71486 FP236 FN48, confident wrong RGB1420 → unsafe. Exact false cases and maps archived [artifact14604987986](https://github.com/Kiddos19882/AutoDraw/actions/runs/44683117471/artifacts/14604987986); all1994 C0 differing pixels in genuine overlap (posthoc E1/E2 diagnostic).
+- [x] [S3v2 frozen E0](ENGINE001_BPRED001_S3V2_NATIVE_CANVAS_COMPOSITING_DIAGNOSTIC_PREREG_2026-11-20.md) pinned *before new S3v2 implementation/native captures*; do not change S3 science, blind, source E/F acceptance gates. Stage S3 remains PARTIAL because C0 source-over physical fidelity FAIL.
+- [ ] **NEXT single step:** reuse P4D15 original CanvasRenderer.renderGraphics scoped capture on frozen 80 S3 source plans; validate intermediate Canvas vs final WebGL plus true source-over with 91 final PNG, E2/native CI and archived negative cases. No adaptive acceptance or S4 BLIND.
+- [ ] Then S4 independent BLIND, S5 global E/F, S6 safe cost optimisation; P4D18 protected FAIL, E4/E5/CHALK NOT_RUN, production/master untouched.
+
 ## CURRENT ENGINE-001 — S2v5 diagnostic closed; S3 source-over E0 frozen (2026-11-20)
 
 - [x] [результат S2v5](ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_RESULTS_2026-11-20.md) [CI44663535886](https://github.com/Kiddos19882/AutoDraw/actions/runs/44663535886) SHA `9d2aee51575b81de36a05f2bfcc6c3b6e9209f12`: audit original real Egret S2v4: 376/376 member SHA, 120×3 physical ROI, source M2/M5 TP/FP exactly reconstructed, width7 angle111 length23 one repeated FP family with 3 pixels native alpha21/pred128, H3 failure only width1 **5445/6876=79.1885%**. 14+14 unit E2 PASS, artifact14596516744.
