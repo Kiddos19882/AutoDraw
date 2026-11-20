@@ -6,7 +6,7 @@
 (function(root) {
   "use strict";
   const ROI=Object.freeze({x:400,y:220,width:270,height:270});
-  const SCHEMA="ENGINE001_BPRED_S3V2R_ORIGINAL_NATIVE_REPEAT_CONTRAST_V1";
+  const SCHEMA="ENGINE001_BPRED_S3V2R2_ORIGINAL_NATIVE_REPEAT_CONTRAST_V2";
   if(root.AutoDrawBPRED_S3v2rObserverInstalled===true ||
      !root.egret || typeof root.egret.CanvasRenderer!=="function" ||
      !root.AutoDrawGameRendererReference ||
