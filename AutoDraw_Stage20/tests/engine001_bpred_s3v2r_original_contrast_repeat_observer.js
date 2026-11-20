@@ -1,4 +1,4 @@
-/* ENGINE-001/BPRED-S3v2r research-only: 1 or 9 original Egret strokes.
+/* ENGINE-001/BPRED-S3v2r2 E0 V2: 1 or 9 original Egret input strokes.\n * Original real main Canvas emits inputCount+1 stroke() calls. Preserve ALL.
  * Original frozen S3v2c/d/h wrappers deliberately allow only 1 or 2.
  * This wrapper observes the original renderer itself; it does NOT recreate
  * brush physics or alter the engine/mask/texture/other game paths.
@@ -97,7 +97,7 @@
       native.renderer!=="real Egret 5.4.1 BoardPane/WebGLRenderer"||
       native.strokeCount!==strokes.length||
       native.syntheticAcceptedVerticesNotChalk!==2*strokes.length||
-      events.length!==strokes.length||captures.length!==2) {
+      events.length!==strokes.length+1||captures.length!==2) {
       throw new Error("BLOCKED_BPRED_S3V2R_RESTORE_OR_ORIGINAL_STROKE_PROVENANCE "+JSON.stringify({
         restoredRender:renderProto.renderGraphics===render,
         restoredStroke:proto.stroke===stroke,
