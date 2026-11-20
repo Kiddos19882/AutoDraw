@@ -118,7 +118,8 @@ class FrozenNativeReadbackS3v2p(unittest.TestCase):
             row={"sample_id":sid,"step":1,"original_main_canvas_png":pngfile,
                  "native_raw_file":rawfile,"native_raw_sha256":hashlib.sha256(data).hexdigest(),
                  "PNG_vs_getImageData_different_RGBA_pixels":1}
-            item={"scene":{"sample_id":sid},"steps":[None],"readback_meta":[row]}
+            item={"scene":{"sample_id":sid,"width":1,"relation":"CROSS_ROTATED",
+                           "variant":"A_ONLY"},"steps":[None],"readback_meta":[row]}
             cases,errors,bins=p.compare_readbacks([item],root)
             self.assertEqual(len(cases),1)
             self.assertEqual(len(errors),1)
