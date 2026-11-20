@@ -1,9 +1,19 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-044`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-045`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
 
+
+## DEC-045. ENGINE-001 / BPRED-S4-R1 — универсальные автоматически создаваемые карты и разделение изображений без утечки
+
+**2026-11-21. Статус: ACCEPTED DESIGN / FROZEN FUTURE E0; IMPLEMENTATION AND S4 VALIDATION NOT_RUN.** Пользователь одобрил, что готовый AutoDraw обязан сам создавать owner/edge/critical/white/UNKNOWN карты **для любого нового исходного изображения**, без индивидуальных ручных прямоугольников и показа каждому изображению ChatGPT. Принято **дополнение, а не замена** к [BPRED-S0→S6](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md); строгий BLIND S4 по DEC-044 остаётся **BLOCKED**; S3 micro-rounding по DEC-043 прекращён; hard owners/protected original white/FAR≤3/coverage и исходные FAILED gates не пересматриваются.
+
+**Новый prospective [S4-R1 E0 с корпусом и immutable split](ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md)** заморожен до любой новой реализации и тестирования. [Папка из проекта](../data/generated_autodraw_plan/images_31_first/) имеет **31** metadata-верифицированный файл; **8** уже идентичны по Git blob с `testImages`, в том числе `wV6VeZI9S1Y.png`, и становятся историческими `KNOWN_CONTROL`. Остальные **23** предварительно разделены **15 DEV + 8 LOCKED_HELDOUT** до настройки. В E1 проверены имена, Git blob SHA1 и размеры; RAW SHA256, декодирование, перцептивные дубли и семантическое разнообразие **ещё UNKNOWN**. Cross-split duplicate => fail-closed, новый version/split только заранее и отдельно.
+
+**API/алгоритм:** исходный RGB/alpha произвольного размера → original-edge + owner-adjacency + исходный white/transparent + semantic/critical evidence + protected/unknown/candidate maps + координатная привязка/уверенность; при сомнении **UNKNOWN**, не `SAFE`. Переменные P1 `FULL_SHAPE=(320,200,3)`, `ROIS_FULL`, P4B4 3 fixed face/eyes/hands rectangles, оригинальный owner=6 и crop X0=155 не универсальны. Минимально использовать оригинальные функции RGB/Sobel/ΔE и существующие source/owner/native harness, не делать новый parallel planner или присваивать E2 по одной математической маске. Предобученная модель возможна лишь как versioned optional semantic hint, без train на heldout или выдуманного цвета. Если нет достоверной семантики или calibrated per-stroke risk, допуска к исполнению нет.
+
+**Future status:** R1 source-only E2 + frozen 8-image DEV→heldout test не эквивалентны E3 native width1..10 или S4 strict BLIND. Новых code/tests/native runs, S0 BLIND, S5, S6, E4/E5, exact game CHALK и production/master/Stage6/Bridge/Monitor изменений этим решением не разрешалось и не утверждалось. Следующее действие: отдельная разрешённая реализация минимального generic source-array adapter и детерминированных provenance/UNKNOWN проверок по этому E0.
 
 ## DEC-044. ENGINE-001 / BPRED-S4: строгая независимая validation пока BLOCKED, допускается только source-known visual-safety preflight
 
