@@ -273,7 +273,7 @@ def analyze(items,output):
     index={(s["scene"]["width"],s["scene"]["relation"],s["scene"]["variant"]):s for s in items}
     effects=[];cases=[];details=[]
     totals={"true_event_gaps":0,"first_owner_mismatches":0,"incremental_changed_occurrences":0,
-            "alpha_changed_occurrences":0,"nonmicro_channel_occurrences":0,
+            "alpha_changed_occurrences":0,
             "final_nonmicro_RGB_pixels":0,"final_alpha_changed_pixels":0}
     for width in WIDTHS:
         for relation in RELATIONS:
@@ -282,6 +282,7 @@ def analyze(items,output):
                 low=index[(width,relation,bg+"_ONLY")]["final_rb"]
                 zone=(top[:,:,3]==0)&(low[:,:,3]>0)
                 records={}
+                final_changed_masks={}
                 for n in REPEATS:
                     source=index[(width,relation,bg+"_R"+str(n))]
                     event=source["events"]
@@ -318,6 +319,10 @@ def analyze(items,output):
                     final=source["final_rb"]
                     difference=final.astype(np.int16)-low.astype(np.int16)
                     anyfinal=zone & np.any(difference!=0,axis=2)
+                    final_changed_masks[n]=anyfinal.copy()
+                    rgb_abs=np.max(np.abs(difference[:,:,:3]),axis=2)
+                    rgb_histogram={str(k):int((zone&(rgb_abs==k)).sum()) for k in range(3)}
+                    rgb_histogram[">2"]=int((zone&(rgb_abs>2)).sum())
                     alpha=zone & (difference[:,:,3]!=0)
                     nonmicro=zone & np.any(np.abs(difference[:,:,:3])>2,axis=2)
                     maxrgb=int(np.max(np.abs(difference[:,:,:3][zone]))) if np.any(zone) else 0
@@ -351,15 +356,17 @@ def analyze(items,output):
                         "final_alpha_changed_owner_pixels":int(alpha.sum()),
                         "final_RGB_abs_over2_owner_pixels":int(nonmicro.sum()),
                         "final_RGB_max_abs_channel_delta":maxrgb,
+                        "final_RGB_absolute_channel_histogram_0_1_2_gt2":rgb_histogram,
                         "final_original_post_readback_vs_PNG_changed":
                             source["final_png_readback_difference"]
                     }
                 cases.append({
                     "width":width,"relation":relation,"lower_background":bg,
                     "R1":records[1],"R8":records[8],
-                    "additional_final_changed_owner_pixels_R8_vs_R1":
-                        records[8]["final_RGBA_changed_owner_pixels"]-
-                        records[1]["final_RGBA_changed_owner_pixels"],
+                    "new_final_changed_owner_pixels_after_R8_vs_R1":
+                        int((final_changed_masks[8]&~final_changed_masks[1]).sum()),
+                    "restored_final_owner_pixels_after_R8_vs_R1":
+                        int((final_changed_masks[1]&~final_changed_masks[8]).sum()),
                     "additional_final_over2_owner_pixels_R8_vs_R1":
                         records[8]["final_RGB_abs_over2_owner_pixels"]-
                         records[1]["final_RGB_abs_over2_owner_pixels"]
