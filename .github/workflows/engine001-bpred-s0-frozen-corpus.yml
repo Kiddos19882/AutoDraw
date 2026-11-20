@@ -80,4 +80,5 @@ jobs:
           name: engine001-bpred-s0-frozen-native-corpus-v1
           path: AutoDraw_Stage20/.bpred-s0-corpus/
           retention-days: 90
-          if-no-files-found: warn
+          include-hidden-files: true
+          if-no-files-found: error
