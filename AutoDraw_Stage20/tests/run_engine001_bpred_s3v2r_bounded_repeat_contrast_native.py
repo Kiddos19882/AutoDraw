@@ -289,7 +289,7 @@ def analyze(items,output):
                     totals["first_owner_mismatches"]+=first_mismatch
                     gaps=sum(row["pre_vs_previous_post_pixel_gap"] for row in source["events_meta"])
                     totals["true_event_gaps"]+=gaps
-                    changed=0;alpha_changed=0;over2=0
+                    changed=0;alpha_changed=0
                     all_event_positions=set()
                     for k,(pre,post) in enumerate(event):
                         if k==0:
@@ -298,7 +298,6 @@ def analyze(items,output):
                         activity=zone & np.any(delta!=0,axis=2)
                         changed+=int(activity.sum())
                         alpha_changed+=int((activity&(delta[:,:,3]!=0)).sum())
-                        over2+=int(np.count_nonzero(np.abs(delta[:,:,:3])>2 & False)) if False else 0
                         for y,x in np.argwhere(activity):
                             y=int(y);x=int(x)
                             d=delta[y,x]
