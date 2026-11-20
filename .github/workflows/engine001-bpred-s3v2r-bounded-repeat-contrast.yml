@@ -111,7 +111,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import hashlib,json,os
-          root=Path("AutoDraw_Stage20/.bpred-s3v2r-bounded-native")
+          root=Path("AutoDraw_Stage20/.bpred-s3v2r2-bounded-native")
           r=json.loads((root/"report.json").read_text("utf8"))
           assert r["experiment"]=="ENGINE001_BPRED_S3V2R2_BOUNDED_NATIVE_CONTRAST_REPEATED_STROKES_V2"
           assert r["E0_blob"]=="e98acc22663beb7f8051e7626c95f696e405f5f3"
@@ -181,7 +181,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: engine001-bpred-s3v2r2-bounded-contrast-native
-          path: AutoDraw_Stage20/.bpred-s3v2r-bounded-native/
+          path: AutoDraw_Stage20/.bpred-s3v2r2-bounded-native/
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 90
