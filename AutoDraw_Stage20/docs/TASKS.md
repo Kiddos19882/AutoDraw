@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001 / BPRED-S3v2e source-native diagnostic done; new S3 native proof NEXT (2026-11-20)
+
+- [x] [Frozen S3v2e E0](ENGINE001_BPRED001_S3V2E_RGBA8_QUANTIZATION_PREREG_2026-11-20.md) Git blob `cab7f2d0` BEFORE full Q code; [S3v2e audited result](ENGINE001_BPRED001_S3V2E_RGBA8_QUANTIZATION_RESULTS_2026-11-20.md), [CI44699876591](https://github.com/Kiddos19882/AutoDraw/actions/runs/44699876591) source SHA `bf389d37` E2 36/36, original source E3 80 scenes with 655/655 SHA, output [JSON artifact14612491268](https://github.com/Kiddos19882/AutoDraw/actions/runs/44699876591/artifacts/14612491268) with verified JSON SHA. Initial CI44699612034 math PASS but artifact missing; final upload fail-closed corrected.
+- [x] Frozen Q0 12694, QF14250, QR12694, QC**70** RGB stage mismatches; H1-QC diagnostic PASS. QC applied to unchanged true Canvas C0 improves final WebGL H1 **19/40** vs original actual final-WebGL C0 **10/40** (H2-QC diagnostic PASS), yet 21 QC variants still FAIL. Original S3 H1 FAIL30/40, Canvas native H1 2 failures retained; posthoc half-up known-source 0 direct mismatches is NOT independent or an accepted model.
+- [ ] **NEXT one S3 step:** preregister prospective *new* original Egret native stroke/canvas/webgl/GL-state cases, diverse widths/angles/phases/colors, comparing strictly preselected QC and half-up, preserving original source-over quality gates, 21 C0 failed variants and protected E/F FAIL. No S0 BLIND until approved independent S4 after safety.
+- [ ] Then S4 reserved independent BLIND → S5 whole E/F original source planner → S6 cost only after quality gates; E4/E5/exact game CHALK NOT_RUN; Stage6/Bridge/master/production untouched.
+
 ## CURRENT ENGINE-001 / S3v2e prereg frozen, original Canvas→WebGL RGB8 mechanism diagnostic (2026-11-20)
 
 - [x] [S3v2e frozen E0](ENGINE001_BPRED001_S3V2E_RGBA8_QUANTIZATION_PREREG_2026-11-20.md) pinned to real [S3v2d source](ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_RESULTS_2026-11-20.md) before Q0/QF/QR/QC full offline calculations; known observed sample explicitly disclaimed as exploratory, not validation.
