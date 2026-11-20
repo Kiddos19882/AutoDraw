@@ -57,7 +57,17 @@ jobs:
             "AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js": "de3b5c5f956e3de7a71817830874b346904bc9e2",
             "AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js": "383e0b25000f4c387687fb38423dce790f149499",
             "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2j_new_native_alpha0_owner_influence.py": "42167e9dbcfad55dcb38216a335f61a0b93989e5",
-            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py": "c55e13bbcf9d2786f741a56ee7a6b39873fee89f"
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py": "c55e13bbcf9d2786f741a56ee7a6b39873fee89f",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2I_ALL_NATIVE_STROKE_EVENTS_PREREG_2026-11-20.md": "9350e69c5f83747a46c71eeb9142065be928a7a5",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2H_NATIVE_CANVAS_STROKE_STEP_PREREG_2026-11-20.md": "75255a7f48d5be00a34a164edb2bcf03e6349d76",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py": "1bf56df9507f2a34fd16e68eef190229c3184ce5",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "511e81a362c4340e0dfdc36a292faa9cb2ef1e83",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2c_multicapture_trace.py": "974de6a86359e9ff49e2e77ee1f420dffa08064b",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2f_prospective_native_rgba8.py": "0c3b799f6bc22958911d35420a30fef1950813dd",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2i_all_native_stroke_events.py": "fdb1542437d645875c305f94bfddef007b4c3e40",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2h_native_stroke_steps.py": "4ae040c6f3720a5ee8fba43e0e4e9acd640264cd",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py": "3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2e_rgba8_quantization.py": "82f8e0c3f3e10fb30ea61d1beb52edf98696563c"
           }
           for path,expected in pins.items():
             raw=subprocess.check_output(["git","show","HEAD:"+path])
