@@ -1,3 +1,12 @@
+## CURRENT ENGINE-001 — BPRED-S2v3 measured; S2v4 E0 frozen (2026-11-20)
+
+- [x] [BPRED-S2v3 — результаты risk-aware alpha](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_RESULTS_2026-11-20.md): [CI44657226273](https://github.com/Kiddos19882/AutoDraw/actions/runs/44657226273) `fe39bba1` 16 new+10 parent+14 regression E2 PASS, H1/H2/H3 PASS, M2 FP2167→M4 FP63, M2 TP346712→M4 TP341139; **critical zero FP FAIL**, still MODEL_ONLY. First CI44657070988 FAIL due missing synthetic phase values, fixed only tests.
+- [x] [BPRED-S2v4 — E0 новых native-сцен](ENGINE001_BPRED001_S2V4_NEW_NATIVE_CORE_VALIDATION_PREREG_2026-11-20.md) fixed **before new S2v4 code/native measurements**: new 120 Egret angle/phase families vs reserved S0 BLIND, M5 alpha>=128, H1 zero FP, H2 TP≥90% M2, H3 per width≥80% / angle≥85%, 10 byte-exact repeats+blank. Known calibration FP0 at alpha>=128 posthoc only, NOT independent.
+- [ ] **NEXT единственный:** research-only native S2v4 limited runner+E2/tests/isolated E3 CI, archive 131 new Egret scenes and full errors, no threshold changes, preserve BLIND S4. S2 not production-safe; no S3–S6 promotion.
+- [ ] P4D18 source protected FAIL, P4D19 DEFERRED, E4/E5/CHALK NOT_RUN, master/production untouched.
+
+*Ниже предыдущий S2v2→S2v3 snapshot — история.*
+
 ## CURRENT ENGINE-001 — BPRED-S2v2 FAILED science, S2v3 E0 frozen (2026-11-20)
 
 - [x] [BPRED-S2v2 — отрицательный isotonic результат](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESULTS_2026-11-20.md): [CI44652423011](https://github.com/Kiddos19882/AutoDraw/actions/runs/44652423011) SHA4656b62e technical E2/CI PASS, but **H1 FAIL/H2 FAIL/H3 PASS**; M3 improves FP2167→1315 at cost FN559→1237 and MAE2.4705→2.5062, **not accepted**. 3-fold group heldout CALIBRATION, no new Egret, no S0 BLIND.

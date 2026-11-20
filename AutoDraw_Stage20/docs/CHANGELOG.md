@@ -1,3 +1,7 @@
+## 2026-11-20 — ENGINE-001 BPRED-S2v3 guarded alpha and frozen S2v4 new-native E0 (research)
+
+- [BPRED-S2v3 — результаты risk-aware alpha](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_RESULTS_2026-11-20.md) [CI44657226273](https://github.com/Kiddos19882/AutoDraw/actions/runs/44657226273) source SHAfe39bba: 40 E2 tests incl parents, H1/H2/H3 PASS, FP2167→63, TP346712→341139 (98.39%), **zero-FP FAIL**; archived all negative errors and prior fixture FAIL. [BPRED-S2v4 — E0 новых native-сцен](ENGINE001_BPRED001_S2V4_NEW_NATIVE_CORE_VALIDATION_PREREG_2026-11-20.md) prereg new 120 previously unknown Egret scenes (10 widths×3 angles×2 lengths×2 phases), controls and H gates, S0 BLIND preserved; production/master unchanged.
+
 ## 2026-11-20 — ENGINE-001 BPRED-S2v2 negative result and S2v3 risk-aware prereg (research)
 
 - [BPRED-S2v2 — отрицательный isotonic результат](ENGINE001_BPRED001_S2V2_ISOTONIC_ALPHA_RESULTS_2026-11-20.md): [CI44652423011](https://github.com/Kiddos19882/AutoDraw/actions/runs/44652423011) code SHA4656b62e technical PASS, but weighted-isotonic M3 **H1/H2 FAIL**, H3 PASS, M3 not promoted; retained artifact14591791460 and FP/FN/MAE negatives. [BPRED-S2v3 — frozen E0 risk-aware alpha/UNKNOWN](ENGINE001_BPRED001_S2V3_RISK_AWARE_ALPHA_PREREG_2026-11-20.md) frozen before future S2v3 implementation: per-width alpha error quantile guard, all non-trusted positives UNKNOWN, internal angle family cross-validation only. Original renderer/production/master unchanged.
