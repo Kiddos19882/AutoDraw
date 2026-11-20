@@ -1,0 +1,59 @@
+name: ENGINE-001 BPRED-S4R1 generic source maps E2 and 31-image integrity (no heldout maps)
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-generic-source-maps.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_generic_source_maps.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_generic_source_maps.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md'
+      - 'AutoDraw_Stage20/data/generated_autodraw_plan/images_31_first/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-source-maps
+  cancel-in-progress: true
+jobs:
+  generic-s4r1-e2-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install previously pinned P1-style numerical source dependencies
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: E0 provenance and E2 generic source/coordinates/UNKNOWN regression tests
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          e0=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md").read_bytes()
+          actual=hashlib.sha1(b"blob "+str(len(e0)).encode()+b"\0"+e0).hexdigest()
+          assert actual=="5211c8ce5bb8b7b0106f7adf5c4c779a92f7a688",(actual,"R1_E0_CHANGED")
+          print("S4R1_FIRST_E0_BLOB_VERIFIED",actual)
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s4r1_generic_source_maps.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_generic_source_maps.py AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_generic_source_maps.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E2 frozen corpus bytes EXIF RGBA and source-only near-duplicate screen BEFORE DEV maps
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py --root . --output AutoDraw_Stage20/.bpred-s4r1-source-only/corpus_integrity.json --dev-maps-dir AutoDraw_Stage20/.bpred-s4r1-source-only/dev_maps
+      - name: Upload E2 source audit and DEV-only geometry masks (never heldout maps)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-source-only-dev-audit
+          path: AutoDraw_Stage20/.bpred-s4r1-source-only/
+          if-no-files-found: warn
+          retention-days: 21
