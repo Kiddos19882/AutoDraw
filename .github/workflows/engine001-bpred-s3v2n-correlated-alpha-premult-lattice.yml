@@ -1,0 +1,134 @@
+name: ENGINE-001 BPRED-S3v2n correlated original Egret source E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3v2n-correlated-alpha-premult-lattice.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2n_correlated_alpha_premult.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s3v2n-correlated-original
+  cancel-in-progress: true
+jobs:
+  original-native-source-known-math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          submodules: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen source math dependencies
+        run: python -m pip install numpy==2.2.6 Pillow==11.3.0 opencv-python-headless==4.11.0.86 scikit-image==0.25.2 scipy==1.15.3 selenium==4.38.0 requests==2.32.5
+      - name: Verify original first E0 and frozen parents by Git object SHA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,hashlib
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2N_CORRELATED_ALPHA_PREMULT_TRANSITIONS_PREREG_2026-11-20.md":"81f1a18ed5b04265123c337a3cbd63985a835307",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2M_FULL_FRACTIONAL_ALPHA_INTEGER_LATTICE_PREREG_2026-11-20.md":"33d40233c271bb8086d1d9c01d45eef3b401679e",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2m_full_fractional_alpha_lattice.py":"e06e952aea7109495cc80d388d69d745d83d85c0",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2l_isolated_rgb_lattice.py":"bb627835448b29f8d4dd89898190d50ad7798884",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2k_owner_alpha_interval.py":"ecd8feea792ce4a104bfe7001004419273730e7f"}
+          for path,expect in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              sha=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert sha==expect,(path,sha,expect)
+              Path(path).write_bytes(raw)
+          print("BPRED_S3V2N_FIRST_E0_AND_PARENT_GIT_BLOBS_PASS",len(pins))
+          PY
+      - name: E2 all original alpha fractions rational transitions and negative regressions
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2n_correlated_alpha_premult.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2m_full_fractional_alpha_lattice.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2l_isolated_rgb_lattice.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3v2k_owner_alpha_interval.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download four existing original source and negative Egret artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44721915503 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2j-new-native-alpha0-owner-risk-80 -D AutoDraw_Stage20/.bpred-s3v2n-original
+          gh run download 44741517301 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2k-original-source-owner-alpha-interval -D AutoDraw_Stage20/.bpred-s3v2n-k
+          gh run download 44743578450 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2l-original-isolated-native-RGB-lattice -D AutoDraw_Stage20/.bpred-s3v2n-l
+          gh run download 44751330819 -R Kiddos19882/AutoDraw -n engine001-bpred-s3v2m-full-alpha-native-source-lattice -D AutoDraw_Stage20/.bpred-s3v2n-m
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile,ZIP_DEFLATED
+          for suffix,n in (("original",857),("k",4),("l",3),("m",3)):
+              root=Path("AutoDraw_Stage20/.bpred-s3v2n-"+suffix)
+              files=sorted(p for p in root.rglob("*") if p.is_file())
+              assert len(files)==n and (root/"report.json").is_file(),(suffix,len(files))
+              output=Path("AutoDraw_Stage20/.bpred-s3v2n-"+suffix+".zip")
+              with ZipFile(output,"x",compression=ZIP_DEFLATED) as z:
+                  for p in files:z.write(p,p.relative_to(root).as_posix())
+              with ZipFile(output) as z:assert z.testzip() is None and len(z.namelist())==n
+          print("BPRED_S3V2N_ORIGINAL_4_ZIP_CRC_PASS")
+          PY
+      - name: Evaluate frozen G3 on all 40 real original Egret isolated source frames
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2n_correlated_alpha_premult.py --workspace . --source-zip AutoDraw_Stage20/.bpred-s3v2n-original.zip --negative-zip AutoDraw_Stage20/.bpred-s3v2n-k.zip --lattice-zip AutoDraw_Stage20/.bpred-s3v2n-l.zip --previous-zip AutoDraw_Stage20/.bpred-s3v2n-m.zip --output AutoDraw_Stage20/.bpred-s3v2n-result
+      - name: Independently check source baseline and all archived negative pixel hashes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,hashlib
+          root=Path("AutoDraw_Stage20/.bpred-s3v2n-result")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2N_CORRELATED_ALPHA_PREMULT_TRANSITIONS_V1"
+          assert r["E0_blob"]=="81f1a18ed5b04265123c337a3cbd63985a835307"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"] and str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
+          assert r["original_source_run"]=="44721915503" and r["original_source_sha"]=="ad1fa7fd66d4df563d729b7faae27651ca8279ea"
+          assert r["source_original_member_SHA_verified"]==856
+          assert r["prior_S3v2k_negative_RGB"]==3186 and r["prior_S3v2l_F2_negative_RGB"]==327
+          assert r["prior_S3v2m_run"]=="44751330819" and r["prior_S3v2m_sha"]=="442fc99c094dda7c93af1c86354c51a905bf7200"
+          assert r["prior_G1_misses"]==0 and r["prior_G1_informative"]==6360
+          assert r["original_true_isolated_scenes"]==40
+          assert r["original_partial_alpha_physical_pixels"]==8648 and r["original_alpha16_254_physical_pixels"]==7753
+          assert r["original_opaque_native_pixels"]==53752
+          assert r["D0_source_provenance"]=="PASS"
+          assert r["D1_original_RGB_coverage"] in ("PASS_SOURCE_KNOWN_ONLY","FAIL")
+          assert r["D2_usefulness_frozen90pct"] in ("PASS","FAIL")
+          assert r["D3_opaque_owner_control"]=="PASS"
+          assert r["D4_original_C0_canvas_pass40"]==31 and r["D4_original_C0_QH_webgl_pass40"]==21
+          assert r["D4_source_alpha0_owner_damage"]==21
+          assert r["D4_S3v2k_I1"]=="FAIL_UNCHANGED" and r["D4_S3v2l_F2"]=="FAIL_UNCHANGED" and r["D4_S3v2m_G2"]=="FAIL_UNCHANGED"
+          assert r["original_EF_protected_quality"]=="FAIL_UNCHANGED"
+          assert r["source_owner_safety"]=="MODEL_ONLY_UNKNOWN" and not r["S0_BLIND_used"]
+          assert not r["new_original_E3"] and not r["production_promotion"]
+          assert r["E4_live_game"]=="NOT_RUN" and r["E5_independent"]=="NOT_RUN" and r["exact_game_CHALK"] is None
+          rows=json.loads((root/"ALL_40_G3_CORRELATED_NATIVE_SOURCE.json").read_text("utf8"))
+          failures=json.loads((root/"ALL_G3_ORIGINAL_NATIVE_RGB_MISSES.json").read_text("utf8"))
+          buckets=json.loads((root/"G3_ORIGINAL_ALPHA_BUCKETS.json").read_text("utf8"))
+          assert len(rows)==40 and len({x["sample_id"] for x in rows})==40
+          assert sum(x["partial_alpha_pixels"] for x in rows)==8648
+          assert sum(x["G3_misses"] for x in rows)==len(failures)==r["G3_out_of_interval_physical_pixels"]
+          assert sum(x["G3_informative_alpha16_254"] for x in rows)==r["G3_informative_alpha16_254"]
+          assert sum(x["old_F2_327_recovered"] for x in rows)==r["G3_recovered_prior_F2_negative"]
+          assert len(buckets)==4 and sum(b["partial"] for b in buckets.values())==8648
+          assert set(r["members_sha256"])=={"ALL_40_G3_CORRELATED_NATIVE_SOURCE.json","ALL_G3_ORIGINAL_NATIVE_RGB_MISSES.json","G3_ORIGINAL_ALPHA_BUCKETS.json"}
+          for name,s in r["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==s,name
+          print("BPRED_S3V2N_OUTPUT_CRC_SHA_VERIFIER_PASS",len(r["members_sha256"]))
+          print("BPRED_S3V2N_FROZEN_SCIENCE",r["D1_original_RGB_coverage"],len(failures),r["D2_usefulness_frozen90pct"],r["G3_informative_alpha16_254"],"/7753")
+          PY
+      - name: Archive positive and ALL original negative pixels on any result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3v2n-correlated-original-source-lattice
+          path: AutoDraw_Stage20/.bpred-s3v2n-result/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
