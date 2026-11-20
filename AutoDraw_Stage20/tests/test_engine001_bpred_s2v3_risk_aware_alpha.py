@@ -30,6 +30,7 @@ def made_cell(m2tp=100,m2fp=4,m4tp=95,m4fp=0):
 def synthetic_rows(**kw):
     return [{
         "sample_id":f"w{w}-a{a}-z{z}", "width":w,"angle_deg":a,
+        "phase_x":v3.v1.PHASES[z % 2][0],"phase_y":v3.v1.PHASES[z % 2][1],
         "cells":[made_cell(**kw) for _ in range(3)]
     } for w in range(1,11) for a in v3.ANGLES for z in range(4)]
 
