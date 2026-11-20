@@ -1,0 +1,137 @@
+name: ENGINE-001 BPRED-S3 frozen native two-owner source-over
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s3-native-source-over.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3_native_source_over.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-bpred-s3-native-source-over
+  cancel-in-progress: true
+
+jobs:
+  native-original-egret-two-color:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Firefox 159.0 for original Egret 5.4.1
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install pinned existing native browser-analysis dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Restore frozen Git blob bytes and verify authentic game/renderer
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          if (-not (Test-Path -LiteralPath $env:BROWSER_PATH -PathType Leaf)) { throw 'Pinned Firefox159 not found' }
+          & $env:BROWSER_PATH --version
+          @'
+          from pathlib import Path
+          import hashlib, subprocess
+          pins={
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3_NATIVE_SOURCE_OVER_PREREG_2026-11-20.md":"61996b3253c794c5cd16ca989a70628b6609669f",
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py":"3437a9326b381d9c94d6ade80059d40adf233d09",
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s2_alpha_aa_eval.py":"ed29df1d559409d5a5783556a12c30d24df7118d",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4d16_canvas_aa_density.py":"9f30dbe7cd2e2cb913db1d4f816e74b80668125d",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              got=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert got==expected,(path,got,expected)
+              Path(path).write_bytes(raw)
+              assert Path(path).read_bytes()==raw
+          print("BPRED_S3_FROZEN_SOURCE_BLOBS_PASS",len(pins))
+          '@ | python -
+      - name: E2 deterministic matrix, true source-over and S2 M2 regression
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py AutoDraw_Stage20/tests/test_engine001_bpred_s3_native_source_over.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s3_native_source_over.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2_alpha_aa_eval.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_bpred_s2v4_native_core.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: E3 80 original Egret color scenes plus 10 exact repeats and blank
+        shell: pwsh
+        env:
+          BROWSER_PATH: ${{ steps.firefox.outputs.firefox-path }}
+        run: |
+          $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --output AutoDraw_Stage20/.bpred-s3-native
+      - name: Independent archive inventory and unmodified scientific gate audit
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os
+          root=Path("AutoDraw_Stage20/.bpred-s3-native")
+          report=json.loads((root/"report.json").read_text("utf8"))
+          assert report["experiment"]=="ENGINE001_BPRED_S3_NATIVE_SOURCE_OVER_V1"
+          assert report["github_sha"]==os.getenv("GITHUB_SHA")
+          assert str(report["github_run_id"])==os.getenv("GITHUB_RUN_ID")
+          assert report["native_primary_scenes"]==80
+          assert report["native_replay_controls"]==10
+          assert report["native_blank_scenes"]==1
+          assert report["native_total_PNG"]==91
+          assert report["native_blank_alpha0"] and report["all_replays_RGBA_exact"]
+          assert report["native_browser"]["browserVersion"].startswith("159.")
+          assert report["source_game_git_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert report["source_renderer_git_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert report["frozen_E0_git_blob"]=="61996b3253c794c5cd16ca989a70628b6609669f"
+          assert not report["S0_BLIND_used"] and not report["production_promotion"]
+          assert report["E4_game"]=="NOT_RUN" and report["E5_independent"]=="NOT_RUN"
+          assert report["exact_run_bound_CHALK"] is None
+          assert report["C0_H1_all_40_ordered_composites"] in ("PASS","FAIL")
+          assert report["H2_all_20_order_pairs"] in ("PASS","FAIL")
+          rows=[json.loads(x) for x in (root/"CASE_ROWS_APPEND_ONLY.jsonl").read_text("utf8").splitlines()]
+          assert len(rows)==20 and len({r["pair_id"] for r in rows})==20
+          assert {r["width"] for r in rows}==set(range(1,11))
+          assert {r["relation"] for r in rows}=={"CROSSING","NEAR_PARALLEL_OVERLAP"}
+          assert all(set(r["variants"])=={"A_THEN_B","B_THEN_A"} for r in rows)
+          assert all(all(p["exact_owner_rgb_alpha255_pixels"]>0 for p in r["source_RGB_proof"].values()) for r in rows)
+          manifest=json.loads((root/"FROZEN_S3_MANIFEST.json").read_text("utf8"))
+          assert len(manifest["scenes"])==80 and len(manifest["controls"])==10
+          assert len(list((root/"native").rglob("*_REAL_EGRET.png")))==80
+          assert len(list((root/"replays").glob("*_REAL_EGRET.png")))==10
+          assert (root/"S3_REAL_EGRET_BLANK.png").is_file()
+          assert len(list((root/"error_maps").glob("*_ERRORS.npz")))==40
+          for name,expected in report["members_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("BPRED_S3_91_TRUE_EGRET_PNG_AND_SOURCE_HASHES_PASS",len(report["members_sha256"]))
+          print("BPRED_S3_SCIENCE_H1_H2_H3",
+                report["C0_H1_all_40_ordered_composites"],
+                report["H2_all_20_order_pairs"],
+                report["H3_C1_owner_diagnostic"])
+          PY
+      - name: Preserve all native RGBA, negative outcomes and byte-exact evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s3-native-two-owner-91
+          path: AutoDraw_Stage20/.bpred-s3-native/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
