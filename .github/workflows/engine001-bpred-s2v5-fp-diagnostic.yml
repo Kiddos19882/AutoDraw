@@ -38,6 +38,7 @@ jobs:
         run: |
           python - <<'PY'
           import subprocess,hashlib
+          from pathlib import Path
           expect={
             'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S2V5_FALSE_SAFE_DIAGNOSTIC_PREREG_2026-11-20.md':'05b4caded0264b643d6748fd19bc9ffd39acb532',
             'AutoDraw_Stage20/tests/run_engine001_bpred_s2v4_native_core.py':'366ee70961ea97622c18dc639475aa6548829cb2',
@@ -49,6 +50,9 @@ jobs:
               raw=subprocess.check_output(['git','show','HEAD:'+path])
               calc=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
               assert calc==sha,(path,calc,sha)
+              # Windows checkout can normalize LF to CRLF; restore frozen Git blob bytes.
+              Path(path).write_bytes(raw)
+              assert Path(path).read_bytes()==raw
           print('BPRED_S2V5_E0_AND_SOURCE_PINS_PASS',len(expect))
           PY
       - name: Synthetic E2 diagnostic regressions and docs integrity
