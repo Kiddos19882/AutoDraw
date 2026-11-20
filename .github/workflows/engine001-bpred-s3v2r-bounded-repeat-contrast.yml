@@ -1,9 +1,9 @@
-name: ENGINE-001 BPRED-S3v2r bounded original Egret contrast and repeated brush strokes
+name: ENGINE-001 BPRED-S3v2r2 corrected original Egret true n+1 stroke events
 on:
   push:
     branches: ['feature/image-geometry-optimization']
     paths:
-      - '.github/workflows/engine001-bpred-s3v2r-bounded-repeat-contrast.yml'
+      - '.github/workflows/engine001-bpred-s3v2r2-bounded-repeat-contrast.yml'
       - 'AutoDraw_Stage20/tests/run_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py'
       - 'AutoDraw_Stage20/tests/test_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py'
       - 'AutoDraw_Stage20/tests/engine001_bpred_s3v2r_original_contrast_repeat_observer.js'
@@ -66,6 +66,7 @@ jobs:
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2Q_NATIVE_INCREMENTAL_MICROALPHA_OWNER_PREREG_2026-11-20.md": "ac0bd08ee45058e890ef16c75efea58ca27bec47",
             "AutoDraw_Stage20/tests/engine001_bpred_s3v2q_incremental_canvas_microalpha.js": "e975ab15f7f4b5646b6d53c8f55fe6bd1f8e6911",
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2R_BOUNDED_REPEAT_CONTRAST_NATIVE_PREREG_2026-11-20.md": "1909565e0a9e4fc7b742e88f2324b848d8f9e017",
+            "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2R2_ORIGINAL_EVENT_COUNT_CORRECTION_PREREG_2026-11-20.md": "e98acc22663beb7f8051e7626c95f696e405f5f3",
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2I_ALL_NATIVE_STROKE_EVENTS_PREREG_2026-11-20.md": "9350e69c5f83747a46c71eeb9142065be928a7a5",
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2H_NATIVE_CANVAS_STROKE_STEP_PREREG_2026-11-20.md": "75255a7f48d5be00a34a164edb2bcf03e6349d76",
             "AutoDraw_Stage20/tests/run_engine001_bpred_s3_native_source_over.py": "1bf56df9507f2a34fd16e68eef190229c3184ce5",
@@ -102,7 +103,7 @@ jobs:
         run: |
           $env:PATH = (Split-Path $env:BROWSER_PATH -Parent) + ";" + $env:PATH
           $env:AUTODRAW_PINNED_FIREFOX_BINARY = $env:BROWSER_PATH
-          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --selector-js AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js --stroke-js AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js --observer-js AutoDraw_Stage20/tests/engine001_bpred_s3v2r_original_contrast_repeat_observer.js --output AutoDraw_Stage20/.bpred-s3v2r-bounded-native
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s3v2r_bounded_repeat_contrast_native.py --workspace . --engine AutoDraw_Stage20/gameEngine/main.min_653f95bc.js --renderer AutoDraw_Stage20/tests/game_renderer_reference.js --trace-js AutoDraw_Stage20/tests/engine001_bpred_s3v2c_multicapture_trace.js --selector-js AutoDraw_Stage20/tests/engine001_bpred_s3v2d_source_node_selector.js --stroke-js AutoDraw_Stage20/tests/engine001_bpred_s3v2h_original_stroke_step_trace.js --observer-js AutoDraw_Stage20/tests/engine001_bpred_s3v2r_original_contrast_repeat_observer.js --output AutoDraw_Stage20/.bpred-s3v2r2-bounded-native
       - name: Independently audit new original genuine native per-stroke raw, controls, and all negatives
         shell: bash
         run: |
@@ -111,8 +112,8 @@ jobs:
           import hashlib,json,os
           root=Path("AutoDraw_Stage20/.bpred-s3v2r-bounded-native")
           r=json.loads((root/"report.json").read_text("utf8"))
-          assert r["experiment"]=="ENGINE001_BPRED_S3V2R_BOUNDED_NATIVE_CONTRAST_REPEATED_STROKES_V1"
-          assert r["E0_blob"]=="1909565e0a9e4fc7b742e88f2324b848d8f9e017"
+          assert r["experiment"]=="ENGINE001_BPRED_S3V2R2_BOUNDED_NATIVE_CONTRAST_REPEATED_STROKES_V2"
+          assert r["E0_blob"]=="e98acc22663beb7f8051e7626c95f696e405f5f3"
           assert r["github_sha"]==os.environ["GITHUB_SHA"]
           assert str(r["github_run_id"])==os.environ["GITHUB_RUN_ID"]
           assert r["browser"]["browserName"]=="firefox" and str(r["browser"]["browserVersion"]).startswith("159.")
@@ -122,7 +123,8 @@ jobs:
           assert r["new_original_source_scenes"]==42
           assert r["native_original_main_PNG"]==42 and r["native_original_mask_PNG"]==42
           assert r["original_native_webgl_PNG"]==49
-          assert r["original_main_strokes"]==150 and r["original_direct_prepost_RGBA"]==300
+          assert r["original_input_source_strokes"]==150
+          assert r["original_main_strokes"]==192 and r["original_direct_prepost_RGBA"]==384
           assert r["uninstrumented_replays"]==6 and r["replay_all_ROI_exact"] is True
           assert r["blank_original_alpha0"] is True
           assert r["T1_strict_foreign_zero"] in ("FAIL","NO_HARM_OBSERVED_IN_NEW_SAMPLE_ONLY")
@@ -130,6 +132,7 @@ jobs:
           assert r["T2_micro_threshold2_diagnostic_only"] is True
           assert r["T2_visually_acceptable_unproven"] is True
           assert r["T4_previous_S3v2q_strict_foreign"]=="FAIL_20"
+          assert r["T4_original_failed_S3v2r_V1_provenance"]=="FAIL_N_PLUS_ONE_MAIN_EVENTS"
           assert r["T4_previous_S3v2q_G3_usefulness"]=="FAIL_7653_OF_8633"
           assert r["T4_original_EF_protected_quality"]=="FAIL_UNCHANGED"
           assert r["T4_internal_fractional_alpha"]=="UNKNOWN"
@@ -140,13 +143,15 @@ jobs:
           assert len(m["scenes"])==42 and len({s["sample_id"] for s in m["scenes"]})==42
           assert len(m["replays"])==6
           assert sum(len(s["runtime_strokes"]) for s in m["scenes"])==150
+          assert m["original_main_stroke_events"]==192
+          assert m["direct_rgba_expected"]==384
           cases=json.loads((root/"ALL_12_TRUE_REPEATED_NATIVE_OWNER_PAIRS.json").read_text("utf8"))
           effects=json.loads((root/"EVERY_TRUE_INCREMENTAL_OWNER_CHANGED_PIXEL.json").read_text("utf8"))
           details=json.loads((root/"EVERY_FINAL_NON_MICRO_OR_ALPHA_CHANGED_PIXEL.json").read_text("utf8"))
           events=json.loads((root/"ALL_TRUE_NATIVE_STROKE_EVENT_METADATA.json").read_text("utf8"))
           replay=json.loads((root/"INDEPENDENT_REPLAY_CONTROLS.json").read_text("utf8"))
           assert len(cases)==12 and len(effects)==r["T1_affected_original_pixel_occurrences"]
-          assert len(events)==150
+          assert len(events)==192
           assert len(replay)==6 and all(x["uninstrumented_native_webgl_ROI_exact"] for x in replay)
           assert sum(c["R1"]["final_RGB_abs_over2_owner_pixels"]+c["R8"]["final_RGB_abs_over2_owner_pixels"] for c in cases)==r["T2_final_nonmicro_RGB_abs_gt2_pixels"]
           assert sum(c["R1"]["final_alpha_changed_owner_pixels"]+c["R8"]["final_alpha_changed_owner_pixels"] for c in cases)==r["T2_final_changed_alpha_pixels"]
@@ -154,8 +159,8 @@ jobs:
           native=root/"native"
           for pattern,expected in [
               ("*_REAL_MAIN_CANVAS.png",42),("*_REAL_MASK_CANVAS.png",42),
-              ("*_REAL_WEBGL.png",42),("*_REAL_STROKE_STEP_*.png",150),
-              ("*_REAL_PRE_STROKE_*.rgba",150),("*_REAL_POST_STROKE_*.rgba",150),
+              ("*_REAL_WEBGL.png",42),("*_REAL_STROKE_STEP_*.png",192),
+              ("*_REAL_PRE_STROKE_*.rgba",192),("*_REAL_POST_STROKE_*.rgba",192),
               ("TRUE_ORIGINAL_NATIVE_PROVENANCE.json",42)
           ]:
               found=len(list(native.rglob(pattern)))
@@ -174,7 +179,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: engine001-bpred-s3v2r-bounded-contrast-native
+          name: engine001-bpred-s3v2r2-bounded-contrast-native
           path: AutoDraw_Stage20/.bpred-s3v2r-bounded-native/
           include-hidden-files: true
           if-no-files-found: warn
