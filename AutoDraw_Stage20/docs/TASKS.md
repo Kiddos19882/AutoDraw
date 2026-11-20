@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 / S3v2e prereg frozen, original Canvas→WebGL RGB8 mechanism diagnostic (2026-11-20)
+
+- [x] [S3v2e frozen E0](ENGINE001_BPRED001_S3V2E_RGBA8_QUANTIZATION_PREREG_2026-11-20.md) pinned to real [S3v2d source](ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_RESULTS_2026-11-20.md) before Q0/QF/QR/QC full offline calculations; known observed sample explicitly disclaimed as exploratory, not validation.
+- [ ] **NEXT within S3:** E2 offline runner and CI on existing original Egret main/isolated/ordered Canvas and WebGL, test QC integer premult/unpremult vs Q0/QF/QR, freeze original source-over, archive all 80/40 and negative cases; H1 QC diagnostic comparison is not S4 and cannot relax frozen original Canvas38/40/final10/40 FAIL.
+- [ ] If plausible, independently preregister NEW native input and actual GL stage instrumentation before causal or safety acceptance; otherwise preserve failure. No S0 BLIND, E/F protected FAIL, E4/E5/CHALK NOT_RUN, no executor/master.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2d full native done; next S3 RGB texture-stage E0 (2026-11-20)
 
 - [x] [S3v2d frozen E0](ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_PREREG_2026-11-20.md) before implementation; [true Canvas-vs-WebGL evidence](ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_RESULTS_2026-11-20.md) [CI44697386598](https://github.com/Kiddos19882/AutoDraw/actions/runs/44697386598) code SHA2ba4241b original Egret technical PASS E2 43 and E3 80 true Canvas main+80 mask+91 WebGL with all source SHA/91 parent RGBA exact.
