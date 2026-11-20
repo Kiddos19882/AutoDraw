@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001 / BPRED-S2v1 E0 frozen BEFORE implementation (2026-11-20)
+
+- [x] [S2 prereg](ENGINE001_BPRED001_S2_PHYSICAL_ALPHA_AA_CALIBRATION_PREREG_2026-11-20.md) locked on HEAD `0dfe1bbd57e8bd70de742f14b2805157b4a0326d`: immutable S1 120 CALIBRATION native source, M0/M1/M2 unchanged P4D16, H1/H2/H3 thresholds, per physical alpha1/24 FP/FN and MAE, no new native renders and S4 BLIND untouched. E2/E3 S2 NOT_RUN when frozen.
+- [ ] **NEXT:** implement read-only native PNG alpha evaluator and E2/CI, archive all negative results on new SHA. If native mismatch/discovered data issue -> BLOCKED; if poor alpha model -> H_FAIL / MODEL_ONLY, no threshold adjustments. Do not move to S3 or production before review.
+
+*Ниже прежний S1 PASS, S2 NEXT снимок.*
+
 ## CURRENT ENGINE-001 — BPRED-S1 geometry E3 PASS, BPRED-S2 NEXT (2026-11-20)
 
 - [x] [BPRED-S1 — результаты настоящей кисти](ENGINE001_BPRED001_S1_NATIVE_SOURCE_GEOMETRY_RESULTS_2026-11-20.md); prereg [S1 E0](ENGINE001_BPRED001_S1_SOURCE_GEOMETRY_NATIVE_PREREG_2026-11-20.md) committed before tests, SHA `606e3f8e`. Research SHA `f38f2dbf`: native Egret Firefox159 [CI44646682797](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797) 120/120 calibration+blank, 360 centroid observations, H1 mean0.7197485571→0.0320447431 widths1/3 PASS, H2 unchanged other widths PASS, ideal bbox alpha24 false-negative=0 **only calibration**. E2 S1 12/12 + archived P4D14 10/10, 363/363 member SHA, [artifact14589516497](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682797/artifacts/14589516497); [general validation](https://github.com/Kiddos19882/AutoDraw/actions/runs/44646682725) required5/5 PASS.
