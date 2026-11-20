@@ -55,5 +55,6 @@ jobs:
         with:
           name: engine001-bpred-s4r1-source-only-dev-audit
           path: AutoDraw_Stage20/.bpred-s4r1-source-only/
-          if-no-files-found: warn
+          if-no-files-found: error
+          include-hidden-files: true
           retention-days: 21
