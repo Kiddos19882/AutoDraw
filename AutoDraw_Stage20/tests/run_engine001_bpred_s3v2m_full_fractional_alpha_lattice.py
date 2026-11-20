@@ -130,7 +130,7 @@ def run(source_zip,k_zip,l_zip,output,workspace=None):
                                  "G1_width_le16_alpha16to254":int((q&useful).sum()),
                                  "G2_unknown_low_alpha":int((a<=15).sum()),
                                  "G2_unknown_wide_alpha16to254":int((q&~useful).sum()),
-                                 "G1_recovered_F2_negative":sum((case["sample_id"],int(xs[i]),int(ys[i])) in original_negative_keys and covered[i] for i in range(len(a)))})
+                                 "G1_recovered_F2_negative":int(sum((case["sample_id"],int(xs[i]),int(ys[i])) in original_negative_keys and bool(covered[i]) for i in range(len(a))))})
         if len(rows)!=40 or total!=8648 or qualified!=7753 or opaque!=53752 or len(original_negative_keys)!=327:
             blocked("ORIGINAL_NATIVE_SOURCE_DRIFT")
         if len(recovered)+sum(m["was_F2_negative"] for m in misses)!=327:
