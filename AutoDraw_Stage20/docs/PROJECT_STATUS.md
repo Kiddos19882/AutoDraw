@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 — BPRED-S0 DONE corpus/manifest integrity; BPRED-S1 NEXT (2026-11-20)
+
+[BPRED-S0 результаты](ENGINE001_BPRED001_S0_CORPUS_MATERIALIZATION_RESULTS_2026-11-20.md): [final CI44644039555](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555) SHA `5b6ed18a065740c3a99b3463129c36118fc6514c` verified seven original ZIP CRC+**3961/3961** member SHA and source SHA; 17/17 E2 tests PASS, frozen `BPRED001_CORPUS_V1` manifest120 calibration/120 blind/11 controls, [archive14586574667](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555/artifacts/14586574667) published. **S0 PASS only for data integrity**, no fresh 251 native scenes (NOT_RUN), no BPRED prediction accuracy claim. NEXT S1 E0 geometry then separate allowed development/tests. P4D18 protected quality FAIL, P4D19 DEFERRED; E4/E5/exact CHALK NOT_RUN, master/production unchanged.
+
+*Ниже предыдущий S0 E1 PARTIAL — исторический снимок.*
+
 ## CURRENT ENGINE-001 / BPRED-S0 — source audit E1 PARTIAL (2026-11-20)
 
 [BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md): проверены архивные E3 CI SHA, native artifact metadata, действующие source functions, существенные ограничения модели P4D16 (только two-point и widths1/2/3/5/10 для независимых dx/dy phases); frozen E0 будущих 120 calibration /120 blind /11 control сцен до разработки. Архивные member hashes и новый BPRED raw corpus в этом чате **NOT_RUN**, следовательно **S0 PARTIAL**, E2/E3/E4/E5 BPRED NOT_RUN. P4D19 DEFERRED, P4D18 protected-quality FAIL. NEXT: материализация/audit raw с разрешёнными кодом/тестами; production/master не изменены.

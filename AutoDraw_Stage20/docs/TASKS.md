@@ -1,3 +1,12 @@
+## CURRENT ENGINE-001 — BPRED-S0 complete, S1 next (2026-11-20)
+
+- [x] [BPRED-S0 результаты](ENGINE001_BPRED001_S0_CORPUS_MATERIALIZATION_RESULTS_2026-11-20.md): read-only archive/manifest preparation E2/CI PASS at SHA `5b6ed18a`, 17/17 unit PASS; 7 original ZIPs/3961 members with verified CRC+SHA and source provenance, [artifact14586574667](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555/artifacts/14586574667). **S0 CLOSED for data integrity**, no new live/native brush tests.
+- [x] `BPRED001_CORPUS_V1` prepared: 120 calibration+120 blind+11 controls, disjoint angles and 251 deterministic native *plans*, 0 new renders.
+- [ ] **NEXT один:** BPRED-S1 separate numerical/source Egret geometry E0 prereg before M0/M1 code/new native tests; then consented research-only E2/E3. S2..S6 OPEN, no production adoption.
+- [ ] P4D19 deferred, P4D18 protected quality FAIL, E4/E5/CHALK NOT_RUN.
+
+*Ниже прежнее S0 partial состояние — история.*
+
 ## CURRENT ENGINE-001 — BPRED-S0 source inventory E1 PARTIAL (2026-11-20)
 
 - [x] [BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md) E1 static inventory of P4D3/4/14/15/16, native E/F, pinned source refs, original CI artifacts, model limitations.

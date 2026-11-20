@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 — S0 complete, BPRED-S1 first unfinished (2026-11-20)
+
+**DONE:** [BPRED-S0 результаты](ENGINE001_BPRED001_S0_CORPUS_MATERIALIZATION_RESULTS_2026-11-20.md) from [CI44644039555](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555) SHA5b6ed18a: archived seven Egret corpora audited for CRC/3961 SHA, E2 17/17 PASS and [consolidated artifact14586574667](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555/artifacts/14586574667); `BPRED001_CORPUS_V1` 251 frozen prospective scenes, **none rendered**. **NEXT:** S1 prereg quantified M0/M1 true Egret geometry/coordinate phase experiment, then source-faithful predictor; S2 alpha, S3 compositing, S4 blind, S5 whole E/F, S6 safe stroke optimisation per [plan](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md). P4D18 quality FAIL; no game/master/production changes.
+
+*Ниже старый S0 partial roadmap — история.*
+
 ## CURRENT ENGINE-001 — BPRED-S0 partially completed source/corpus inventory (2026-11-20)
 
 [BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md) (baseline `6bb28b50`): E1 source/matrix/native archive review и prospective E0 split 120 calibration+120 blind+11 controls выполнены. **Следующий один шаг:** S0 raw artifact materialization with complete CRC/SHA, deterministic manifest, group-isolation E2 validation; E2/E3 BPRED NOT_RUN, permission needed for development/tests. Затем S1 source geometry → S2 physical alpha → S3 ordered RGBA → S4 blind native safety → S5 global original E/F plan → S6 quality-preserving stroke optimization по [плану](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md). P4D19 DEFERRED; production/master untouched.

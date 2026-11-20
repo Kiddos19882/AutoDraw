@@ -1,3 +1,7 @@
+## 2026-11-20 — ENGINE-001 BPRED-S0 seven frozen ZIPs verified and consolidated (research only)
+
+- [BPRED-S0 результаты](ENGINE001_BPRED001_S0_CORPUS_MATERIALIZATION_RESULTS_2026-11-20.md): new (ф) `tests/run_engine001_bpred_s0_corpus_audit.py`, (ф) `tests/test_engine001_bpred_s0_corpus_audit.py`, (ф) `.github/workflows/engine001-bpred-s0-frozen-corpus.yml`, all research-only; [CI44644039555](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555) SHA5b6ed18a PASS, 17 E2 tests, 7 original ZIP CRC/3961 member SHA verified, [artifact14586574667](https://github.com/Kiddos19882/AutoDraw/actions/runs/44644039555/artifacts/14586574667) includes unchanged raw originals and `BPRED001_CORPUS_V1` 251 prospective plans only (0 native renders). Prior corrupted-ZIP E2 FAIL and missing-upload case preserved. No production/master or CHALK/live claims.
+
 ## 2026-11-20 — ENGINE-001 / BPRED-S0 native corpus source inventory (documentation only)
 
 - Recorded [BPRED-S0: инвентаризация и frozen split](ENGINE001_BPRED001_S0_CORPUS_INVENTORY_AND_SPLIT_PREREG_2026-11-20.md): pinned original P4D3/P4D4/P4D14/P4D15/P4D16/E/F evidence, native artifacts and explicit model limitations; froze future distinct angle-family calibration/holdout definition (120/120/11) before any new tests. S0 source E1 PARTIAL, data materialization and all new E2/E3/E4/E5 NOT_RUN; no production changes or altered historical results.
