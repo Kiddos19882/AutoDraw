@@ -56,7 +56,7 @@ jobs:
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2_NATIVE_CANVAS_COMPOSITING_DIAGNOSTIC_PREREG_2026-11-20.md": "d8d703779f6364a3dda8e8edf9717fe0d065ef45",
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2B_DEBG_EQUIVALENCE_PREREG_2026-11-20.md": "23c5772e9193c760c0611287a44c877b8f10ab7f",
             "AutoDraw_Stage20/docs/ENGINE001_BPRED001_S3V2D_MAIN_NODE_STAGE_PREREG_2026-11-20.md": "1eb60858facc4d208f238ca9bb1c39e2f937ca1b", 
-            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "0a14757ca4a412f86f561164cda15b1c389513c1", 
+            "AutoDraw_Stage20/tests/run_engine001_bpred_s3v2_native_canvas_stage.py": "ae2c78418a1733a2f98087497cda826cea7fec3b", 
             "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
             "AutoDraw_Stage20/tests/game_renderer_reference.js": "76d950e0a8911888a9df3b675b866519ecf7bba4",
             "AutoDraw_Stage20/tests/run_engine001_b1r_p4d3_native_brush_repeatability.py": "3437a9326b381d9c94d6ade80059d40adf233d09",
