@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001/BPRED-S3v2r2 original main n+1 source event correction and bounded next run (2026-11-20)
+
+- [x] [DEC-043 bounded research plan](ENGINE001_BPRED001_BOUNDED_RESEARCH_AND_VISUAL_QUALITY_PLAN_2026-11-20.md) approved; old scientific zero owner and source usefulness immutable; candidate RGB2 diagnostic only.
+- [x] [Original V1 E0](ENGINE001_BPRED001_S3V2R_BOUNDED_REPEAT_CONTRAST_NATIVE_PREREG_2026-11-20.md) blob1909565e preserved with [first technical FAIL CI44809494536](https://github.com/Kiddos19882/AutoDraw/actions/runs/44809494536) and [diagnostic technical FAIL CI44810040626](https://github.com/Kiddos19882/AutoDraw/actions/runs/44810040626); *no accepted native scientific source results*. Real original single input stroke emits two main `stroke()` calls; original renderer/main/mask verified and methods restored.
+- [x] [New separate S3v2r2 V2 E0](ENGINE001_BPRED001_S3V2R2_ORIGINAL_EVENT_COUNT_CORRECTION_PREREG_2026-11-20.md) blob `e98acc22663beb7f8051e7626c95f696e405f5f3` before V2 implementation; same42 new source scenes/150 original source strokes, but true main count192=150+42 extra original callbacks,384 raw pre-post observations,6 untouched original WebGL replay and blank. Require every event and signed owner changes, no fitted parameter.
+- [ ] **NEXT:** run S3v2r2 exact-SHA native E2/E3 to archive full192 genuine main events,384 pre/post native RGBA and original final WebGL; independently CRC/SHA and owner RGB>2/alpha cumulative contrasts, one decision. Earlier S3v2q strict foreign20 Q2 FAIL and G3 useful7653/8633 Q4 FAIL remain; S0 BLIND/S4/E4/E5/exact CHALK NOT_RUN, no production/master/Stage6/Bridge/Monitor.
+
 ## CURRENT ENGINE-001/BPRED-S3v2r one bounded original native repeated-brush study (2026-11-20)
 
 - [x] [DEC-043 bounded research/visual-quality plan](ENGINE001_BPRED001_BOUNDED_RESEARCH_AND_VISUAL_QUALITY_PLAN_2026-11-20.md) accepted; original old scientific owner-zero and fixed G3>=90% FAIL results preserved; prioritize native gap-spacing/coverage later instead of indefinite RGB byte tests.
