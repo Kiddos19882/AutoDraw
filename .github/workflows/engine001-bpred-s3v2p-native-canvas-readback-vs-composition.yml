@@ -77,7 +77,7 @@ jobs:
             assert sha==expected,(path,sha,expected)
             Path(path).write_bytes(raw)
             assert Path(path).read_bytes()==raw
-          print("S3V2O_FIRST_FROZEN_E0_AND_PARENT_ORIGINAL_BLOBS_PASS",len(pins))
+          print("S3V2P_FIRST_FROZEN_E0_AND_PARENT_ORIGINAL_BLOBS_PASS",len(pins))
           '@ | python -
       - name: E2 new independent geometry and native true Canvas readback exact-byte tests
         shell: bash
