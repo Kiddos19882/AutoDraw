@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001 / S3v2g frozen E0 Canvas2D integer source-over investigation (2026-11-20)
+
+- [x] [S3v2g E0](ENGINE001_BPRED001_S3V2G_CANVAS_INTEGER_SOURCE_OVER_PREREG_2026-11-20.md) Git blob `9dd47155d284f63c81cbb525ad757b137c287f11` BEFORE P1/P2/P3 implementation: known S3v2f original Egret E3 only, P0 frozen source straight RGB reference, premultiplied byte blend hypotheses and low-alpha representability/UNKNOWN.
+- [ ] **NEXT single bounded S3 step:** run 10 arithmetic tests plus source 655 hash/CRC verification and 40 owner variants against real saved Canvas/WebGL in new S3v2g offline E2 CI; preserve negative cases/archives and original 23/40 native Canvas source-over/14/40 corrected final baselines. No fresh E3/S0 BLIND promotion.
+- [ ] If math insufficient, new premultiplied Canvas internal-stage native experiment with separately frozen E0; S4/S5/S6 and protected E/F quality remain blocked; E4/E5/exact CHALK NOT_RUN, no production/master.
+
 ## CURRENT ENGINE-001 / BPRED-S3v2f prospectively verified stage; S3 Canvas compositing NEXT (2026-11-20)
 
 - [x] [Frozen original Egret S3v2f E0](ENGINE001_BPRED001_S3V2F_PROSPECTIVE_NATIVE_RGBA8_PREREG_2026-11-20.md) Git blob `24259eeeadb9451c43390bdcf5a01fb67c7cf39a` BEFORE new code and 80 scenes; [S3v2f native results](ENGINE001_BPRED001_S3V2F_PROSPECTIVE_NATIVE_RGBA8_RESULTS_2026-11-20.md), [CI44710870514](https://github.com/Kiddos19882/AutoDraw/actions/runs/44710870514) source SHA `819b7fd2`: 48 E2 PASS, 80 true main+80 true mask Canvas,91 native WebGL, 10 exact ROI replays/blank0, true GL uploads, [raw artifact14617442073](https://github.com/Kiddos19882/AutoDraw/actions/runs/44710870514/artifacts/14617442073) 655/655 member SHA/CRC PASS.
