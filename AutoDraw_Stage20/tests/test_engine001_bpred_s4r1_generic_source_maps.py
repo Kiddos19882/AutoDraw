@@ -299,5 +299,144 @@ class Owner128ProvisionalBindingTest(unittest.TestCase):
         with self.assertRaises((ValueError, OSError)):
             provisional_game128_owner_maps(b"not an image", palette, prov)
 
+
+
+from engine001_bpred_s4r1_generic_source_maps import original_source_region_uncertainty
+
+
+class OriginalSourceRegionUncertaintyTest(unittest.TestCase):
+    # Synthetic originals here define independent source truth. No real image
+    # owner/semantic label is inferred from the nearest game swatch.
+    def test_two_source_regions_edges_protected_and_core_not_safe(self):
+        a = solid(88, 48, rgb=(30, 45, 70))
+        a[:, 44:, :3] = [235, 30, 50]
+        known_truth = np.zeros(a.shape[:2], dtype=np.uint8)
+        known_truth[:, 44:] = 1
+        source = generic_source_maps(a)
+        seg = original_source_region_uncertainty(a, source)
+        self.assertEqual(seg["region_ids"].shape, (48, 88))
+        self.assertEqual(seg["counts"]["opaque"], 88 * 48)
+        self.assertGreater(seg["counts"]["regions"], 0)
+        self.assertGreater(seg["counts"]["geometric_potential_core"], 0)
+        self.assertFalse(seg["geometric_potential_core"][:, 42:46].any())
+        self.assertTrue((seg["source_region_warning"] |
+                         source["protected"])[:, 43:45].all())
+        self.assertEqual(seg["source_owner_status"], "MISSING")
+        self.assertEqual(seg["region_owner_accuracy"],
+                         "UNKNOWN_NO_INDEPENDENT_REAL_SOURCE_LABELS")
+        self.assertEqual(seg["stroke_admission"],
+                         "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION")
+        self.assertTrue(source["unknown"][
+            seg["geometric_potential_core"]].all())
+        self.assertTrue(np.array_equal(known_truth[:, :43], 0 * known_truth[:, :43]))
+        self.assertTrue(np.array_equal(known_truth[:, 45:], np.ones_like(known_truth[:, 45:])))
+
+    def test_alpha_holes_excluded_and_source_untouched(self):
+        a = solid(64, 48, rgb=(63, 77, 99))
+        a[15:28, 19:35, 3] = 0
+        a[6, 12, 3] = 126
+        original = a.copy()
+        source = generic_source_maps(a)
+        seg = original_source_region_uncertainty(a, source)
+        self.assertFalse(seg["region_ids"][15:28, 19:35].any())
+        self.assertEqual(int(seg["region_ids"][6, 12]), 0)
+        self.assertFalse(seg["geometric_potential_core"][15:28, 19:35].any())
+        self.assertFalse(seg["geometric_potential_core"][6, 12])
+        self.assertTrue(np.array_equal(a, original))
+        self.assertTrue(np.array_equal(
+            seg["source_medoids_preview_rgba"][15:28, 19:35], a[15:28, 19:35]
+        ))
+        self.assertTrue(np.array_equal(
+            seg["source_medoids_preview_rgba"][:, :, 3], a[:, :, 3]
+        ))
+        self.assertEqual(seg["counts"]["opaque"], 64 * 48 - (28-15)*(35-19)-1)
+
+    def test_every_medoid_is_a_true_pixel_of_its_own_source_region(self):
+        a = solid(51, 35, rgb=(35, 78, 109))
+        a[:, 16:33, :3] = [185, 111, 54]
+        a[:, 33:, :3] = [20, 35, 70]
+        a[5:11, 3:10, :3] = [255, 255, 255]
+        seg = original_source_region_uncertainty(a, generic_source_maps(a))
+        present = np.unique(seg["region_ids"])
+        self.assertEqual(present.tolist(), list(range(1, len(present) + 1)))
+        for entry in seg["representatives"]:
+            x, y = entry["source_pixel_xy"]
+            label = entry["region_id"]
+            self.assertEqual(int(seg["region_ids"][y, x]), label)
+            self.assertEqual(a[y, x, :3].tolist(), entry["source_rgb"])
+            self.assertEqual(int(np.count_nonzero(seg["region_ids"] == label)),
+                             entry["pixels"])
+        original_colors = set(map(tuple, a[:, :, :3].reshape(-1, 3).tolist()))
+        medoid_colors = set(map(tuple, seg[
+            "source_medoids_preview_rgba"][:, :, :3].reshape(-1, 3).tolist()))
+        self.assertTrue(medoid_colors.issubset(original_colors))
+
+    def test_thin_original_source_line_produces_warning_without_semantic_claim(self):
+        a = solid(61, 57, rgb=(216, 202, 179))
+        a[28, 7:54, :3] = [18, 24, 36]
+        source = generic_source_maps(a)
+        seg = original_source_region_uncertainty(a, source)
+        self.assertGreater(int(source["source_edge"].sum()), 0)
+        self.assertTrue(np.all(seg["source_region_warning"][
+            source["source_edge"] & (a[:, :, 3] == 255)]))
+        self.assertFalse(seg["geometric_potential_core"][
+            source["source_edge"]].any())
+        self.assertEqual(seg["semantic_detail_status"],
+                         "UNKNOWN_NO_VERIFIED_SEMANTIC_MODEL")
+
+    def test_deterministic_region_labels_and_preview(self):
+        a = solid(38, 26)
+        a[:, 20:, :3] = [240, 35, 22]
+        a[8:17, 4:13, :3] = [30, 190, 45]
+        original = a.copy()
+        source = generic_source_maps(a)
+        x = original_source_region_uncertainty(a, source)
+        y = original_source_region_uncertainty(a, source)
+        for key in ("region_ids", "source_medoids_preview_rgba",
+                    "region_boundary", "region_color_uncertain",
+                    "source_region_warning", "geometric_potential_core"):
+            self.assertTrue(np.array_equal(x[key], y[key]), key)
+        self.assertEqual(x["counts"], y["counts"])
+        self.assertTrue(np.array_equal(original, a))
+        self.assertEqual(x["source_rgba_sha256"],
+                         hashlib.sha256(a.tobytes()).hexdigest())
+
+    def test_empty_alpha_yields_zero_regions_and_zero_core(self):
+        a = solid(17, 13)
+        a[:, :, 3] = 0
+        s = original_source_region_uncertainty(a, generic_source_maps(a))
+        self.assertEqual(s["counts"]["regions"], 0)
+        self.assertEqual(s["counts"]["geometric_potential_core"], 0)
+        self.assertEqual(s["segmentation_method"], "NO_OPAQUE_SOURCE_PIXELS")
+        self.assertEqual(s["representatives"], [])
+        self.assertTrue(np.array_equal(s["source_medoids_preview_rgba"], a))
+
+    def test_small_and_narrow_shapes_fail_closed_with_alpha_component_fallback(self):
+        for wh in ((1, 1), (1, 23), (2, 3), (7, 2)):
+            a = solid(*wh)
+            src = generic_source_maps(a)
+            s = original_source_region_uncertainty(a, src)
+            self.assertEqual(s["region_ids"].shape, (wh[1], wh[0]))
+            self.assertTrue((s["region_ids"] > 0).all())
+            self.assertTrue(s["stroke_admission"].startswith("FORBIDDEN"))
+
+    def test_wrong_source_provenance_and_true_owner_binding_rejected(self):
+        a = solid(23, 19)
+        source = generic_source_maps(a)
+        mutated = a.copy()
+        mutated[2, 4, :3] = [255, 0, 10]
+        with self.assertRaisesRegex(ValueError, "ORIGINAL_RGB_ALPHA_MISMATCH"):
+            original_source_region_uncertainty(mutated, source)
+        corrupt = dict(source)
+        corrupt["candidate_interior"] = np.ones(a.shape[:2], dtype=bool)
+        with self.assertRaisesRegex(ValueError, "UNSAFE_SOURCE_MASK"):
+            original_source_region_uncertainty(a, corrupt)
+        owner = np.zeros(a.shape[:2], dtype=np.int16)
+        palette = np.array([[42, 81, 119]], dtype=np.uint8)
+        source_bound = generic_source_maps(a, owner_index=owner,
+                                           owner_palette_rgb=palette)
+        with self.assertRaisesRegex(ValueError, "INPUT_PROVENANCE"):
+            original_source_region_uncertainty(a, source_bound)
+
 if __name__ == "__main__":
     unittest.main()
