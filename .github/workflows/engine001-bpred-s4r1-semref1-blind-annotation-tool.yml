@@ -87,20 +87,20 @@ jobs:
           (out/"semref1_blind_annotator.js").write_bytes(js)
           (out/"SOURCE_METADATA.json").write_text(json.dumps(md,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
           (out/"README_RU.txt").write_text(
-            "AutoDraw SEMREF1: офлайн-инструмент ручной независимой разметки.\\n"
-            "Открой semref1_blind_annotator.html в актуальном Chrome/Firefox.\\n"
-            "Выбери из отдельного ранее скачанного GitHub-архива один из ЧЕТЫРЕХ оригиналов.\\n"
-            "Инструмент проверит байтовый SHA-256 и правильные размеры.\\n"
-            "Ручным маркером отметь важные детали/границы и несколько внутренних\\n"
-            "одноцветных областей. Пустые участки не являются отрицательной разметкой.\\n"
-            "Введи псевдоним и выбери проверку A. Сохрани ДВА файла PNG+JSON.\\n"
-            "Для второго независимого автора — те же оригиналы, без доступа к\\n"
-            "меткам первого, с другим псевдонимом и вариантом B.\\n"
-            "Нужно по 2 пары файлов на каждый из 4 оригиналов.\\n"
-            "Не используйте готовые маски/наложения CR1/SAM2/OneFormer как эталон.\\n"
-            "Никакие исходные изображения и метки браузер никуда не отправляет.\\n"
-            "Проверка человека на независимость не выполняется автоматически.\\n"
-            "STRICT S4 BLOCKED, H8/BLIND120 untouched.\\n",
+            "AutoDraw SEMREF1: офлайн-инструмент ручной независимой разметки.\n"
+            "Открой semref1_blind_annotator.html в актуальном Chrome/Firefox.\n"
+            "Выбери из отдельного ранее скачанного GitHub-архива один из ЧЕТЫРЕХ оригиналов.\n"
+            "Инструмент проверит байтовый SHA-256 и правильные размеры.\n"
+            "Ручным маркером отметь важные детали/границы и несколько внутренних\n"
+            "одноцветных областей. Пустые участки не являются отрицательной разметкой.\n"
+            "Введи псевдоним и выбери проверку A. Сохрани ДВА файла PNG+JSON.\n"
+            "Для второго независимого автора — те же оригиналы, без доступа к\n"
+            "меткам первого, с другим псевдонимом и вариантом B.\n"
+            "Нужно по 2 пары файлов на каждый из 4 оригиналов.\n"
+            "Не используйте готовые маски/наложения CR1/SAM2/OneFormer как эталон.\n"
+            "Никакие исходные изображения и метки браузер никуда не отправляет.\n"
+            "Проверка человека на независимость не выполняется автоматически.\n"
+            "STRICT S4 BLOCKED, H8/BLIND120 untouched.\n",
             encoding="utf8")
           assert len(entries)==4 and len(list(out.glob("*.jpg")))==0 and len(list(out.glob("*.png")))==0
           print("SEMREF1_FROZEN_SOURCE_METADATA_4_DEV_ONLY",json.dumps(entries))
@@ -128,6 +128,24 @@ jobs:
             fs.writeFileSync('/tmp/semref1-synthetic-test-rgb.png',Buffer.from(await png.arrayBuffer()));
             console.log('SEMREF1_NODE_SYNTHETIC_CORE_PASS',Array.from(mask));
           })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - name: Validate packaged offline HTML syntax, frozen DEV metadata, no remote scripts
+        run: |
+          node - <<'JS'
+          const fs=require('node:fs');
+          const vm=require('node:vm');
+          const html=fs.readFileSync('AutoDraw_Stage20/.semref1-blind-annotation-tool/semref1_blind_annotator.html','utf8');
+          if(html.includes('__SEMREF1_SOURCE_META_JSON__'))throw Error('UNBOUND_METADATA');
+          const meta=html.match(/<script id="semref1SourceMetadata" type="application\/json">([\s\S]*?)<\/script>/);
+          if(!meta)throw Error('NO_EMBEDDED_FROZEN_SOURCE_META');
+          const data=JSON.parse(meta[1]);
+          if(data.images.length!==4 || !data.images.every(v=>v.role==='DEV' && v.original_hw?.length===2 && /^[a-f0-9]{64}$/.test(v.original_rgba_sha256)))
+             throw Error('INVALID_META_ROLES_OR_SHAPES');
+          const inline=html.match(/<script>\s*([\s\S]*?)<\/script>/);
+          if(!inline)throw Error('NO_UI_SCRIPT');
+          new vm.Script(inline[1],{filename:'semref1_inline_ui.js'}); // syntax only; no simulated human validation.
+          if(/<script\s+src=["']https?:/.test(html))throw Error('REMOTE_SCRIPT_FORBIDDEN');
+          console.log('SEMREF1_LOCAL_HTML_JS_SYNTAX_AND_FROZEN_METADATA_PASS');
           JS
       - name: Independent Pillow decode and exact RGB code / source geometry gate
         run: |
