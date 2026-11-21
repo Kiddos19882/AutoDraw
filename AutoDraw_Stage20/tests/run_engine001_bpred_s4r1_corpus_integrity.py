@@ -21,6 +21,7 @@ from PIL import Image
 
 from engine001_bpred_s4r1_generic_source_maps import (
     decode_original, generic_source_maps, provisional_game128_owner_maps,
+    original_source_region_uncertainty,
 )
 from run_engine001_b1r_p3b_engine128_adaptive32 import read_engine_palette
 
@@ -168,7 +169,12 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
         assert proposal["proposal_status"].startswith("PROVISIONAL")
         assert maps["counts"]["candidate_interior"] == 0
         assert proposal["stroke_admission"].startswith("FORBIDDEN")
-
+        regions = original_source_region_uncertainty(src["rgba"], maps)
+        assert regions["source_rgba_sha256"] == hashlib.sha256(
+            src["rgba"].tobytes()).hexdigest()
+        assert regions["source_owner_status"] == "MISSING"
+        assert regions["stroke_admission"].startswith("FORBIDDEN")
+        assert np.all(regions["geometric_potential_core"] <= maps["unknown"])
         assert maps["stroke_admission"].startswith("FORBIDDEN")
         prefix = hashlib.sha256(name.encode("utf8")).hexdigest()[:12]
         png_sha = {}
@@ -188,7 +194,17 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
         ).save(edges_png)
         png_sha["provisional_owner_edges"] = hashlib.sha256(
             edges_png.read_bytes()).hexdigest()
-        assert len(png_sha) == 6
+        medoid_png = output / (prefix + "_source_region_medoids.png")
+        Image.fromarray(regions["source_medoids_preview_rgba"], mode="RGBA"
+                        ).save(medoid_png)
+        png_sha["source_region_medoids"] = hashlib.sha256(
+            medoid_png.read_bytes()).hexdigest()
+        warning_png = output / (prefix + "_source_region_warning.png")
+        Image.fromarray(regions["source_region_warning"].astype(np.uint8) * 255,
+                        mode="L").save(warning_png)
+        png_sha["source_region_warning"] = hashlib.sha256(
+            warning_png.read_bytes()).hexdigest()
+        assert len(png_sha) == 8
         assert (proposal["counts"]["opaque_assigned_provisionally"] +
                 proposal["counts"]["unassigned_nonopaque"] ==
                 src["height"] * src["width"])
@@ -201,6 +217,17 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             "stroke_admission": maps["stroke_admission"],
             "counts": maps["counts"],
             "derived_png_sha256": png_sha,
+            "original_source_regions": {
+                "version": regions["version"],
+                "segmentation_method": regions["segmentation_method"],
+                "source_rgba_sha256": regions["source_rgba_sha256"],
+                "counts": regions["counts"],
+                "representatives": regions["representatives"],
+                "source_owner_status": regions["source_owner_status"],
+                "region_owner_accuracy": regions["region_owner_accuracy"],
+                "semantic_detail_status": regions["semantic_detail_status"],
+                "stroke_admission": regions["stroke_admission"],
+            },
             "owner128_proposal": {
                 "version": proposal["version"],
                 "status": proposal["proposal_status"],
@@ -215,7 +242,10 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             },
         })
     assert len(summaries) == 23
-    assert len(list(output.glob("*.png"))) == 23 * 6
+    assert len(list(output.glob("*.png"))) == 23 * 8
+    if not any(s["original_source_regions"]["counts"]["geometric_potential_core"] > 0
+               for s in summaries):
+        raise ValueError("FAIL_NOT_USEFUL_S4R1_ALL_DEV_SOURCE_REGION_CORES_EMPTY")
     (output / "dev_summary.json").write_text(
         json.dumps(summaries, ensure_ascii=False, indent=2), encoding="utf8")
     return summaries
@@ -237,7 +267,8 @@ def main() -> int:
     if args.dev_maps_dir is not None:
         summaries = run_dev_maps(args.root, result, args.dev_maps_dir)
         print("S4R1_DEV_ONLY_SOURCE_MAPS", len(summaries),
-              "OWNER128_ONLY_PROVISIONAL", "STROKE_ADMISSION_ALWAYS_FORBIDDEN")
+              "OWNER128_ONLY_PROVISIONAL", "SOURCE_REGIONS_MODEL_ONLY",
+              "STROKE_ADMISSION_ALWAYS_FORBIDDEN")
     return 0
 
 
