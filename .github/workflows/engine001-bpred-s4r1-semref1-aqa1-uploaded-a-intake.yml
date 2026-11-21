@@ -1,0 +1,72 @@
+name: ENGINE-001 BPRED-S4R1 SEMREF1 AQA1 uploaded A-only source intake
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-semref1-aqa1-uploaded-a-intake.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_semref1_aqa1_uploaded_a_intake.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_semref1_aqa1_uploaded_a_intake.py'
+      - 'AutoDraw_Stage20/data/result_SEMREF1/**'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_SEMREF1_AQA1_UPLOADED_A_TECHNICAL_PREFLIGHT_PREREG_2026-11-21.md'
+      - 'AutoDraw_Stage20/docs/README.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-semref1-aqa1-frozen-intake
+  cancel-in-progress: true
+
+jobs:
+  original-source-a-only-technical-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 6
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing original-source decoding stack; no pretrained model
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Synthetic five A-only input-format tests and existing 11 SEMREF1 guards
+        run: |
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_semref1_aqa1_uploaded_a_intake.py' -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_semref1_human_review_validation.py' -v
+      - name: Audit exact uploaded eight original A files; science must stay BLOCKED
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_semref1_aqa1_uploaded_a_intake.py --root . --output semref1_aqa1_intake.json
+          python - <<'PY'
+          import json
+          r=json.load(open("semref1_aqa1_intake.json",encoding="utf-8"))
+          assert r["technical_status"]=="PASS_A_ONLY_SOURCE_AND_LABEL_INTEGRITY"
+          assert r["pairs_a_checked"]==4 and r["pairs_b_checked"]==0
+          assert r["reviewer_count"]==1
+          assert r["science_status"]=="BLOCKED_MISSING_SECOND_INDEPENDENT_REVIEWER"
+          assert r["strict_s4"]=="BLOCKED"
+          assert r["semantic_false_safe_or_recall"] is None
+          assert r["exact_CHALK"] is None
+          assert r["heldout_outputs"]==0
+          assert all(x["source_role"]=="DEV" for x in r["per_original"])
+          assert all(sum(x["single_reviewer_counts"][k] for k in (
+             "unreviewed","critical","color_region_boundary",
+             "verified_interior","ambiguous"))==x["single_reviewer_counts"]["source_pixels"]
+             for x in r["per_original"])
+          print("SEMREF1_AQA1_REAL_A_ONLY_BYTES_PASS; STRICT_TWO_REVIEWER_SCIENCE_BLOCKED")
+          PY
+      - name: Markdown documentation integrity
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Archive A-only technical counts, not review mask/overlays
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-semref1-aqa1-original-a-intake-no-b
+          path: semref1_aqa1_intake.json
+          if-no-files-found: ignore
+          retention-days: 30
