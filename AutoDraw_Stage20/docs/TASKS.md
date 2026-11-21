@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001/BPRED-S4-R1 — NG2 true Egret original native diagnostic COMPLETE; guarded admission NEXT (2026-11-21)
+
+- [x] [NG2 E0](ENGINE001_BPRED001_S4R1_NG2_ORIGINAL_EF_NATIVE_SINGLE_STROKE_RISK_PREREG_2026-11-21.md) immutable blob `c9a5af70223c5eccbadb36e659c98d4ebdf2d186`; [NG2 signed original-Egret native owner/white/contour E3](ENGINE001_BPRED001_S4R1_NG2_TRUE_ORIGINAL_EGRET_NATIVE_RISK_E3_RESULTS_2026-11-21.md); [CI44916234316](https://github.com/Kiddos19882/AutoDraw/actions/runs/44916234316) SHA `9cefbb66ca7a28047a3133db11077281adfac666` E2 5/5 and genuine original Egret E3 20 singles +blank PASS technically, raw [artifact14712410260](https://github.com/Kiddos19882/AutoDraw/actions/runs/44916234316/artifacts/14712410260).
+- [x] **STOP NG2 one experiment:** native owner-white contamination0 on fixed samples but width3 protected overlap310 across9/10 scenes; never classify protected-hit as observed foreign-owner damage; preserve history full P4D18/old S3 FAIL and both prior NG2 technical CI failures.
+- [ ] **FIRST OPEN NEXT:** one scoped original-owner + original-white + important RGB-contour native footprint **nonvacuous candidate-admission contract design** (evidence E0/E1) reusing existing SKC1/native results, not microtuning. Separate independent real Egret E3 and strict S4 decision only with verifiable safety/meaningful usefulness; no blanket width1 promotion.
+- [ ] Strict S4 BLIND120 BLOCKED, H8/second50 sealed, S5/S6/E4/E5/exact CHALK NOT_RUN; production/master/Stage6/Monitor/Bridge unchanged.
+
 ## CURRENT ENGINE-001/BPRED-S4-R1 — NG2 original Egret source-risk diagnostic frozen E0 (2026-11-21)
 
 - [x] [NG2 fixed real original Egret source-known E/F native risk prereg](ENGINE001_BPRED001_S4R1_NG2_ORIGINAL_EF_NATIVE_SINGLE_STROKE_RISK_PREREG_2026-11-21.md) Git blob `c9a5af70223c5eccbadb36e659c98d4ebdf2d186` frozen before code/native; original owner/white/strong RGB contours and true Egret BoardPane; only 5 deterministic SKC1 UNKNOWN cells × widths1/3 × E/F =20 separate single-stroke scenes + blank, no tuning or native safety promotion.
