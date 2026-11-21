@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001/BPRED-S4-R1 SEMREF1 — human reference protocol and fail-closed evaluator DONE technically, annotations NEXT (2026-11-21)
+
+- [x] [frozen SEMREF1 E0](ENGINE001_BPRED001_S4R1_SEMREF1_HUMAN_DEV_REFERENCE_PREREG_2026-11-21.md) immutable Git blob `734ef71adeabfedeaaab0f3edccb62254fbca24a` before implementation; four fixed opaque DEV review cases, two independently blinded source-image reviewers required, no pseudo-model labels.
+- [x] Research-only two-reviewer PNG/sidecar validator, source shape/raw/Git/RGBA/label SHA/UNKNOWN and reviewer disagreement checks plus 11 synthetic tests; first CI44898448450 OpenCV dependency FAIL preserved, only CI dependency fixed; [CI44898522669](https://github.com/Kiddos19882/AutoDraw/actions/runs/44898522669) code SHA `ae11e83527b5ddabb938f70edd4864c7c142223c` 11/11 E2, Markdown 306/306, technical PASS. No original human labels; artifact14704353629 BLOCKED scientific packet.
+- [ ] **FIRST OPEN NEXT:** obtain and independently verify two actual original-only blind human annotations for *each* four frozen DEV images; do not equate attestations alone with independent proof. Require both nonempty agreed critical/boundary and interior evidence; measure protected recall/hypothetical-core critical risk and useful interior abstention with unchanged source maps. No real semantic data available yet: `BLOCKED_NO_INDEPENDENT_HUMAN_LABELS`, no scientific PASS.
+- [ ] Strict S4, H8, S0 BLIND120, second50, original native E3, S5/S6, E4/E5 and run-bound CHALK remain BLOCKED/NOT_RUN, old S2/S3/P4D18 FAIL intact, no production/master/Stage6/Bridge/Monitor edits.
+
 ## CURRENT ENGINE-001/BPRED-S4-R1 — CR1 measured source RGB contrast FAIL; independently verified semantic details FIRST NEXT (2026-11-21)
 
 - [x] [CR1 prospective source RGB reference E0](ENGINE001_BPRED001_S4R1_OPAQUE_DEV_COLOR_REFERENCE_PREREG_2026-11-21.md), blob `5c277643c3a778f21a509e8ae84f20b887c36ed0` before code. Research-only original-four-neighbor raw RGB threshold32, preserve baseline source masks/UNKNOWN; 11 synthetic E2 tests.
