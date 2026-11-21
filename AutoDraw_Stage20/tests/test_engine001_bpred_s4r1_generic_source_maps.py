@@ -438,5 +438,108 @@ class OriginalSourceRegionUncertaintyTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "INPUT_PROVENANCE"):
             original_source_region_uncertainty(a, source_bound)
 
+
+
+from engine001_bpred_s4r1_generic_source_maps import (
+    original_alpha_interface_reference,
+)
+
+
+class OriginalAlphaReferenceTest(unittest.TestCase):
+    def test_opaque_side_alpha0_and_partial_reference_exact_four_neighbors(self):
+        # No RGB contrast: source Sobel/DeltaE alone cannot identify alpha-only edges.
+        rgba = solid(11, 11, rgb=(80, 90, 100))
+        rgba[3, 3, 3] = 0
+        rgba[7, 7, 3] = 127
+        original = rgba.copy()
+        maps = generic_source_maps(rgba)
+        expected = np.zeros((11, 11), dtype=bool)
+        for y, x in ((2, 3), (3, 2), (3, 4), (4, 3),
+                     (6, 7), (7, 6), (7, 8), (8, 7)):
+            expected[y, x] = True
+        self.assertTrue(np.array_equal(maps["alpha_opaque_interface"], expected))
+        self.assertFalse(maps["source_edge"].any())
+        self.assertTrue(maps["protected"][expected].all())
+        self.assertFalse(maps["unknown"][expected].any())
+        self.assertEqual(maps["counts"]["alpha_opaque_interface"], 8)
+        ref = original_alpha_interface_reference(rgba, maps)
+        self.assertEqual(ref["alpha_reference_status"],
+                         "PASS_ALPHA_SOURCE_REFERENCE_ONLY")
+        self.assertEqual(ref["invalid_pixels"], 2)
+        self.assertEqual(ref["invalid_protected_pixels"], 2)
+        self.assertEqual(ref["opaque_interface_pixels"], 8)
+        self.assertEqual(ref["opaque_interface_protected_pixels"], 8)
+        self.assertEqual(ref["opaque_interface_unprotected_pixels"], 0)
+        self.assertTrue(np.array_equal(original, rgba))
+        self.assertEqual(maps["owner_status"], "MISSING")
+        self.assertEqual(maps["counts"]["candidate_interior"], 0)
+        self.assertTrue(ref["stroke_admission"].startswith("FORBIDDEN"))
+
+    def test_diagonal_is_not_alpha_interface(self):
+        rgba = solid(5, 5)
+        rgba[1, 1, 3] = 0
+        m = generic_source_maps(rgba)
+        mask = m["alpha_opaque_interface"]
+        self.assertTrue(mask[0, 1] and mask[1, 0] and
+                        mask[1, 2] and mask[2, 1])
+        self.assertFalse(mask[2, 2])
+        self.assertEqual(int(mask.sum()), 4)
+        self.assertEqual(original_alpha_interface_reference(rgba, m)[
+            "opaque_interface_pixels"], 4)
+
+    def test_reference_detects_tampered_opaque_side_but_not_pseudo_semantics(self):
+        rgba = solid(15, 13)
+        rgba[5, 5, 3] = 0
+        m = generic_source_maps(rgba)
+        tampered = dict(m)
+        tampered["protected"] = m["protected"].copy()
+        tampered["protected"][5, 6] = False
+        bad = original_alpha_interface_reference(rgba, tampered)
+        self.assertEqual(bad["alpha_reference_status"],
+                         "FAIL_ALPHA_INTERFACE_SOURCE_PROTECTION")
+        self.assertGreater(bad["opaque_interface_unprotected_pixels"], 0)
+        self.assertEqual(bad["source_owner_accuracy"],
+                         "UNKNOWN_NO_INDEPENDENT_OWNER_LABELS")
+        self.assertEqual(bad["semantic_recall"],
+                         "NOT_READY_NO_INDEPENDENT_SEMANTIC_LABELS")
+
+    def test_no_alpha_is_na_not_success(self):
+        rgba = solid(13, 9)
+        ref = original_alpha_interface_reference(rgba, generic_source_maps(rgba))
+        self.assertEqual(ref["alpha_reference_status"],
+                         "NOT_APPLICABLE_FULLY_OPAQUE_NO_ALPHA_REFERENCE")
+        self.assertIsNone(ref["invalid_protected_fraction"])
+        self.assertIsNone(ref["interface_protected_fraction"])
+        self.assertEqual(ref["opaque_interface_pixels"], 0)
+
+    def test_all_nonopaque_is_na_not_success(self):
+        rgba = solid(9, 7)
+        rgba[:, :, 3] = 50
+        m = generic_source_maps(rgba)
+        ref = original_alpha_interface_reference(rgba, m)
+        self.assertEqual(ref["alpha_reference_status"],
+                         "NOT_APPLICABLE_NO_OPAQUE_SIDE")
+        self.assertEqual(ref["invalid_protected_fraction"], 1)
+        self.assertEqual(ref["opaque_interface_pixels"], 0)
+        self.assertEqual(m["counts"]["candidate_interior"], 0)
+
+    def test_reference_detects_source_and_region_provenance_mismatch(self):
+        rgba = solid(17, 11)
+        rgba[3, 3, 3] = 0
+        m = generic_source_maps(rgba)
+        regions = original_source_region_uncertainty(rgba, m)
+        good = original_alpha_interface_reference(rgba, m, regions)
+        self.assertEqual(good["alpha_reference_status"],
+                         "PASS_ALPHA_SOURCE_REFERENCE_ONLY")
+        self.assertEqual(good["opaque_interface_in_diagnostic_core"], 0)
+        altered = rgba.copy()
+        altered[2, 2, :3] = [1, 20, 200]
+        with self.assertRaisesRegex(ValueError, "ORIGINAL_MISMATCH"):
+            original_alpha_interface_reference(altered, m, regions)
+        bad_region = dict(regions)
+        bad_region["source_rgba_sha256"] = "a" * 64
+        with self.assertRaisesRegex(ValueError, "REGION_MISMATCH"):
+            original_alpha_interface_reference(rgba, m, bad_region)
+
 if __name__ == "__main__":
     unittest.main()
