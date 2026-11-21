@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoDraw SEMREF1 — независимая разметка оригинала</title>
+<style>
+:root { color-scheme: dark; font-family: system-ui, Arial, sans-serif; background:#14191f; color:#f4f5f7; }
+body { max-width:1140px; margin:0 auto; padding:1.1rem; }
+h1 { font-size:1.35rem; margin:0 0 .45rem; }
+p,li { line-height:1.48; }
+small,.muted {color:#b9c6cf}
+fieldset {border:1px solid #45515e; border-radius:9px; padding:.75rem; margin:.8rem 0;}
+legend {font-weight:bold}
+select,input,button {font:inherit}
+select,input[type=text] {max-width:100%;box-sizing:border-box;border:1px solid #74808e;border-radius:6px;padding:.45rem;background:#212b33;color:#fff}
+input[type=range] {vertical-align:middle}
+button,.save {border:1px solid #9ba6b7;border-radius:7px;padding:.5rem .8rem;background:#293842;color:white;cursor:pointer;display:inline-block;text-decoration:none}
+button:hover,.save:hover {background:#395166}
+button:disabled,.save[aria-disabled=true] {opacity:.48;cursor:not-allowed;pointer-events:none}
+.grid {display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.grid label {display:flex;align-items:center;gap:.5rem}
+#stage {position:relative;width:min(100%,900px);margin:.8rem 0;user-select:none;border:2px solid #647385}
+#original,#marks {display:block;width:100%;height:auto}
+#marks {position:absolute;inset:0;height:100%;touch-action:none;cursor:crosshair}
+#message {padding:.6rem .8rem;background:#23303a;border-radius:6px;white-space:pre-wrap}
+#message.error {background:#612d36}
+#message.good {background:#254c38}
+.palette {display:flex;flex-wrap:wrap;gap:.65rem}
+.palette label {padding:.45rem .6rem;border:1px solid #536675;border-radius:6px;cursor:pointer}
+.swatch {display:inline-block;vertical-align:middle;width:16px;height:16px;border:1px solid #eee;margin-right:.3rem}
+table {border-collapse:collapse}
+td {padding:.2rem .65rem .2rem 0}
+</style>
+</head>
+<body>
+<h1>AutoDraw / SEMREF1 — разметка для независимой проверки</h1>
+<p>Здесь отображается <strong>только исходный файл AutoDraw</strong>. Цветные штрихи — исключительно твои собственные отметки, не предложения нейросетей или алгоритма. Работает локально в браузере, без загрузки изображений на сервер.</p>
+<p class="muted">Для строгой проверки каждому из четырёх оригиналов нужны две независимые разметки от разных людей. Два разных псевдонима одного человека не считаются независимой проверкой. Просто просмотренные изображения не являются разметкой.</p>
+
+<fieldset>
+<legend>1. Загрузить подлинный оригинал</legend>
+<div class="grid">
+<label>Изображение <select id="sourceChoice"></select></label>
+<label>Файл с диска <input id="imageFile" type="file" accept="image/png,image/jpeg"></label>
+</div>
+<p class="muted">Выбери соответствующий оригинал из ранее полученного GitHub-архива. Проверяются его SHA-256 и размер после декодирования; другое изображение не будет принято.</p>
+</fieldset>
+
+<fieldset>
+<legend>2. Разметить только то, что можешь уверенно определить</legend>
+<div class="palette">
+<label><input type="radio" name="category" value="1" checked><span class="swatch" style="background:#ff00ff"></span>Важная деталь (глаза, лицо, волосы, руки, контуры)</label>
+<label><input type="radio" name="category" value="2"><span class="swatch" style="background:#00ffff"></span>Граница разных цветовых областей</label>
+<label><input type="radio" name="category" value="3"><span class="swatch" style="background:#00ff00"></span>Уверенно однородная внутренняя область</label>
+<label><input type="radio" name="category" value="4"><span class="swatch" style="background:#ffff00"></span>Неоднозначное место</label>
+<label><input type="radio" name="category" value="0"><span class="swatch" style="background:#14191f"></span>Ластик</label>
+</div>
+<div class="grid" style="margin-top:.75rem">
+<label>Радиус кисти (пиксели оригинала) <input type="range" id="brush" min="1" max="50" value="5"> <span id="brushValue">5</span></label>
+<button id="undo" type="button" disabled>Отменить штрих</button>
+<button id="reset" type="button" disabled>Очистить отметки</button>
+</div>
+<p class="muted">Отмечай небольшие, но очевидные участки. Не надо закрашивать картинку полностью. Необозначенные области остаются НЕПРОВЕРЕННЫМИ и не попадут в оценку безопасности.</p>
+</fieldset>
+
+<div id="stage"><canvas id="original" width="1" height="1" aria-label="Подлинный исходник"></canvas><canvas id="marks" width="1" height="1" aria-label="Твоя ручная разметка"></canvas></div>
+<p id="counts">Оригинал ещё не загружен.</p>
+
+<fieldset>
+<legend>3. Сохранить разметку (2 файла на одно изображение)</legend>
+<div class="grid">
+<label>Псевдоним проверяющего <input id="reviewer" type="text" placeholder="например: reviewer-a" maxlength="48"></label>
+<label>Независимая проверка <select id="slot"><option value="a">A</option><option value="b">B</option></select></label>
+</div>
+<p><label><input id="blind" type="checkbox"> Подтверждаю, что размечал только оригинал и не видел алгоритмические маски/наложения для этого изображения.</label></p>
+<div class="grid">
+<button id="prepare" disabled>Проверить и подготовить файлы</button>
+<a id="savePng" class="save" aria-disabled="true">Сохранить PNG меток</a>
+<a id="saveJson" class="save" aria-disabled="true">Сохранить JSON проверки</a>
+</div>
+<p class="muted">Сохрани оба файла. PNG содержит строго 5 заданных цветов без сглаживания, в исходных размерах. JSON содержит SHA-256 и подтверждение автора. Время и идентификатор автора нельзя считать независимым доказательством личности.</p>
+</fieldset>
+<p id="message">Ожидание подлинного оригинала.</p>
+<details><summary>Пояснение по научному статусу</summary>
+<p>Это только средство сбора разметки. Оно не проверяет независимость людей, не определяет игровые владельцы 128 цветов, не рассчитывает native footprint кисти и не разрешает штрихи. Пока не получены оба независимых комплекта по каждому из 4 DEV, SEMREF1 и строгий S4 остаются BLOCKED. H8, BLIND120 и другие резервные данные не открываются.</p>
+</details>
+
+<script id="semref1SourceMetadata" type="application/json">__SEMREF1_SOURCE_META_JSON__</script>
+<script src="semref1_blind_annotator.js"></script>
+<script>
+"use strict";
+(() => {
+  const $ = id => document.getElementById(id);
+  const state = {loaded:false,mask:null,w:0,h:0,image:null,meta:null,
+                 dragging:false,previous:null,history:[],exports:[]};
+  const source = $("original"), overlay = $("marks");
+  const ctx = source.getContext("2d"), over = overlay.getContext("2d");
+  const {emptyLabels,segment,previewRGBA,counts,rgbPNG,sha256Hex} = window.SEMREF1Core;
+  const meta = JSON.parse($("semref1SourceMetadata").textContent);
+  if (!Array.isArray(meta.images) || meta.images.length!==4) throw Error("INVALID_FROZEN_SUBSET");
+  const chooser = $("sourceChoice");
+  for (const record of meta.images) {
+    const option = document.createElement("option");
+    option.value = record.file; option.textContent = record.file;
+    chooser.append(option);
+  }
+  const message = (msg,kind="") => {
+    $("message").textContent = msg; $("message").className = kind;
+  };
+  const revoke = () => {
+    for (const url of state.exports) URL.revokeObjectURL(url);
+    state.exports=[];
+    for (const id of ["savePng","saveJson"]) {
+      $(id).removeAttribute("href");
+      $(id).setAttribute("aria-disabled","true");
+    }
+  };
+  const invalidate = () => {
+    revoke(); $("prepare").disabled=!state.loaded;
+  };
+  const updateCounts = () => {
+    if (!state.mask) return;
+    const c=counts(state.mask);
+    $("counts").textContent =
+      "Пиксели: не проверены "+c[0]+", важные "+c[1]+
+      ", границы "+c[2]+", внутренние "+c[3]+", неоднозначные "+c[4]+
+      " (все координаты — исходные пиксели)";
+  };
+  const render = () => {
+    if (!state.mask) return;
+    over.putImageData(new ImageData(previewRGBA(state.mask), state.w, state.h),0,0);
+    updateCounts();
+  };
+  const reset = () => {
+    state.dragging=false;state.previous=null;state.history=[];state.mask=null;
+    state.loaded=false;state.image=null;state.meta=null;
+    source.width=overlay.width=1;source.height=overlay.height=1;
+    ctx.clearRect(0,0,1,1);over.clearRect(0,0,1,1);
+    $("undo").disabled=true;$("reset").disabled=true;
+    $("prepare").disabled=true;revoke();
+    $("counts").textContent="Оригинал ещё не загружен.";
+  };
+  chooser.addEventListener("change",() => {$("imageFile").value="";reset();});
+  $("imageFile").addEventListener("change",async () => {
+    reset();
+    const file=$("imageFile").files?.[0];
+    if (!file) return;
+    try {
+      const record=meta.images.find(x=>x.file===chooser.value);
+      if (!record || file.name!==record.file)
+        throw Error("Имя исходного файла не соответствует выбранному DEV-оригиналу.");
+      if (file.size!==record.original_bytes)
+        throw Error("Размер файла не совпадает с замороженным оригиналом.");
+      const digest=await sha256Hex(new Uint8Array(await file.arrayBuffer()));
+      if (digest!==record.original_sha256)
+        throw Error("SHA-256 исходного файла не совпадает. Разметка запрещена.");
+      if (!window.createImageBitmap)
+        throw Error("Браузер не поддерживает точное декодирование изображения.");
+      const bmp=await createImageBitmap(file,{imageOrientation:"from-image"});
+      const [h,w]=record.original_hw;
+      if (bmp.width!==w || bmp.height!==h) {
+        bmp.close();
+        throw Error("EXIF/геометрия расходятся с Python source decoder; экспорт запрещён.");
+      }
+      source.width=overlay.width=w;source.height=overlay.height=h;
+      ctx.drawImage(bmp,0,0,w,h);bmp.close();
+      state.mask=emptyLabels(w,h);state.w=w;state.h=h;
+      state.meta=record;state.loaded=true;
+      $("prepare").disabled=false;$("reset").disabled=false;
+      render();
+      message("Побайтовый SHA-256 подтверждён. Исходник "+w+"×"+h+
+              " загружен; теперь ставь свои отметки.", "good");
+    } catch(e) {
+      reset(); message("BLOCKED: "+e.message,"error");
+    }
+  });
+  $("brush").addEventListener("input",() => $("brushValue").textContent=$("brush").value);
+  function category() {
+    return Number(document.querySelector('input[name="category"]:checked').value);
+  }
+  function pointer(e) {
+    const rect=overlay.getBoundingClientRect();
+    return {
+      x:Math.max(0,Math.min(state.w-1,((e.clientX-rect.left)/rect.width)*state.w)),
+      y:Math.max(0,Math.min(state.h-1,((e.clientY-rect.top)/rect.height)*state.h))
+    };
+  }
+  overlay.addEventListener("pointerdown",e => {
+    if (!state.loaded || e.button!==0) return;
+    e.preventDefault();overlay.setPointerCapture(e.pointerId);
+    state.history.push(state.mask.slice());
+    if (state.history.length>12) state.history.shift();
+    $("undo").disabled=false;state.dragging=true;
+    state.previous=pointer(e);
+    segment(state.mask,state.w,state.h,state.previous,state.previous,
+            Number($("brush").value),category());
+    invalidate();render();
+  });
+  overlay.addEventListener("pointermove",e => {
+    if (!state.dragging || !state.loaded) return;
+    e.preventDefault();
+    const next=pointer(e);
+    segment(state.mask,state.w,state.h,state.previous,next,
+            Number($("brush").value),category());
+    state.previous=next;invalidate();render();
+  });
+  for (const name of ["pointerup","pointercancel","lostpointercapture"]) {
+    overlay.addEventListener(name,() => {state.dragging=false;state.previous=null;});
+  }
+  $("undo").addEventListener("click",() => {
+    if (!state.loaded || !state.history.length) return;
+    state.mask=state.history.pop();$("undo").disabled=!state.history.length;
+    invalidate();render();
+  });
+  $("reset").addEventListener("click",() => {
+    if (!state.loaded || !confirm("Удалить все отметки этого изображения?")) return;
+    state.history=[];state.mask.fill(0);$("undo").disabled=true;
+    invalidate();render();
+  });
+  for (const id of ["reviewer","slot","blind"]) {
+    $(id).addEventListener("change",invalidate);
+    $(id).addEventListener("input",invalidate);
+  }
+  function urlFor(blob) {
+    const url=URL.createObjectURL(blob);state.exports.push(url);return url;
+  }
+  $("prepare").addEventListener("click",async () => {
+    invalidate();
+    try {
+      if (!state.loaded) throw Error("Нет подтверждённого оригинала.");
+      const who=$("reviewer").value.trim();
+      if (!/^[a-zA-Z0-9_-]{2,48}$/.test(who))
+        throw Error("Нужен псевдоним 2–48 символов: латиница, цифры, _ или -.");
+      if (!$("blind").checked)
+        throw Error("Нужно подтвердить независимую разметку без масок алгоритмов.");
+      const c=counts(state.mask);
+      if (c[1]+c[2]===0 || c[3]===0)
+        throw Error("Требуются и важные детали/границы, и уверенно однородная внутренняя область.");
+      const png=await rgbPNG(state.w,state.h,state.mask);
+      const digest=await sha256Hex(new Uint8Array(await png.arrayBuffer()));
+      const prefix=(await sha256Hex(new TextEncoder().encode(state.meta.file))).slice(0,12);
+      const base=prefix+"_"+$("slot").value;
+      const sidecar={
+        reviewer_id:who,
+        source_raw_sha256:state.meta.original_sha256,
+        source_git_blob_sha1:state.meta.original_git_blob,
+        original_rgba_sha256:state.meta.original_rgba_sha256,
+        original_hw:[state.h,state.w],
+        labels_png_sha256:digest,
+        source_only_blind_review:true,
+        annotation_tool_and_version:"AutoDraw SEMREF1 blind offline review tool v1",
+        review_timestamp:new Date().toISOString()
+      };
+      const js=new Blob([JSON.stringify(sidecar,null,2)+"\n"],{type:"application/json"});
+      $("savePng").href=urlFor(png);$("savePng").download=base+".png";
+      $("saveJson").href=urlFor(js);$("saveJson").download=base+".json";
+      for (const id of ["savePng","saveJson"]) $(id).setAttribute("aria-disabled","false");
+      message("Готовы 2 файла разметки для "+state.meta.file+
+              " (автор "+who+", проверка "+$("slot").value.toUpperCase()+
+              "). Нажми ОБЕ ссылки сохранения. PNG — RGB, точный "+state.w+"×"+state.h+".","good");
+    }catch(e) {
+      message("Экспорт заблокирован: "+e.message,"error");
+    }
+  });
+})();
+</script>
+</body>
+</html>
