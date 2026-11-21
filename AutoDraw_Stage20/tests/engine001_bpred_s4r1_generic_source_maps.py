@@ -150,13 +150,23 @@ def generic_source_maps(
             owner_edge[:, 1:] |= diff
     transparent = alpha == 0
     partial_alpha = (alpha > 0) & (alpha < 255)
+    # Independently observable source alpha: the opaque side of a true
+    # four-neighbor alpha transition must not silently remain unprotected.
+    # This does NOT infer foreground semantics, game color owners or strokes.
+    alpha_invalid = alpha < 255
+    alpha_opaque_interface = (
+        ndimage.binary_dilation(
+            alpha_invalid, structure=ndimage.generate_binary_structure(2, 1)
+        ) & (alpha == 255)
+    )
     exact_white = (alpha == 255) & np.all(rgb == 255, axis=2)
     owner_white = (owner_index == source_white_owner if source_white_owner is not None
                    else np.zeros((h, w), dtype=bool))
     geometric_detail = source_edge | owner_edge
     boundary_band = ndimage.binary_dilation(geometric_detail, iterations=1)
     # Conservative source masks are NOT proof of semantically complete protection.
-    protected = (boundary_band | exact_white | owner_white | transparent | partial_alpha)
+    protected = (boundary_band | exact_white | owner_white | transparent |
+                 partial_alpha | alpha_opaque_interface)
     unknown = ~protected  # No independently validated semantic model or native false-safe bound.
     geometric_interior = (alpha == 255) & ~protected
     candidate_interior = geometric_interior & (owner_index is not None)
@@ -176,6 +186,7 @@ def generic_source_maps(
         "semantic_detail_status": "UNKNOWN_NO_VERIFIED_SEMANTIC_MODEL",
         "transparent": transparent,
         "partial_alpha": partial_alpha,
+        "alpha_opaque_interface": alpha_opaque_interface,
         "exact_white_evidence": exact_white,
         "explicit_white_owner": owner_white,
         "protected": protected,
@@ -189,6 +200,7 @@ def generic_source_maps(
             "geometric_detail": geometric_detail,
             "protected": protected, "unknown": unknown,
             "transparent": transparent, "partial_alpha": partial_alpha,
+            "alpha_opaque_interface": alpha_opaque_interface,
             "exact_white": exact_white, "owner_white": owner_white,
             "geometric_interior": geometric_interior,
             "candidate_interior": candidate_interior,
@@ -480,4 +492,98 @@ def original_source_region_uncertainty(
             "geometric_potential_core": int(np.count_nonzero(core)),
             "semantic_unknown": int(np.count_nonzero(source_maps["unknown"])),
         },
+    }
+
+
+# Source original-alpha reference: only a geometric opacity label, never a
+# semantic ground truth, true palette owner or a native brush risk proof.
+SOURCE_ALPHA_REFERENCE_VERSION = "ENGINE001_BPRED_S4R1_ALPHA_INTERFACE_REFERENCE_V1"
+
+
+def original_alpha_interface_reference(
+    rgba: np.ndarray, source_maps: dict[str, Any],
+    source_regions: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Independently derive 4-connected opaque-side alpha interface from raw A.
+
+    Reference is computed by explicit neighbor pairs, independently of
+    generic_source_maps' ndimage dilation. Real source alpha is an actual
+    label for opacity only; no labels for faces/clothing/game color owners.
+    """
+    if (not isinstance(rgba, np.ndarray) or rgba.dtype != np.uint8
+            or rgba.ndim != 3 or rgba.shape[-1] != 4
+            or not min(rgba.shape[:2]) >= 1
+            or rgba.shape[0] * rgba.shape[1] > MAX_PIXELS
+            or not isinstance(source_maps, dict)
+            or source_maps.get("owner_status") != "MISSING"
+            or source_maps.get("stroke_admission") !=
+                "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"):
+        raise ValueError("BLOCKED_S4R1_ALPHA_REFERENCE_PROVENANCE")
+    h, w = rgba.shape[:2]
+    if (not isinstance(source_maps.get("source_alpha"), np.ndarray)
+            or not np.array_equal(rgba[:, :, 3], source_maps["source_alpha"])
+            or not isinstance(source_maps.get("source_rgb"), np.ndarray)
+            or not np.array_equal(rgba[:, :, :3], source_maps["source_rgb"])
+            or not isinstance(source_maps.get("protected"), np.ndarray)
+            or source_maps["protected"].dtype != bool
+            or source_maps["protected"].shape != (h, w)):
+        raise ValueError("BLOCKED_S4R1_ALPHA_REFERENCE_ORIGINAL_MISMATCH")
+    invalid = rgba[:, :, 3] < 255
+    opaque = ~invalid
+    opaque_interface = np.zeros((h, w), dtype=bool)
+    if h > 1:
+        opaque_interface[:-1] |= opaque[:-1] & invalid[1:]
+        opaque_interface[1:] |= opaque[1:] & invalid[:-1]
+    if w > 1:
+        opaque_interface[:, :-1] |= opaque[:, :-1] & invalid[:, 1:]
+        opaque_interface[:, 1:] |= opaque[:, 1:] & invalid[:, :-1]
+    protected = source_maps["protected"]
+    bad_invalid = invalid & ~protected
+    bad_interface = opaque_interface & ~protected
+    n_invalid = int(np.count_nonzero(invalid))
+    n_interface = int(np.count_nonzero(opaque_interface))
+    core_overlap = None
+    if source_regions is not None:
+        if (not isinstance(source_regions, dict)
+                or source_regions.get("source_rgba_sha256") !=
+                    hashlib.sha256(rgba.tobytes()).hexdigest()
+                or source_regions.get("source_owner_status") != "MISSING"
+                or source_regions.get("stroke_admission") !=
+                    "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"
+                or not isinstance(source_regions.get("geometric_potential_core"),
+                                  np.ndarray)
+                or source_regions["geometric_potential_core"].shape != (h, w)
+                or source_regions["geometric_potential_core"].dtype != bool):
+            raise ValueError("BLOCKED_S4R1_ALPHA_REFERENCE_REGION_MISMATCH")
+        core_overlap = int(np.count_nonzero(
+            opaque_interface & source_regions["geometric_potential_core"]))
+    if n_invalid == 0:
+        status = "NOT_APPLICABLE_FULLY_OPAQUE_NO_ALPHA_REFERENCE"
+    elif n_interface == 0:
+        status = "NOT_APPLICABLE_NO_OPAQUE_SIDE"
+    elif np.any(bad_invalid) or np.any(bad_interface):
+        status = "FAIL_ALPHA_INTERFACE_SOURCE_PROTECTION"
+    else:
+        status = "PASS_ALPHA_SOURCE_REFERENCE_ONLY"
+    return {
+        "version": SOURCE_ALPHA_REFERENCE_VERSION,
+        "original_source_rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest(),
+        "alpha_reference_status": status,
+        "invalid_pixels": n_invalid,
+        "invalid_protected_pixels": n_invalid - int(np.count_nonzero(bad_invalid)),
+        "opaque_interface_pixels": n_interface,
+        "opaque_interface_protected_pixels": (
+            n_interface - int(np.count_nonzero(bad_interface))),
+        "opaque_interface_unprotected_pixels": int(np.count_nonzero(bad_interface)),
+        "opaque_interface_in_diagnostic_core": core_overlap,
+        "invalid_protected_fraction": (
+            float((n_invalid - np.count_nonzero(bad_invalid)) / n_invalid)
+            if n_invalid else None),
+        "interface_protected_fraction": (
+            float((n_interface - np.count_nonzero(bad_interface)) / n_interface)
+            if n_interface else None),
+        "reference_class": "ORIGINAL_ALPHA_OPACITY_ONLY_NOT_SEMANTIC_GT",
+        "source_owner_accuracy": "UNKNOWN_NO_INDEPENDENT_OWNER_LABELS",
+        "semantic_recall": "NOT_READY_NO_INDEPENDENT_SEMANTIC_LABELS",
+        "stroke_admission": "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION",
     }
