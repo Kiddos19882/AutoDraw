@@ -9,6 +9,7 @@ on:
       - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_cr1_opaque_dev_color_reference.py'
       - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_cr1_original_rgb_reference.py'
       - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_OPAQUE_DEV_COLOR_REFERENCE_PREREG_2026-11-21.md'
+      - 'AutoDraw_Stage20/docs/README.md'
   workflow_dispatch:
 permissions:
   contents: read
