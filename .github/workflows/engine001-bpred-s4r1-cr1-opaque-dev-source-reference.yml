@@ -1,0 +1,111 @@
+name: ENGINE-001 BPRED-S4R1 CR1 independent opaque DEV RGB contrast review source-only
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-cr1-opaque-dev-source-reference.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_original_rgb_pair_reference.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_cr1_opaque_dev_color_reference.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_cr1_original_rgb_reference.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_OPAQUE_DEV_COLOR_REFERENCE_PREREG_2026-11-21.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-bpred-s4r1-cr1-source-only
+  cancel-in-progress: true
+
+jobs:
+  original-opaque14-source-reference-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install source-first numerical dependencies only (no neural/download)
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Freeze CR1 E0 before analysis, verify synthetic source/UNKNOWN contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_OPAQUE_DEV_COLOR_REFERENCE_PREREG_2026-11-21.md")
+          b=p.read_bytes()
+          sha=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert sha=="5c277643c3a778f21a509e8ae84f20b887c36ed0",(sha,"CR1_E0_DRIFT")
+          print("S4R1_CR1_SOURCE_ONLY_E0_FROZEN",sha)
+          PY
+          python -m py_compile \
+            AutoDraw_Stage20/tests/engine001_bpred_s4r1_original_rgb_pair_reference.py \
+            AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_cr1_opaque_dev_color_reference.py \
+            AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_cr1_original_rgb_reference.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_cr1_original_rgb_reference.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Original image opaque14 DEV source contrast reference and 28 review-only images
+        shell: bash
+        timeout-minutes: 30
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_cr1_opaque_dev_color_reference.py \
+            --root . \
+            --output AutoDraw_Stage20/.s4r1-cr1-opaque14-reference
+      - name: Independently check per-file hashes, scope and refusal to mark semantic truth
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          out=Path("AutoDraw_Stage20/.s4r1-cr1-opaque14-reference")
+          r=json.loads((out/"cr1_report.json").read_text())
+          assert r["expected_opaque_dev"]==14 and len(r["records"])==14
+          assert r["excluded_alpha_dev"]==["Sanrio_Characters_Hello_Kitty_Image026.webp"]
+          assert r["heldout_outputs"]==0 and r["strict_s4"]=="BLOCKED"
+          assert r["source_owner"]=="MISSING" and r["model_inference"]=="NOT_RUN"
+          assert r["human_semantic_reference"].startswith("NOT_ANNOTATED")
+          assert not r["production_accepted"] and r["exact_CHALK"] is None
+          assert len(list(out.glob("*.png")))==28
+          for x in r["records"]:
+              assert x["role"]=="DEV" and x["source_game_owner_status"]=="MISSING"
+              assert x["review_status"].startswith("NEEDS_INDEPENDENT")
+              assert x["stroke_admission"].startswith("FORBIDDEN")
+              assert len(x["review_packet_png_sha256"])==2
+              for name,digest in x["review_packet_png_sha256"].items():
+                  assert hashlib.sha256((out/name).read_bytes()).hexdigest()==digest
+          assert r["counts"]["source_contrast_endpoints"]==(
+              r["counts"]["source_contrast_protected"]+r["counts"]["source_contrast_unprotected"])
+          print("S4R1_CR1_DEV_ONLY_TECHNICAL_PASS_SCIENCE_MAY_FAIL",r["scientific_status"])
+          print("S4R1_CR1_COUNTS",r["counts"])
+          print("S4R1_CR1_REPORT_SHA256",hashlib.sha256((out/"cr1_report.json").read_bytes()).hexdigest())
+          PY
+      - name: Archive CR1 fail-closed technical failure status, not model evidence
+        if: failure()
+        run: |
+          mkdir -p AutoDraw_Stage20/.s4r1-cr1-opaque14-reference
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path("AutoDraw_Stage20/.s4r1-cr1-opaque14-reference/ci-failure.json")
+          p.write_text(json.dumps({"status":"CR1_TECHNICAL_FAIL_OR_INCOMPLETE",
+            "source_color_owner":"MISSING","semantic_gt":"MISSING",
+            "strict_s4":"BLOCKED","strokes":"FORBIDDEN",
+            "game_E4":"NOT_RUN","exact_CHALK":None,"github_sha":os.getenv("GITHUB_SHA"),
+            "github_run":os.getenv("GITHUB_RUN_ID")},indent=2)+"\n")
+          PY
+      - name: Always archive 14 opaque DEV review-only originals/overlays and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-cr1-opaque14-source-reference-review
+          path: AutoDraw_Stage20/.s4r1-cr1-opaque14-reference/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 21
