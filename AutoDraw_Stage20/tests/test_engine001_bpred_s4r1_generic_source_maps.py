@@ -169,5 +169,135 @@ class GenericSourceMapsTest(unittest.TestCase):
                 decode_original(raw)
 
 
+
+
+from engine001_bpred_s4r1_generic_source_maps import (
+    PINNED_ENGINE_BLOB_SHA1, PINNED_ENGINE_BYTES,
+    provisional_game128_owner_maps,
+)
+
+
+def _engine128_synthetic():
+    palette = np.array([
+        [i, (i * 17) % 256, (i * 37) % 256] for i in range(128)
+    ], dtype=np.uint8)
+    palette[6] = [255, 255, 255]
+    assert len(np.unique(palette, axis=0)) == 128
+    provenance = {
+        "engine_git_blob_sha1": PINNED_ENGINE_BLOB_SHA1,
+        "engine_bytes": PINNED_ENGINE_BYTES,
+        "engine_colors": 128,
+        "painter_method": "PainterPopup.createElaborateEasterEggs",
+        "swatch_RGB": [
+            {"index": i, "RGB": palette[i].tolist()} for i in range(128)
+        ],
+    }
+    return palette, provenance
+
+
+def _rgba_bytes(rgba):
+    b = io.BytesIO()
+    Image.fromarray(rgba, "RGBA").save(b, "PNG")
+    return b.getvalue()
+
+
+class Owner128ProvisionalBindingTest(unittest.TestCase):
+    def test_unbounded_shapes_and_actual_swatch_identity(self):
+        palette, prov = _engine128_synthetic()
+        for wh in ((1, 1), (29, 11), (5, 41)):
+            rgba = solid(*wh, rgb=tuple(palette[20].tolist()))
+            raw = _rgba_bytes(rgba)
+            proposal = provisional_game128_owner_maps(raw, palette, prov)
+            self.assertEqual(proposal["source_wh"], list(wh))
+            self.assertEqual(proposal["provisional_owner_index"].shape,
+                             (wh[1], wh[0]))
+            self.assertTrue((proposal["provisional_owner_index"] == 20).all())
+            self.assertEqual(proposal["source_sha256"],
+                             hashlib.sha256(raw).hexdigest())
+            self.assertEqual(proposal["counts"]["opaque_assigned_provisionally"],
+                             wh[0] * wh[1])
+            self.assertEqual(proposal["counts"]["proposed_owner_edges"], 0)
+            self.assertEqual(proposal["lab_nearest_distance_mean"], 0.0)
+
+    def test_no_forced_32_and_detects_valid_owner_proposal_edges(self):
+        palette, prov = _engine128_synthetic()
+        rgba = solid(40, 5)
+        for x in range(40):
+            rgba[:, x, :3] = palette[20 + x]
+        proposal = provisional_game128_owner_maps(_rgba_bytes(rgba), palette, prov)
+        self.assertEqual(proposal["counts"]["unique_proposed_game_colors"], 40)
+        self.assertTrue(proposal["provisional_owner_edge"][:, 1:-1].all())
+        self.assertEqual(proposal["source_owner_status"], "MISSING")
+        self.assertEqual(proposal["owner_accuracy"],
+                         "UNKNOWN_NO_SOURCE_OWNER_GROUND_TRUTH")
+        self.assertTrue(proposal["stroke_admission"].startswith("FORBIDDEN"))
+
+    def test_transparent_partial_alpha_unassigned_not_game_color(self):
+        palette, prov = _engine128_synthetic()
+        rgba = solid(9, 7, rgb=tuple(palette[20].tolist()))
+        rgba[2, 3, 3] = 0
+        rgba[4, 5, 3] = 127
+        original = rgba.copy()
+        proposal = provisional_game128_owner_maps(_rgba_bytes(rgba), palette, prov)
+        idx = proposal["provisional_owner_index"]
+        self.assertEqual(int(idx[2, 3]), -1)
+        self.assertEqual(int(idx[4, 5]), -1)
+        self.assertEqual(proposal["counts"]["unassigned_nonopaque"], 2)
+        self.assertTrue(np.isnan(proposal["lab_nearest_distance"][2, 3]))
+        self.assertTrue(np.isnan(proposal["lab_nearest_distance"][4, 5]))
+        self.assertTrue(np.array_equal(proposal["provisional_owner_rgb_preview"]
+                                       [:, :, 3], original[:, :, 3]))
+        self.assertTrue(np.array_equal(proposal["provisional_owner_rgb_preview"]
+                                       [2, 3], original[2, 3]))
+        self.assertFalse(proposal["provisional_owner_edge"][2, 3])
+
+    def test_all_alpha_unknown_and_no_spurious_owners(self):
+        palette, prov = _engine128_synthetic()
+        rgba = solid(7, 5)
+        rgba[:, :, 3] = 0
+        proposal = provisional_game128_owner_maps(_rgba_bytes(rgba), palette, prov)
+        self.assertEqual(proposal["counts"]["opaque_assigned_provisionally"], 0)
+        self.assertEqual(proposal["counts"]["unique_proposed_game_colors"], 0)
+        self.assertFalse(proposal["provisional_owner_edge"].any())
+        self.assertTrue((proposal["provisional_owner_index"] == -1).all())
+        self.assertIsNone(proposal["lab_nearest_distance_mean"])
+
+    def test_reproducible_and_source_maps_never_admit_proposal(self):
+        palette, prov = _engine128_synthetic()
+        rgba = solid(31, 21)
+        rgba[:, 15:, :3] = palette[45]
+        original = rgba.copy()
+        raw = _rgba_bytes(rgba)
+        a = provisional_game128_owner_maps(raw, palette, prov)
+        b = provisional_game128_owner_maps(raw, palette, prov)
+        for key in ("provisional_owner_index", "provisional_owner_edge",
+                    "provisional_owner_rgb_preview"):
+            self.assertTrue(np.array_equal(a[key], b[key]), key)
+        self.assertTrue(np.array_equal(rgba, original))
+        m = generic_source_maps(rgba)
+        self.assertEqual(m["owner_status"], "MISSING")
+        self.assertEqual(m["counts"]["candidate_interior"], 0)
+        self.assertTrue(m["stroke_admission"].startswith("FORBIDDEN"))
+
+    def test_invalid_palette_and_provenance_fail_closed(self):
+        palette, prov = _engine128_synthetic()
+        raw = _rgba_bytes(solid(13, 7))
+        for corrupt in (
+            {**prov, "engine_git_blob_sha1": "0" * 40},
+            {**prov, "engine_bytes": 0},
+            {**prov, "engine_colors": 32},
+            {**prov, "swatch_RGB": prov["swatch_RGB"][:-1]},
+        ):
+            with self.assertRaisesRegex(ValueError, "UNVERIFIED_GAME128"):
+                provisional_game128_owner_maps(raw, palette, corrupt)
+        wrong_meta = {**prov, "swatch_RGB": [dict(x) for x in prov["swatch_RGB"]]}
+        wrong_meta["swatch_RGB"][20]["RGB"] = [5, 6, 7]
+        with self.assertRaisesRegex(ValueError, "PALETTE_METADATA_MISMATCH"):
+            provisional_game128_owner_maps(raw, palette, wrong_meta)
+        with self.assertRaisesRegex(ValueError, "UNVERIFIED_GAME128"):
+            provisional_game128_owner_maps(raw, palette[:32], prov)
+        with self.assertRaises((ValueError, OSError)):
+            provisional_game128_owner_maps(b"not an image", palette, prov)
+
 if __name__ == "__main__":
     unittest.main()
