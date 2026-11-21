@@ -11,6 +11,7 @@ import hashlib
 import io
 import json
 import os
+import subprocess
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -169,7 +170,10 @@ def run(workspace: Path, archive: Path, engine_js: Path,
         renderer: Path, output: Path) -> dict:
     if output.exists():
         raise ValueError("BLOCKED_NG2_OUTPUT_EXISTS")
-    e0_raw = (workspace / "AutoDraw_Stage20" / "docs" / E0).read_bytes()
+    # Windows checkout may rewrite LF to CRLF; freeze Git object, not worktree.
+    e0_raw = subprocess.check_output(
+        ["git", "show", "HEAD:AutoDraw_Stage20/docs/" + E0],
+        cwd=workspace)
     e0_sha = maps.git_blob_sha1(e0_raw)
     if e0_sha != E0_BLOB:
         raise ValueError("BLOCKED_NG2_E0_DRIFT")

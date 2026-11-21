@@ -42,11 +42,11 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import hashlib
+          import hashlib,subprocess
           from pathlib import Path
           expected="c9a5af70223c5eccbadb36e659c98d4ebdf2d186"
           p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NG2_ORIGINAL_EF_NATIVE_SINGLE_STROKE_RISK_PREREG_2026-11-21.md")
-          b=p.read_bytes()
+          b=subprocess.check_output(["git","show","HEAD:"+p.as_posix()])
           got=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
           assert got==expected,("BLOCKED_NG2_E0_HASH",got)
           for path,sha in {
@@ -55,9 +55,10 @@ jobs:
             "AutoDraw_Stage20/tests/game_renderer_reference.js":
               "76d950e0a8911888a9df3b675b866519ecf7bba4"
           }.items():
-            data=Path(path).read_bytes()
+            data=subprocess.check_output(["git","show","HEAD:"+path])
             git=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
             assert git==sha,("BLOCKED_NG2_GAME_RENDERER_GIT_SHA",path,git)
+            Path(path).write_bytes(data)  # exact immutable source on Windows
           print("NG2_PREREG_SOURCE_GAME_RENDERER_E0_HASHES_PASS")
           PY
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py
