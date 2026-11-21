@@ -1,5 +1,13 @@
 # ENGINE-001 / BPRED-001 — прогноз фактического следа кисти Egret/Canvas2D/WebGL
 
+
+## Дополнение 2026-11-21 — промежуточная ветвь S4-R1/NH1–NH4 без обучения, в прежнем S0→S6
+
+По решению пользователя, [prospective neural-helper NH1–NH4 E0](ENGINE001_BPRED001_S4R1_NEURAL_HELPER_NO_TRAIN_INTERMEDIATE_PLAN_PREREG_2026-11-21.md) Git blob `63bc08ce3caecbb9803f22ea75aa201232906bbe` введён **внутрь незавершённого S4-R1, а не вместо следующего этапа**. Сначала настоящая бездообучающая SAM2.1 Tiny source-first проверка A0 grid8/A1 grid16/A2 crop1/P1 оригинальные SLIC точки± на KNOWN Egret и DEV Hello Kitty; потом только по отдельным E0 при научном смысле — OneFormer semantic/instance/panoptic, DINOv2 оригинальные region similarities или pretrained semantic head, BiRefNet original soft foreground uncertainty. Параметры и стоп-правила NH1 заморожены до нового CI. Никаких ручных масок под каждый новый рисунок, нейросеть не истинная карта игровых owner, не изменяется RGB-источник, quality gates/DECs и экспериментальная история, H8/BLIND120/second50 sealed, production/master/Stage6/Monitor/Bridge не затрагиваются.
+
+**Условие возврата к основному маршруту:** отчёт по независимым проверяемым DEV critical/owner reference и модельным абстенциям, затем отдельно original Egret native false-safe E3 для S4; только после настоящего допуска S4 — S5 native whole-image и S6 stroke/CHALK. Увеличенное число нейросетевых масок само по себе не PASS, все прежние S2/S3/P4D18 FAIL остаются. NH1 CI и новые исходы в момент регистрации E0: `NOT_RUN`.
+
+
 ## Дополнение 2026-11-21 — BPRED-S4-R1: универсальный автоматический генератор карт и проверка на разных изображениях (принято пользователем)
 
 **Статус: ACCEPTED DESIGN SCOPE, NOT IMPLEMENTED / NOT S4 VALIDATED.** Это дополнение к прежнему S0→S1→S2→S3→S4→S5→S6, [DEC-044](DECISIONS.md) и [ограниченному плану DEC-043](ENGINE001_BPRED001_BOUNDED_RESEARCH_AND_VISUAL_QUALITY_PLAN_2026-11-20.md). Пользователь требует, чтобы **готовый AutoDraw строил карты владельцев цветов, границ и защиты самостоятельно для ЛЮБОГО нового входного изображения**: ручная разметка мной для каждого файла не является допустимым production-процессом. [Отдельный перспективный S4-R1 E0, корпус и split](ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md) задаёт будущие проверки до разработки и измерений. Нынешний Egret E/F — только известный development baseline, не независимое доказательство универсальности.
