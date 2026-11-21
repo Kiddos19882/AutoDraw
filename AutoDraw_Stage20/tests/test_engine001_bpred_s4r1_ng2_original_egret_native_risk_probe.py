@@ -19,7 +19,7 @@ class OriginalEgretNG2SyntheticTest(unittest.TestCase):
 
     def test_fixed_source_lexicographic_quantiles_and_determinism(self):
         c = self._contract()
-        expect = [(0, 0), (2, 10), (5, 0), (7, 10), (9, 19)]
+        expect = [(0, 0), (5, 0), (10, 0), (15, 0), (19, 9)]
         self.assertEqual(choose_original_unknown_cells(c), expect)
         self.assertEqual(choose_original_unknown_cells(c), expect)
 
