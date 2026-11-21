@@ -1,3 +1,10 @@
+## CURRENT FIRST OPEN — FC1 целиком из оригинала, без старых художественных входов (DEC-047, 2026-11-21)
+
+- [x] [FC1 неизменяемый E0 — полная независимая цепочка](ENGINE001_BPRED001_S4R1_FC1_FRESH_CHAIN_EGRET_PREREG_2026-11-21.md) immutable Git blob `e026b0ef82f04ecb979e5366d5c582162c60052a` принят до development; явный запрет старых owner/contour/masks/strokes/feedback как входа любого нового алгоритма; допускается только current input + real engine swatches / native harness.
+- [x] [Код FC1](https://github.com/Kiddos19882/AutoDraw/commit/58869a0019d88fecbdb51e16e4139cd36707594e): полный fresh image source→game128 proposal→adaptive planner/contour→native fill→native current-run repair→final, 7 E2 synthetic регрессий и isolated native CI; **не считать выполненным runtime по одному коммиту**.
+- [ ] **FIRST OPEN NEXT:** проверить [FC1 CI44920079432](https://github.com/Kiddos19882/AutoDraw/actions/runs/44920079432), корректно исправить только технические ошибки если появятся; при нативном PASS подписать исходные PNG/план/report и предоставить человеку полный новый final Egret artwork. Без новых NG safety gate или перехода к старым E/F планам.
+- [ ] После полного native изображения: оценить большие видимые прорехи, цветовую узнаваемость/контур и затем при наличии ощутимой проблемы одну коррекцию. Formal S4/production не принимается автоматически; H8/BLIND120/second50 sealed.
+
 ## CURRENT ENGINE-001 — DEC-046: полный узнаваемый рисунок — первоначальная цель (2026-11-21)
 
 - [x] [DEC-046](DECISIONS.md#dec-046-autodraw--главная-цель-узнаваемый-полный-рисунок-а-не-абсолютная-безопасность-штрихов): зафиксировано, что безопасность кисти **никогда не была и не является главным критерием AutoDraw**; качество/узнаваемость полной игровой отрисовки и исправление существенных визуальных дефектов имеют приоритет. NG2 научно завершён; не запускать NG3 и бесконечную проверку отдельных пикселей только ради нулевых ошибок.
