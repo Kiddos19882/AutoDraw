@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image, ImageOps
 from scipy import ndimage
 from scipy.spatial import cKDTree
-from skimage import color, filters
+from skimage import color, filters, segmentation
 
 VERSION = "ENGINE001_BPRED_S4R1_GENERIC_SOURCE_MAP_V1"
 MAX_PIXELS = 16_000_000
@@ -315,4 +315,169 @@ def provisional_game128_owner_maps(
             float(np.percentile(valid_distances, 95)) if len(valid_distances) else None),
         "owner_accuracy": "UNKNOWN_NO_SOURCE_OWNER_GROUND_TRUTH",
         "source_to_logical": letterbox_binding((width, height)),
+    }
+
+
+# S4-R1 P2 original-first generalization. These regions are a source-only
+# diagnostic, NEVER a source-owner truth, semantic classifier or stroke permit.
+SOURCE_REGION_VERSION = "ENGINE001_BPRED_S4R1_SOURCE_SLIC_MEDOID_UNCERTAINTY_V1"
+REGION_COMPACTNESS = 6.0  # original B1-R P2 J_FINE, not native acceptance
+REGION_TARGET_AREA = 128  # prospective source-resolution heuristic
+REGION_MAX_SEGMENTS = 2048
+
+
+def original_source_region_uncertainty(
+    rgba: np.ndarray, source_maps: dict[str, Any],
+) -> dict[str, Any]:
+    """Generalize P2 source SLIC/medoids without fixed ROI or palette owners.
+
+    Source maps MUST be independently built from the SAME original RGBA.
+    Diagnostic candidate cores always stay UNKNOWN and non-executable.
+    """
+    if (not isinstance(rgba, np.ndarray) or rgba.dtype != np.uint8
+            or rgba.ndim != 3 or rgba.shape[-1] != 4
+            or min(rgba.shape[:2]) < 1 or
+            rgba.shape[0] * rgba.shape[1] > MAX_PIXELS
+            or not isinstance(source_maps, dict)
+            or source_maps.get("version") != VERSION
+            or source_maps.get("owner_status") != "MISSING"
+            or source_maps.get("stroke_admission") !=
+                    "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"):
+        raise ValueError("BLOCKED_S4R1_SOURCE_REGION_INPUT_PROVENANCE")
+    h, w = rgba.shape[:2]
+    for name, expected in (
+        ("source_rgb", rgba[:, :, :3]),
+        ("source_alpha", rgba[:, :, 3]),
+    ):
+        actual = source_maps.get(name)
+        if not isinstance(actual, np.ndarray) or not np.array_equal(actual, expected):
+            raise ValueError("BLOCKED_S4R1_REGION_ORIGINAL_RGB_ALPHA_MISMATCH")
+    for key in ("source_edge", "protected", "unknown",
+                "candidate_interior", "exact_white_evidence"):
+        mask = source_maps.get(key)
+        if not isinstance(mask, np.ndarray) or mask.shape != (h, w) or mask.dtype != bool:
+            raise ValueError("BLOCKED_S4R1_REGION_SOURCE_MASK_PROVENANCE")
+    if (np.any(source_maps["candidate_interior"])
+            or not np.all(source_maps["protected"] | source_maps["unknown"])
+            or np.any(source_maps["protected"] & source_maps["unknown"])):
+        raise ValueError("BLOCKED_S4R1_REGION_UNSAFE_SOURCE_MASK")
+
+    opaque = rgba[:, :, 3] == 255
+    num_opaque = int(np.count_nonzero(opaque))
+    labels = np.zeros((h, w), dtype=np.int32)
+    method = "MASKED_SOURCE_SLIC"
+    if num_opaque:
+        n_segments = max(1, min(REGION_MAX_SEGMENTS,
+                                (num_opaque + REGION_TARGET_AREA - 1)
+                                // REGION_TARGET_AREA))
+        # SLIC cannot meaningfully initialize multi-dimensional seeds on
+        # single-row/tiny masked sources: use deterministic 4-connected
+        # original alpha components only for that degenerate case.
+        if num_opaque < 16 or min(h, w) < 2:
+            labels, n_regions = ndimage.label(
+                opaque, structure=ndimage.generate_binary_structure(2, 1))
+            labels = labels.astype(np.int32)
+            method = "DEGENERATE_ALPHA_COMPONENTS_ONLY"
+        else:
+            labels = segmentation.slic(
+                rgba[:, :, :3].astype(np.float64) / 255.0,
+                n_segments=n_segments,
+                compactness=REGION_COMPACTNESS,
+                sigma=0,
+                convert2lab=True,
+                enforce_connectivity=True,
+                start_label=1,
+                channel_axis=-1,
+                slic_zero=False,
+                mask=opaque,
+            ).astype(np.int32)
+        if (np.any(labels[~opaque] != 0) or np.any(labels[opaque] < 1)):
+            raise ValueError("BLOCKED_S4R1_REGION_ALPHA_CROSSING")
+        ids = np.unique(labels[opaque])
+        if (not len(ids) or
+                not np.array_equal(ids, np.arange(1, len(ids) + 1))):
+            raise ValueError("BLOCKED_S4R1_REGION_NONCONTIGUOUS_IDS")
+    else:
+        n_segments = 0
+        ids = np.empty(0, dtype=np.int32)
+        method = "NO_OPAQUE_SOURCE_PIXELS"
+
+    result_rgba = rgba.copy()
+    disagreement = np.zeros((h, w), dtype=bool)
+    representatives = []
+    # P2's actual-in-original median-Lab medoid rule, generalized to HxW.
+    for region_id, sl in enumerate(ndimage.find_objects(labels), start=1):
+        if sl is None:
+            raise ValueError("BLOCKED_S4R1_REGION_EMPTY_LABEL")
+        patch_mask = labels[sl] == region_id
+        rgb_samples = rgba[sl[0], sl[1], :3][patch_mask]
+        lab_samples = color.rgb2lab(
+            rgb_samples.astype(np.float64).reshape(1, -1, 3) / 255.0
+        ).reshape(-1, 3)
+        med = np.median(lab_samples, axis=0)
+        local_sq = np.sum((lab_samples - med) ** 2, axis=1)
+        medoid_position = int(np.argmin(local_sq))
+        medoid_rgb = rgb_samples[medoid_position].copy()
+        median_delta = color.deltaE_ciede2000(
+            lab_samples, lab_samples[medoid_position]
+        )
+        if not np.all(np.isfinite(median_delta)):
+            raise ValueError("BLOCKED_S4R1_REGION_NONFINITE_SOURCE_DELTA")
+        view = result_rgba[sl[0], sl[1], :3]
+        view[patch_mask] = medoid_rgb
+        disagree_view = disagreement[sl]
+        disagree_view[patch_mask] = median_delta > DELTA_E_STRONG
+        px = np.argwhere(patch_mask)[medoid_position]
+        representatives.append({
+            "region_id": region_id,
+            "source_pixel_xy": [int(sl[1].start + px[1]),
+                                int(sl[0].start + px[0])],
+            "source_rgb": medoid_rgb.tolist(),
+            "pixels": int(np.count_nonzero(patch_mask)),
+        })
+    if len(representatives) != len(ids):
+        raise ValueError("BLOCKED_S4R1_REGION_REPRESENTATIVE_COUNT")
+    boundary = np.zeros((h, w), dtype=bool)
+    if h > 1:
+        changed = labels[:-1] != labels[1:]
+        boundary[:-1] |= changed & opaque[:-1]
+        boundary[1:] |= changed & opaque[1:]
+    if w > 1:
+        changed = labels[:, :-1] != labels[:, 1:]
+        boundary[:, :-1] |= changed & opaque[:, :-1]
+        boundary[:, 1:] |= changed & opaque[:, 1:]
+    source_edge = source_maps["source_edge"] & opaque
+    warning = source_edge | boundary | disagreement
+    warning_band = ndimage.binary_dilation(warning, iterations=1)
+    core = (opaque & ~source_maps["protected"]
+            & ~warning_band & ~source_maps["exact_white_evidence"])
+    if np.any(core & warning) or np.any(core & ~source_maps["unknown"]):
+        raise ValueError("BLOCKED_S4R1_REGION_FALSE_SAFE_CORE_CONTRACT")
+    if not np.array_equal(result_rgba[:, :, 3], rgba[:, :, 3]):
+        raise ValueError("BLOCKED_S4R1_REGION_ALPHA_MUTATION")
+    return {
+        "version": SOURCE_REGION_VERSION,
+        "source_rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest(),
+        "segmentation_method": method,
+        "region_ids": labels,
+        "source_medoids_preview_rgba": result_rgba,
+        "region_boundary": boundary,
+        "region_color_uncertain": disagreement,
+        "source_region_warning": warning,
+        "geometric_potential_core": core,
+        "representatives": representatives,
+        "source_owner_status": "MISSING",
+        "semantic_detail_status": "UNKNOWN_NO_VERIFIED_SEMANTIC_MODEL",
+        "region_owner_accuracy": "UNKNOWN_NO_INDEPENDENT_REAL_SOURCE_LABELS",
+        "stroke_admission": "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION",
+        "counts": {
+            "opaque": num_opaque,
+            "regions": int(len(ids)),
+            "source_edge_opaque": int(np.count_nonzero(source_edge)),
+            "region_boundary": int(np.count_nonzero(boundary)),
+            "region_color_uncertain": int(np.count_nonzero(disagreement)),
+            "source_region_warning": int(np.count_nonzero(warning)),
+            "geometric_potential_core": int(np.count_nonzero(core)),
+            "semantic_unknown": int(np.count_nonzero(source_maps["unknown"])),
+        },
     }
