@@ -1,0 +1,155 @@
+name: ENGINE-001 BPRED-S4R1 NG2 original Egret single-stroke native owner white contour risk
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-ng2-original-egret-native-risk-probe.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NG2_ORIGINAL_EF_NATIVE_SINGLE_STROKE_RISK_PREREG_2026-11-21.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: engine001-bpred-s4r1-ng2-original-egret-research
+  cancel-in-progress: true
+jobs:
+  ng2-original-egret-native-risk-diagnostic:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin existing archived Firefox 159 source-native browser
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install previous pinned source + Egret renderer requirements
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Freeze E0 and verify actual original game and renderer SHA
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          expected="c9a5af70223c5eccbadb36e659c98d4ebdf2d186"
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NG2_ORIGINAL_EF_NATIVE_SINGLE_STROKE_RISK_PREREG_2026-11-21.md")
+          b=p.read_bytes()
+          got=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert got==expected,("BLOCKED_NG2_E0_HASH",got)
+          for path,sha in {
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":
+              "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":
+              "76d950e0a8911888a9df3b675b866519ecf7bba4"
+          }.items():
+            data=Path(path).read_bytes()
+            git=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
+            assert git==sha,("BLOCKED_NG2_GAME_RENDERER_GIT_SHA",path,git)
+          print("NG2_PREREG_SOURCE_GAME_RENDERER_E0_HASHES_PASS")
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+      - name: Download frozen original E/F P4D18 archive independently by SHA256
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,requests
+          from pathlib import Path
+          url="https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/14557770111/zip"
+          r=requests.get(url,headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+               "Accept":"application/vnd.github+json","User-Agent":"AutoDraw-NG2-Egret"},timeout=180)
+          r.raise_for_status()
+          sha=hashlib.sha256(r.content).hexdigest()
+          assert sha=="b0700a6b2d7fcd03aa1af0e741e0e7eb700304b779c32eced67fe43582066079",("BLOCKED_NG2_ARCHIVE",sha)
+          (Path(os.environ["RUNNER_TEMP"])/"ng2-original-p4d18.zip").write_bytes(r.content)
+          print("NG2_TRUE_SOURCE_ARCHIVE_PIN_PASS",sha)
+          PY
+      - name: Native Egret BoardPane blank plus 20 deterministic source-known SINGLE stroke probes
+        shell: bash
+        env:
+          AUTODRAW_PINNED_FIREFOX: ${{ steps.firefox.outputs.firefox-path }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import os,sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path("AutoDraw_Stage20/tests").resolve()))
+          import run_engine001_b1r_p4b7_native_stroke_attribution as p4b7
+          real=p4b7.webdriver.Firefox
+          pin=os.environ["AUTODRAW_PINNED_FIREFOX"]
+          assert Path(pin).is_file(), "BLOCKED_NG2_FIREFOX159_NOT_FOUND"
+          def pinned_firefox(*args,**kwargs):
+              opts=kwargs.get("options")
+              if opts is None:raise ValueError("BLOCKED_NG2_BROWSER_OPTIONS")
+              opts.binary_location=pin
+              return real(*args,**kwargs)
+          p4b7.webdriver.Firefox=pinned_firefox
+          import run_engine001_bpred_s4r1_ng2_original_egret_native_risk_probe as ng2
+          try:
+              report=ng2.run(
+                  Path("."),Path(os.environ["RUNNER_TEMP"])/"ng2-original-p4d18.zip",
+                  Path("AutoDraw_Stage20/gameEngine/main.min_653f95bc.js"),
+                  Path("AutoDraw_Stage20/tests/game_renderer_reference.js"),
+                  Path(os.environ["RUNNER_TEMP"])/"ng2-original-egret-native")
+          finally:
+              p4b7.webdriver.Firefox=real
+          assert report["source_native_scene_count"]==20
+          assert report["actual_native_scene_count"]==21
+          assert report["strict_S4"]=="BLOCKED" and report["zero_stroke_admissions"] is True
+          print("NG2_ORIGINAL_EGRET_NATIVE_DIAGNOSTIC_COMPLETE",
+                "foreign",report["total_foreign"],
+                "white",report["total_source_white"],
+                "protected",report["total_protected"])
+          PY
+      - name: Audit all native source hashes, scene sample positions and no promotion
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"ng2-original-egret-native"
+          report=json.loads((p/"report.json").read_text(encoding="utf-8"))
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["native_paint_quality"]=="RESEARCH_DIAGNOSTIC_ONLY"
+          assert report["heldout8_BLIND120_second50"]=="SEALED"
+          assert report["strict_S4"]=="BLOCKED" and report["zero_stroke_admissions"] is True
+          assert len(report["scenes"])==20
+          for path,sha in report["raw_files_sha256"].items():
+              f=p/path
+              assert f.is_file() and hashlib.sha256(f.read_bytes()).hexdigest()==sha
+          for method in ("E_SOBEL90","F_SOBEL90_LAB12"):
+              ss=[s for s in report["scenes"] if s["method"]==method]
+              assert len(ss)==10
+              assert sorted(set(s["width"] for s in ss))==[1,3]
+              assert len(report["selected_unknown_samples"][method])==5
+          print("NG2_TRUE_NATIVE_EF_RAW_SHA_AND_S4_FAIL_CLOSED_PASS")
+          PY
+      - name: Upload full original Egret raw native 21-scene source-only diagnosis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-ng2-original-egret-native-risk-20-strokes-blank
+          path: ${{ runner.temp }}/ng2-original-egret-native/
+          if-no-files-found: warn
+          retention-days: 30
