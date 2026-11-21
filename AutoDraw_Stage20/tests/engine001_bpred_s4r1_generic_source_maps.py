@@ -14,6 +14,7 @@ from typing import Any
 import numpy as np
 from PIL import Image, ImageOps
 from scipy import ndimage
+from scipy.spatial import cKDTree
 from skimage import color, filters
 
 VERSION = "ENGINE001_BPRED_S4R1_GENERIC_SOURCE_MAP_V1"
@@ -192,4 +193,126 @@ def generic_source_maps(
             "geometric_interior": geometric_interior,
             "candidate_interior": candidate_interior,
         }.items()},
+    }
+
+
+# S4R1 owner128 DEV step: a palette proximity PROPOSAL, never a verified owner.
+PROPOSAL_VERSION = "ENGINE001_BPRED_S4R1_OWNER128_PROVISIONAL_V1"
+PINNED_ENGINE_BLOB_SHA1 = "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+PINNED_ENGINE_BYTES = 4859418
+PROPOSAL_CHUNK_PIXELS = 32768
+
+
+def provisional_game128_owner_maps(
+    original_raw: bytes,
+    game128: np.ndarray,
+    engine_provenance: dict[str, Any],
+) -> dict[str, Any]:
+    """Original RGB nearest-Lab game128 hypothesis; NEVER source-bound / SAFE.
+
+    Caller must obtain game128/provenance from the pre-existing B1-R P3B
+    read_engine_palette() SHA-pinned parser. Do not call its 32-color selector
+    or its image-specific ROI/shape code. Alpha<255 cannot have known owner.
+    """
+    original = decode_original(original_raw)  # input bytes + EXIF/alpha pin
+    if (
+        not isinstance(game128, np.ndarray)
+        or game128.shape != (128, 3)
+        or game128.dtype != np.uint8
+        or np.unique(game128, axis=0).shape[0] != 128
+        or not isinstance(engine_provenance, dict)
+        or engine_provenance.get("engine_git_blob_sha1") != PINNED_ENGINE_BLOB_SHA1
+        or engine_provenance.get("engine_bytes") != PINNED_ENGINE_BYTES
+        or engine_provenance.get("engine_colors") != 128
+        or engine_provenance.get("painter_method")
+           != "PainterPopup.createElaborateEasterEggs"
+        or not isinstance(engine_provenance.get("swatch_RGB"), list)
+        or len(engine_provenance["swatch_RGB"]) != 128
+        or not np.array_equal(game128[6], [255, 255, 255])
+    ):
+        raise ValueError("BLOCKED_S4R1_UNVERIFIED_GAME128_PROVENANCE")
+    # Bind the supplied array to the per-index RGB metadata returned by P3B.
+    for i, record in enumerate(engine_provenance["swatch_RGB"]):
+        if (not isinstance(record, dict) or record.get("index") != i
+                or record.get("RGB") != game128[i].tolist()):
+            raise ValueError("BLOCKED_S4R1_PALETTE_METADATA_MISMATCH")
+
+    rgba = original["rgba"]
+    height, width = rgba.shape[:2]
+    opaque = rgba[:, :, 3] == 255
+    opaque_flat_indices = np.flatnonzero(opaque.reshape(-1))
+    owner_flat = np.full(height * width, -1, dtype=np.int16)
+    # Distances are EXPLORATORY CIELAB Euclidean, not calibrated owner confidence.
+    distance_flat = np.full(height * width, np.nan, dtype=np.float32)
+    game_lab = color.rgb2lab(
+        game128.astype(np.float64).reshape(1, 128, 3) / 255.0
+    ).reshape(128, 3)
+    tree = cKDTree(game_lab)
+    original_rgb_flat = rgba[:, :, :3].reshape(-1, 3)
+    for start in range(0, len(opaque_flat_indices), PROPOSAL_CHUNK_PIXELS):
+        positions = opaque_flat_indices[start:start + PROPOSAL_CHUNK_PIXELS]
+        source_lab = color.rgb2lab(
+            original_rgb_flat[positions].astype(np.float64).reshape(1, -1, 3)
+            / 255.0
+        ).reshape(-1, 3)
+        dist, nearest = tree.query(source_lab, k=2, workers=1)
+        # For an exact numerical tie between two returned neighbors, use
+        # the lower index (but never infer any semantic certainty from it).
+        chosen = np.where(
+            np.isclose(dist[:, 0], dist[:, 1], rtol=0, atol=1e-10),
+            np.minimum(nearest[:, 0], nearest[:, 1]),
+            nearest[:, 0],
+        )
+        owner_flat[positions] = chosen.astype(np.int16)
+        distance_flat[positions] = dist[:, 0].astype(np.float32)
+    proposal = owner_flat.reshape(height, width)
+    distance = distance_flat.reshape(height, width)
+    # Only valid-and-valid neighboring owner changes are eligible evidence.
+    edges = np.zeros((height, width), dtype=bool)
+    if height > 1:
+        changed = (opaque[:-1] & opaque[1:] &
+                   (proposal[:-1] != proposal[1:]))
+        edges[:-1] |= changed
+        edges[1:] |= changed
+    if width > 1:
+        changed = (opaque[:, :-1] & opaque[:, 1:] &
+                   (proposal[:, :-1] != proposal[:, 1:]))
+        edges[:, :-1] |= changed
+        edges[:, 1:] |= changed
+    preview = rgba.copy()
+    if len(opaque_flat_indices):
+        preview.reshape(-1, 4)[opaque_flat_indices, :3] = game128[
+            owner_flat[opaque_flat_indices]
+        ]
+    valid_distances = distance_flat[opaque_flat_indices]
+    return {
+        "version": PROPOSAL_VERSION,
+        "source_sha256": original["sha256"],
+        "source_git_blob_sha1": original["git_blob_sha1"],
+        "source_wh": [width, height],
+        "source_alpha_unmodified": True,
+        "game_engine_git_blob_sha1": PINNED_ENGINE_BLOB_SHA1,
+        "game128_palette_sha256": hashlib.sha256(game128.tobytes()).hexdigest(),
+        "provisional_owner_index": proposal,
+        "provisional_owner_rgb_preview": preview,
+        "provisional_owner_valid": opaque,
+        "provisional_owner_edge": edges,
+        "lab_nearest_distance": distance,
+        "proposal_status": "PROVISIONAL_LAB_NEAREST_NOT_SOURCE_OWNER",
+        "source_owner_status": "MISSING",
+        "semantic_detail_status": "UNKNOWN_NO_VERIFIED_SEMANTIC_MODEL",
+        "stroke_admission": "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION",
+        "counts": {
+            "opaque_assigned_provisionally": int(len(opaque_flat_indices)),
+            "unassigned_nonopaque": int(opaque.size - len(opaque_flat_indices)),
+            "unique_proposed_game_colors": int(len(np.unique(owner_flat[
+                opaque_flat_indices]))) if len(opaque_flat_indices) else 0,
+            "proposed_owner_edges": int(np.count_nonzero(edges)),
+        },
+        "lab_nearest_distance_mean": (
+            float(np.mean(valid_distances)) if len(valid_distances) else None),
+        "lab_nearest_distance_p95": (
+            float(np.percentile(valid_distances, 95)) if len(valid_distances) else None),
+        "owner_accuracy": "UNKNOWN_NO_SOURCE_OWNER_GROUND_TRUTH",
+        "source_to_logical": letterbox_binding((width, height)),
     }
