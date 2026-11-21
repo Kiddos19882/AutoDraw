@@ -21,7 +21,7 @@ from PIL import Image
 
 from engine001_bpred_s4r1_generic_source_maps import (
     decode_original, generic_source_maps, provisional_game128_owner_maps,
-    original_source_region_uncertainty,
+    original_source_region_uncertainty, original_alpha_interface_reference,
 )
 from run_engine001_b1r_p3b_engine128_adaptive32 import read_engine_palette
 
@@ -174,6 +174,10 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             src["rgba"].tobytes()).hexdigest()
         assert regions["source_owner_status"] == "MISSING"
         assert regions["stroke_admission"].startswith("FORBIDDEN")
+        alpha_reference = original_alpha_interface_reference(src["rgba"], maps, regions)
+        assert alpha_reference["original_source_rgba_sha256"] == regions[
+            "source_rgba_sha256"]
+        assert alpha_reference["stroke_admission"].startswith("FORBIDDEN")
         assert np.all(regions["geometric_potential_core"] <= maps["unknown"])
         assert maps["stroke_admission"].startswith("FORBIDDEN")
         prefix = hashlib.sha256(name.encode("utf8")).hexdigest()[:12]
@@ -217,6 +221,7 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             "stroke_admission": maps["stroke_admission"],
             "counts": maps["counts"],
             "derived_png_sha256": png_sha,
+            "independent_source_alpha_reference": alpha_reference,
             "original_source_regions": {
                 "version": regions["version"],
                 "segmentation_method": regions["segmentation_method"],
@@ -243,6 +248,29 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
         })
     assert len(summaries) == 23
     assert len(list(output.glob("*.png"))) == 23 * 8
+    applicable = [
+        s for s in summaries if s["independent_source_alpha_reference"][
+            "opaque_interface_pixels"] > 0
+    ]
+    if (len(applicable) != 6 or
+            sum(s["role"] == "DEV" for s in applicable) != 1 or
+            sum(s["role"] == "KNOWN_CONTROL" for s in applicable) != 5):
+        raise ValueError("BLOCKED_S4R1_ALPHA_REFERENCE_APPLICABILITY_CHANGED")
+    if any(s["independent_source_alpha_reference"]["alpha_reference_status"]
+           != "PASS_ALPHA_SOURCE_REFERENCE_ONLY" for s in applicable):
+        failures = [
+            (s["file"], s["independent_source_alpha_reference"][
+                "opaque_interface_unprotected_pixels"])
+            for s in applicable if s["independent_source_alpha_reference"][
+                "opaque_interface_unprotected_pixels"] > 0
+        ]
+        raise ValueError("FAIL_ALPHA_INTERFACE_SOURCE_PROTECTION:" + repr(failures))
+    print("S4R1_DEV_ALPHA_SOURCE_REFERENCE", len(applicable),
+          "DEV", 1, "KNOWN_CONTROL", 5,
+          "OPAQUE_INTERFACE", sum(s["independent_source_alpha_reference"][
+              "opaque_interface_pixels"] for s in applicable),
+          "UNPROTECTED", sum(s["independent_source_alpha_reference"][
+              "opaque_interface_unprotected_pixels"] for s in applicable))
     if not any(s["original_source_regions"]["counts"]["geometric_potential_core"] > 0
                for s in summaries):
         raise ValueError("FAIL_NOT_USEFUL_S4R1_ALL_DEV_SOURCE_REGION_CORES_EMPTY")
