@@ -212,7 +212,7 @@ def run(root:Path,output:Path)->dict:
                 )[0].cpu().numpy().astype(np.int32)
                 checked=validate_prediction(task,labels,[],rgba,source)
                 rec["model_modes"].append(serialize_prediction(
-                    sample_dir/f"{task}_oneformer",task,checked,
+                    sample_dir/f"{task}_oneformer",f"{task}_oneformer",checked,
                     {"model_task_token":task,"threshold":None,
                      "seconds_forward_and_postprocess":round(time.monotonic()-start,3)}))
             else:
