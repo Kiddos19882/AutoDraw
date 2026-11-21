@@ -33,7 +33,7 @@ jobs:
           python-version: '3.11'
       - name: Install same original-source numerical stack, no neural model
         run: |
-          python -m pip install numpy==2.2.6 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
       - name: Immutable E0, technical synthetic tests, documentation audit
         run: |
           python - <<'PY'
