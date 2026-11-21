@@ -51,7 +51,7 @@ def fresh_logical_source(original_raw: bytes) -> tuple[np.ndarray, dict]:
     if np.any(rgba[:, :, 3] != 255):
         raise ValueError("BLOCKED_FC1_ALPHA_NOT_SUPPORTED_IN_FIRST_DEV")
     logical = np.asarray(
-        Image.fromarray(rgba, "RGBA").resize(LOGICAL_WH, Image.Resampling.LANCZOS)
+        Image.fromarray(rgba).resize(LOGICAL_WH, Image.Resampling.LANCZOS)
     ).copy()
     if logical.shape != (240, 150, 4) or not np.all(logical[:, :, 3] == 255):
         raise ValueError("BLOCKED_FC1_LOGICAL_SOURCE")
@@ -62,7 +62,7 @@ def fresh_owner_and_edges(logical: np.ndarray, game: np.ndarray,
                           provenance: dict) -> tuple[np.ndarray, np.ndarray, dict]:
     """Only this original's freshly normalized RGBA is fed to source analysis."""
     with io.BytesIO() as buffer:
-        Image.fromarray(logical, "RGBA").save(buffer, format="PNG")
+        Image.fromarray(logical).save(buffer, format="PNG")
         raw_logical = buffer.getvalue()
     suggestion = source_maps.provisional_game128_owner_maps(
         raw_logical, game, provenance)
@@ -290,8 +290,8 @@ def native_diagnostics(native: np.ndarray, owners: np.ndarray,
 def save_review(output: Path, original: np.ndarray, owners: np.ndarray,
                 palette: np.ndarray, native_fill: np.ndarray,
                 native_final: np.ndarray, edges: np.ndarray) -> None:
-    rgb = Image.fromarray(original[:, :, :3], "RGB")
-    Image.fromarray(palette[owners], "RGB").save(output / "02_FRESH_GAME128_TARGET.png")
+    rgb = Image.fromarray(original[:, :, :3])
+    Image.fromarray(palette[owners]).save(output / "02_FRESH_GAME128_TARGET.png")
     Image.fromarray(owners, "L").save(output / "03_FRESH_OWNER_INDEX.png")
     Image.fromarray((edges.astype(np.uint8) * 255), "L").save(
         output / "04_FRESH_SOURCE_EDGES.png")
@@ -301,7 +301,7 @@ def save_review(output: Path, original: np.ndarray, owners: np.ndarray,
     final.save(output / "06_ACTUAL_EGRET_FINAL.png")
     images = [
         rgb.resize((450, 720), Image.Resampling.NEAREST),
-        Image.fromarray(palette[owners], "RGB").resize((450, 720), Image.Resampling.NEAREST),
+        Image.fromarray(palette[owners]).resize((450, 720), Image.Resampling.NEAREST),
         fill, final,
     ]
     sheet = Image.new("RGB", (1800, 768), "white")
