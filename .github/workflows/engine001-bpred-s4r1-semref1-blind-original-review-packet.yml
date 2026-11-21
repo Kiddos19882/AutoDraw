@@ -1,0 +1,102 @@
+name: ENGINE-001 BPRED-S4R1 SEMREF1 four unchanged DEV originals for blind review
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-semref1-blind-original-review-packet.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-semref1-review-original-packet
+  cancel-in-progress: true
+
+jobs:
+  package-exact-four-dev-originals-no-generated-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - name: Verify frozen E0, immutable DEV roles and original bytes; copy only
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          import shutil
+          from pathlib import Path
+
+          root = Path("AutoDraw_Stage20")
+          e0 = root / "docs/ENGINE001_BPRED001_S4R1_SEMREF1_HUMAN_DEV_REFERENCE_PREREG_2026-11-21.md"
+          b = e0.read_bytes()
+          gitblob = lambda raw: hashlib.sha1(b"blob "+str(len(raw)).encode("ascii")+b"\0"+raw).hexdigest()
+          assert gitblob(b) == "734ef71adeabfedeaaab0f3edccb62254fbca24a", "SEMREF1_E0_DRIFT"
+          split = (root / "docs/ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md").read_text(encoding="utf8")
+          rows = re.findall(r"^\| `([^`]+)` \| `([a-f0-9]{40})` \| ([0-9]+) \| (DEV|KNOWN_CONTROL|LOCKED_HELDOUT) \|$", split, flags=re.M)
+          assert len(rows)==31 and sum(x[3]=="DEV" for x in rows)==15
+          assert sum(x[3]=="LOCKED_HELDOUT" for x in rows)==8
+          manifest = {name:(sha,int(size),role) for name,sha,size,role in rows}
+          selected = (
+              "6f6fff4105b941bf85b1fbd8519a.jpg",
+              "ima56655ges.jpg",
+              "EZAL3k9ddfs.jpg",
+              "images (1).png",
+          )
+          assert len(set(selected))==4
+          out = root / ".semref1-blind-review-originals"
+          assert not out.exists()
+          out.mkdir(parents=True)
+          records = []
+          for name in selected:
+              assert name in manifest and manifest[name][2]=="DEV", ("NOT_DEV", name)
+              path = root / "data/generated_autodraw_plan/images_31_first" / name
+              raw = path.read_bytes()
+              assert len(raw)==manifest[name][1] and gitblob(raw)==manifest[name][0], ("SOURCE_DRIFT", name)
+              shutil.copyfile(path,out/name)   # Verbatim bytes, no image library, no regeneration.
+              assert (out/name).read_bytes()==raw
+              records.append(dict(file=name,original_git_blob=gitblob(raw),original_sha256=hashlib.sha256(raw).hexdigest(),original_bytes=len(raw),role="DEV"))
+          (out/"MANIFEST.json").write_text(json.dumps({
+              "experiment":"ENGINE001_BPRED_S4R1_SEMREF1", "purpose":"BLINDED_ORIGINAL_RGB_ONLY_HUMAN_REVIEW",
+              "e0_git_blob":"734ef71adeabfedeaaab0f3edccb62254fbca24a",
+              "github_sha":os.getenv("GITHUB_SHA"),"images":records,
+              "alpha_or_pixel_changes":"NONE_BYTE_EXACT_COPIES",
+              "diagnostic_overlays_included":False,"model_generated_images":False,
+              "human_labels":"NOT_RECEIVED", "source_game_owner":"MISSING",
+              "strict_s4":"BLOCKED","heldout_files_included":0,
+          },ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+          (out/"SHA256SUMS.txt").write_text("".join(x["original_sha256"]+"  "+x["file"]+"\n" for x in records),encoding="utf8")
+          (out/"READ_ME_RU.txt").write_text(
+              "AutoDraw SEMREF1 — только четыре неизменённых оригинальных DEV-файла.\n"
+              "Файлы JPG/PNG скопированы из репозитория ПОБАЙТОВО, без нейросетей,\n"
+              "ресайза, перекодирования, наложений или дорисовки.\n\n"
+              "Откройте каждую картинку отдельно. Для первой независимой оценки\n"
+              "НЕ открывайте CR1-карты, раскраски, маски и предложения моделей.\n"
+              "Ищите важные детали (глаза, лица, руки, волосы, контуры), границы\n"
+              "разных цветовых областей и внутренние однородные области.\n"
+              "Можно сообщить замечания в чате; они будут наблюдениями, но НЕ\n"
+              "машинно-проверенной попиксельной эталонной разметкой.\n"
+              "Для строгого SEMREF1 понадобятся две независимые маски меток на\n"
+              "каждый оригинал, в исходных пиксельных координатах.\n"
+              "Резервные H8 и BLIND120 не использованы; S4 остаётся BLOCKED.\n",
+              encoding="utf8")
+          assert len([x for x in out.iterdir() if x.suffix.lower() in (".jpg",".png")])==4
+          print("SEMREF1_FOUR_BYTE_EXACT_ORIGINAL_DEV_FILES", json.dumps(records))
+          print("NO_GENERATED_IMAGES_NO_OVERLAYS_NO_HELDOUT")
+          PY
+      - name: Upload four original files with manifest only
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-semref1-4-originals-blind-review
+          path: AutoDraw_Stage20/.semref1-blind-review-originals/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 30
