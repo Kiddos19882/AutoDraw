@@ -1,3 +1,9 @@
+## CURRENT ENGINE-001/BPRED-S4-R1 — NG2 original Egret source-risk diagnostic frozen E0 (2026-11-21)
+
+- [x] [NG2 fixed real original Egret source-known E/F native risk prereg](ENGINE001_BPRED001_S4R1_NG2_ORIGINAL_EF_NATIVE_SINGLE_STROKE_RISK_PREREG_2026-11-21.md) Git blob `c9a5af70223c5eccbadb36e659c98d4ebdf2d186` frozen before code/native; original owner/white/strong RGB contours and true Egret BoardPane; only 5 deterministic SKC1 UNKNOWN cells × widths1/3 × E/F =20 separate single-stroke scenes + blank, no tuning or native safety promotion.
+- [ ] **FIRST OPEN:** implement minimal research-only adapter with reuse P4D0 stroke/P4D13 render/native harness, synthetic E2 and one original Egret E3 native CI; if archive/browser fail, BLOCKED, do not retune.
+- [ ] Strict S4/BLIND BLOCKED after any technical result; semantic critical and nonvacuous safe admission still missing. H8/second50/S5/S6/E4/E5/exact game CHALK untouched.
+
 ## CURRENT ENGINE-001/BPRED-S4-R1 — NG1 native readiness E1 decision after SKC1 (2026-11-21)
 
 - [x] [NG1 source/native readiness E1](ENGINE001_BPRED001_S4R1_NG1_POST_SKC1_NATIVE_ENTRY_READINESS_E1_2026-11-21.md): existing real source E/F owner128/white/contour maps E2 known but protected nonwhite 11,949/11,942, remaining 1,919/1,921 UNKNOWN, **admissible strokes=0**; semantic critical completeness not independent. Historical P4D18 E/F native protected-white/holes FAIL. Reused R0/code E1, did NOT repeat archive audit, run tests or native scene.
