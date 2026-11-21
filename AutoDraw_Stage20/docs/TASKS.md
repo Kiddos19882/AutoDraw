@@ -1,3 +1,10 @@
+## CURRENT ENGINE-001/BPRED-S4-R1 — NG1 native readiness E1 decision after SKC1 (2026-11-21)
+
+- [x] [NG1 source/native readiness E1](ENGINE001_BPRED001_S4R1_NG1_POST_SKC1_NATIVE_ENTRY_READINESS_E1_2026-11-21.md): existing real source E/F owner128/white/contour maps E2 known but protected nonwhite 11,949/11,942, remaining 1,919/1,921 UNKNOWN, **admissible strokes=0**; semantic critical completeness not independent. Historical P4D18 E/F native protected-white/holes FAIL. Reused R0/code E1, did NOT repeat archive audit, run tests or native scene.
+- [x] Strict S4 E3/BLIND eligibility decision **BLOCKED/NOT_READY** under DEC-044, cannot call all-UNKNOWN source geometry a successful planner. Existing original Egret/Firefox harness available E1 for bounded research only.
+- [ ] **FIRST OPEN NEXT:** freeze separate prospective E0 for one **fixed, research-only original Egret native risk probe** (white/owner/strong RGB critical contour + actual physical strokes/blank), then run genuine original Egret E3 *only within that research-only scope* after explicit input checks; no promotion and no retuned acceptance.
+- [ ] Full semantic/critical and nonvacuous independent safety still required before S0 BLIND strict S4; H8/second50 sealed, S5/S6/E4/E5/exact CHALK NOT_RUN, production/master/Stage6/Bridge/Monitor untouched.
+
 ## CURRENT ENGINE-001/BPRED-S4-R1 — SKC1 E/F source-known E2 DONE; native readiness NEXT (2026-11-21)
 
 - [x] [SKC1 E0](ENGINE001_BPRED001_S4R1_SKC1_ORIGINAL_EGRET_SOURCE_KNOWN_CONTRACT_PREREG_2026-11-21.md) Git blob `8e58aa5c2f64695e29aa87301c63b47aa5d8f5e4` frozen before code. [SKC1 signed original E/F source-only E2 results](ENGINE001_BPRED001_S4R1_SKC1_ORIGINAL_EF_SOURCE_CONTRACT_E2_RESULTS_2026-11-21.md); [CI44913972626](https://github.com/Kiddos19882/AutoDraw/actions/runs/44913972626) SHA `877dc760259a509a2570e1a4bc70408f879caf1a` E2 43/43 tests and original archive+E/F protected owner/white/contrast hashes/CRC SUCCESS, artifact14710524600. Source UNKNOWN1919/1921, **no stroke permission**; S4 quality NOT_PASS.
