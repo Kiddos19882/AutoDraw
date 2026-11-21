@@ -171,15 +171,27 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
 
         assert maps["stroke_admission"].startswith("FORBIDDEN")
         prefix = hashlib.sha256(name.encode("utf8")).hexdigest()[:12]
+        png_sha = {}
         for key in ("source_edge", "protected", "unknown", "geometric_detail_evidence"):
             mask = (maps[key].astype(np.uint8) * 255)
-            Image.fromarray(mask, mode="L").save(output / (prefix + "_" + key + ".png"))
-        Image.fromarray(
-            proposal["provisional_owner_rgb_preview"], mode="RGBA"
-        ).save(output / (prefix + "_provisional_game128_rgb.png"))
+            out_png = output / (prefix + "_" + key + ".png")
+            Image.fromarray(mask, mode="L").save(out_png)
+            png_sha[key] = hashlib.sha256(out_png.read_bytes()).hexdigest()
+        preview_png = output / (prefix + "_provisional_game128_rgb.png")
+        Image.fromarray(proposal["provisional_owner_rgb_preview"], mode="RGBA"
+                        ).save(preview_png)
+        png_sha["provisional_game128_rgb"] = hashlib.sha256(
+            preview_png.read_bytes()).hexdigest()
+        edges_png = output / (prefix + "_provisional_owner_edges.png")
         Image.fromarray(
             proposal["provisional_owner_edge"].astype(np.uint8) * 255, mode="L"
-        ).save(output / (prefix + "_provisional_owner_edges.png"))
+        ).save(edges_png)
+        png_sha["provisional_owner_edges"] = hashlib.sha256(
+            edges_png.read_bytes()).hexdigest()
+        assert len(png_sha) == 6
+        assert (proposal["counts"]["opaque_assigned_provisionally"] +
+                proposal["counts"]["unassigned_nonopaque"] ==
+                src["height"] * src["width"])
         summaries.append({
             "file": name, "role": r["role"], "sha256": r["sha256"],
             "source_shape": [src["height"], src["width"]],
@@ -188,6 +200,7 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             "semantic_detail_status": maps["semantic_detail_status"],
             "stroke_admission": maps["stroke_admission"],
             "counts": maps["counts"],
+            "derived_png_sha256": png_sha,
             "owner128_proposal": {
                 "version": proposal["version"],
                 "status": proposal["proposal_status"],
@@ -202,6 +215,7 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             },
         })
     assert len(summaries) == 23
+    assert len(list(output.glob("*.png"))) == 23 * 6
     (output / "dev_summary.json").write_text(
         json.dumps(summaries, ensure_ascii=False, indent=2), encoding="utf8")
     return summaries
