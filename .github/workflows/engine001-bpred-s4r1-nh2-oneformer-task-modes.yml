@@ -1,0 +1,116 @@
+name: ENGINE-001 BPRED-S4R1 NH2 genuine pretrained OneFormer task modes no-training
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-nh2-oneformer-task-modes.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_nh2_oneformer_modes.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_nh2_oneformer_modes.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NH2_ONEFORMER_NO_TRAIN_TASK_MODES_PREREG_2026-11-21.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-bpred-s4r1-nh2-oneformer-task-modes
+  cancel-in-progress: true
+
+jobs:
+  nh2-genuine-oneformer-no-training-original-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+          submodules: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install previously genuine pinned OneFormer CPU runtime
+        run: |
+          python -m pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "transformers==4.51.3" "huggingface_hub>=0.30,<1" numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 "timm>=1,<2"
+      - name: Immutable NH2 E0, synthetic no-pseudotruth contracts and docs audit
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NH2_ONEFORMER_NO_TRAIN_TASK_MODES_PREREG_2026-11-21.md")
+          raw=p.read_bytes()
+          actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+          assert actual=="1f71260543422e7766b0cb43743eb38406394230",(actual,"NH2_E0_CHANGED")
+          print("S4R1_NH2_E0_FROZEN",actual)
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_nh2_oneformer_modes.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_nh2_oneformer_modes.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_nh2_oneformer_modes.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Real official pinned ADE20K OneFormer semantic/instance/panoptic full-original tasks
+        shell: bash
+        timeout-minutes: 45
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_nh2_oneformer_modes.py \
+            --root . --output "$RUNNER_TEMP/engine001-bpred-s4r1-nh2-oneformer"
+      - name: Verify real model segments, source roles and every output sha
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-bpred-s4r1-nh2-oneformer"
+          r=json.loads((p/"manifest.json").read_text())
+          assert r["no_training"] is True and r["model_revision"]=="05f2812b1eccf9909b3897777450f8d68148cafc"
+          assert r["semantic_ground_truth"]=="MISSING" and r["original_game_color_owner"]=="MISSING"
+          assert r["s4_strict"]=="BLOCKED" and not r["production_accepted"] and r["exact_CHALK"] is None
+          assert len(r["records"])==2 and {x["role"] for x in r["records"]}=={"KNOWN_CONTROL","DEV"}
+          for sample in r["records"]:
+              src=p/hashlib.sha256(sample["file"].encode()).hexdigest()[:12]
+              for name,digest in sample["sample_sha256"].items():
+                  assert hashlib.sha256((src/name).read_bytes()).hexdigest()==digest
+              assert len(sample["model_modes"])==5
+              for v in sample["model_modes"]:
+                  assert v["actual_pretrained_inference"]
+                  assert v["semantic_reference"]=="PSEUDOLABEL_NOT_INDEPENDENT_GT"
+                  assert v["stroke_admission"].startswith("FORBIDDEN")
+                  for name,digest in v["sha256"].items():
+                      assert hashlib.sha256((src/v["name"]/name).read_bytes()).hexdigest()==digest
+          print("NH2_MODE_PROPOSALS_SOURCE_ONLY",r["research_only_outcome"])
+          print("NH2_REPORT_SHA256",hashlib.sha256((p/"manifest.json").read_bytes()).hexdigest())
+          PY
+      - name: Archive explicit NH2 failure without claiming model inference
+        if: failure()
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/engine001-bpred-s4r1-nh2-oneformer"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-bpred-s4r1-nh2-oneformer"/"ci-failure.json"
+          p.write_text(json.dumps({"status":"NH2_FAIL_OR_MODEL_INFERENCE_NOT_CONFIRMED",
+            "semantic_ground_truth":"MISSING","s4_strict":"BLOCKED",
+            "native_E3":"NOT_RUN","game_E4":"NOT_RUN","exact_CHALK":None,
+            "github_sha":os.getenv("GITHUB_SHA"),"github_run_id":os.getenv("GITHUB_RUN_ID"),
+            "production_accepted":False},indent=2)+"\n")
+          PY
+      - name: Always archive original image task-ID maps or negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-nh2-oneformer-original-task-hints
+          path: ${{ runner.temp }}/engine001-bpred-s4r1-nh2-oneformer/
+          if-no-files-found: warn
+          retention-days: 21
