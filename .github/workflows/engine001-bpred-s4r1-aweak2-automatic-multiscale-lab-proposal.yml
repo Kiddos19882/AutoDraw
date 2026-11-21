@@ -1,0 +1,79 @@
+name: ENGINE-001 BPRED-S4R1 AWEAK2 one automatic Lab multiscale edge candidate
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-aweak2-automatic-multiscale-lab-proposal.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_aweak2_multiscale_lab_source_proposal.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_aweak2_multiscale_lab_source_proposal.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AWEAK2_AUTOMATIC_MULTISCALE_LAB_EDGE_PROPOSAL_PREREG_2026-11-21.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-aweak2-one-source-candidate
+  cancel-in-progress: true
+jobs:
+  single-unchanged-source-candidate-vs-four-real-A-marks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 6
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing source mathematical libraries; no model generation
+        run: python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Verify frozen candidate E0 and run seven source-only synthetic cases
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AWEAK2_AUTOMATIC_MULTISCALE_LAB_EDGE_PROPOSAL_PREREG_2026-11-21.md")
+          b=p.read_bytes()
+          blob=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert blob=="80a410cb5feb45dec3f7b36b0499e71120c8c512",("E0_MISMATCH",blob)
+          print("AWEAK2_FROZEN_E0_BEFORE_ONE_CANDIDATE",blob)
+          PY
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_aweak2_multiscale_lab_source_proposal.py' -v
+      - name: Apply frozen one automatic Lab proposal to same four DEV originals only
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_aweak2_multiscale_lab_source_proposal.py --root . --out aweak2_one_multiscale_candidate.json
+          python - <<'PY'
+          import json
+          d=json.load(open("aweak2_one_multiscale_candidate.json",encoding="utf-8"))
+          assert d["four_DEV_real_A_approximations"]==4
+          assert d["single_candidate_scales_source_px"]==[1.,3.]
+          assert d["human_marks_only_evaluation_not_generator"] is True
+          assert d["trial_protected_not_production"] is True
+          assert d["strict_S4"]=="BLOCKED" and d["exact_CHALK"] is None
+          assert d["stroke_admission"]=="FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"
+          assert d["heldout_outputs"]==0
+          for rec in d["per_original"]:
+              m=rec["source_only_comparison"]
+              assert m["human_rgb_pixel_exact_ground_truth"] is False
+              assert m["game128_owner_is_known"] is False
+              assert m["stroke_admission"]=="FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"
+              for r in ("0","2","5"):
+                  v=m["K_near_source_protected_radii"][r]
+                  assert v["trial_K_near"]>=v["baseline_K_near"]
+              assert m["old_total_source_potential_core"]>=m["trial_total_source_potential_core"]
+          print("AWEAK2_DESCRIPTIVE_GAIN_AND_INTERIOR_COST_BOTH_REPORTED_NO_STRICT_S4_PASS")
+          PY
+      - name: Markdown audit
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Preserve source-only AWEAK2 tradeoff regardless of science outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-aweak2-one-multiscale-lab-tradeoff-no-native
+          path: aweak2_one_multiscale_candidate.json
+          if-no-files-found: ignore
+          retention-days: 30
