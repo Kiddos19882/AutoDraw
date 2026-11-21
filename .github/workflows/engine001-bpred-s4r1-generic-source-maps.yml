@@ -100,9 +100,9 @@ jobs:
           with zipfile.ZipFile(io.BytesIO(archive)) as z:
               assert z.testzip() is None,"BLOCKED_SKC1_ARCHIVE_CRC"
               report=json.loads(z.read("report.json"))
-              assert report["game_bundle_blob"]==engine_blob
-              assert report["renderer_blob"]==renderer_blob
-              assert report["no_G32_V44_used"] is True
+              assert report["game_bundle_git_blob"]==engine_blob
+              assert report["renderer_git_blob"]==renderer_blob
+              assert report["production_promotion"] is False
               assert len(report["members_sha256"])==34
               for path,digest in report["members_sha256"].items():
                   assert hashlib.sha256(z.read(path)).hexdigest()==digest,("BLOCKED_SKC1_MEMBER_SHA",path)
