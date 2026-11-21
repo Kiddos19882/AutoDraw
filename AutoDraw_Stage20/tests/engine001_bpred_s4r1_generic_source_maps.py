@@ -208,6 +208,161 @@ def generic_source_maps(
     }
 
 
+
+# SKC1: a bound original Egret E/F source evidence contract.  No brush permit.
+SOURCE_KNOWN_EGRET_VERSION = "ENGINE001_BPRED_S4R1_SKC1_EF_SOURCE_ONLY_V1"
+SOURCE_KNOWN_EGRET_ARTIFACT_SHA256 = (
+    "b0700a6b2d7fcd03aa1af0e741e0e7eb700304b779c32eced67fe43582066079"
+)
+SOURCE_KNOWN_EGRET_RENDERER_BLOB = "76d950e0a8911888a9df3b675b866519ecf7bba4"
+SOURCE_KNOWN_EGRET_METHODS = ("E_SOBEL90", "F_SOBEL90_LAB12")
+SOURCE_CONTRAST_DIAGNOSTIC_MAX_RGB = 32  # existing CR1, never native safety
+
+
+def source_known_egret_protection_contract(
+    original_rgba: np.ndarray,
+    source_owner_index: np.ndarray,
+    source_owner_rgb: np.ndarray,
+    game128: np.ndarray,
+    engine_provenance: dict[str, Any],
+    source_provenance: dict[str, Any],
+) -> dict[str, Any]:
+    """Research-only P4D18 E/F original logical-source binding.
+
+    Provenance values are verified independently by the caller against the
+    original archive and engine bytes, not inferred from nearest-Lab proposals.
+    Even with all hashes matching, no candidate stroke is ADMISSIBLE.
+    """
+    if (not isinstance(original_rgba, np.ndarray) or
+            original_rgba.ndim != 3 or original_rgba.shape[2] != 4 or
+            original_rgba.dtype != np.uint8 or
+            min(original_rgba.shape[:2]) < 1 or
+            original_rgba.shape[0] * original_rgba.shape[1] > MAX_PIXELS):
+        raise ValueError("BLOCKED_SKC1_INVALID_ORIGINAL_RGBA")
+    h, w = original_rgba.shape[:2]
+    if (not isinstance(source_owner_index, np.ndarray) or
+            source_owner_index.shape != (h, w) or
+            source_owner_index.dtype != np.uint8 or
+            not isinstance(source_owner_rgb, np.ndarray) or
+            source_owner_rgb.shape != (h, w, 3) or
+            source_owner_rgb.dtype != np.uint8):
+        raise ValueError("BLOCKED_SKC1_SOURCE_OWNER_SHAPE_OR_MODE")
+    if (not isinstance(game128, np.ndarray) or
+            game128.shape != (128, 3) or game128.dtype != np.uint8 or
+            len(np.unique(game128, axis=0)) != 128 or
+            not isinstance(engine_provenance, dict) or
+            engine_provenance.get("engine_git_blob_sha1") != PINNED_ENGINE_BLOB_SHA1 or
+            engine_provenance.get("engine_bytes") != PINNED_ENGINE_BYTES or
+            engine_provenance.get("engine_colors") != 128 or
+            engine_provenance.get("painter_method") !=
+                "PainterPopup.createElaborateEasterEggs"):
+        raise ValueError("BLOCKED_SKC1_GAME128_PROVENANCE")
+    swatches = engine_provenance.get("swatch_RGB")
+    if (not isinstance(swatches, list) or len(swatches) != 128 or
+            any(not isinstance(item, dict) or item.get("index") != i or
+                item.get("RGB") != game128[i].tolist()
+                for i, item in enumerate(swatches))):
+        raise ValueError("BLOCKED_SKC1_GAME128_SWATCH_MISMATCH")
+    white_ids = np.flatnonzero(np.all(game128 == 255, axis=1))
+    if len(white_ids) != 1:
+        raise ValueError("BLOCKED_SKC1_GAME_WHITE_NOT_UNIQUE")
+    if np.any(source_owner_index >= 128) or not np.array_equal(
+        source_owner_rgb, game128[source_owner_index]
+    ):
+        raise ValueError("BLOCKED_SKC1_SOURCE_OWNER_RGB_PALETTE_MISMATCH")
+    digests = {
+        "original_rgba_sha256": hashlib.sha256(
+            original_rgba.tobytes()).hexdigest(),
+        "owner_index_sha256": hashlib.sha256(
+            source_owner_index.tobytes()).hexdigest(),
+        "owner_rgb_sha256": hashlib.sha256(
+            source_owner_rgb.tobytes()).hexdigest(),
+        "game128_sha256": hashlib.sha256(game128.tobytes()).hexdigest(),
+    }
+    if (not isinstance(source_provenance, dict) or
+            source_provenance.get("source_kind") != "ORIGINAL_P4D18_EF_LOGICAL" or
+            source_provenance.get("artifact_id") != 14557770111 or
+            source_provenance.get("archive_sha256") !=
+                SOURCE_KNOWN_EGRET_ARTIFACT_SHA256 or
+            source_provenance.get("method") not in SOURCE_KNOWN_EGRET_METHODS or
+            source_provenance.get("engine_git_blob_sha1") !=
+                PINNED_ENGINE_BLOB_SHA1 or
+            source_provenance.get("renderer_git_blob_sha1") !=
+                SOURCE_KNOWN_EGRET_RENDERER_BLOB or
+            source_provenance.get("archive_members_verified") is not True or
+            any(source_provenance.get(key) != value
+                for key, value in digests.items())):
+        raise ValueError("BLOCKED_SKC1_SOURCE_PROVENANCE_OR_HASH")
+    # Reuse the original RGB/alpha+owner boundary adapter, not a new planner.
+    existing = generic_source_maps(
+        original_rgba, owner_index=source_owner_index,
+        owner_palette_rgb=game128,
+        source_white_owner=int(white_ids[0]),
+    )
+    # Same 4-connected source RGB contrast diagnostic as CR1. Exact endpoint
+    # detection supplements Sobel/Lab source evidence, not semantic labels.
+    rgb = original_rgba[:, :, :3]
+    contrast = np.zeros((h, w), dtype=bool)
+    if h > 1:
+        vertical = np.max(np.abs(
+            rgb[:-1].astype(np.int16) - rgb[1:].astype(np.int16)),
+            axis=2) >= SOURCE_CONTRAST_DIAGNOSTIC_MAX_RGB
+        contrast[:-1] |= vertical
+        contrast[1:] |= vertical
+    if w > 1:
+        horizontal = np.max(np.abs(
+            rgb[:, :-1].astype(np.int16) - rgb[:, 1:].astype(np.int16)),
+            axis=2) >= SOURCE_CONTRAST_DIAGNOSTIC_MAX_RGB
+        contrast[:, :-1] |= horizontal
+        contrast[:, 1:] |= horizontal
+    protected = existing["protected"] | contrast
+    unknown = ~protected
+    candidate = existing["candidate_interior"] & ~contrast
+    if (np.any(candidate & protected) or not np.all(candidate <= unknown)
+            or np.any(protected & unknown)):
+        raise AssertionError("BLOCKED_SKC1_PROTECTION_PARTITION")
+    return {
+        "version": SOURCE_KNOWN_EGRET_VERSION,
+        "source_kind": "ORIGINAL_P4D18_EF_LOGICAL_ARCHIVE_BOUND",
+        "source_method": source_provenance["method"],
+        "source_provenance": dict(source_provenance),
+        "array_sha256": digests,
+        "source_wh": [w, h],
+        "original_source_rgb": existing["source_rgb"],
+        "original_source_alpha": existing["source_alpha"],
+        "source_owner_index": existing["owner_index"],
+        "source_owner_rgb": source_owner_rgb.copy(),
+        "owner_edge": existing["owner_edge"],
+        "original_rgb_strong_contrast": contrast,
+        "original_rgb_edge": existing["source_edge"],
+        "exact_white": existing["exact_white_evidence"],
+        "owner_white": existing["explicit_white_owner"],
+        "alpha_opaque_interface": existing["alpha_opaque_interface"],
+        "transparent": existing["transparent"],
+        "partial_alpha": existing["partial_alpha"],
+        "protected": protected,
+        "unknown": unknown,
+        "candidate_interior": candidate,
+        "semantic_detail_status": "UNKNOWN_NO_VERIFIED_CRITICAL_SEMANTICS",
+        "owner_truth_scope": "ORIGINAL_ARCHIVED_EF_GAME_SOURCE_ONLY",
+        "source_to_logical": existing["source_to_logical"],
+        "stroke_admission": "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION",
+        "scientific_s4": "BLOCKED",
+        "counts": {name: int(np.count_nonzero(mask)) for name, mask in {
+            "owner_edge": existing["owner_edge"],
+            "original_rgb_strong_contrast": contrast,
+            "original_rgb_edge": existing["source_edge"],
+            "exact_white": existing["exact_white_evidence"],
+            "owner_white": existing["explicit_white_owner"],
+            "alpha_opaque_interface": existing["alpha_opaque_interface"],
+            "transparent": existing["transparent"],
+            "partial_alpha": existing["partial_alpha"],
+            "protected": protected, "unknown": unknown,
+            "candidate_interior": candidate,
+        }.items()},
+    }
+
+
 # S4R1 owner128 DEV step: a palette proximity PROPOSAL, never a verified owner.
 PROPOSAL_VERSION = "ENGINE001_BPRED_S4R1_OWNER128_PROVISIONAL_V1"
 PINNED_ENGINE_BLOB_SHA1 = "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"

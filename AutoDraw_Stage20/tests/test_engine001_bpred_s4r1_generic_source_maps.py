@@ -541,5 +541,132 @@ class OriginalAlphaReferenceTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "REGION_MISMATCH"):
             original_alpha_interface_reference(rgba, m, bad_region)
 
+
+class SourceKnownEgretSKC1Test(unittest.TestCase):
+    """Synthetic archive-shape/source integrity tests: not native Egret E3."""
+
+    @staticmethod
+    def sample(wh=(19, 11), method="E_SOBEL90"):
+        from engine001_bpred_s4r1_generic_source_maps import (
+            SOURCE_KNOWN_EGRET_ARTIFACT_SHA256,
+            SOURCE_KNOWN_EGRET_RENDERER_BLOB,
+        )
+        palette, engine = _engine128_synthetic()
+        original = solid(*wh)
+        owner = np.full((wh[1], wh[0]), 20, dtype=np.uint8)
+        rgb = palette[owner].copy()
+        attrs = {
+            "source_kind": "ORIGINAL_P4D18_EF_LOGICAL",
+            "artifact_id": 14557770111,
+            "archive_sha256": SOURCE_KNOWN_EGRET_ARTIFACT_SHA256,
+            "method": method,
+            "engine_git_blob_sha1": PINNED_ENGINE_BLOB_SHA1,
+            "renderer_git_blob_sha1": SOURCE_KNOWN_EGRET_RENDERER_BLOB,
+            "archive_members_verified": True,
+            "original_rgba_sha256": hashlib.sha256(original.tobytes()).hexdigest(),
+            "owner_index_sha256": hashlib.sha256(owner.tobytes()).hexdigest(),
+            "owner_rgb_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(),
+            "game128_sha256": hashlib.sha256(palette.tobytes()).hexdigest(),
+        }
+        return original, owner, rgb, palette, engine, attrs
+
+    def call(self, fixture):
+        from engine001_bpred_s4r1_generic_source_maps import (
+            source_known_egret_protection_contract,
+        )
+        return source_known_egret_protection_contract(*fixture)
+
+    def test_true_source_index_stays_unknown_for_strokes(self):
+        for method in ("E_SOBEL90", "F_SOBEL90_LAB12"):
+            f = self.sample((21, 13), method)
+            result = self.call(f)
+            self.assertEqual(result["source_wh"], [21, 13])
+            self.assertTrue(result["unknown"][result["candidate_interior"]].all())
+            self.assertGreater(result["counts"]["candidate_interior"], 0)
+            self.assertEqual(result["stroke_admission"],
+                             "FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION")
+            self.assertEqual(result["scientific_s4"], "BLOCKED")
+            self.assertEqual(result["semantic_detail_status"],
+                             "UNKNOWN_NO_VERIFIED_CRITICAL_SEMANTICS")
+
+    def test_source_owner_border_and_explicit_white_not_generic_background(self):
+        f = list(self.sample())
+        f[1][:, 9:] = 31
+        f[1][2, 2] = 6
+        f[2] = f[3][f[1]].copy()
+        f[5] = dict(f[5])
+        f[5]["owner_index_sha256"] = hashlib.sha256(f[1].tobytes()).hexdigest()
+        f[5]["owner_rgb_sha256"] = hashlib.sha256(f[2].tobytes()).hexdigest()
+        result = self.call(f)
+        self.assertTrue(result["owner_edge"][:, 8:10].all())
+        self.assertTrue(result["protected"][:, 8:10].all())
+        self.assertTrue(result["owner_white"][2, 2])
+        self.assertTrue(result["protected"][2, 2])
+        self.assertFalse(result["exact_white"][2, 2])
+
+    def test_original_rgb_four_neighbor_contrast_not_owner_nearest_lab(self):
+        f = list(self.sample((7, 7)))
+        f[0][3, 3, :3] = [255, 0, 0]
+        f[5] = dict(f[5])
+        f[5]["original_rgba_sha256"] = hashlib.sha256(f[0].tobytes()).hexdigest()
+        result = self.call(f)
+        self.assertEqual(result["counts"]["original_rgb_strong_contrast"], 5)
+        self.assertTrue(result["protected"][3, 3])
+        self.assertTrue(result["original_rgb_strong_contrast"][3, 2])
+        self.assertFalse(result["original_rgb_strong_contrast"][2, 2])
+
+    def test_original_exact_white_transparency_and_owner_white_independent(self):
+        f = list(self.sample())
+        f[0][4, 4, :3] = 255
+        f[0][3, 2, 3] = 0
+        f[0][3, 3, 3] = 75
+        f[5] = dict(f[5])
+        f[5]["original_rgba_sha256"] = hashlib.sha256(f[0].tobytes()).hexdigest()
+        frozen = [item.copy() for item in f[:4]]
+        result = self.call(f)
+        self.assertTrue(result["exact_white"][4, 4])
+        self.assertFalse(result["owner_white"][4, 4])
+        self.assertTrue(result["protected"][3, 2])
+        self.assertTrue(result["protected"][3, 3])
+        self.assertTrue(result["alpha_opaque_interface"][2, 2])
+        for item, original in zip(f[:4], frozen):
+            self.assertTrue(np.array_equal(item, original))
+
+    def test_bad_shape_or_owner_rgb_blocked(self):
+        f = list(self.sample())
+        f[2][0, 0, 1] ^= 1
+        with self.assertRaisesRegex(ValueError, "OWNER_RGB_PALETTE_MISMATCH"):
+            self.call(f)
+        f = list(self.sample())
+        f[1] = f[1][:, :-1]
+        with self.assertRaisesRegex(ValueError, "OWNER_SHAPE_OR_MODE"):
+            self.call(f)
+
+    def test_archive_method_source_hash_and_engine_forgery_blocked(self):
+        for key, bad in (("method", "HIDDEN_HELDOUT"),
+                         ("archive_sha256", "0" * 64),
+                         ("archive_members_verified", False),
+                         ("owner_index_sha256", "0" * 64),
+                         ("original_rgba_sha256", "0" * 64)):
+            f = list(self.sample())
+            f[5] = dict(f[5], **{key: bad})
+            with self.assertRaisesRegex(ValueError, "SOURCE_PROVENANCE_OR_HASH"):
+                self.call(f)
+        f = list(self.sample())
+        f[4] = dict(f[4], engine_git_blob_sha1="0" * 40)
+        with self.assertRaisesRegex(ValueError, "GAME128_PROVENANCE"):
+            self.call(f)
+
+    def test_non_128_palette_and_unverified_provisional_owner_rejected(self):
+        f = list(self.sample())
+        f[3] = f[3][:32]
+        with self.assertRaisesRegex(ValueError, "GAME128_PROVENANCE"):
+            self.call(f)
+        f = list(self.sample())
+        f[1][0, 0] = 200
+        with self.assertRaisesRegex(ValueError, "OWNER_RGB_PALETTE_MISMATCH"):
+            self.call(f)
+
+
 if __name__ == "__main__":
     unittest.main()

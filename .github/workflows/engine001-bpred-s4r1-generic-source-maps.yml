@@ -37,7 +37,7 @@ jobs:
           python-version: '3.11'
       - name: Install previously pinned P1-style numerical source dependencies
         run: |
-          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
       - name: E0 provenance and E2 generic source/coordinates/UNKNOWN regression tests
         run: |
           python - <<'PY'
@@ -59,6 +59,10 @@ jobs:
           alpha_blob=hashlib.sha1(b"blob "+str(len(alpha_e0)).encode()+b"\0"+alpha_e0).hexdigest()
           assert alpha_blob=="cdf9bc175d52531810cfca155eec7ba4ff791ec3",(alpha_blob,"R1_ALPHA_REFERENCE_E0_CHANGED")
           print("S4R1_ALPHA_REFERENCE_E0_BLOB_VERIFIED",alpha_blob)
+          skc1=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_SKC1_ORIGINAL_EGRET_SOURCE_KNOWN_CONTRACT_PREREG_2026-11-21.md").read_bytes()
+          skc1_blob=hashlib.sha1(b"blob "+str(len(skc1)).encode()+b"\0"+skc1).hexdigest()
+          assert skc1_blob=="8e58aa5c2f64695e29aa87301c63b47aa5d8f5e4",(skc1_blob,"SKC1_E0_CHANGED")
+          print("SKC1_FROZEN_E0_BLOB_VERIFIED",skc1_blob)
           PY
           python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s4r1_generic_source_maps.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_generic_source_maps.py AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_generic_source_maps.py' -v
@@ -66,6 +70,100 @@ jobs:
       - name: E2 original source corpus, DEV-only SLIC/owner and exact alpha-interface protection
         run: |
           python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py --root . --output AutoDraw_Stage20/.bpred-s4r1-source-only/corpus_integrity.json --dev-maps-dir AutoDraw_Stage20/.bpred-s4r1-source-only/dev_maps
+      - name: SKC1 E2 original P4D18 E/F archive integrity and source-known owner/white/contrast maps only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib, io, json, os, sys, zipfile
+          from pathlib import Path
+          import numpy as np
+          import requests
+          from PIL import Image
+          sys.path.insert(0, "AutoDraw_Stage20/tests")
+          from engine001_bpred_s4r1_generic_source_maps import (
+              source_known_egret_protection_contract as source_contract,
+              SOURCE_KNOWN_EGRET_ARTIFACT_SHA256 as frozen_archive,
+              SOURCE_KNOWN_EGRET_RENDERER_BLOB as renderer_blob,
+              PINNED_ENGINE_BLOB_SHA1 as engine_blob,
+          )
+          from run_engine001_b1r_p3b_engine128_adaptive32 import read_engine_palette
+          url="https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/14557770111/zip"
+          response=requests.get(url,headers={
+              "Authorization":"Bearer "+os.environ["GH_TOKEN"],
+              "Accept":"application/vnd.github+json",
+              "User-Agent":"AutoDraw-ENGINE001-SKC1"},timeout=180)
+          response.raise_for_status()
+          archive=response.content
+          assert hashlib.sha256(archive).hexdigest()==frozen_archive,"BLOCKED_SKC1_ARCHIVE_SHA"
+          with zipfile.ZipFile(io.BytesIO(archive)) as z:
+              assert z.testzip() is None,"BLOCKED_SKC1_ARCHIVE_CRC"
+              report=json.loads(z.read("report.json"))
+              assert report["game_bundle_blob"]==engine_blob
+              assert report["renderer_blob"]==renderer_blob
+              assert report["no_G32_V44_used"] is True
+              assert len(report["members_sha256"])==34
+              for path,digest in report["members_sha256"].items():
+                  assert hashlib.sha256(z.read(path)).hexdigest()==digest,("BLOCKED_SKC1_MEMBER_SHA",path)
+              game128,engine=read_engine_palette(
+                  Path("AutoDraw_Stage20/gameEngine/main.min_653f95bc.js"))
+              def image(path,mode,size):
+                  with Image.open(io.BytesIO(z.read(path))) as obj:
+                      assert obj.mode==mode and obj.size==size,(path,obj.mode,obj.size)
+                      return np.asarray(obj).copy()
+              original=image("ORIGINAL_RGB_LOGICAL.png","RGB",(150,240))
+              rgba=np.concatenate((original,np.full((240,150,1),255,np.uint8)),axis=2)
+              results={}
+              for method in ("E_SOBEL90","F_SOBEL90_LAB12"):
+                  idx=image(method+"/SOURCE_OWNER_INDEX.png","L",(150,240))
+                  srgb=image(method+"/SOURCE_OWNER_RGB.png","RGB",(150,240))
+                  assert np.array_equal(game128[idx],srgb),"BLOCKED_SKC1_SOURCE_PALETTE"
+                  evidence={
+                      "source_kind":"ORIGINAL_P4D18_EF_LOGICAL",
+                      "artifact_id":14557770111,
+                      "archive_sha256":frozen_archive,
+                      "method":method,
+                      "engine_git_blob_sha1":engine_blob,
+                      "renderer_git_blob_sha1":renderer_blob,
+                      "archive_members_verified":True,
+                      "original_rgba_sha256":hashlib.sha256(rgba.tobytes()).hexdigest(),
+                      "owner_index_sha256":hashlib.sha256(idx.tobytes()).hexdigest(),
+                      "owner_rgb_sha256":hashlib.sha256(srgb.tobytes()).hexdigest(),
+                      "game128_sha256":hashlib.sha256(game128.tobytes()).hexdigest()
+                  }
+                  out=source_contract(rgba,idx,srgb,game128,engine,evidence)
+                  assert out["stroke_admission"]=="FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"
+                  assert out["scientific_s4"]=="BLOCKED"
+                  assert np.array_equal(out["owner_white"],idx==6)
+                  assert np.array_equal(out["protected"]|out["unknown"],
+                                        np.ones((240,150),dtype=bool))
+                  assert np.all(out["unknown"][out["candidate_interior"]])
+                  results[method]={
+                      "counts":out["counts"],
+                      "arrays_sha256":out["array_sha256"],
+                      "source_size":out["source_wh"],
+                      "stroke_admission":out["stroke_admission"],
+                      "scientific_s4":out["scientific_s4"],
+                      "semantic_detail_status":out["semantic_detail_status"],
+                  }
+          report_out={
+              "task":"ENGINE001_BPRED_S4R1_SKC1",
+              "code_sha":os.environ["GITHUB_SHA"],
+              "run_id":os.environ["GITHUB_RUN_ID"],
+              "archive_sha256":frozen_archive,
+              "archive_crc_and_34_member_shas":"PASS",
+              "source_scope":"ORIGINAL_EGRET_EF_ONLY",
+              "native_egret_new_run":"NOT_RUN",
+              "strict_s4":"BLOCKED",
+              "s5_s6_game_chalk":"NOT_RUN",
+              "results":results,
+          }
+          path=Path("AutoDraw_Stage20/.bpred-s4r1-source-only/skc1_original_ef_source_contract.json")
+          path.write_text(json.dumps(report_out,indent=2,sort_keys=True)+"\\n",encoding="utf8")
+          print("SKC1_ORIGINAL_EF_SOURCE_ONLY_E2_PASS",json.dumps(
+              {method: data["counts"] for method,data in results.items()},sort_keys=True))
+          PY
       - name: Upload DEV-only source geometry, provisional owner and region uncertainty (never heldout maps)
         if: always()
         uses: actions/upload-artifact@v4
