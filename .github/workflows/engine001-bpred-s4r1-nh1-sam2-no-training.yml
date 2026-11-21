@@ -1,0 +1,141 @@
+name: ENGINE-001 BPRED-S4R1 NH1 genuine SAM2 source-only no-training variants
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-nh1-sam2-no-training.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_nh1_sam2_variants.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_nh1_sam2_variants.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NEURAL_HELPER_NO_TRAIN_INTERMEDIATE_PLAN_PREREG_2026-11-21.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-bpred-s4r1-nh1-sam2-source-only
+  cancel-in-progress: true
+
+jobs:
+  genuine-sam2-nh1-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout frozen AutoDraw source branch (no production actions)
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+          submodules: false
+      - name: Checkout original pinned official SAM2 source
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          repository: facebookresearch/sam2
+          ref: 2b90b9f5ceec907a1c18123530e92e794ad901a4
+          path: external/sam2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU torch and official SAM2 dependency chain
+        env:
+          SAM2_BUILD_CUDA: '0'
+        run: |
+          python -m pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 "hydra-core>=1.3,<2"
+          python -m pip install -e external/sam2
+          git -C external/sam2 rev-parse HEAD
+      - name: Immutable NH1 E0 and synthetic contracts, docs structural audit
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_NEURAL_HELPER_NO_TRAIN_INTERMEDIATE_PLAN_PREREG_2026-11-21.md")
+          b=p.read_bytes()
+          sha=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert sha=="63bc08ce3caecbb9803f22ea75aa201232906bbe",(sha,"NH1_E0_CHANGED")
+          print("S4R1_NH1_E0_FROZEN",sha)
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_nh1_sam2_variants.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_nh1_sam2_variants.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_nh1_sam2_variants.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download only original pinned official SAM2.1 tiny checkpoint, verify SHA
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          curl -fLSs --retry 2 --max-time 300 \
+            https://huggingface.co/facebook/sam2.1-hiera-tiny/resolve/main/sam2.1_hiera_tiny.pt \
+            -o "$RUNNER_TEMP/sam2.1_hiera_tiny.pt"
+          echo "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69  $RUNNER_TEMP/sam2.1_hiera_tiny.pt" | sha256sum --check
+      - name: Genuine no-training SAM2 A0/A1/A2 and automatic source-RGB prompted P1
+        shell: bash
+        timeout-minutes: 65
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_nh1_sam2_variants.py \
+            --root . \
+            --sam2-repo external/sam2 \
+            --checkpoint "$RUNNER_TEMP/sam2.1_hiera_tiny.pt" \
+            --output "$RUNNER_TEMP/engine001-bpred-s4r1-nh1-sam2"
+      - name: Validate raw original-source model evidence hashes without unsafe claims
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])/"engine001-bpred-s4r1-nh1-sam2"
+          r=json.loads((base/"manifest.json").read_text())
+          assert r["no_training"] and r["semantic_gt"]=="MISSING"
+          assert r["s4_strict"]=="BLOCKED"
+          assert r["source_color_quality"]=="NOT_ASSESSED"
+          assert len(r["records"])==2
+          assert {a["role"] for a in r["records"]}=={"DEV","KNOWN_CONTROL"}
+          assert not r["production_accepted"] and r["exact_CHALK"] is None
+          for record in r["records"]:
+              p=base/hashlib.sha256(record["file"].encode()).hexdigest()[:12]
+              for name,expected in record["sha256"].items():
+                  assert hashlib.sha256((p/name).read_bytes()).hexdigest()==expected
+              for v in record["variants"]:
+                  assert v["metrics"]["source_owner_status"]=="MISSING"
+                  assert v["metrics"]["stroke_admission"].startswith("FORBIDDEN")
+                  for name,expected in v["sha256"].items():
+                      assert hashlib.sha256((p/v["name"]/name).read_bytes()).hexdigest()==expected
+          print("NH1_GENUINE_MODEL_PROPOSALS_ONLY",r["information_only_gate"])
+          print("NH1_REPORT_SHA",hashlib.sha256((base/"manifest.json").read_bytes()).hexdigest())
+          PY
+      - name: On failure archive explicit negative marker, never claim successful model
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/engine001-bpred-s4r1-nh1-sam2"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-bpred-s4r1-nh1-sam2"/"ci-failure.json"
+          p.write_text(json.dumps({"status":"CI_FAIL_OR_MODEL_INFERENCE_NOT_FULLY_CONFIRMED",
+            "s4_strict":"BLOCKED","source_color_quality":"NOT_ASSESSED",
+            "game_E4":"NOT_RUN","exact_CHALK":None,
+            "github_sha":os.getenv("GITHUB_SHA"),"github_run_id":os.getenv("GITHUB_RUN_ID"),
+            "production_accepted":False},indent=2)+"\n")
+          PY
+      - name: Always upload DEV/KNOWN original-source raw model outputs or negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-nh1-sam2-no-training-dev-proposals
+          path: ${{ runner.temp }}/engine001-bpred-s4r1-nh1-sam2/
+          if-no-files-found: warn
+          retention-days: 21
