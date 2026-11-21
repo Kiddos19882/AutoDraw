@@ -1,0 +1,150 @@
+name: ENGINE-001 BPRED-S4R1 SEMREF1 offline blind human annotation tool
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-semref1-blind-annotation-tool.yml'
+      - 'AutoDraw_Stage20/tools/semref1_blind_annotator.html'
+      - 'AutoDraw_Stage20/tools/semref1_blind_annotator.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-semref1-offline-blind-tool
+  cancel-in-progress: true
+jobs:
+  byte-exact-dev-metadata-and-rgb-png-tool-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Only Pillow for immutable original EXIF/RGBA metadata; no models
+        run: python -m pip install Pillow==11.3.0
+      - name: Bind four frozen opaque DEV originals to offline review tool (no images copied)
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+          from io import BytesIO
+          import hashlib
+          import json
+          import re
+
+          root=Path("AutoDraw_Stage20")
+          e0=root/"docs/ENGINE001_BPRED001_S4R1_SEMREF1_HUMAN_DEV_REFERENCE_PREREG_2026-11-21.md"
+          blob=lambda b: hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert blob(e0.read_bytes())=="734ef71adeabfedeaaab0f3edccb62254fbca24a", "SEMREF1_FROZEN_E0_DRIFT"
+          split=(root/"docs/ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md").read_text(encoding="utf8")
+          rows=re.findall(r"^\| \x60([^\x60]+)\x60 \| \x60([a-f0-9]{40})\x60 \| ([0-9]+) \| (DEV|KNOWN_CONTROL|LOCKED_HELDOUT) \|$",split,re.M)
+          assert len(rows)==31 and sum(v[3]=="DEV" for v in rows)==15 and sum(v[3]=="LOCKED_HELDOUT" for v in rows)==8
+          manifest={name:(sha,int(size),role) for name,sha,size,role in rows}
+          selected=("6f6fff4105b941bf85b1fbd8519a.jpg",
+                    "ima56655ges.jpg", "EZAL3k9ddfs.jpg", "images (1).png")
+          entries=[]
+          for name in selected:
+            exp=manifest.get(name)
+            assert exp and exp[2]=="DEV", ("NOT_DEV",name)
+            p=root/"data/generated_autodraw_plan/images_31_first"/name
+            b=p.read_bytes()
+            assert len(b)==exp[1] and blob(b)==exp[0], ("RAW_FILE_DRIFT",name)
+            with Image.open(BytesIO(b)) as img:
+              img.load()
+              oriented=ImageOps.exif_transpose(img)
+              w,h=oriented.size
+              rgba=oriented.convert("RGBA")
+              assert rgba.getextrema()[3]==(255,255), ("NOT_OPAQUE",name)
+              rgba_sha=hashlib.sha256(rgba.tobytes()).hexdigest()
+            entries.append({
+                "file":name,"role":"DEV",
+                "original_git_blob":exp[0],"original_sha256":hashlib.sha256(b).hexdigest(),
+                "original_bytes":len(b),"original_hw":[h,w],
+                "original_rgba_sha256":rgba_sha,
+            })
+          out=root/".semref1-blind-annotation-tool"
+          assert not out.exists()
+          out.mkdir()
+          md={"experiment":"SEMREF1", "e0_blob":"734ef71adeabfedeaaab0f3edccb62254fbca24a",
+              "scope":"FOUR_DEV_ONLY_NO_HELDOUT_NO_MODEL_MASKS", "images":entries,
+              "human_review_status":"NOT_RECEIVED", "strict_s4":"BLOCKED"}
+          payload=json.dumps(md,ensure_ascii=False,sort_keys=True).replace("</","<\\/")
+          html=(root/"tools/semref1_blind_annotator.html").read_text(encoding="utf8")
+          token="__SEMREF1_SOURCE_META_JSON__"
+          assert html.count(token)==1
+          rendered=html.replace(token,payload)
+          assert token not in rendered
+          (out/"semref1_blind_annotator.html").write_text(rendered,encoding="utf8")
+          js=(root/"tools/semref1_blind_annotator.js").read_bytes()
+          (out/"semref1_blind_annotator.js").write_bytes(js)
+          (out/"SOURCE_METADATA.json").write_text(json.dumps(md,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+          (out/"README_RU.txt").write_text(
+            "AutoDraw SEMREF1: офлайн-инструмент ручной независимой разметки.\\n"
+            "Открой semref1_blind_annotator.html в актуальном Chrome/Firefox.\\n"
+            "Выбери из отдельного ранее скачанного GitHub-архива один из ЧЕТЫРЕХ оригиналов.\\n"
+            "Инструмент проверит байтовый SHA-256 и правильные размеры.\\n"
+            "Ручным маркером отметь важные детали/границы и несколько внутренних\\n"
+            "одноцветных областей. Пустые участки не являются отрицательной разметкой.\\n"
+            "Введи псевдоним и выбери проверку A. Сохрани ДВА файла PNG+JSON.\\n"
+            "Для второго независимого автора — те же оригиналы, без доступа к\\n"
+            "меткам первого, с другим псевдонимом и вариантом B.\\n"
+            "Нужно по 2 пары файлов на каждый из 4 оригиналов.\\n"
+            "Не используйте готовые маски/наложения CR1/SAM2/OneFormer как эталон.\\n"
+            "Никакие исходные изображения и метки браузер никуда не отправляет.\\n"
+            "Проверка человека на независимость не выполняется автоматически.\\n"
+            "STRICT S4 BLOCKED, H8/BLIND120 untouched.\\n",
+            encoding="utf8")
+          assert len(entries)==4 and len(list(out.glob("*.jpg")))==0 and len(list(out.glob("*.png")))==0
+          print("SEMREF1_FROZEN_SOURCE_METADATA_4_DEV_ONLY",json.dumps(entries))
+          print("SEMREF1_OFFLINE_NO_SOURCE_REENCODE_NO_SYNTHETIC_REVIEW_LABELS")
+          PY
+      - name: Node syntax and source-mask rendering/segment/CRC/RGB PNG encoding
+        shell: bash
+        run: |
+          node --check AutoDraw_Stage20/tools/semref1_blind_annotator.js
+          node - <<'JS'
+          const core=require('./AutoDraw_Stage20/tools/semref1_blind_annotator.js');
+          const fs=require('node:fs');
+          (async()=>{
+            const z=core.emptyLabels(3,2);
+            core.segment(z,3,2,{x:0,y:0},{x:2,y:0},1,1);
+            if (!z.some(v=>v===1))throw new Error('STAMP_EMPTY');
+            const counts=core.counts(z);
+            if (counts[1]===0 || counts.reduce((a,b)=>a+b,0)!==6)throw new Error('COUNTS');
+            if(core.previewRGBA(z).length!==24)throw new Error('PREVIEW');
+            let failed=false;
+            try{core.stamp(z,3,2,0,0,1,7)}catch(e){failed=true}
+            if(!failed)throw new Error('INVALID_CATEGORY_NOT_BLOCKED');
+            const mask=Uint8Array.from([1,2,3,4,0,1]);
+            const png=await core.rgbPNG(3,2,mask);
+            fs.writeFileSync('/tmp/semref1-synthetic-test-rgb.png',Buffer.from(await png.arrayBuffer()));
+            console.log('SEMREF1_NODE_SYNTHETIC_CORE_PASS',Array.from(mask));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - name: Independent Pillow decode and exact RGB code / source geometry gate
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          with Image.open('/tmp/semref1-synthetic-test-rgb.png') as im:
+              assert im.format=="PNG" and im.mode=="RGB" and im.size==(3,2), (im.format,im.mode,im.size)
+              assert list(im.getdata())==[
+                  (255,0,255),(0,255,255),(0,255,0),
+                  (255,255,0),(0,0,0),(255,0,255)]
+          print("SEMREF1_INDEPENDENT_PILLOW_PNG_TRUECOLOR_EXACT_PASS")
+          PY
+      - name: Archive only reviewer app, its source-bound metadata and instructions
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-semref1-offline-human-annotation-tool-no-source-images
+          path: AutoDraw_Stage20/.semref1-blind-annotation-tool/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 30
