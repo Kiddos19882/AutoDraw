@@ -419,7 +419,7 @@ def original_source_region_uncertainty(
         medoid_position = int(np.argmin(local_sq))
         medoid_rgb = rgb_samples[medoid_position].copy()
         median_delta = color.deltaE_ciede2000(
-            lab_samples, lab_samples[medoid_position]
+            lab_samples, lab_samples[medoid_position][None, :]
         )
         if not np.all(np.isfinite(median_delta)):
             raise ValueError("BLOCKED_S4R1_REGION_NONFINITE_SOURCE_DELTA")
