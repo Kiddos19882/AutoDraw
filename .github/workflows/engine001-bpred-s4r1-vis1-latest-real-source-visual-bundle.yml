@@ -1,0 +1,105 @@
+name: ENGINE-001 BPRED-S4R1 VIS1 latest source visual review ZIP
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-vis1-latest-real-source-visual-bundle.yml'
+      - 'AutoDraw_Stage20/tools/build_engine001_bpred_s4r1_vis1_visual_review.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_vis1_visual_review.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_VIS1_LATEST_SOURCE_MAP_VISUAL_REVIEW_SPEC_2026-11-21.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-vis1-real-source-visual-bundle
+  cancel-in-progress: true
+
+jobs:
+  render-existing-source-maps-no-closed-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 6
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing pinned original-source map stack only, no pretrained model
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Verify VIS1 frozen spec, syntax and display-only regression tests
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_VIS1_LATEST_SOURCE_MAP_VISUAL_REVIEW_SPEC_2026-11-21.md")
+          b=p.read_bytes()
+          digest=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert digest=="1c67aaec9d3238695d1631be607d3db8f8337105",("VIS1_FROZEN_E0_DRIFT",digest)
+          print("VIS1_FROZEN_E0",digest)
+          PY
+          python -m py_compile AutoDraw_Stage20/tools/build_engine001_bpred_s4r1_vis1_visual_review.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_vis1_visual_review.py' -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_aweak3_perceptual_slic_coherence.py' -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_semref1_aqa1_uploaded_a_intake.py' -v
+      - name: Build latest real full-resolution maps, AWEAK2/AWEAK3, offline atlas for 23 allowed originals
+        run: |
+          python AutoDraw_Stage20/tools/build_engine001_bpred_s4r1_vis1_visual_review.py --root . --out "$RUNNER_TEMP/autodraw_vis1"
+      - name: Verify every PNG, four A comparisons and exact source bytes; H preview zero
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          from PIL import Image
+          p=Path(os.environ["RUNNER_TEMP"])/"autodraw_vis1"
+          data=json.loads((p/"manifest.json").read_text(encoding="utf-8"))
+          assert data["source_png_derived_images"]==23
+          assert data["DEV_originals"]==15 and data["KNOWN_CONTROL_originals"]==8
+          assert data["LOCKED_HELDOUT_derived"]==0 and data["A_reviewed_DEV_detailed"]==4
+          assert data["AWEAK2_AWEAK3_adopted"] is False
+          assert data["strict_S4"]=="BLOCKED" and data["exact_game_CHALK"] is None
+          assert data["source_owner_ground_truth"]=="MISSING"
+          assert data["generated_image_model_used"] is False
+          assert data["originals_byte_identical"] is True
+          assert (p/"00_review_atlas.html").is_file()
+          assert (p/"README_RU.txt").is_file()
+          assert len(list(p.glob("*/00_contact_sheet.png")))==23
+          for r in data["images"]:
+              q=p/r["id"]
+              assert r["source_owner_status"]=="MISSING"
+              assert r["stroke_admission"]=="FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"
+              assert r["original_copy_sha256"]==r["source_original_raw_sha256"]
+              assert r["role"] in ("DEV","KNOWN_CONTROL")
+              for n,digest in r["derived_png_sha256"].items():
+                  f=q/n
+                  assert f.is_file() and hashlib.sha256(f.read_bytes()).hexdigest()==digest
+                  with Image.open(f) as im:
+                      im.load()
+                      if n!="00_contact_sheet.png":
+                          assert im.mode=="RGB" and im.size==tuple(reversed(r["source_shape_hw"]))
+              if r["human_A"]:
+                  assert r["role"]=="DEV"
+                  assert "12_aweak3_A_conflict_overlay.png" in r["derived_png_sha256"]
+                  assert r["AWEAK3_new_core_pixels"]>=0
+              if r["AWEAK3_status"]=="SKIPPED_ALPHA_NONOPAQUE":
+                  assert r["AWEAK3_trial_core_pixels"] is None
+                  assert "09_aweak3_core_trial.png" not in r["derived_png_sha256"]
+          print("VIS1_PNG_BYTE_AND_DIMENSION_CHECK_PASS; 23 SOURCE, 4 HUMAN_A, H8_0, S4_BLOCKED")
+          PY
+      - name: Markdown audit only, no software or game build
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Publish complete latest real AutoDraw source PNG bundle as downloadable ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-s4r1-vis1-latest-source-maps-23-images-4-aweak3-human-review
+          path: ${{ runner.temp }}/autodraw_vis1/
+          if-no-files-found: ignore
+          retention-days: 30
+          compression-level: 6
