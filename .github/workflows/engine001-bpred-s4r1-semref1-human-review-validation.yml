@@ -1,0 +1,70 @@
+name: ENGINE-001 BPRED-S4R1 SEMREF1 blinded human-source review gate
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-semref1-human-review-validation.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_semref1_human_review_validation.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_semref1_human_review_validation.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_SEMREF1_HUMAN_DEV_REFERENCE_PREREG_2026-11-21.md'
+      - 'AutoDraw_Stage20/docs/README.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-semref1-synthetic
+  cancel-in-progress: true
+
+jobs:
+  semantic-review-synthetic-and-no-labels-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install same original-source numerical stack, no neural model
+        run: |
+          python -m pip install numpy==2.2.6 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Immutable E0, technical synthetic tests, documentation audit
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_SEMREF1_HUMAN_DEV_REFERENCE_PREREG_2026-11-21.md")
+          b=p.read_bytes()
+          h=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
+          assert h=="734ef71adeabfedeaaab0f3edccb62254fbca24a",("E0_CHANGED",h)
+          print("SEMREF1_FROZEN_BEFORE_SCORER",h)
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s4r1_semref1_human_review_validation.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_semref1_human_review_validation.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: No actual independent labels means scientific BLOCKED, never false PASS
+        run: |
+          python AutoDraw_Stage20/tests/engine001_bpred_s4r1_semref1_human_review_validation.py --root . > semref1_technical_gate.json
+          python - <<'PY'
+          import json
+          d=json.load(open("semref1_technical_gate.json",encoding="utf8"))
+          assert d["scientific_status"]=="BLOCKED_NO_INDEPENDENT_HUMAN_LABELS"
+          assert d["records"]==[] and d["heldout_outputs"]==0
+          assert d["strict_s4"]=="BLOCKED" and d["exact_CHALK"] is None
+          assert d["stroke_admission"]=="FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION"
+          print("SEMREF1_TECHNICAL_GATE_OK, SCIENTIFIC_LABELS_BLOCKED")
+          PY
+      - name: Archive scientific NOT_READY without pseudo-annotations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-semref1-no-labels-gate
+          path: semref1_technical_gate.json
+          if-no-files-found: ignore
+          retention-days: 14
