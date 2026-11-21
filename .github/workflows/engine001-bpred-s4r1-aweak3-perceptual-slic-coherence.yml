@@ -1,0 +1,80 @@
+name: ENGINE-001 BPRED-S4R1 AWEAK3 single perceptual-SLIC coherence tradeoff
+
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-aweak3-perceptual-slic-coherence.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_aweak3_perceptual_slic_coherence.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_aweak3_perceptual_slic_coherence.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AWEAK3_PERCEPTUAL_SLIC_COHERENCE_PREREG_2026-11-21.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-aweak3-one-coherent-region-e2
+  cancel-in-progress: true
+jobs:
+  evaluate-single-automatic-source-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 6
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install previously pinned source numerical stack, no neural inference
+        run: python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3
+      - name: Freeze E0 blob and run synthetic structural regressions
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AWEAK3_PERCEPTUAL_SLIC_COHERENCE_PREREG_2026-11-21.md')
+          b=p.read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert sha=='0d899b80415967315f1a87219428a4a867af2adf',('FROZEN_AWEAK3_E0_DRIFT',sha)
+          print('FROZEN_AWEAK3_E0_BEFORE_DATA',sha)
+          PY
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_aweak3_perceptual_slic_coherence.py' -v
+      - name: Compare one source-only SLIC adjacency candidate with frozen actual DEV human A
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_aweak3_perceptual_slic_coherence.py --root . --output aweak3_perceptual_slic_source_only.json
+          python - <<'PY'
+          import json
+          d=json.load(open('aweak3_perceptual_slic_source_only.json',encoding='utf-8'))
+          assert d['tested_DEV_count']==4 and len(d['per_original'])==4
+          assert d['holdout_used']==0 and d['trial_core_is_safe'] is False
+          assert d['human_annotations_for_scoring_only'] is True
+          assert d['strict_S4']=='BLOCKED'
+          assert d['stroke_admission']=='FORBIDDEN_UNTIL_NATIVE_INDEPENDENT_VALIDATION'
+          assert d['exact_CHALK'] is None and d['source_owner']=='MISSING'
+          assert d['old_protection_unmodified'] is True
+          for q in d['per_original']:
+            x=q['candidate_automatic']
+            m=q['human_weak_visual_evaluation']
+            assert q['source_role']=='DEV'
+            assert x['human_mark_input_to_generator'] is False
+            assert x['trial_core_pixels']>=x['original_slic_core_pixels']
+            assert x['weak_region_pair_count']+x['strong_region_pair_count']==x['region_pair_count']
+            assert m['K_trial_core_overlap_proxy']>=m['K_old_core_overlap_proxy']
+            assert m['I_trial_core_overlap_proxy']>=m['I_old_core_overlap_proxy']
+            assert m['human_rgb_equality_assumed'] is False
+          print('AWEAK3_ORIGINAL_A_SOURCE_TRADEOFF_RECORDED_NO_NATIVE_STROKE_SAFETY_CLAIM')
+          PY
+      - name: Markdown integrity
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Archive source-only decision numbers, no generated images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-aweak3-one-perceptual-slic-source-tradeoff
+          path: aweak3_perceptual_slic_source_only.json
+          if-no-files-found: ignore
+          retention-days: 30
