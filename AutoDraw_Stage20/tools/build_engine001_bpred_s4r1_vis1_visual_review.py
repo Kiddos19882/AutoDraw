@@ -15,6 +15,10 @@ import json
 import os
 from pathlib import Path
 import shutil
+import sys
+
+# Reuse the existing research implementation in (п) tests/, not a new planner.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
