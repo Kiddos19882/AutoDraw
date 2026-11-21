@@ -6,6 +6,8 @@
 
 **Baseline:** [FC1 E2/E3](ENGINE001_BPRED001_S4R1_FC1_FRESH_CHAIN_NATIVE_E3_RESULTS_2026-11-21.md), [CI44920332768](https://github.com/Kiddos19882/AutoDraw/actions/runs/44920332768) technical PASS, visual **FAIL/PARTIAL** (точечная заливка, width1, overblack contour и фрагментация). Локальная FC2-перекраска outline **не является следующим шагом**: сначала общая архитектура регионов/цветов/контуров. Один ограниченный multi-DEV обзор, один действительно обоснованный архитектурный пересмотр, не бесконечные поправки уже нарисованного FC1 final.
 
+**RAG1 measured negative (2026-11-22):** [RAG1 signed E2 result](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG1_E2_RESULTS_2026-11-22.md), CI44954612003 E2 TECH PASS but scientific numeric quality `FAIL 0/4`; heavy pixelwise noise reduced at cost of erasing real face/hair/cloth details and MAE increase. **Do not** treat SLIC→RAG1 as accepted S4 segmentation; stop one frozen experiment without threshold tuning. Next same S4.2+S4.3: design a source-detail-constrained initial splitting/guard (inside SLIC), **new E0 before development**, then bounded new original-only DEV. S4.4/S5 still not started.
+
 **Граница:** при инженерной пригодности карт — `RESEARCH_ONLY S5` (реальный Egret widths1–10, направления 360°, spacing/overdraw/цветовой порядок/gap repair); S6 — уменьшение штрихов и exact run-bound CHALK **только с E4**. Формальная независимая scientific BPRED-S4 native validation отдельно `BLOCKED`: без изменения frozen thresholds, H8/BLIND120/second50, production/master/Stage6/Bridge/Monitor; handoff не научный PASS.
 
 ## Исторические состояния дорожной карты (не действующий NEXT)
