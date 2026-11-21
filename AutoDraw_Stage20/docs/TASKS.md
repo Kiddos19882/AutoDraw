@@ -1,4 +1,11 @@
-## CURRENT ENGINE-001/BPRED-S4-R1 — SKC1 prospective owner/white/contrast/UNKNOWN E0 (2026-11-21)
+## CURRENT ENGINE-001/BPRED-S4-R1 — SKC1 E/F source-known E2 DONE; native readiness NEXT (2026-11-21)
+
+- [x] [SKC1 E0](ENGINE001_BPRED001_S4R1_SKC1_ORIGINAL_EGRET_SOURCE_KNOWN_CONTRACT_PREREG_2026-11-21.md) Git blob `8e58aa5c2f64695e29aa87301c63b47aa5d8f5e4` frozen before code. [SKC1 signed original E/F source-only E2 results](ENGINE001_BPRED001_S4R1_SKC1_ORIGINAL_EF_SOURCE_CONTRACT_E2_RESULTS_2026-11-21.md); [CI44913972626](https://github.com/Kiddos19882/AutoDraw/actions/runs/44913972626) SHA `877dc760259a509a2570e1a4bc70408f879caf1a` E2 43/43 tests and original archive+E/F protected owner/white/contrast hashes/CRC SUCCESS, artifact14710524600. Source UNKNOWN1919/1921, **no stroke permission**; S4 quality NOT_PASS.
+- [x] Stop SKC1 after one original source-known E/F binding; no further Lab/SLIC/contrast threshold tuning, no repeating R0.
+- [ ] **FIRST OPEN NEXT:** scoped read-only E1 readiness/independent critical+white/owner native test feasibility and prospective frozen E0; only separately approved original Egret E3 if eligible. Do not assert semantic owner-safe from source maps, H8/BLIND120/second50 remain sealed.
+- [ ] Strict S4 BLOCKED; S5/S6/E4/E5/game CHALK NOT_RUN, production/master/Stage6/Bridge/Monitor unchanged.
+
+## HISTORICAL PRE-SKC1 ENGINE-001/BPRED-S4-R1 — SKC1 prospective owner/white/contrast/UNKNOWN E0 (2026-11-21)
 
 - [x] [SKC1 immutable source-known pre-registration](ENGINE001_BPRED001_S4R1_SKC1_ORIGINAL_EGRET_SOURCE_KNOWN_CONTRACT_PREREG_2026-11-21.md) Git blob `8e58aa5c2f64695e29aa87301c63b47aa5d8f5e4` before code/measurement, after visual VIS1 provisional user feedback; reuse existing generic source maps and original P4D18 E/F, do not repeat R0.
 - [ ] **FIRST OPEN:** implement one source-known E/F provenance-bound protected/UNKNOWN original RGB + game128 owner contract, synthetic E2 and archived source-only E/F verification; prevent promotion of provisional nearest-Lab owner and any stroke admission.
