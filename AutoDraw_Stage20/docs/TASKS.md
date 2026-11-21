@@ -1,3 +1,10 @@
+## ENGINE-001/BPRED-S4-R1 — промежуточный neural-helper без обучения NH1–NH4 (2026-11-21)
+
+- [x] По запросу пользователя заморожено [дополнение NH1–NH4 к прежнему S4-R1](ENGINE001_BPRED001_S4R1_NEURAL_HELPER_NO_TRAIN_INTERMEDIATE_PLAN_PREREG_2026-11-21.md), blob `63bc08ce3caecbb9803f22ea75aa201232906bbe` до новой реализации/исходов. Официальные SAM2/OneFormer/DINOv2/BiRefNet API и старые E2/E3 source FAIL сопоставлены; без обучения, подсказки автоматически из оригинального RGB.
+- [ ] **Промежуточный NH1 (ограниченное выполнение):** настоящий pinned SAM2.1 tiny source original full-res, auto8/auto16/crop1 + оригинальная SLIC positive/negative prompts, известный Egret и один DEV только, фиксация и аудит результата с явным NOT_READY owner/semantics. Технические E2/E3/качество не приписывать до завершённого SHA-bound CI.
+- [ ] **Промежуточный NH2–NH4 лишь после NH1 решения и отдельных E0:** OneFormer instance/panoptic, DINOv2 regional similarity/pretrained semantic head, BiRefNet soft uncertainty; reuse signed archives before new downloads, не трогать H8/BLIND120. После них **тот же FIRST OPEN** независимый DEV semantic/critical reference и оригинальный native Egret S4 safety, не переходить к S5/S6 без допуска.
+
+
 ## CURRENT ENGINE-001/BPRED-S4-R1 — source-alpha independent reference PASS; true color/critical semantics NEXT (2026-11-21)
 
 - [x] Frozen [S4R1 original-alpha E0](ENGINE001_BPRED001_S4R1_INDEPENDENT_ALPHA_REFERENCE_PREREG_2026-11-21.md) blob `cdf9bc175d52531810cfca155eec7ba4ff791ec3` before actual alpha-side measurement. Independently rescored original signed S4R1 archive: 18180/19260 source opaque-side alpha4 transition pixels formerly unprotected despite invalid alpha pixels all protected. Preserve this negative SOURCE FAIL, no game-native FAIL asserted.
