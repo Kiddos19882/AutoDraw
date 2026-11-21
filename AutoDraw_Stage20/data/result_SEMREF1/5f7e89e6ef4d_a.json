@@ -1,0 +1,14 @@
+{
+  "reviewer_id": "Kiddos",
+  "source_raw_sha256": "62821b5274c0325e32052717284e009d91918c837151896c29abd82eacee3da8",
+  "source_git_blob_sha1": "da82ab87349b6fdf650e3cf0200041558cfb5a6d",
+  "original_rgba_sha256": "1c952f67785969bc5d36c0fa959eb6ae4fe77cf31948439e7c56a4e9f6f25b63",
+  "original_hw": [
+    554,
+    554
+  ],
+  "labels_png_sha256": "e2a2819888325cd856808b399f7757d9e195db0b79bb08e65f4dcbfcfbd51f40",
+  "source_only_blind_review": true,
+  "annotation_tool_and_version": "AutoDraw SEMREF1 blind offline review tool v1",
+  "review_timestamp": "2026-11-21T11:58:36.433Z"
+}
