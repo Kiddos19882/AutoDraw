@@ -19,7 +19,10 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from engine001_bpred_s4r1_generic_source_maps import decode_original, generic_source_maps
+from engine001_bpred_s4r1_generic_source_maps import (
+    decode_original, generic_source_maps, provisional_game128_owner_maps,
+)
+from run_engine001_b1r_p3b_engine128_adaptive32 import read_engine_palette
 
 REL_CORPUS = Path("AutoDraw_Stage20/data/generated_autodraw_plan/images_31_first")
 REL_OLD = Path("AutoDraw_Stage20/testImages")
@@ -144,6 +147,11 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
     if audit_report["perceptual_screen"] != "PASS_SOURCE_PRE_SCREEN_ONLY":
         raise ValueError("BLOCKED_S4R1_CROSS_SPLIT_LEAKAGE_PREVENTS_DEV_OUTPUT")
     output.mkdir(parents=True, exist_ok=True)
+    # Reuse P3B's genuine SHA-pinned 128-swatch engine parser; DO NOT call
+    # its fixed-Egret 32-color weighting/assignment code.
+    engine128, engine_provenance = read_engine_palette(
+        root / "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js"
+    )
     summaries = []
     for r in audit_report["records"]:
         if r["role"] == "LOCKED_HELDOUT":
@@ -152,13 +160,26 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
         raw = (root / REL_CORPUS / name).read_bytes()
         src = decode_original(raw)
         maps = generic_source_maps(src["rgba"])
-        # source owner remains MISSING until independently supplied by preparation.
-        assert maps["owner_status"] == "MISSING"
+        # Nearest game swatch is only a diagnostic PROPOSAL, not source owner.
+        proposal = provisional_game128_owner_maps(raw, engine128, engine_provenance)
+        assert proposal["source_sha256"] == r["sha256"]
+        assert proposal["source_git_blob_sha1"] == r["git_blob_sha1"]
+        assert proposal["source_owner_status"] == maps["owner_status"] == "MISSING"
+        assert proposal["proposal_status"].startswith("PROVISIONAL")
+        assert maps["counts"]["candidate_interior"] == 0
+        assert proposal["stroke_admission"].startswith("FORBIDDEN")
+
         assert maps["stroke_admission"].startswith("FORBIDDEN")
         prefix = hashlib.sha256(name.encode("utf8")).hexdigest()[:12]
         for key in ("source_edge", "protected", "unknown", "geometric_detail_evidence"):
             mask = (maps[key].astype(np.uint8) * 255)
             Image.fromarray(mask, mode="L").save(output / (prefix + "_" + key + ".png"))
+        Image.fromarray(
+            proposal["provisional_owner_rgb_preview"], mode="RGBA"
+        ).save(output / (prefix + "_provisional_game128_rgb.png"))
+        Image.fromarray(
+            proposal["provisional_owner_edge"].astype(np.uint8) * 255, mode="L"
+        ).save(output / (prefix + "_provisional_owner_edges.png"))
         summaries.append({
             "file": name, "role": r["role"], "sha256": r["sha256"],
             "source_shape": [src["height"], src["width"]],
@@ -167,6 +188,18 @@ def run_dev_maps(root: Path, audit_report: dict, output: Path) -> list[dict]:
             "semantic_detail_status": maps["semantic_detail_status"],
             "stroke_admission": maps["stroke_admission"],
             "counts": maps["counts"],
+            "owner128_proposal": {
+                "version": proposal["version"],
+                "status": proposal["proposal_status"],
+                "source_owner_status": proposal["source_owner_status"],
+                "game_engine_git_blob_sha1": proposal["game_engine_git_blob_sha1"],
+                "game128_palette_sha256": proposal["game128_palette_sha256"],
+                "counts": proposal["counts"],
+                "lab_nearest_distance_mean": proposal["lab_nearest_distance_mean"],
+                "lab_nearest_distance_p95": proposal["lab_nearest_distance_p95"],
+                "owner_accuracy": proposal["owner_accuracy"],
+                "stroke_admission": proposal["stroke_admission"],
+            },
         })
     assert len(summaries) == 23
     (output / "dev_summary.json").write_text(
@@ -190,7 +223,7 @@ def main() -> int:
     if args.dev_maps_dir is not None:
         summaries = run_dev_maps(args.root, result, args.dev_maps_dir)
         print("S4R1_DEV_ONLY_SOURCE_MAPS", len(summaries),
-              "STROKE_ADMISSION_ALWAYS_FORBIDDEN")
+              "OWNER128_ONLY_PROVISIONAL", "STROKE_ADMISSION_ALWAYS_FORBIDDEN")
     return 0
 
 
