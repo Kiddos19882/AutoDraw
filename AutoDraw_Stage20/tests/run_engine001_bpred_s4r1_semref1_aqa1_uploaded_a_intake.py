@@ -31,7 +31,7 @@ EXPECTED_BLOBS = {
     "5f7e89e6ef4d_a.json": "2b9a4f1464bef58c71a4b236f1bdece51ac7605f",
     "5f7e89e6ef4d_a.png": "06d2be54c6560d6f9acf7408e8d2090bdae657e5",
     "ed23a65642d7_a.json": "10640cfe32b754d4ae477b1816ac4b2cef6bf0e7",
-    "ed23a65642d7_a.png": "9ba3dbd1fdf383bd1ffb499e55a7d12c",
+    "ed23a65642d7_a.png": "9ba3dbd1fdf383bd1ffb499e55de2aaf55a7d12c",
 }
 CATEGORIES = ("unreviewed", "critical", "color_region_boundary",
               "verified_interior", "ambiguous")
