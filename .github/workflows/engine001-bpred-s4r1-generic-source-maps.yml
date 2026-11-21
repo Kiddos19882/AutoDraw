@@ -11,6 +11,7 @@ on:
       - 'AutoDraw_Stage20/gameEngine/main.min_653f95bc.js'
       - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_OWNER128_DEV_BINDING_PREREG_2026-11-21.md'
       - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_SOURCE_REGION_UNCERTAINTY_DEV_PREREG_2026-11-21.md'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_INDEPENDENT_ALPHA_REFERENCE_PREREG_2026-11-21.md'
       - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_AUTOMATIC_MULTIMAGE_PROTECTION_PREREG_2026-11-21.md'
       - 'AutoDraw_Stage20/data/generated_autodraw_plan/images_31_first/**'
   workflow_dispatch:
@@ -54,11 +55,15 @@ jobs:
           region_blob=hashlib.sha1(b"blob "+str(len(region_e0)).encode()+b"\0"+region_e0).hexdigest()
           assert region_blob=="c70b4090c761bb4706a17c106798464ec09c153c",(region_blob,"R1_REGION_E0_CHANGED")
           print("S4R1_SOURCE_REGION_E0_BLOB_VERIFIED",region_blob)
+          alpha_e0=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_INDEPENDENT_ALPHA_REFERENCE_PREREG_2026-11-21.md").read_bytes()
+          alpha_blob=hashlib.sha1(b"blob "+str(len(alpha_e0)).encode()+b"\0"+alpha_e0).hexdigest()
+          assert alpha_blob=="cdf9bc175d52531810cfca155eec7ba4ff791ec3",(alpha_blob,"R1_ALPHA_REFERENCE_E0_CHANGED")
+          print("S4R1_ALPHA_REFERENCE_E0_BLOB_VERIFIED",alpha_blob)
           PY
           python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s4r1_generic_source_maps.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_generic_source_maps.py AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_generic_source_maps.py' -v
           python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
-      - name: E2 frozen source corpus and DEV-only game128 owner plus source SLIC regions
+      - name: E2 original source corpus, DEV-only SLIC/owner and exact alpha-interface protection
         run: |
           python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_corpus_integrity.py --root . --output AutoDraw_Stage20/.bpred-s4r1-source-only/corpus_integrity.json --dev-maps-dir AutoDraw_Stage20/.bpred-s4r1-source-only/dev_maps
       - name: Upload DEV-only source geometry, provisional owner and region uncertainty (never heldout maps)
