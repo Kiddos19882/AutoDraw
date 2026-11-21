@@ -1,0 +1,144 @@
+name: ENGINE-001 BPRED-S4R1 FC1 fresh full chain original Egret visual prototype
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-fc1-fresh-full-egret.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_fc1_fresh_full_native.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_fc1_fresh_full_native.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_FC1_FRESH_CHAIN_EGRET_PREREG_2026-11-21.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-fc1-fresh-full-chain
+  cancel-in-progress: true
+jobs:
+  fc1-independent-full-original-egret:
+    runs-on: windows-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Firefox 159 for existing native Egret measurement infrastructure
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795
+        with:
+          firefox-version: '159.0'
+      - name: Install pinned Egret and fresh RGB-source dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify immutable FC1 E0 original and game environment Git objects
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          prereg=Path("AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_FC1_FRESH_CHAIN_EGRET_PREREG_2026-11-21.md")
+          content=subprocess.check_output(["git","show","HEAD:"+prereg.as_posix()])
+          git=hashlib.sha1(b"blob "+str(len(content)).encode()+b"\0"+content).hexdigest()
+          assert git=="e026b0ef82f04ecb979e5366d5c582162c60052a",("BLOCKED_FC1_E0_DRIFT",git)
+          src=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png")
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          for path,expected in {
+              "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":
+                  "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+              "AutoDraw_Stage20/tests/game_renderer_reference.js":
+                  "76d950e0a8911888a9df3b675b866519ecf7bba4",
+          }.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              git=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert git==expected,("BLOCKED_FC1_GAME_RENDERER",path,git)
+              Path(path).write_bytes(raw)  # Undo CRLF for pinned native transport
+          print("FC1_ORIGINAL_E0_GAME_RENDERER_SHA_PASS")
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_fc1_fresh_full_native.py AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_fc1_fresh_full_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p 'test_engine001_bpred_s4r1_fc1_fresh_full_native.py' -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+      - name: Entire fresh chain original RGB to native Egret fill repair and final screenshot
+        shell: bash
+        env:
+          AUTODRAW_PINNED_FIREFOX: ${{ steps.firefox.outputs.firefox-path }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import os,sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path("AutoDraw_Stage20/tests").resolve()))
+          import run_engine001_b1r_p4b7_native_stroke_attribution as transport
+          firefox=transport.webdriver.Firefox
+          binary=os.environ["AUTODRAW_PINNED_FIREFOX"]
+          assert Path(binary).is_file(),"BLOCKED_FC1_FIREFOX159"
+          def pinned(*args,**kwargs):
+              options=kwargs.get("options")
+              if options is None: raise ValueError("BLOCKED_FC1_FIREFOX_OPTIONS")
+              options.binary_location=binary
+              return firefox(*args,**kwargs)
+          transport.webdriver.Firefox=pinned
+          import run_engine001_bpred_s4r1_fc1_fresh_full_native as fc1
+          try:
+              report=fc1.run(
+                  Path("."),
+                  Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png"),
+                  Path("AutoDraw_Stage20/gameEngine/main.min_653f95bc.js"),
+                  Path("AutoDraw_Stage20/tests/game_renderer_reference.js"),
+                  Path(os.environ["RUNNER_TEMP"])/"fc1-fresh-full-egret")
+          finally:
+              transport.webdriver.Firefox=firefox
+          assert report["run_input_provenance"]["old_e_f_g32_v44_p4d_artistic_data_used"] is False
+          assert report["native_blank_alpha0"] is True
+          assert report["plan"]["fill_strokes"]>0
+          assert report["plan"]["final_strokes"]>=report["plan"]["fill_strokes"]
+          assert report["strict_S4"]=="BLOCKED" and report["formal_S5_S6"]=="NOT_RUN"
+          print("FC1_FULL_FRESH_EGRET_COMPLETED",report["plan"]["final_strokes"],
+                report["final_diagnostics"])
+          PY
+      - name: Audit all derived full-chain PNG plan and raw hashes
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          folder=Path(os.environ["RUNNER_TEMP"])/"fc1-fresh-full-egret"
+          report=json.loads((folder/"report.json").read_text(encoding="utf8"))
+          assert report["github_sha"]==os.environ["GITHUB_SHA"]
+          assert report["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert report["run_input_provenance"]["source_generated_in_same_run"] is True
+          assert report["run_input_provenance"]["old_e_f_g32_v44_p4d_artistic_data_used"] is False
+          assert report["strict_S4"]=="BLOCKED"
+          assert report["game_E4_E5_CHALK"]=="NOT_RUN"
+          assert report["heldout8_BLIND120_second50"]=="SEALED"
+          for name in ("00_VISUAL_REVIEW_FRESH_CHAIN.png",
+                       "02_FRESH_GAME128_TARGET.png",
+                       "03_FRESH_OWNER_INDEX.png",
+                       "05_ACTUAL_EGRET_FILL.png",
+                       "06_ACTUAL_EGRET_FINAL.png",
+                       "FILL_PLAN_FROM_ORIGINAL.json",
+                       "OUTLINE_PLAN_FROM_ORIGINAL.json",
+                       "FULL_FRESH_CHAIN_STROKES.json"):
+              assert (folder/name).is_file(),("BLOCKED_FC1_MISSING_RESULT",name)
+          for path,sha in report["raw_files_sha256"].items():
+              file=folder/path
+              assert file.is_file() and hashlib.sha256(file.read_bytes()).hexdigest()==sha
+          print("FC1_FULL_CHAIN_RAW_SHA_COMPLETE",len(report["raw_files_sha256"]))
+          PY
+      - name: Upload full native Egret visual review with fresh maps and all strokes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-fc1-fresh-full-egret-visual-archive
+          path: ${{ runner.temp }}/fc1-fresh-full-egret/
+          if-no-files-found: warn
+          retention-days: 30
