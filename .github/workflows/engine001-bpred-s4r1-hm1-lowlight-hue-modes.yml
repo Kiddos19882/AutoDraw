@@ -1,0 +1,91 @@
+name: ENGINE-001 BPRED-S4R1 HM1 low-light original hue-mode source E2 four DEV
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-hm1-lowlight-hue-modes.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_hm1_lowlight_hue_modes.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_hm1_lowlight_hue_modes.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_hm1_dev.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_HM1_LOWLIGHT_HUE_MODES_PREREG_2026-11-22.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-hm1-lowlight-hue-source
+  cancel-in-progress: true
+jobs:
+  hm1-source-four-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - name: Checkout full source for exact commit
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install source E2 pinned dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Pin immutable original HM1 E0 and original game128
+        run: |
+          python - <<'PY'
+          import hashlib, subprocess
+          from pathlib import Path
+          file='AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_HM1_LOWLIGHT_HUE_MODES_PREREG_2026-11-22.md'
+          data=subprocess.check_output(['git', 'show', 'HEAD:'+file])
+          digest=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert digest=='ee10dec2a1a22732e69e4aa5a3a0f42c63e4569f', ('BLOCKED_HM1_FROZEN_E0_CHANGED', digest)
+          engine=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          engine_hash=hashlib.sha1(b'blob '+str(len(engine)).encode()+b'\0'+engine).hexdigest()
+          assert engine_hash=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388', ('BLOCKED_HM1_GAME_ENGINE_CHANGED', engine_hash)
+          print('HM1_FROZEN_E0_AND_GENUINE_GAME128_PASS')
+          PY
+      - name: Frozen HM1 original lowlight connected hue-mode E2 invariants
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s4r1_hm1_lowlight_hue_modes
+      - name: HM1 four fresh full originals and double-run raw arrays
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_hm1_dev.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/hm1_dev"
+      - name: Independent source-original bytes and every raw file SHA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os
+          output=Path(os.environ['RUNNER_TEMP'])/'hm1_dev'
+          summary=json.loads((output/'00_HM1_SUMMARY.json').read_text(encoding='utf-8'))
+          assert summary['source_original_count']==4
+          assert summary['builds_per_source']==2
+          assert summary['source_original_only'] and summary['no_old_derived_art']
+          assert summary['no_aftercolor_detail_overlay']
+          assert summary['e0_git_blob_sha1']=='ee10dec2a1a22732e69e4aa5a3a0f42c63e4569f'
+          assert summary['native_egret']=='NOT_RUN' and summary['formal_s4']=='BLOCKED'
+          manifests=sorted(output.glob('*/manifest.json'))
+          assert len(manifests)==4
+          for f in manifests:
+              m=json.loads(f.read_text(encoding='utf-8'))
+              assert m['source_original_only'] and not m['legacy_artistic_input']
+              assert m['original_atom_one_swatch'] and m['no_postcolor_detail_overlay']
+              assert m['two_clean_original_builds_identical']
+              assert m['e0_git_blob_sha1']==summary['e0_git_blob_sha1']
+              assert '09_HM1_CURRENT_ORIGINAL_SOURCE_ARRAYS.npz' in m['outputs_sha256']
+              assert len(m['outputs_sha256'])>=11
+              for name,digest in m['outputs_sha256'].items():
+                  assert hashlib.sha256((f.parent/name).read_bytes()).hexdigest()==digest,(f,name)
+          print('HM1_FOUR_ORIGINALS_AND_RAW_FILES_SHA_PASS',len(manifests))
+          PY
+      - name: Upload HM1 raw source and full original visual evidence on failure too
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-hm1-original-lowlight-hue-four-dev
+          path: ${{ runner.temp }}/hm1_dev
+          retention-days: 30
+          if-no-files-found: warn
