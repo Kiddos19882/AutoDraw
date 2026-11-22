@@ -1,0 +1,87 @@
+name: ENGINE-001 BPRED-S5R2 four fresh original R1 versus R2 E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r2-four-originals.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r2_region_candidates.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r2_region_candidates.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r2_dev.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r2-four-originals
+  cancel-in-progress: true
+jobs:
+  original-source-fresh-double:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: S4.6 exact dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Freeze E0 and engine provenance
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R2_REGION_FIRST_ADAPTIVE_CANDIDATES_PREREG_2026-11-23.md').read_bytes()
+          blob=hashlib.sha1(b'blob '+str(len(p)).encode()+b'\0'+p).hexdigest()
+          assert blob=='fa5073ca36e1069a67155bbf10aef097c5149b23','BLOCKED_S5R2_E0_CHANGED'
+          engine=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          engineblob=hashlib.sha1(b'blob '+str(len(engine)).encode()+b'\0'+engine).hexdigest()
+          assert engineblob=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388','BLOCKED_GAME_ENGINE_CHANGED'
+          print('S5R2_ORIGINAL_FIRST_PROVENANCE_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r2_region_candidates.py AutoDraw_Stage20/tests/run_engine001_bpred_s5r2_dev.py
+      - name: Eight R2 negative and deterministic E2
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r2_region_candidates
+      - name: Full four originals x2 independent R1/R2 2000-trial comparable model
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r2_dev.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/s5r2"
+      - name: Verify all raw model bindings and SHA, preserve quality FAIL honestly
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r2'
+          summary=json.loads((root/'00_S5R2_RESULTS.json').read_bytes())
+          assert summary['drawing_mode']=='normal' and summary['smooth'] is False
+          assert summary['admissible_for_gameplay'] is False
+          assert summary['native']=='NOT_RUN' and summary['chalk']=='NOT_RUN'
+          assert len(summary['sources'])==4
+          for row in summary['sources']:
+              for prefix in ('r1','r2'):
+                  data=(root/row[prefix+'_output']).read_bytes()
+                  assert hashlib.sha256(data).hexdigest()==row[prefix+'_sha256']
+                  obj=json.loads(data)
+                  assert obj['smooth'] is False and obj['drawing_mode']=='normal'
+                  assert obj['safe_to_execute'] is False
+                  assert obj['source_owner_status']=='MISSING'
+                  assert obj['admissible_for_gameplay'] is False
+              assert row['double_original_fresh_determinism']=='PASS'
+              assert row['r2_trials']<=2000 and row['r2_strokes']<=200
+          print('S5R2_FOUR_SOURCE_BOUND_RAW_PASS')
+          print('S5R2_FEASIBILITY_STATUS',summary['feasibility_E0'])
+          PY
+      - name: Upload raw evidence even if experiment fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s5r2-four-original-model-only
+          path: ${{ runner.temp }}/s5r2
+          if-no-files-found: warn
+          retention-days: 30
