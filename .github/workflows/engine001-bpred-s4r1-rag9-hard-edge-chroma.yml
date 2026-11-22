@@ -1,0 +1,87 @@
+name: ENGINE-001 BPRED-S4R1 RAG9 original hard-edge chroma propagation E2 DEV
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-rag9-hard-edge-chroma.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_rag9_hard_edge_chroma.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_rag9_hard_edge_chroma.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_rag9_dev.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-rag9-hard-edge-chroma
+  cancel-in-progress: true
+jobs:
+  rag9-four-original-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          persist-credentials: false
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin source-only E2 dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Independently pin frozen RAG9 E0 and genuine engine128
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          path='AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md'
+          raw=subprocess.check_output(['git','show','HEAD:'+path])
+          blob=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+          assert blob=='5bd38c425f599747e3d8319edf20973782e9bb74',('BLOCKED_RAG9_E0_CHANGED',blob)
+          engine=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          engine_blob=hashlib.sha1(b'blob '+str(len(engine)).encode()+b'\0'+engine).hexdigest()
+          assert engine_blob=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388',('BLOCKED_RAG9_GAME_ENGINE_CHANGED',engine_blob)
+          print('RAG9_FROZEN_E0_AND_GAME128_BLOBS_PASS')
+          PY
+      - name: RAG9 original hard-boundary and chroma-mode E2 invariants
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s4r1_rag9_hard_edge_chroma
+      - name: Four original-only DEV source images and double-replay raw arrays
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_rag9_dev.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/rag9_dev"
+      - name: Independently verify every original source and raw SHA manifest
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'rag9_dev'
+          summary=json.loads((root/'00_RAG9_SUMMARY.json').read_text(encoding='utf-8'))
+          assert summary['source_count']==4 and summary['original_only'] and summary['no_legacy_derived_art']
+          assert summary['e0_git_blob_sha1']=='5bd38c425f599747e3d8319edf20973782e9bb74'
+          assert summary['native_egret']=='NOT_RUN' and summary['formal_bpred_s4']=='BLOCKED'
+          manifests=sorted(root.glob('*/manifest.json'))
+          assert len(manifests)==4
+          for file in manifests:
+              m=json.loads(file.read_text(encoding='utf-8'))
+              assert m['original_only'] and not m['legacy_derived_art_used'] and m['two_clean_runs_array_identical']
+              assert m['e0_git_blob_sha1']==summary['e0_git_blob_sha1']
+              assert '09_RAG9_FULL_SOURCE_LAYERS.npz' in m['output_files_sha256']
+              assert len(m['output_files_sha256'])>=11
+              for basename, expected in m['output_files_sha256'].items():
+                  actual=hashlib.sha256((file.parent/basename).read_bytes()).hexdigest()
+                  assert actual==expected,(file,basename)
+          print('RAG9_FOUR_FRESH_ORIGINALS_MANIFEST_SHA_PASS',len(manifests))
+          PY
+      - name: Upload original-source E2 raw and visual evidence even when failed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-rag9-original-hard-edge-source-four-dev
+          path: ${{ runner.temp }}/rag9_dev
+          if-no-files-found: warn
+          retention-days: 30
