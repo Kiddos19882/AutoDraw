@@ -70,6 +70,7 @@ jobs:
           assert len(json.loads(rows))==960
           assert report['model_cases']==960
           assert hashlib.sha256(rows).hexdigest()==report['matrix_cases_sha256']
+          assert report['drawing_mode']=='normal' and report['smooth'] is False
           assert report['execution_allowed'] is False
           assert report['native_Egret']=='NOT_RUN'
           assert report['game_CHALK']=='NOT_RUN'
