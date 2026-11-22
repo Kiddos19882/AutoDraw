@@ -7,6 +7,7 @@ All positions are source-pixel centers, NOT calibrated Egret coordinates.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
@@ -153,3 +154,29 @@ def build_candidates(arrays: dict, *, max_strokes: int = 1000,
         output, sort_keys=True, separators=(",", ":"), allow_nan=False
     ).encode("utf-8")).hexdigest()
     return output
+
+
+def build_from_verified_s46(meta_bytes: bytes, raw_bytes: bytes,
+                            original_bytes: bytes, **kwargs) -> dict:
+    """Only provenance-bound S4.6 can enter the integrated S5 research path."""
+    import engine001_bpred_s4r1_s46_source_contract as s46
+    meta = s46.verify_quarantined(meta_bytes, raw_bytes, original_bytes)
+    _block(meta.get("source_original_only") is True
+           and meta.get("admissible_for_gameplay") is False
+           and meta.get("source_owner_status") == "MISSING"
+           and meta.get("native_calibration") == "UNVERIFIED",
+           "S46_STATUS")
+    with np.load(io.BytesIO(raw_bytes), allow_pickle=False) as src:
+        arrays = {k: src[k] for k in
+                  ("game_index", "paintable_id", "original_rgba",
+                   "protected_original_dot")}
+    result = build_candidates(arrays, **kwargs)
+    result["input_sha256"] = meta["input_sha256"]
+    result["engine_git_blob_sha1"] = meta["engine_git_blob_sha1"]
+    result["s46_packet_sha256"] = hashlib.sha256(meta_bytes).hexdigest()
+    result["s46_raw_sha256"] = meta["raw_npz_sha256"]
+    result["result_sha256"] = hashlib.sha256(json.dumps(
+        {k: v for k, v in result.items() if k != "result_sha256"},
+        sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8")).hexdigest()
+    return result
