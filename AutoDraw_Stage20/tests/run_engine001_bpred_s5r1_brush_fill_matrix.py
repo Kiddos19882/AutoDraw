@@ -124,6 +124,10 @@ def _fill_comparator():
                     "safe_to_execute":candidate["safe_to_execute"]}
             if candidate["safe_to_execute"] is not False:
                 fails.append(("candidate_exec_admission",name))
+            if candidate["uncovered_potential_pixel_count"] > 0 and candidate["status"] != "PARTIAL":
+                fails.append(("candidate_uncovered_status_not_partial",name))
+            if candidate["drawing_mode"] != "normal" or candidate["smooth"] is not False:
+                fails.append(("candidate_unexpected_smoothing",name))
         except ValueError as exc:
             cand = {"status":"BLOCKED","reason":str(exc)}
         results.append({"map":name,"visible":int(np.count_nonzero(idx>=0)),
