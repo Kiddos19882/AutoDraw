@@ -1,3 +1,7 @@
+## ENGINE-001 S5-R2 E0 rejected, R2b balanced broad/detail next (2026-11-23)
+
+[Signed negative E2](ENGINE001_BPRED_S5R2_FOUR_ORIGINALS_REJECTED_E2_RESULTS_2026-11-23.md) CI45081142727 proves region-first/protected-only scheduling reached only width1 and very small coverage at frozen2000 footprint trials. Technical CI PASS but model feasibility FAIL, historical thresholds unchanged. [Prospective R2b two-ledger E0](ENGINE001_BPRED_S5R2B_TWO_LEDGER_COVERAGE_AND_DETAIL_PREREG_2026-11-23.md) defines area-first wide coverage budget1400/80 and protected details budget600/120, same total cap, proven original-only S4.6 input, reused capsule, normal-only DEC-052. **NEXT implementation+synthetic E2**, then 4 DEV fresh×2 and (only after valid owner/native calibration) real Egret composition/quality; S6 CHALK later. Do not return to S4 color tuning (DEC-051).
+
 ## DEC-052 S5 fixed execution mode, 2026-11-23
 
 All **new** S5 geometry, plans, offline/Egret tests must specify `smooth=false` `normal` `moveTo/lineTo`; reject/stop if runtime smooth state is not verified OFF. Historical smooth evidence not rewritten. Use existing normal-only reference Egret harness, no duplicated renderer and no production default changes. Verify new CI and bounded source4×2, then region-based S5-R2 with normal-only native color/alpha/owner checks. [DEC-052](DECISIONS.md).
