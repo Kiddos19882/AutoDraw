@@ -1,3 +1,7 @@
+## 2026-11-22 — RAG4 research source-only hierarchical regional colors (numeric negative)
+
+Added source-coherent color subregions nested in main surfaces, nine E2 tests, four-DEV reproducible atlas/NPZ/manifest runner and isolated CI (SHA6022a65). [CI45023303476](https://github.com/Kiddos19882/AutoDraw/actions/runs/45023303476) technical SUCCESS+raw verified; reconstructed colors/contours improve vs RAG3, but **frozen numeric FAIL 1/4** and up to 77,365 internal color IDs, so **NOT_PROMOTED**. [Signed RAG4 report](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG4_E2_RESULTS_2026-11-22.md). Historical E0, production/master/executor/Bridge/Monitor and strict gates unchanged; S4.4/S5/native E3/E4/E5/exact CHALK NOT_RUN.
+
 ## 2026-11-22 — RAG3 research-only hierarchical region + protected color details (negative quality result)
 
 Added RAG3 source-only algorithm, nine E2 regressions, deterministic four-original DEV manifests, source-layer NPZ and review atlases; code SHA335a70f. [CI44984076198](https://github.com/Kiddos19882/AutoDraw/actions/runs/44984076198) E2 technically SUCCESS and raw ZIP independently checked, but predeclared research numeric FAIL 1/4 and visible color/detail flattening: **NO_PROMOTION**. [Signed measurements](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG3_E2_RESULTS_2026-11-22.md). Immutable E0, production/master/Stage6/Bridge/Monitor and strict scientific gates untouched; S4.4/S5/E3/E4/E5/CHALK not initiated.
