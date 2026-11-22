@@ -1,0 +1,49 @@
+name: ENGINE-001 BPRED-S5R2 region-first source-only E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r2-region-first-synthetic.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r2_region_candidates.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r2_region_candidates.py'
+      - 'AutoDraw_Stage20/source/preparation/brush_footprint_geometry.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r2-region-first-e2
+  cancel-in-progress: true
+jobs:
+  region-first-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned numpy scipy
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3
+      - name: Freeze prereg provenance and Python syntax
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          doc=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R2_REGION_FIRST_ADAPTIVE_CANDIDATES_PREREG_2026-11-23.md').read_bytes()
+          gitblob=hashlib.sha1(b'blob '+str(len(doc)).encode()+b'\0'+doc).hexdigest()
+          assert gitblob=='fa5073ca36e1069a67155bbf10aef097c5149b23', 'BLOCKED_S5R2_E0_CHANGED'
+          print('S5R2_FROZEN_E0_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r2_region_candidates.py AutoDraw_Stage20/tests/test_engine001_bpred_s5r2_region_candidates.py
+      - name: Eight region-first synthetic regression tests
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r2_region_candidates
+      - name: Documentation integrity
+        run: |
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
