@@ -1,4 +1,8 @@
-## АКТУАЛЬНЫЙ ENGINE-001/BPRED-S4-R1 — RAG9 prospective E0 frozen, implementation NOT_RUN (2026-11-22)
+## АКТУАЛЬНЫЙ ENGINE-001/BPRED-S4-R1 — RAG9 original-source science FAIL (2026-11-22)
+
+[Signed frozen RAG9 negative](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_E2_RESULTS_2026-11-22.md) code SHAaf9b1f5 [CI45042223293](https://github.com/Kiddos19882/AutoDraw/actions/runs/45042223293) completed technical SUCCESS 11/11 source E2, full four originals x2, independently ZIP49/49 CRC,44/44 listed file SHA, original SHA and four atlases reviewed. Numeric2/4 PASS + actual paintable connected compactness PASS, but mandatory wV source RGB MAE **167.865%>115 FAIL**; source strong original contrast wV **70.710%<75 FAIL**, EZAL **57.606%<75 FAIL**, visibly flattened brown/purple hair and EZAL features. **SCIENTIFIC FAIL/PARTIAL/NO_PROMOTION.** RAG9 E0 frozen, no RAG9 threshold tuning; first next within S4.2+S4.3 source-identity/contrast loss cause E1 then one genuinely different E0. S4.4/S5/E3/E4/E5/CHALK NOT_RUN; formal BPRED-S4 BLOCKED; master/production/Stage6/Bridge/Monitor unchanged.
+
+## HISTORICAL RAG9 before-code E0 entry (2026-11-22)
 
 [Original hard-edge/chromatic source region propagation E0](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md) committed [01adeaf2](https://github.com/Kiddos19882/AutoDraw/commit/01adeaf2d08adcac30e5c056800fb867db3b19f7) on feature branch before any RAG9 implementation. Distinct source-only boundary topology, chromatic propagation and regional game128 contrast proposal. This is **HYPOTHESIS E0, NOT_RUN E2/DEV**, not acceptance; current signed RAG8 original-source scientific FAIL remains authoritative. FIRST NEXT: one frozen-RAG9 E2 implementation + 4 original DEV x2 and signed raw/visual report, no threshold sweep. S4.2+S4.3 IN_PROGRESS, S4.4/S5/native E3/E4/E5/exact CHALK NOT_RUN, independent formal BPRED-S4 BLOCKED; master/production/Stage6/Bridge/Monitor unchanged.
 

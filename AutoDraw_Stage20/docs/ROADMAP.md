@@ -1,4 +1,8 @@
-## АКТУАЛЬНЫЙ RAG9 E0 frozen; next implement one source-only candidate (2026-11-22)
+## АКТУАЛЬНЫЙ RAG9 source science FAIL; next distinct S4.2+S4.3 architecture (2026-11-22)
+
+[RAG9 signed 4 DEV source result](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_E2_RESULTS_2026-11-22.md) / [CI45042223293](https://github.com/Kiddos19882/AutoDraw/actions/runs/45042223293) exact SHAaf9b1f5: technical 11/11 and four originals x2+ZIP integrity PASS; numeric2/4 and source compactness PASS, mandatory wV original RGB MAE167.865%>115 FAIL, wV/EZAL original strong edge70.710%/57.606%<75 FAIL, visual dark-hair loss. RAG9 STOP/NO_PROMOTION, frozen E0 unchanged. **NEXT:** source chromatic identity/palette contrast failure causal E1 and one distinct before-code E0, NOT RAG9 tuning or new post-PNG repair; S4.4 coherent contour → S4.5 multi-DEV → S4.6 provenance API → research S5 only on accepted original maps. Formal BPRED-S4 BLOCKED; E3/E4/E5/native/exact game CHALK NOT_RUN.
+
+## HISTORICAL RAG9 E0 frozen before implementation (2026-11-22)
 
 [RAG9 hard original neighbor barriers and chromatic geodesic propagation prereg](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md) commit [01adeaf2](https://github.com/Kiddos19882/AutoDraw/commit/01adeaf2d08adcac30e5c056800fb867db3b19f7) is frozen **before code**, after RAG8 FAIL. ONE distinct source-only architecture and one 4-original DEV x2 E2 are next, NOT_RUN. Previously frozen wV RGB MAE <=115%, true actual paintable ID limits and wV/EZAL original-edge >=75% remain mandatory. S4.4 coherent contours → S4.5 multiple originals → S4.6 provenance → research S5 remain ordered only after accepted S4.2+S4.3. Formal BPRED-S4 BLOCKED; native E3/E4/E5/exact CHALK NOT_RUN.
 
