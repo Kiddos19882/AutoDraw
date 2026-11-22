@@ -170,6 +170,7 @@ def main():
         "synthetic_fill":examples,
         "perf":speed,
         "wall_seconds":round(time.perf_counter()-start,4),
+        "drawing_mode":"normal","smooth":False,
         "execution_allowed":False,"native_Egret":"NOT_RUN","game_CHALK":"NOT_RUN"}
     out=args.output
     out.mkdir(parents=True,exist_ok=True)
