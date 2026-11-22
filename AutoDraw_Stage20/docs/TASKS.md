@@ -1,3 +1,11 @@
+**CURRENT ENGINE-001 / DEC-051 (2026-11-23): S4 USER QUALITY ACCEPTED → S5 RESEARCH START AUTHORIZED.** Пользователь явно признал качество нынешнего S4 достаточным и разрешил переход к S5; не возвращаться к цветовой подгонке S4 ради прежнего research gate. Это пользовательское решение, **не** ретроактивный numeric E2 PASS. Сохраняются wV ART-C125 FAIL, S4.5 semantic PARTIAL и технические блокеры source owner/calibration/gameplay. [DEC-051](DECISIONS.md), [S5-R0 prereg](ENGINE001_BPRED001_S5R0_QUARANTINED_ADAPTIVE_PLANNER_PREREG_2026-11-23.md).
+
+- [x] **S4 visual/practical acceptance for S5:** явное решение пользователя, без отмены исходных результатов.
+- [ ] **FIRST NEXT S5-R0.1:** read-only inventory действующих S4.6 producer/validator, planner, brush Egret и native harness; документировать reuse-first и пространство координат.
+- [ ] **S5-R0.2:** отдельный замороженный E0 реализации offline planner; затем E2 один original-first 4DEV ×2, результаты/отклонения/хеши и детальные визуальные оценки.
+- [ ] **Gameplay admission:** source owner/protected semantics + native calibration/ROI все ещё MISSING/UNVERIFIED, исполнитель fail-closed, native/game/CHALK NOT_RUN; не обозначать как разрешённые из-за визуальной приёмки.
+
+---
 **CURRENT ENGINE-001 S4.6 research packet E2 complete but S4 quality/S5 admission BLOCKED (2026-11-23):** [Signed S4.6 E2 report](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_E2_RESULTS_2026-11-23.md) / [CI45074109363](https://github.com/Kiddos19882/AutoDraw/actions/runs/45074109363) SHA86c5133 11/11 tests + four full original ×2 deterministic and independent 9 CRC/48 raw array SHA. First CI45074001214 FAIL preserved, minimal fail-closed range-before-index fix. Contract marked `admissible_for_gameplay=false`; no new native or CHALK.
 
 - [x] **S4.6 minimal RESEARCH_ONLY source contract + E2 DEV:** original bytes+alpha, game128, region/surface/paintable, adjacency, original corner contour, protected 1px, source coordinate and SHA with strict fail closed; no legacy outputs.
