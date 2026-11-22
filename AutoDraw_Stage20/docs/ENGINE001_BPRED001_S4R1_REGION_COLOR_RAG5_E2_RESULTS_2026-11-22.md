@@ -1,0 +1,42 @@
+# ENGINE-001 / BPRED-S4-R1 / RAG5 — signed E2: numeric 3/4 PASS, edge contrast 0/2 FAIL
+
+**Дата:** 2026-11-22. **Task:** S4.2+S4.3 / DEC-048. **Decision:** E2 TECHNICAL PASS; frozen RGB-MAE/singleton source screen PASS 3/4; main and actual paintable connectedness PASS; frozen strong-source-edge reconstructed contrast FAIL both complex DEV; visual PARTIAL. Overall research FAIL / NO_PROMOTION. Strict formal BPRED-S4 BLOCKED; RAG5 S4.4/S5/native E3/E4/E5/exact run-bound CHALK NOT_RUN.
+
+## Prospective E0 / read-input graph
+
+[Immutable RAG5 E0](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG5_SOURCE_MULTISCALE_PATCHES_PREREG_2026-11-22.md), Git blob **f4bd6070a9c4d543d4764ff9cf43845738e7e8b5**, committed [be603506](https://github.com/Kiddos19882/AutoDraw/commit/be6035069fb5ccfa601b21b92ee182631bed9382) **before code, tests, DEV**. Starting branch HEAD c6cb6f8ff987e532cb81dfca5b07c933ff5b1eb6; original RAG1 FAIL / RAG2 PARTIAL / RAG3 FAIL / RAG4 FAIL remain frozen and may be compared only after the RAG5 result. No post-run threshold or candidate modification.
+
+New research-only code [ebe156c](https://github.com/Kiddos19882/AutoDraw/commit/ebe156c00c87aa152e0a8ec5c180533ca4c853fc), [10 synthetic tests 8b40c05](https://github.com/Kiddos19882/AutoDraw/commit/8b40c05800d7b4e44c5259d60580862ad5a0b10e), [four-DEV source runner a954896](https://github.com/Kiddos19882/AutoDraw/commit/a9548965857546942b391ff26871c9b23b85349f), [isolated CI da80d60](https://github.com/Kiddos19882/AutoDraw/commit/da80d600cc78c79d9bf583826b7f73cdcac4d382), workflow path-only trigger fix [bd4dcd7](https://github.com/Kiddos19882/AutoDraw/commit/bd4dcd7549e2bf1ad71d8a59198c3f6d9c325a89). **Final exact tested code SHA: bd4dcd7549e2bf1ad71d8a59198c3f6d9c325a89.** No algorithm selection or acceptance threshold changes after E0.
+
+Every run computes source geometry/colors from **current original bytes with EXIF-transpose and original RGB/alpha only**, plus genuine pinned engine game128 Git blob **46cc74de00b6cb5d207b1e1a2ffcd81613b6d388**. Stateless source-only SLIC, RAG and connectivity functions are reused but recompute all maps on current original. No artistic RAG1–RAG4/FC1/P4D/E/F/G32/V44-derived PNG, labels, masks, strokes, previews, reports, or old color maps enter the analysis. Nearest128 per-pixel labels are computed independently only as evaluation baseline, never used for RAG5 segmentation. H8/BLIND120/second50/images2_50_second held out. Source strong-edge map is a separate layer; its availability does **not** imply all game128 preview contrast is preserved.
+
+## Tests and independently downloaded raw artifact
+
+[GitHub CI45026229292](https://github.com/Kiddos19882/AutoDraw/actions/runs/45026229292), exact SHA bd4dcd7: **completed SUCCESS**. Frozen E0 and real game blob source hash PASS. **10/10 source-only E2 synthetic** PASS (thin contrasting line and one bright dot, weak noise, source 4-connectivity main/patch/detail/paintable, alpha, same-color disconnected regions, true game swatches, two clean rebuilds bitwise identical, invalid input fails closed). Four full original DEV processed twice: all raw layer arrays and metrics identical; manifest file hashes passed in CI. CI success certifies *technical source-only E2*, not scientific image quality or native Egret.
+
+[Raw RAG5 artifact14756610017](https://github.com/Kiddos19882/AutoDraw/actions/runs/45026229292/artifacts/14756610017): ZIP **6 124 424 bytes**; **SHA256 102e1743895556f2b4623cf34deb6215512f7fd1f3f9e5a3a6ee2e78c83bd5be**. Independent download and checking: outer SHA256 matched server digest; **49/49 ZIP CRC PASS** (testzip returns no corruption); **44/44 manifest-listed source bytes, PNG, atlas, raw source layer NPZ SHA256 PASS**. Four manifests include original SHA, sizes, alpha/EXIF, game palette hash, coordinate image frame, E0 blob and source only provenance; each original visual has original/nearest128/main/fine patch/detail/actual paintable/color composite/source strong edges. All four seven-panel atlases were inspected visually. Native Egret and game CHALK not measured.
+
+## Measured ORIGINAL source-resolution results (not game painting)
+
+Source opaque RGB MAE nearest game128 vs new composed game128, 8-connected color singleton reduction, *actual* 4-connected paintable components grouped by main surface and composed game128 swatch, strong original-neighbor Lab contrast retention.
+
+| DEV | Fresh nearest128 MAE -> RAG5 | 8-neighbor singleton components (reduction) | Main / fresh fine patch / accepted detail / final paintable IDs | Strong original edge contrast retained | Frozen 15%/115% screen |
+|---|---:|---:|---:|---:|---|
+| wV6VeZI9S1Y.png (200x320) | **4.876172 -> 7.489401** (153.6% baseline) | **6277 -> 1766 (71.866%)** | **497 / 1535 / 2214 / 3861** | **69.464%** | **FAIL RGB MAE** |
+| Sanrio Hello Kitty Image026.webp (311x360) | **9.796982 -> 10.389501** (106.05%) | **2670 -> 1183 (55.693%)** | **538 / 1143 / 1618 / 2502** | **74.410%** | **PASS** |
+| EZAL3k9ddfs.jpg (1235x1920) | **22.196840 -> 23.149229** (104.29%) | **41419 -> 10801 (73.923%)** | **1791 / 7227 / 13640 / 21136** | **70.658%** | **PASS** |
+| images (1).png (554x554) | **1.866692 -> 1.978470** (105.99%) | **4366 -> 2678 (38.662%)** | **98 / 578 / 2821 / 3194** | **89.479%** | **PASS** |
+
+**Prespecified Gate A** RGB MAE <=115% baseline and >=15% singleton reduction per case on >=2/4 DEV: **PASS 3/4**. **Gate B** complex-source main surfaces wV497<5444 and EZAL1791<39894 and actual paintable IDs wV3861<5283 and EZAL21136<38682: **PASS both**. Historical RAG4 had 10,566/77,365 total color regions, so new true paintable count is about 63.5%/72.7% lower; no old artwork used as input. Thin source contrast synthetic line and dot PASS; accepted detail pixel counts 3203/2335/25456/3383, nonempty on all four.
+
+**Prespecified Gate C** source strong-neighbor Lab delta >=12 must remain >=12 in reconstructed game128 for >=75% of source strong pairs on both complex DEV: **FAIL 0/2** (wV **69.464%**, EZAL **70.658%**). Some original strong contours still exist in the saved source_edge mask but **roughly 30% of original high-contrast neighboring pixel pairs lack equivalent composed game128 contrast**. This is not a native brush measurement. Kitty 74.410% and images(1) 89.479% are diagnostic only, cannot replace complex gate. Under the frozen protocol, **overall RAG5 FAIL regardless of A/B success**.
+
+First-run source-only processing times: wV 3.645s, Kitty 4.108s, EZAL 170.759s, images(1) 43.872s; second run 3.597s / 4.138s / 170.819s / 43.957s. No claim of interactive/production runtime performance.
+
+## Visual review and decision
+
+Seven-panel source atlases viewed, no human semantic ground truth, no user final-art approval. **wV:** two figures, poses/clothing remain recognizable, but warm orange hair and fine face/eyes/tonal gradations are washed out; MAE increased +53.6%, visual color/detail FAIL/PARTIAL. **Hello Kitty:** white face, black silhouette, red bow, yellow nose and blue outfit remain strongly recognizable, source visual promising. **EZAL:** overall figure, white long hair, blue eyes, scarf and costume remain recognizable; some original hair/eye/costume fine tonal edges degrade, source edge gate FAIL, visual PARTIAL. **images(1):** original Hello Kitty face/bow/pink dress remain recognizable with small color/edge changes, promising. No statement of brush leakage or native final image.
+
+**STOP RAG5**: E2 technical PASS, original numeric3/4 PASS and paintable topology PASS, but frozen edge source color-contrast FAIL0/2 plus wV color/face degradation; source overall research **FAIL/PARTIAL/NOT_PROMOTED**, formal BPRED-S4 BLOCKED. No RAG5 threshold relaxation, no sweeps and no change to frozen RAG1–RAG5 failures. No progression to S4.4/S5 with this unaccepted map.
+
+**One next architectural proposal, NOT_RUN:** new separate before-code E0 for **original-edge-topology-first connected paintable color regions**, making continuous source high-contrast boundaries/line evidence explicit separators before source regional color assignment rather than correcting a rendered PNG. Preserve true thin details and improve wV color while retaining compact paintable components; test one original-only DEV batch and inspect source strong neighbor contrast. This is not a RAG5 parameter tweak. Production/master/Stage6/Bridge/Monitor/calibration, game CHALK estimator and heldout unchanged; native Egret E3, E4/E5 and exact game CHALK NOT_RUN.
