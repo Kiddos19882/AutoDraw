@@ -45,6 +45,9 @@ jobs:
           print('FROZEN_MATRIX_E0_VERIFIED')
           PY
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_brush_fill_matrix.py AutoDraw_Stage20/tests/engine001_bpred_s5r1_offline_candidates.py
+      - name: Documentation links and IDs
+        run: |
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
       - name: Existing footprint and fill regressions
         run: |
           cd AutoDraw_Stage20/source/preparation
