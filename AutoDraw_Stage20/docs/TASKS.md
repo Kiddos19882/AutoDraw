@@ -1,3 +1,8 @@
+**НОВЫЙ RAG3 статус (2026-11-22):** [RAG3 signed E2](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG3_E2_RESULTS_2026-11-22.md): [CI44984076198](https://github.com/Kiddos19882/AutoDraw/actions/runs/44984076198) 9/9 synthetic E2 PASS, 4 original DEV and raw verification PASS; scientific source numeric **FAIL 1/4**, visual PARTIAL/NO_PROMOTION. Старое RAG2 «FIRST NEXT RAG3 E0» ниже — исторический снимок. 
+
+- [x] **RAG3 ограниченный E0 цикл завершён FAIL:** frozen [RAG3 prereg](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG3_HIERARCHICAL_DETAIL_PREREG_2026-11-22.md) Git blob 1741ed7; 4 source visuals, IDs, detail maps, SHA; 497/1791 main surfaces but reconstructed RGB MAE fails 3/4. [Signed report](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG3_E2_RESULTS_2026-11-22.md). STOP, no threshold tuning, no S4.4 handoff.
+- [ ] **FIRST NEXT S4.2+S4.3:** отдельно зафиксировать source-only E0 архитектуры согласованной цветовой заливки внутренних detail-подрегионов при сохранении крупных 4-связных surface IDs, source contours, исходной детализации и независимого baseline. Новый подход, не RAG3 micro-adjustment; после согласованного E0 лишь один DEV-batch, далее S4.4 при инженерном качестве.
+
 ## АКТУАЛЬНЫЙ BPRED-S4-R1 — пакет карт для S5 (2026-11-22)
 
 **Единый план:** [S4.1–S4.6](ENGINE001_BPRED001_BRUSH_PREDICTION_PLAN_2026-11-20.md). Вся новая обработка — только текущий исходный RGB/alpha + игровые свойства/128 swatches; старые `E/F/G32/V44/P4D/FC1` художественные карты/PNG/штрихи не являются входом.
