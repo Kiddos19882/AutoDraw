@@ -6,6 +6,7 @@ on:
       - '.github/workflows/engine001-bpred-s5r1-brush-fill-validation.yml'
       - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_brush_fill_matrix.py'
       - 'AutoDraw_Stage20/tests/engine001_bpred_s5r1_offline_candidates.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r1_offline_candidates.py'
       - 'AutoDraw_Stage20/source/preparation/brush_footprint_geometry.py'
       - 'AutoDraw_Stage20/source/preparation/interior_fill_planner.py'
   workflow_dispatch:
