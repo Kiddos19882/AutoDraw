@@ -29,6 +29,10 @@ class S5R1Tests(unittest.TestCase):
         self.assertEqual(r["proposals"][0]["brush_value"], 1)
         self.assertFalse(r["safe_to_execute"])
         self.assertFalse(r["admissible_for_gameplay"])
+        self.assertEqual(r["drawing_mode"], "normal")
+        self.assertIs(r["smooth"], False)
+        self.assertTrue(all(p["drawing_mode"] == "normal" and p["smooth"] is False
+                            for p in r["proposals"]))
 
     def test_deterministic_double(self):
         s = scene([[2]*7 for _ in range(7)])
