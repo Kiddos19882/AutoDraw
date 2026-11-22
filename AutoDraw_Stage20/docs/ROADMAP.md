@@ -1,3 +1,7 @@
+## DEC-051: пользователь принял качество S4; очередной этап S5 research (2026-11-23)
+
+**Текущий порядок:** S4 user-quality ACCEPTED → **S5-R0.1** инвентаризация source contract, native brush и planner → S5-R0.2 отдельный E0 offline adaptive strokes → original-first offline E2 4 DEV ×2 → только после source owner/native calibration доказательств Egret replay → затем отдельный S6 CHALK optimization. Никакой новой цветовой микроподгонки S4 перед S5; принятый пользователем уровень качества не равен изменению frozen численных gates. [DEC-051](DECISIONS.md), [S5-R0 prereg](ENGINE001_BPRED001_S5R0_QUARANTINED_ADAPTIVE_PLANNER_PREREG_2026-11-23.md). **Исполнение S5 в игре пока BLOCKED** из-за source owner MISSING и native calibration UNVERIFIED; S5 research НЕ BLOCKED. Прежние разделы ниже отражают более ранний статус до решения пользователя.
+
 ## ENGINE-001 S4.6 source-only research contract E2 TECH PASS, quality/S5 blocked (2026-11-23)
 
 [Signed E2](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_E2_RESULTS_2026-11-23.md), CI45074109363 SHA86c5133: 11/11 E2 + four fresh originals ×2, ZIP and 48 raw array hashes independently verified. S4.5 visual source detail PARTIAL, DG1 original wV color FAIL, owner MISSING. Contract is deliberately `admissible_for_gameplay=false`. NEXT one original-first source-map acceptance eligibility decision; S5 research and production remain BLOCKED, no algorithm tuning or brush experiments yet.
