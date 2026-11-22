@@ -1,3 +1,7 @@
+## S5-R1 исследовательский candidate, текущая следующая проверка (2026-11-23)
+
+[Inventory/E0](ENGINE001_BPRED001_S5R0_REUSE_INVENTORY_AND_S5R1_PREREG_2026-11-23.md) → новый bounded source-only adapter + tests/4 original×2 runner + isolated CI workflow на SHA `5c3d90e`. **Код сохранён, результаты E2/CI UNKNOWN**, не выдавать отсутствие run ID за PASS. FIRST NEXT получить подтверждённый run/jobs и artifact исходного SHA; проверить ошибки/сохранить негативы. Затем, если E2 валиден, расширить candidate coverage/continuous direction sampling как отдельную контролируемую версию S5, сохраняя S4 user quality acceptance, no native/game promotion without source owner + calibration. S6 CHALK только после quality/native evidence.
+
 ## DEC-051: пользователь принял качество S4; очередной этап S5 research (2026-11-23)
 
 **Текущий порядок:** S4 user-quality ACCEPTED → **S5-R0.1** инвентаризация source contract, native brush и planner → S5-R0.2 отдельный E0 offline adaptive strokes → original-first offline E2 4 DEV ×2 → только после source owner/native calibration доказательств Egret replay → затем отдельный S6 CHALK optimization. Никакой новой цветовой микроподгонки S4 перед S5; принятый пользователем уровень качества не равен изменению frozen численных gates. [DEC-051](DECISIONS.md), [S5-R0 prereg](ENGINE001_BPRED001_S5R0_QUARANTINED_ADAPTIVE_PLANNER_PREREG_2026-11-23.md). **Исполнение S5 в игре пока BLOCKED** из-за source owner MISSING и native calibration UNVERIFIED; S5 research НЕ BLOCKED. Прежние разделы ниже отражают более ранний статус до решения пользователя.
