@@ -64,8 +64,10 @@ jobs:
               assert obj['input_sha256']==s['input_sha256']
               assert obj['source_owner_status']=='MISSING'
               assert obj['native_calibration']=='UNVERIFIED'
+              assert obj['drawing_mode']=='normal' and obj['smooth'] is False
               assert obj['admissible_for_gameplay'] is False
-              assert all(x['safe_to_execute'] is False for x in obj['proposals'])
+              assert all(x['drawing_mode']=='normal' and x['smooth'] is False and
+                         x['safe_to_execute'] is False for x in obj['proposals'])
               assert s['double_fresh_determinism']=='PASS'
           print('S5R1_RESEARCH_ONLY_FOUR_SOURCE_PASS')
           PY
