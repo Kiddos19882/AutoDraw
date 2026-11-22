@@ -189,13 +189,13 @@ def build_rag2(original_rgba: np.ndarray, game128: np.ndarray) -> dict:
     # The returned geometry must remain 4-connected and distinguish region vs color.
     final = _split_geometry(slic, owners, opaque)
     preview[opaque, :3] = game128[owners[opaque]]
-    for a, b in (
+    for (left_lab, right_lab), (left_out, right_out) in (
         ((lab[:, :-1], lab[:, 1:]), (strong[:, :-1], strong[:, 1:])),
         ((lab[:-1], lab[1:]), (strong[:-1], strong[1:])),
     ):
-        contrast = np.linalg.norm(a[0] - a[1], axis=2) > SOURCE_STRONG_LAB
-        b[0] |= contrast
-        b[1] |= contrast
+        contrast = np.linalg.norm(left_lab - right_lab, axis=2) > SOURCE_STRONG_LAB
+        left_out[...] |= contrast
+        right_out[...] |= contrast
     return {
         "version": VERSION, "region_ids": final, "game_index": owners,
         "baseline_index": baseline, "preview_rgba": preview,
