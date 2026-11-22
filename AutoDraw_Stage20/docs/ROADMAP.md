@@ -1,3 +1,7 @@
+## ENGINE-001 S4.6 source-only research contract E2 TECH PASS, quality/S5 blocked (2026-11-23)
+
+[Signed E2](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_E2_RESULTS_2026-11-23.md), CI45074109363 SHA86c5133: 11/11 E2 + four fresh originals ×2, ZIP and 48 raw array hashes independently verified. S4.5 visual source detail PARTIAL, DG1 original wV color FAIL, owner MISSING. Contract is deliberately `admissible_for_gameplay=false`. NEXT one original-first source-map acceptance eligibility decision; S5 research and production remain BLOCKED, no algorithm tuning or brush experiments yet.
+
 ## ENGINE-001 S4.5 original CTR1 archive review signed E1 PARTIAL → quarantined S4.6 schema research (2026-11-23)
 
 [S4.5 direct archive visual/structural review](ENGINE001_BPRED001_S4R1_S45_CTR1_CROSS_ORIGINAL_SOURCE_VISUAL_E1_2026-11-23.md) confirms true original strong missing in wV3380/EZAL18806 and source detail unresolved; two Hello Kitty examples visually stronger. Source characters remain recognizable but source map color quality and real native readiness FAIL/UNKNOWN. [S4.6 isolated E0 frozen](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_PREREG_2026-11-23.md): research-only fail-closed package of fresh original-derived region/color/contour/alpha/provenance with NO S5 admission. No color retuning, no changes to original formal S4 requirements.

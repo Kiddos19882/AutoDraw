@@ -1,3 +1,7 @@
+## 2026-11-23 — ENGINE-001 S4.6 quarantined source contract E2
+
+Added `tests/engine001_bpred_s4r1_s46_source_contract.py`, unit test and four-original runner, and isolated source-only GitHub workflow; [signed E2 technical PASS](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_E2_RESULTS_2026-11-23.md) SHA86c5133/CI45074109363 after preserved first CI FAIL. No acceptance of DG1 original colors, source owner, S5, native or production changes.
+
 ## 2026-11-23 — S4.5 CTR1 source review E1 PARTIAL; S4.6 E0 research-only frozen
 
 Documented [four original source review](ENGINE001_BPRED001_S4R1_S45_CTR1_CROSS_ORIGINAL_SOURCE_VISUAL_E1_2026-11-23.md) and [prospective fail-closed source-contract prereg](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_PREREG_2026-11-23.md). No color, production, native, Stage6, Bridge or Monitor changes; S5 remains blocked.
