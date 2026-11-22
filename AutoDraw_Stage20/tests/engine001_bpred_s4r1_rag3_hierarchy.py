@@ -239,15 +239,25 @@ def build_rag3(original_rgba: np.ndarray, game128: np.ndarray) -> dict:
     surfaces, split_count = _split_confirmed_source_edges(merged, lab, opaque)
     main_n = int(surfaces.max())
     counts, sums, main_mean = _lab_means(surfaces, lab)
+    # Mean may lie BETWEEN a narrow strong detail and its dominant source
+    # background, causing both colors to be marked as one cancelling detail.
+    # The actual source-Lab median is a robust surface-color anchor; it does
+    # not import or partition by old game/pixel-nearest art labels.
+    main_anchor = np.zeros_like(main_mean)
+    for region_id, sl in enumerate(ndimage.find_objects(surfaces), start=1):
+        if sl is None:
+            raise ValueError("BLOCKED_RAG3_DISCONNECTED_MAIN_LABEL")
+        local = surfaces[sl] == region_id
+        main_anchor[region_id] = np.median(lab[sl][local], axis=0)
     main_table = np.full(main_n + 1, -1, np.int16)
-    main_table[1:] = tree.query(main_mean[1:], k=1, workers=1)[1].astype(np.int16)
+    main_table[1:] = tree.query(main_anchor[1:], k=1, workers=1)[1].astype(np.int16)
     main_color[opaque] = main_table[surfaces[opaque]]
     index[opaque] = main_color[opaque]
 
     # A detail ID is a source-Lab-distinct 4-connected subregion of its parent.
     # It cannot create a new MAIN surface. Its color needs observed source edge
     # evidence plus actual RGB reconstruction improvement over its parent.
-    deviation = np.linalg.norm(lab - main_mean[surfaces], axis=2)
+    deviation = np.linalg.norm(lab - main_anchor[surfaces], axis=2)
     candidate = opaque & (deviation >= STRONG_LAB)
     provisional = _connected(np.where(candidate, surfaces, 0).astype(np.int32))
     dcount = int(provisional.max())
@@ -264,7 +274,7 @@ def build_rag3(original_rgba: np.ndarray, game128: np.ndarray) -> dict:
                                 minlength=dcount + 1) > 0
         valid = (witnessed &
                  (details_table != main_table[parents]) &
-                 (np.linalg.norm(d_means - main_mean[parents], axis=1) >= STRONG_LAB))
+                 (np.linalg.norm(d_means - main_anchor[parents], axis=1) >= STRONG_LAB))
         valid[0] = False
         # Aggregate per-detail pixelwise RGB costs without any legacy map.
         ids = provisional[candidate]
