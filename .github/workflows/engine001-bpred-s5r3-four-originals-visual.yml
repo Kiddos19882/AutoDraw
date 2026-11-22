@@ -1,0 +1,87 @@
+name: ENGINE-001 S5-R3 source 4DEV E2 with actual brush-model PNG
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r3-four-originals-visual.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r3_dev_visual.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r3_clearance_paths.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r3_clearance_paths.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r3-four-originals
+  cancel-in-progress: true
+jobs:
+  original-four-fresh-visual-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned source pipeline dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Pin frozen E0, game engine and syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          def sha(b):return hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          doc=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R3_CLEARANCE_PATH_GENERATION_PREREG_2026-11-23.md').read_bytes()
+          assert sha(doc)=='fd1253789677a64d3576a0f27ab4f123afc44cec','BLOCKED_S5R3_E0'
+          src=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          assert sha(src)=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388','BLOCKED_GAME_ENGINE'
+          print('S5R3_FROZEN_SOURCE_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r3_dev_visual.py AutoDraw_Stage20/tests/engine001_bpred_s5r3_clearance_paths.py
+      - name: Synthetic path/capsule E2
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r3_clearance_paths
+      - name: Four unmodified originals two fresh full builds and actual brush model visual
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r3_dev_visual.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/s5r3"
+      - name: Independently check raw output and faithful PNG binding
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r3'
+          report=json.loads((root/'00_S5R3_RESULTS.json').read_bytes())
+          assert len(report['sources'])==4
+          assert report['smooth'] is False and report['drawing_mode']=='normal'
+          assert report['native_Egret']=='NOT_RUN' and report['exact_game_chalk']=='NOT_RUN'
+          assert report['frozen_model_feasibility'] in ('PASS_MODEL_FEASIBILITY_ONLY','FAIL_MODEL_FEASIBILITY')
+          for row in report['sources']:
+              assert row['double_fresh_determinism']=='PASS'
+              for key in ('r2b','r3'):
+                  raw=(root/row[key+'_file']).read_bytes()
+                  assert hashlib.sha256(raw).hexdigest()==row[key+'_sha256']
+                  obj=json.loads(raw)
+                  assert obj['smooth'] is False and obj['drawing_mode']=='normal'
+                  assert obj['safe_to_execute'] is False
+                  assert obj['source_owner_status']=='MISSING'
+          visual=report['sources'][0]['visual']
+          png=(root/visual['preview_file']).read_bytes()
+          assert png.startswith(b'\x89PNG\r\n\x1a\n')
+          assert hashlib.sha256(png).hexdigest()==visual['preview_sha256']
+          assert visual['potential_px']==report['sources'][0]['r3_covered']
+          assert visual['guaranteed_px']==report['sources'][0]['r3_guaranteed']
+          print('S5R3_FOUR_ORIGINALS_AND_ACTUAL_MODEL_PNG_SHA_PASS')
+          print('S5R3_FROZEN_MODEL_FEASIBILITY',report['frozen_model_feasibility'])
+          PY
+      - name: Retain algorithm-rendered PNG plus model and negative outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r3-source-brush-paths-model-PNG-four-originals
+          path: ${{ runner.temp }}/s5r3
+          if-no-files-found: warn
+          retention-days: 30
