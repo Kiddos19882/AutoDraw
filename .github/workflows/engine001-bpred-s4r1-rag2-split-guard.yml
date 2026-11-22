@@ -1,0 +1,83 @@
+name: ENGINE-001 BPRED-S4R1 RAG2 original detail split guarded game128 E2 DEV
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s4r1-rag2-split-guard.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_rag2_split_guard.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_rag2_split_guard.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_rag2_dev.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG2_SPLIT_GUARD_PREREG_2026-11-22.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s4r1-rag2-split-guard
+  cancel-in-progress: true
+jobs:
+  rag2-source-detail-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - name: Checkout pinned repository state
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen research numerical libraries
+        run: |
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify frozen RAG2 E0 and original game engine blob
+        run: |
+          python - <<'PY'
+          import subprocess,hashlib
+          from pathlib import Path
+          rel='AutoDraw_Stage20/docs/ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG2_SPLIT_GUARD_PREREG_2026-11-22.md'
+          b=subprocess.check_output(['git','show','HEAD:'+rel])
+          sha=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert sha=='c5e6564829b4ed641b31cba83da4a66c79caa5dd',('BLOCKED_RAG2_FROZEN_E0_CHANGED',sha)
+          game=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          g=hashlib.sha1(b'blob '+str(len(game)).encode()+b'\0'+game).hexdigest()
+          assert g=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388',('BLOCKED_GAME_SHA',g)
+          print('RAG2_FROZEN_SOURCE_AND_GAME_E0_PASS')
+          PY
+      - name: RAG2 source-only E2 synthetic regression tests
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s4r1_rag2_split_guard
+      - name: RAG2 four original DEV source-only maps and visual artifact
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_rag2_dev.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/rag2_dev"
+      - name: Verify four source manifests and all raw artifact SHA
+        run: |
+          python - <<'PY'
+          import hashlib,os,json
+          from pathlib import Path
+          out=Path(os.environ['RUNNER_TEMP'])/'rag2_dev'
+          report=json.loads((out/'00_RAG2_SUMMARY.json').read_text())
+          assert report['source_count']==4 and report['no_legacy_art']
+          assert report['native_egret']=='NOT_RUN' and report['formal_s4']=='BLOCKED'
+          files=sorted(out.glob('*/manifest.json'))
+          assert len(files)==4
+          for f in files:
+              m=json.loads(f.read_text())
+              assert m['e0_git_blob_sha1']=='c5e6564829b4ed641b31cba83da4a66c79caa5dd'
+              assert m['original_only'] and not m['legacy_artistic_input']
+              for name,want in m['output_files_sha256'].items():
+                  actual=hashlib.sha256((f.parent/name).read_bytes()).hexdigest()
+                  assert actual==want,(f,name,actual,want)
+          print('RAG2_FOUR_SOURCE_SHA_AND_RAW_PNG_PASS',len(files))
+          PY
+      - name: Upload original-only source artifacts even if scientific FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s4r1-rag2-detail-split-guard-four-dev
+          path: ${{ runner.temp }}/rag2_dev
+          if-no-files-found: warn
+          retention-days: 30
