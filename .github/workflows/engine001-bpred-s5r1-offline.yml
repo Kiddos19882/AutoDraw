@@ -1,0 +1,79 @@
+name: ENGINE-001 BPRED-S5R1 offline adaptive candidate E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r1-offline.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r1_offline_candidates.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r1_offline_candidates.py'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_dev.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r1-offline
+  cancel-in-progress: true
+jobs:
+  original-first-research-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Dependencies reused from S4.6
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Genuine engine provenance
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          engine=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          gitblob=hashlib.sha1(b'blob '+str(len(engine)).encode()+b'\0'+engine).hexdigest()
+          assert gitblob=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388', 'BLOCKED_S5R1_ENGINE_CHANGED'
+          print('ENGINE_SHA_MATCH')
+          PY
+      - name: E2 synthetic source-only model negatives
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r1_offline_candidates
+      - name: Four fresh S4.6 originals x2 to S5 bounded model candidates
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_dev.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/s5r1"
+      - name: Check model-only output binding
+        run: |
+          python - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r1'
+          summary=json.loads((root/'00_S5R1_RESULTS.json').read_bytes())
+          assert len(summary['sources'])==4 and summary['admissible_for_gameplay'] is False
+          for s in summary['sources']:
+              data=(root/s['output_file']).read_bytes()
+              obj=json.loads(data)
+              assert hashlib.sha256(data).hexdigest()==s['output_sha256']
+              assert obj['input_sha256']==s['input_sha256']
+              assert obj['source_owner_status']=='MISSING'
+              assert obj['native_calibration']=='UNVERIFIED'
+              assert obj['admissible_for_gameplay'] is False
+              assert all(x['safe_to_execute'] is False for x in obj['proposals'])
+              assert s['double_fresh_determinism']=='PASS'
+          print('S5R1_RESEARCH_ONLY_FOUR_SOURCE_PASS')
+          PY
+      - name: Archive reproducible model evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-bpred-s5r1-offline-research-only
+          path: ${{ runner.temp }}/s5r1
+          if-no-files-found: warn
+          retention-days: 30
