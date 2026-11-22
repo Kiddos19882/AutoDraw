@@ -1,0 +1,26 @@
+# ENGINE-001 / BPRED-S5-R2: original-first E2 TECH PASS, frozen feasibility FAIL (2026-11-23)
+
+**Preregistered E0 (before code):** [S5-R2 region-first adaptive candidate](ENGINE001_BPRED_S5R2_REGION_FIRST_ADAPTIVE_CANDIDATES_PREREG_2026-11-23.md) Git blob `fa5073ca36e1069a67155bbf10aef097c5149b23`. **Fixed comparison:** same 2000 actual ideal-capsule footprint evaluations and max200 accepted strokes for prior S5-R1 and new S5-R2, fresh four original source S4.6 packet generated twice independently, no legacy artwork inputs, `smooth=false` / `normal`, all outputs `safe_to_execute=false`, native/calibration owner unknown. **Code/CI exact SHA:** `a9d7e07738b7112aa98da9af40fef3a190378cfb`, [CI45081142727](https://github.com/Kiddos19882/AutoDraw/actions/runs/45081142727) job137389357622 **COMPLETED SUCCESS**, 8/8 synthetic R2 E2, all 4×2 fresh original/engine SHA, output pixel-footprint/region checks, determinism and artifact binding PASS. **Feasibility criterion frozen in E0: FAIL_MODEL_FEASIBILITY.** Not a native Egret rendering quality PASS. S4 visual quality remains accepted under DEC-051.
+
+## Raw E2 archive and independent audit
+
+[GitHub artifact14776728534](https://github.com/Kiddos19882/AutoDraw/actions/runs/45081142727/artifacts/14776728534) name `engine001-bpred-s5r2-four-original-model-only`. ZIP size17846 bytes, downloaded ZIP SHA256 `3eb3367e9aaf683c8a02830642ccad9da5247514985c199508b011dd18f100e0`, ZIP CRC 9/9 PASS (`testzip()=None`), raw reference `00_S5R2_RESULTS.json` and 4 R1/4 R2 source-only JSON outputs; **8/8 output file SHA256 independently match signed summary**. No overwrite of historical R1 artifacts. Raw member-level SHA and exact per-original input SHA embedded in manifest. Four originals use current first-source image and three independent DEV images from project.
+
+## Empirical outcome, same frozen budget
+
+| Fresh original | Source visible | S5-R1 modeled potential covered | S5-R2 modeled potential covered | S5-R2 protected original dots / touched potential | R2 visited / total regions | R2 rejected foreign | R2 accepted strokes | E0 gate |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| wV 200×320 | 64000 | 1575 | **124** |604 /119|119 /4031|1406|122|FAIL|
+| Hello Kitty 311×360 |72112|65|**119**|480 /118|118 /2480|1412|119|PASS individual only|
+| EZAL 1235×1920 |2371200|1637|**124**|1243 /118|118 /26203|1411|122|FAIL|
+| Pink Kitty 554×554 |306916|1637|**118**|1681 /118|118 /3085|1412|118|FAIL|
+
+Every S5-R2 result consumed **2000/2000** candidate footprint evaluations; `stroke_count` ≤200. All R2 outcomes `PARTIAL` from enormous residual pixels and unvisited regions. **All 481 accepted S5-R2 strokes use brush_value=1**, confirmed by independent member scan. Across sources rejected no-new-cells 462/466/454/470. No guaranteed full-cell coverage in any S5-R2 output (0), which for ideal width1 round capsule center strokes is expected and is **not** an Egret actual blank claim. Runner included genuine complete input byte SHA, source manifest SHA and 2/2 byte-identical rebuilt model plans for each original, all PASS. Per-original measured fresh-build+R1+R2 end-to-end in CI: wV2.08s, Hello2.35s, EZAL~29s, Pink~7.3s per repetition; specific runner/platform only, not production throughput.
+
+**Frozen success condition:** R2 must be ≥R1 potential covered on **all four** and strictly > on ≥2, with zero model foreign/alpha, deterministic. Only **one** source improved, **three regressed heavily** → **quality/feasibility FAIL**. No quality threshold change, no reinterpretation of R1 baseline or model E2 safety claim. Technical GitHub job success indicates only correct completion of prespecified diagnostics, **not quality acceptance**.
+
+## Actual failure mode and decision
+
+R2 fair-by-region design prioritized `protected_original_dot` regions before all broad regions, so most footprint trials went to many tiny/singleton source components, with explicit width1 dot proposals and repeated wide/long rejected proposals; large interior zones rarely visited. Its `clearance` geometric heuristic also frequently leads to width1 in fragmented regions; it is **not** a verified predictor of native Egret physical coverage. Per-source ~1400 foreign-region/canvas-mask rejects reveal substantial wasted budget. This is an architectural objective/scheduling failure, not an argument to dilute detail gates, raise budget until it looks better, modify S4, or claim game-ready brush. We retain the entire negative R2 raw archive and source code as frozen **rejected research comparator**.
+
+**Next task:** freeze a *distinct* S5-R2b balanced two-ledger scheduling E0 **before code**: preserve protected dots as hard metric/integral dedicated pass, but allocate independent broad-area candidate budget and avoid rejecting giant capsules by centerline/clearance prefilter. Reuse same S4.6, capsule evaluator and Egret P4D3/P4D4 historic findings; no separate production renderer. Same 2000 candidate evaluations per source for fair R1/R2 comparison; do not touch original E0 thresholds. Distinct candidate acceptance only after new E2 full-original verification and independent normal-only native E3 with verified source owner/calibration. Exact game CHALK, E4/E5 NOT_RUN.
