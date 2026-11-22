@@ -1,0 +1,84 @@
+name: ENGINE-001 S5R1 full brush geometry and fill model E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r1-brush-fill-validation.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_brush_fill_matrix.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r1_offline_candidates.py'
+      - 'AutoDraw_Stage20/source/preparation/brush_footprint_geometry.py'
+      - 'AutoDraw_Stage20/source/preparation/interior_fill_planner.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-s5r1-brush-fill-model
+  cancel-in-progress: true
+jobs:
+  geometry-fill-synthetic-e2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout pinned branch
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          lfs: false
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Dependencies
+        run: |
+          python -m pip install numpy==2.2.6 pytest==8.3.4
+      - name: Frozen E0 and current runner static syntax
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R1_BRUSH_FILL_VALIDATION_MATRIX_PREREG_2026-11-23.md')
+          data=p.read_bytes()
+          blob=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert blob=='8e46437b19532dc2814d9988567686d29c69a2c6','BLOCKED_FROZEN_BRUSH_MATRIX_E0'
+          print('FROZEN_MATRIX_E0_VERIFIED')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_brush_fill_matrix.py AutoDraw_Stage20/tests/engine001_bpred_s5r1_offline_candidates.py
+      - name: Existing footprint and fill regressions
+        run: |
+          cd AutoDraw_Stage20/source/preparation
+          python -m pytest -q tests/test_brush_footprint_geometry.py tests/test_interior_fill_planner.py tests/test_swept_footprint_geometry.py tests/test_brush_planner.py
+      - name: S5-R1 new model negative regressions
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r1_offline_candidates
+      - name: 960-case width direction phase plus fill comparison and performance
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r1_brush_fill_matrix.py --output "$RUNNER_TEMP/s5brush"
+      - name: Independently verify matrix evidence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          root=Path(os.environ['RUNNER_TEMP'])/'s5brush'
+          report=json.loads((root/'brush_fill_model_report.json').read_bytes())
+          rows=(root/'matrix_cases.json').read_bytes()
+          assert len(json.loads(rows))==960
+          assert report['model_cases']==960
+          assert hashlib.sha256(rows).hexdigest()==report['matrix_cases_sha256']
+          assert report['execution_allowed'] is False
+          assert report['native_Egret']=='NOT_RUN'
+          assert report['game_CHALK']=='NOT_RUN'
+          assert report['model_failure_total']==0
+          assert len(report['synthetic_fill'])==4
+          print('S5_BRUSH_MODEL_EVIDENCE_SHA_PASS')
+          PY
+      - name: Upload model-only raw audit even on failed tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r1-brush-fill-matrix-model-only
+          path: ${{ runner.temp }}/s5brush
+          if-no-files-found: warn
+          retention-days: 30
