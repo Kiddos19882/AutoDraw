@@ -1,0 +1,42 @@
+name: ENGINE-001 S5-R3 source clearance long-path synthetic E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r3-clearance-synthetic.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r3_clearance_paths.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r3_clearance_paths.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r3-synthetic
+  cancel-in-progress: true
+jobs:
+  source-clearance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install numpy==2.2.6 scipy==1.15.3
+      - name: Confirm frozen preregistration source E0 and compile
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R3_CLEARANCE_PATH_GENERATION_PREREG_2026-11-23.md').read_bytes()
+          d=hashlib.sha1(b'blob '+str(len(p)).encode()+b'\0'+p).hexdigest()
+          assert d=='fd1253789677a64d3576a0f27ab4f123afc44cec','BLOCKED_S5R3_PREREG_CHANGED'
+          print('S5R3_FROZEN_E0_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r3_clearance_paths.py AutoDraw_Stage20/tests/test_engine001_bpred_s5r3_clearance_paths.py
+      - name: Run synthetic S5-R3 region clearance/long-path safety
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r3_clearance_paths
