@@ -1,0 +1,46 @@
+name: ENGINE-001 BPRED-S5R2b normal-only broad-detail synthetic E2
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r2b-two-ledger-synthetic.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r2b_two_ledger_candidates.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r2b_two_ledger_candidates.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-s5r2b-synthetic
+  cancel-in-progress: true
+jobs:
+  frozen-region-wide-details:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install numpy==2.2.6 scipy==1.15.3
+      - name: E0 frozen before R2b source
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          data=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R2B_TWO_LEDGER_COVERAGE_AND_DETAIL_PREREG_2026-11-23.md').read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert sha=='f0b0fb42a1822499ae9e008daa50c1f7a40c6864','BLOCKED_R2B_FROZEN_E0_CHANGED'
+          print('S5R2B_FROZEN_E0_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r2b_two_ledger_candidates.py AutoDraw_Stage20/tests/test_engine001_bpred_s5r2b_two_ledger_candidates.py
+      - name: Two-ledger synthetic negative E2
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r2b_two_ledger_candidates
+      - name: Documentation integrity
+        run: |
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
