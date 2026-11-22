@@ -138,8 +138,11 @@ def build_candidates(arrays: dict, *, max_strokes: int = 1000,
         if len(proposals) >= max_strokes:
             finished = True
     visible = int(opaque.sum())
+    uncovered = int(np.count_nonzero(opaque & ~covered_potential))
+    # A completed seed sweep is not evidence of complete modeled coverage.
+    # Report every residual explicitly, even when no budget limit fired.
     output = {
-        "schema": VERSION, "status": "PARTIAL" if finished else "MODEL_ONLY",
+        "schema": VERSION, "status": "PARTIAL" if uncovered else "MODEL_ONLY",
         "drawing_mode": "normal", "smooth": False,
         "safe_to_execute": False, "admissible_for_gameplay": False,
         "source_owner_status": "MISSING", "native_calibration": "UNVERIFIED",
@@ -149,7 +152,7 @@ def build_candidates(arrays: dict, *, max_strokes: int = 1000,
         "visible_pixel_count": visible,
         "potential_covered_pixel_count": int(np.count_nonzero(covered_potential & opaque)),
         "guaranteed_covered_pixel_count": int(np.count_nonzero(covered_guaranteed & opaque)),
-        "uncovered_potential_pixel_count": int(np.count_nonzero(opaque & ~covered_potential)),
+        "uncovered_potential_pixel_count": uncovered,
         "rejected": rejects, "proposals": proposals,
     }
     output["result_sha256"] = hashlib.sha256(json.dumps(
