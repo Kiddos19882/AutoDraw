@@ -131,6 +131,7 @@ def build_candidates(arrays: dict, *, max_strokes: int = 1000,
         proposals.append({
             "color_index": color, "paintable_id": region, "brush_value": width,
             "points": [[float(x), float(y)], [float(end[0]), float(end[1])]],
+            "drawing_mode": "normal", "smooth": False,
             "safe_to_execute": False, "status": "MODEL_ONLY_NON_EXECUTABLE",
             "modeled_new_upper_bound_cells": best[0][0],
         })
@@ -139,6 +140,7 @@ def build_candidates(arrays: dict, *, max_strokes: int = 1000,
     visible = int(opaque.sum())
     output = {
         "schema": VERSION, "status": "PARTIAL" if finished else "MODEL_ONLY",
+        "drawing_mode": "normal", "smooth": False,
         "safe_to_execute": False, "admissible_for_gameplay": False,
         "source_owner_status": "MISSING", "native_calibration": "UNVERIFIED",
         "coordinates": "ORIGINAL_PIXEL_CENTERS_NOT_EGRET",
