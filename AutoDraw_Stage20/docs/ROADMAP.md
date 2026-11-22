@@ -4,7 +4,7 @@
 
 ## HISTORICAL RAG9 E0 frozen before implementation (2026-11-22)
 
-[RAG9 hard original neighbor barriers and chromatic geodesic propagation prereg](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md) commit [01adeaf2](https://github.com/Kiddos19882/AutoDraw/commit/01adeaf2d08adcac30e5c056800fb867db3b19f7) is frozen **before code**, after RAG8 FAIL. ONE distinct source-only architecture and one 4-original DEV x2 E2 are next, NOT_RUN. Previously frozen wV RGB MAE <=115%, true actual paintable ID limits and wV/EZAL original-edge >=75% remain mandatory. S4.4 coherent contours → S4.5 multiple originals → S4.6 provenance → research S5 remain ordered only after accepted S4.2+S4.3. Formal BPRED-S4 BLOCKED; native E3/E4/E5/exact CHALK NOT_RUN.
+[RAG9 hard original neighbor barriers and chromatic geodesic propagation prereg](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md) commit [01adeaf2](https://github.com/Kiddos19882/AutoDraw/commit/01adeaf2d08adcac30e5c056800fb867db3b19f7) is frozen **before code**, after RAG8 FAIL. One distinct source-only architecture and 4-original DEV x2 E2 were completed and signed scientific FAIL; see current active result above. Previously frozen wV RGB MAE <=115%, true actual paintable ID limits and wV/EZAL original-edge >=75% remain mandatory. S4.4 coherent contours → S4.5 multiple originals → S4.6 provenance → research S5 remain ordered only after accepted S4.2+S4.3. Formal BPRED-S4 BLOCKED; native E3/E4/E5/exact CHALK NOT_RUN.
 
 ## АКТУАЛЬНЫЙ RAG8 source-only scientific FAIL and next S4.2+S4.3 (2026-11-22)
 

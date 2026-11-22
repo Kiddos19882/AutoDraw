@@ -4,7 +4,7 @@
 
 ## HISTORICAL RAG9 before-code E0 entry (2026-11-22)
 
-[Original hard-edge/chromatic source region propagation E0](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md) committed [01adeaf2](https://github.com/Kiddos19882/AutoDraw/commit/01adeaf2d08adcac30e5c056800fb867db3b19f7) on feature branch before any RAG9 implementation. Distinct source-only boundary topology, chromatic propagation and regional game128 contrast proposal. This is **HYPOTHESIS E0, NOT_RUN E2/DEV**, not acceptance; current signed RAG8 original-source scientific FAIL remains authoritative. FIRST NEXT: one frozen-RAG9 E2 implementation + 4 original DEV x2 and signed raw/visual report, no threshold sweep. S4.2+S4.3 IN_PROGRESS, S4.4/S5/native E3/E4/E5/exact CHALK NOT_RUN, independent formal BPRED-S4 BLOCKED; master/production/Stage6/Bridge/Monitor unchanged.
+[Original hard-edge/chromatic source region propagation E0](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG9_HARD_EDGE_CHROMA_PROPAGATION_PREREG_2026-11-22.md) committed [01adeaf2](https://github.com/Kiddos19882/AutoDraw/commit/01adeaf2d08adcac30e5c056800fb867db3b19f7) on feature branch before any RAG9 implementation. Distinct source-only boundary topology, chromatic propagation and regional game128 contrast proposal. At the time, this was **E0 before RAG9 code/DEV**, not acceptance. Subsequent RAG9 E2/4 DEV is now signed scientific FAIL above. RAG8 signed scientific FAIL remains historical. S4.2+S4.3 remains IN_PROGRESS after signed negative, S4.4/S5/native E3/E4/E5/exact CHALK NOT_RUN, independent formal BPRED-S4 BLOCKED; master/production/Stage6/Bridge/Monitor unchanged.
 
 ## АКТУАЛЬНЫЙ ENGINE-001/BPRED-S4-R1 — RAG8 original-source graph E2 source science FAIL (2026-11-22)
 
