@@ -78,6 +78,17 @@ class S5R1Tests(unittest.TestCase):
         with self.assertRaises(BlockedS5):
             build_candidates(s, directions=((0.,0.),))
 
+    def test_uncovered_without_exhaustion_still_partial(self):
+        # Regression for CI45079897646: no budget exhaustion is NOT
+        # equivalent to all source pixels being covered.
+        s = scene([[4] * 8 for _ in range(8)])
+        r = build_candidates(s, directions=((0.25, 0.9682458366),),
+                             max_strokes=1000, max_seed_trials=5000)
+        self.assertLess(r["trials"], 5000)
+        self.assertGreater(r["uncovered_potential_pixel_count"], 0)
+        self.assertEqual(r["status"], "PARTIAL")
+        self.assertIs(r["smooth"], False)
+
     def test_explicit_budgets_and_no_runtime(self):
         s = scene([[2]*10 for _ in range(10)])
         r = build_candidates(s, max_strokes=1, max_seed_trials=50)
