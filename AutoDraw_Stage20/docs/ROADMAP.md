@@ -1,3 +1,7 @@
+## S5-R3 complete E2 + machine-produced brush preview; region multi-lane sweep next (2026-11-23)
+
+[Signed E2 and user-requested non-AI brush overlay preview](ENGINE001_BPRED_S5R3_CLEARANCE_PATH_FOUR_ORIGINALS_E2_AND_VISUAL_2026-11-23.md), CI45084243078 TECH PASS; frozen E0 relative feasibility PASS 4/4; full source cover only 2.25–14.45% PARTIAL. NEXT preregister multi-offset interior lanes/coverage sweeps and independently check each capsule on original4×2 under same limits, not raise budgets or postprocess pictures. Remain normal/smooth=false, no native gameplay/source owner promotion.
+
 ## ENGINE-001 S5-R3 ready for controlled experiment (2026-11-23)
 
 [Prospective E0 clearance/region-guided long centerline path-generation](ENGINE001_BPRED_S5R3_CLEARANCE_PATH_GENERATION_PREREG_2026-11-23.md) frozen after R2b original4×2 model-feasibility PASS; next implementation/test and same-budget original comparison, without treating ideal capsule pixels as native Egret. Production/Stage6 blocked until source owner/calibration verified. DEC-052 normal only.
