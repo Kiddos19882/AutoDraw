@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 import engine001_bpred_s4r1_generic_source_maps as originals
-import engine001_bpred_s4r1_rag4_hierarchy as rag4
+import engine001_bpred_s4r1_rag4_coherent_detail as rag4
 import run_engine001_b1r_p3b_engine128_adaptive32 as palette_reader
 
 
