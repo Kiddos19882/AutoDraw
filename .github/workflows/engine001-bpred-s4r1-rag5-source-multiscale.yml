@@ -3,7 +3,7 @@ on:
   push:
     branches: ['feature/image-geometry-optimization']
     paths:
-      - '.github/workflows/.github/workflows/engine001-bpred-s4r1-rag5-source-multiscale.yml'
+      - '.github/workflows/engine001-bpred-s4r1-rag5-source-multiscale.yml'
       - 'AutoDraw_Stage20/tests/engine001_bpred_s4r1_rag5_source_multiscale.py'
       - 'AutoDraw_Stage20/tests/test_engine001_bpred_s4r1_rag5_source_multiscale.py'
       - 'AutoDraw_Stage20/tests/run_engine001_bpred_s4r1_rag5_dev.py'
