@@ -101,6 +101,8 @@ def validate_original_ctr1(rgba: np.ndarray, game128: np.ndarray,
           "ALPHA_NOT_ORIGINAL")
     block(np.array_equal(arrays["preview_rgba"][..., 3], alpha),
           "PREVIEW_ALPHA")
+    block(np.all((game[opaque] >= 0) & (game[opaque] < 128)),
+          "SWATCH_ID_RANGE")
     block(np.array_equal(arrays["preview_rgba"][opaque, :3],
                          game128[game[opaque]]), "PREVIEW_SWATCH")
     block(np.all(atom[invalid] == 0) and np.all(surface[invalid] == 0)
@@ -108,8 +110,6 @@ def validate_original_ctr1(rgba: np.ndarray, game128: np.ndarray,
           "UNKNOWN_ALPHA_IS_PAINTABLE")
     block(np.all(atom[opaque] > 0) and np.all(surface[opaque] > 0)
           and np.all(paint[opaque] > 0), "OPAQUE_REGION_MISSING")
-    block(np.all((game[opaque] >= 0) & (game[opaque] < 128)),
-          "SWATCH_ID_RANGE")
     block(not np.any(arrays["protected_original_dot"][invalid]),
           "DOT_OUTSIDE_ORIGINAL")
     block(np.all(adj >= 1) and np.all(adj <= int(surface.max())),
