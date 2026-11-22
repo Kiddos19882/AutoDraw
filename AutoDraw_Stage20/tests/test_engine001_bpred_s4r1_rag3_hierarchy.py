@@ -33,7 +33,6 @@ class RAG3Tests(unittest.TestCase):
         before = a.copy()
         r = build_rag3(a, palette())
         self.assertTrue(np.array_equal(a, before))
-        print("RAG3_THIN_DIAGNOSTIC", r["counts"], "line", int(r["surface_id"][18,26]), int(r["detail_id"][18,26]), int(r["game_index"][18,26]), "neighbor", int(r["surface_id"][18,25]), int(r["detail_id"][18,25]), int(r["game_index"][18,25]), "detail_color", r["detail_color_index"].tolist()[:30], flush=True)
         self.assertNotEqual(int(r["game_index"][18, 26]),
                             int(r["game_index"][18, 25]))
         self.assertTrue(r["source_edge"][18, 26])
