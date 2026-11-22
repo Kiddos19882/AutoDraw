@@ -187,6 +187,7 @@ def build_ctr1(original_rgba: np.ndarray, game128: np.ndarray) -> dict:
         "paintable_id": source["paintable_id"],
         "baseline_index": source["baseline_index"],
         "source_edge": source["source_edge"],
+        "adjacency": source["adjacency"],
         "source_original_alpha": original_rgba[..., 3].copy(),
         "preview_rgba": source["preview_rgba"],
         "contour_segments": rows,

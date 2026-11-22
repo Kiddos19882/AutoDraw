@@ -133,7 +133,7 @@ def do_original(root:Path,relative:str,game128:np.ndarray,out:Path,index:int):
         "surface_id":data["surface_id"],
         "source_edge":data["source_edge"],
     }
-    source_metric=provisional.evaluate_dg1(original,game128,source_data)
+    source_metric=provisional.evaluate_dg1(original,game128,data)
     rgb_error=source_metric["candidate_rgb_mae"]
     rgb_control=source_metric["baseline_rgb_mae"]
     ratio=rgb_error/rgb_control if rgb_control>0 else None
