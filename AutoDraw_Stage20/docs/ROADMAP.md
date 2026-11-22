@@ -1,3 +1,7 @@
+## DEC-052 S5 fixed execution mode, 2026-11-23
+
+All **new** S5 geometry, plans, offline/Egret tests must specify `smooth=false` `normal` `moveTo/lineTo`; reject/stop if runtime smooth state is not verified OFF. Historical smooth evidence not rewritten. Use existing normal-only reference Egret harness, no duplicated renderer and no production default changes. Verify new CI and bounded source4×2, then region-based S5-R2 with normal-only native color/alpha/owner checks. [DEC-052](DECISIONS.md).
+
 ## S5 next brush/fill verification checkpoint — 2026-11-23
 
 New [960-case 1..10 width ×24 angle ×2 length ×2 phase model matrix E0](ENGINE001_BPRED_S5R1_BRUSH_FILL_VALIDATION_MATRIX_PREREG_2026-11-23.md) and [native comparison](ENGINE001_BPRED_S5R1_BRUSH_FILL_E1_E3_REVIEW_AND_E2_PENDING_2026-11-23.md) committed; CI configuration SHA `25805f54e`. Historical Egret already covers width-angle repeatability and failures, so don't redundantly rerun its 1121 PNG for same hypothesis. **NEXT** confirm code SHA/action run and 4DEV original×2 geometry coverage; then S5-R2 new frozen E0 for actual connected-region directions + native-checked color/alpha compositing, no S4 color refinement or Stage6/CHALK work. New E2 UNKNOWN; native full new S5 not run.
