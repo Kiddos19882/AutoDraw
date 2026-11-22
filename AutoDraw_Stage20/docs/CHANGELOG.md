@@ -1,3 +1,7 @@
+## 2026-11-22 — RAG5 source-only two-scale colored patches (scientific edge-contrast FAIL)
+
+Research-only new source-multiscale fine SLIC + connected parent surface/color patch hierarchy and real-source-thin-detail overlays; 10 E2 tests, four DEV x2 raw visualization/NPZ/sha runner, isolated CI code SHA bd4dcd7. [CI45026229292](https://github.com/Kiddos19882/AutoDraw/actions/runs/45026229292) E2 technical SUCCESS and raw independently ZIP CRC49/file SHA44 verified. [Signed research decision](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG5_E2_RESULTS_2026-11-22.md): numeric3/4 and real paintable regions PASS, strong-edge reconstruction FAIL0/2, wV color degradation; **NOT_PROMOTED**. Strict S4 BLOCKED, no source sweep/repainted old PNG, production/master/Stage6/Bridge/Monitor unchanged; S4.4/S5/native E3/E4/E5/CHALK NOT_RUN.
+
 ## 2026-11-22 — RAG4 research source-only hierarchical regional colors (numeric negative)
 
 Added source-coherent color subregions nested in main surfaces, nine E2 tests, four-DEV reproducible atlas/NPZ/manifest runner and isolated CI (SHA6022a65). [CI45023303476](https://github.com/Kiddos19882/AutoDraw/actions/runs/45023303476) technical SUCCESS+raw verified; reconstructed colors/contours improve vs RAG3, but **frozen numeric FAIL 1/4** and up to 77,365 internal color IDs, so **NOT_PROMOTED**. [Signed RAG4 report](ENGINE001_BPRED001_S4R1_REGION_COLOR_RAG4_E2_RESULTS_2026-11-22.md). Historical E0, production/master/executor/Bridge/Monitor and strict gates unchanged; S4.4/S5/native E3/E4/E5/exact CHALK NOT_RUN.
