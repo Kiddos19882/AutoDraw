@@ -1,3 +1,7 @@
+## S5 next prerequisite: measured game brush widths before multi-lane coverage (2026-11-23)
+
+[Web literature / reuse-first native brush footprint inventory](ENGINE001_S5_GEOMETRIC_COVERAGE_RESEARCH_AND_BRUSH_CALIBRATION_2026-11-23.md) (E1 research reference, not E0 or CI): recover physical size/phase/angle/alpha from P4A2/P4D3/P4D4 first, then freeze only missing-case measurements. After that preregister S5 region multi-offset sweeps with EDT and optionally Boustrophedon/medial-axis/contour-parallel candidates. No code/test run or game-admission promotion; keep S5-R3 result, DEC-052 normal/smooth=false and exact CHALK restrictions.
+
 ## S5-R3 complete E2 + machine-produced brush preview; region multi-lane sweep next (2026-11-23)
 
 [Signed E2 and user-requested non-AI brush overlay preview](ENGINE001_BPRED_S5R3_CLEARANCE_PATH_FOUR_ORIGINALS_E2_AND_VISUAL_2026-11-23.md), CI45084243078 TECH PASS; frozen E0 relative feasibility PASS 4/4; full source cover only 2.25–14.45% PARTIAL. NEXT preregister multi-offset interior lanes/coverage sweeps and independently check each capsule on original4×2 under same limits, not raise budgets or postprocess pictures. Remain normal/smooth=false, no native gameplay/source owner promotion.
