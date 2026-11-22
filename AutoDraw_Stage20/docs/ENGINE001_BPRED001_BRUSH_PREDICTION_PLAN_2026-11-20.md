@@ -1,3 +1,7 @@
+## Дополнение после ровно двух CHROMA-AB1 color/detail проверок (2026-11-22) — DEC-049
+
+[Signed A/B source-original E2 results](ENGINE001_BPRED001_S4R1_CHROMA_AB1_E2_TWO_COLOR_TEST_RESULTS_2026-11-22.md) confirm neither alternative meets frozen strict source gates: A/B wV RGB MAE120.018/120.570% >115 and actual wV paintable5303/5328>5283; A strong EZAL source edges74.298%<75 while B source edges wV84.407% EZAL78.767% PASS. Per explicit user instruction **only the FUTURE ENGINEERING S4 source ART color-screen** is relaxed to RGB MAE <=125% of independently fresh nearest128 for >=2/4 full originals plus mandatory wV<=125% (source4.876171875 baseline -> absolute limit6.09521484375). The previous E0 scientific original <=115 and independent formal BPRED-S4 remain unchanged, previous FAIL remain FAIL. Critically **NO detail relaxation**: strong original Lab boundary retention>=75% on EACH wV/EZAL, genuine 1px line/point, important eyes/face/hair/silhouette and local details, true source main/paintable connectivity (wV<5283 and EZAL<38682 paintable), 15% singletons and raw source/provenance/alpha/UNKNOWN keep priority. Engineering color pass alone is not accepted source map, actual game drawing, S5 or scientific S4. Next task still one distinct S4.2+S4.3 region-color/detail architecture prospective E0, not pixel PNG microrepair.
+
 # ENGINE-001 / BPRED-001 — прогноз фактического следа кисти Egret/Canvas2D/WebGL
 
 ## Текущий S4-R1 — единая архитектура областей, цветов и контуров (уточнение 2026-11-22)

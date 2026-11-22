@@ -1,3 +1,7 @@
+## DEC-049 detail-first source E2 policy after two original color tests (2026-11-22)
+
+[CHROMA-AB1 signed two DEV source tests](ENGINE001_BPRED001_S4R1_CHROMA_AB1_E2_TWO_COLOR_TEST_RESULTS_2026-11-22.md) triggered user-authorized **future engineering only** RGB MAE<=125% relative to fresh nearest128 original; never replace historical frozen scientific <=115%, formal BPRED-S4, or re-mark earlier RAG8/RAG9/AB1 FAIL. **No weakening of detail:** original strong source edge>=75% separately on both complex images, real preserved 1px source line/dot and eyes/face/hair/silhouette, true 4connected (source main,game128) paintable wV<5283/EZAL<38682, original alpha/UNKNOWN/SHAs, at least15% singletons remain required. DEC-047 full-original fresh-chain required for eventual native drawing. Neither CHROMA-AB1 variant currently accepted or production-admissible. S4.4/S5 and exact CHALK NOT_RUN.
+
 # Регламент работы ИИ с AutoDraw — краткий вход
 
 ## Правило работы с BPRED-S4-R1 (уточнение 2026-11-22)
