@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 from scipy import ndimage
 
-from engine001_bpred_s4r1_rag8_source_color_modes import (
+from engine001_bpred_s4r1_rag8_joint_color_graph import (
     build_rag8, evaluate_rag8, _full_palette_cost,
     _source_chromatic_graph, _joint_source_regional_optimization,
 )
