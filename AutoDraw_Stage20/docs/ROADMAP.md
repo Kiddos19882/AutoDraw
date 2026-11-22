@@ -1,3 +1,7 @@
+## ENGINE-001 S5-R3 ready for controlled experiment (2026-11-23)
+
+[Prospective E0 clearance/region-guided long centerline path-generation](ENGINE001_BPRED_S5R3_CLEARANCE_PATH_GENERATION_PREREG_2026-11-23.md) frozen after R2b original4×2 model-feasibility PASS; next implementation/test and same-budget original comparison, without treating ideal capsule pixels as native Egret. Production/Stage6 blocked until source owner/calibration verified. DEC-052 normal only.
+
 ## ENGINE-001 S5-R2b model feasibility achieved, S5-R3 architectural step (2026-11-23)
 
 [Signed source-only R2b E2 result](ENGINE001_BPRED_S5R2B_FOUR_ORIGINALS_SIGNED_E2_RESULTS_2026-11-23.md), CI45082642153 exact SHA b78ec25: 4/4 R1 potential coverage improvements and 4/4 protected dot non-regressions under frozen E0, technical E2 PASS; **absolute full coverage still PARTIAL**, 15–17 accepted broad strokes vs1400 broad model trials. NEXT S5-R3 E0 requires long interior trajectories/shape-aware major-axis trace on eroded/clearance-safe regions, coarse geometric pruning, one reuse capsule safety oracle and same original source4×2 without old derivative masks; no user-visible postprocessed-art patching, no threshold weakening. After good modeled coverage, native normal Egret compositing source-owner calibration before any Stage6 or run-bound CHALK.
