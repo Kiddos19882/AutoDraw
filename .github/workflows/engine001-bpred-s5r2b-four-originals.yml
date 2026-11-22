@@ -1,0 +1,89 @@
+name: ENGINE-001 BPRED-S5R2b four original E2 frozen feasibility
+on:
+  push:
+    branches: ['feature/image-geometry-optimization']
+    paths:
+      - '.github/workflows/engine001-bpred-s5r2b-four-originals.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r2b_dev.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r2b_two_ledger_candidates.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r2b_two_ledger_candidates.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r2b-four-originals
+  cancel-in-progress: true
+jobs:
+  original-first-double:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exactly reused S4.6 dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Verify frozen protocol and genuine game palette
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R2B_TWO_LEDGER_COVERAGE_AND_DETAIL_PREREG_2026-11-23.md').read_bytes()
+          sha=lambda data:hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert sha(p)=='f0b0fb42a1822499ae9e008daa50c1f7a40c6864','BLOCKED_R2B_E0'
+          engine=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          assert sha(engine)=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388','BLOCKED_GAME_BLOB'
+          print('R2B_SOURCE_PROVENANCE_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r2b_two_ledger_candidates.py AutoDraw_Stage20/tests/run_engine001_bpred_s5r2b_dev.py
+      - name: Region and detail negative regression
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r2b_two_ledger_candidates
+      - name: Four source originals x2 fresh R1 vs R2b
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r2b_dev.py --root AutoDraw_Stage20 --output "$RUNNER_TEMP/s5r2b"
+      - name: Independent output SHA, no gameplay, frozen criterion preserved
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r2b'
+          result=json.loads((root/'00_S5R2B_RESULTS.json').read_bytes())
+          assert len(result['sources'])==4
+          assert result['drawing_mode']=='normal' and result['smooth'] is False
+          assert result['admissible_for_gameplay'] is False
+          assert result['native']=='NOT_RUN' and result['game_chalk']=='NOT_RUN'
+          assert result['frozen_model_feasibility'] in ('PASS_MODEL_FEASIBILITY_ONLY','FAIL_MODEL_FEASIBILITY')
+          for row in result['sources']:
+              assert row['double_fresh_determinism']=='PASS'
+              for prefix in ('r1','r2b'):
+                  raw=(root/row[prefix+'_output']).read_bytes()
+                  assert hashlib.sha256(raw).hexdigest()==row[prefix+'_sha256']
+                  obj=json.loads(raw)
+                  assert obj['drawing_mode']=='normal' and obj['smooth'] is False
+                  assert obj['safe_to_execute'] is False
+                  assert obj['admissible_for_gameplay'] is False
+                  assert obj['source_owner_status']=='MISSING'
+                  assert obj['native_calibration']=='UNVERIFIED'
+              assert row['r2b_phase_trials']['broad']<=1400
+              assert row['r2b_phase_trials']['detail']<=600
+              assert row['r2b_phase_strokes']['broad']<=80
+              assert row['r2b_phase_strokes']['detail']<=120
+          print('R2B_RAW_BUDGET_PROVENANCE_PASS')
+          print('R2B_FROZEN_FEASIBILITY',result['frozen_model_feasibility'])
+          PY
+      - name: Preserve raw artifacts including negative outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r2b-originals-model-only
+          path: ${{ runner.temp }}/s5r2b
+          if-no-files-found: warn
+          retention-days: 30
