@@ -1,3 +1,5 @@
+**ENGINE-001 S5 · 2026-11-23 four-way native tolerance.** 0/10/15/20% E3 completed at SHA `1bd22ce`; 20% measured best but quality PARTIAL, local spill/edge and CHALK unverified. [Full four-way evidence](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#four-way-native-tolerance-0101520-2026-11-23).
+
 **ENGINE-001 S5.** Eight-color wV full native baseline rendered. Foreground misses decreased after repair; total agreement fell slightly. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).
 
 **ENGINE-001 S5 · 2026-11-23.** Native full redraw left the sampled width-1 singleton blank and crossed two sampled source owners. Full-scene native remains open. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).

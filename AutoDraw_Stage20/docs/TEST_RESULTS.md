@@ -1,3 +1,5 @@
+**ENGINE-001 S5 native four-way E3 (2026-11-23).** [CI45211813045](https://github.com/Kiddos19882/AutoDraw/actions/runs/45211813045) SHA `1bd22ce`, matrix0/10/15/20 all completed success; 4 ZIP SHA256+CRC30/30 independently PASS; best 20% total269234/324000, fg77456/117215, white-fg12932, RGB-MAE12.1729; versus 0% net+3393 but 346 pixels worsened. [Full result](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#four-way-native-tolerance-0101520-2026-11-23). E4/CHALK NOT_RUN, quality PARTIAL.
+
 **ENGINE-001 S5.** Full-scene native Egret E3, run 45205918003. Native PNG metrics independently recomputed. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).
 
 **ENGINE-001 S5 · 2026-11-23.** Native E3 CI 45203361169 passed technical controls; original singleton and direct-width footprint assumptions failed on sampled strokes. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).

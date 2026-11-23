@@ -1,3 +1,5 @@
+**2026-11-23 · ENGINE-001 S5 four-way experimental tolerance.** Checked remote HEAD and last20 commits, expanded only test choices/workflow matrix to 0/10/15/20 (`1bd22ce`), ran [four-way native CI45211813045](https://github.com/Kiddos19882/AutoDraw/actions/runs/45211813045) with four successful Egret jobs, verified all four raw archive SHA and 30/30 CRC, independently compared nearest-color full PNG including worsened/changed pixels; [results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#four-way-native-tolerance-0101520-2026-11-23). 20% leads measured native quality, 15% close; no production/executor/master/game CHALK changes, E4/E5 NOT_RUN.
+
 **ENGINE-001 S5.** Completed the unrestricted full wV redraw with measured native widths and two-point residual calibration. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).
 
 **ENGINE-001 S5 · 2026-11-23.** Measured all ten native brush widths plus three actual paths from the unrestricted wV plan on the 150×240 bench ROI. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).
