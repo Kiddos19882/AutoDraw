@@ -1,3 +1,7 @@
+## 2026-11-23 — ENGINE-001 S5-R4 experimental multi-offset model and frozen S5-R5 next
+
+New source-only `tests/engine001_bpred_s5r4_offset_lanes.py`, six tests, original4×2 source-runner, separate synthetic/4DEV workflows; [signed S5-R4 result](ENGINE001_BPRED_S5R4_FOUR_ORIGINALS_SIGNED_E2_AND_CONTENT_REVIEW_2026-11-23.md) CI45090117499 E2 relative feasibility PASS, full visual detail PARTIAL and wV non-WHITE6 regression. Recorded next [content-aware region scheduler E0](ENGINE001_BPRED_S5R5_CONTENT_STRATIFIED_REGION_LANES_PREREG_2026-11-23.md), keeping old E0 and raw negative cases untouched. No native S5 paint/production/CHALK changes.
+
 ## 2026-11-23 — ENGINE-001 native brush seam E3 validated, S5-R4 experimental lane planner
 
 Validated [native S5-LANE-P1 full archived E3](ENGINE001_S5_LANE_P1_SIGNED_NATIVE_E3_180_CASES_2026-11-23.md) from CI45089280114 exact source SHA and independently checked PNG/manifest. [Frozen S5-R4 E0](ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md) and new research-only offset-lane module, 6 synthetic E2 tests CI45090038737 PASS, original4×2 reproducible comparison runner and workflow (running at time of record). Original missing-artifact/Markdown audit failures preserved. No production, executor, engine or CHALK estimator modification.
