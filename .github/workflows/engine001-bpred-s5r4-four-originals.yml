@@ -1,0 +1,87 @@
+name: ENGINE-001 S5-R4 four fresh originals 2x offset lanes model E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r4-four-originals.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r4_four_originals.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r4_offset_lanes.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r4_offset_lanes.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r4-four-originals
+  cancel-in-progress: true
+jobs:
+  original-four-source-offset-lanes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned source pipeline dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Frozen source/experiment prereg and synthetic checks
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          root=Path('AutoDraw_Stage20')
+          prereg=root/'docs'/'ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md'
+          assert prereg.is_file() and 'frozen BEFORE S5-R4 implementation' in prereg.read_text('utf8')
+          engine=(root/'gameEngine'/'main.min_653f95bc.js').read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(engine)).encode()+b'\0'+engine).hexdigest()
+          assert sha=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388'
+          print('S5R4_FROZEN_ENGINE_AND_E0_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r4_four_originals.py
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r4_offset_lanes
+      - name: Four genuinely fresh original pipelines doubled and model PNG
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r4_four_originals.py \
+            --root AutoDraw_Stage20 --output "${RUNNER_TEMP}/s5r4"
+      - name: Verify signed original output and preserve relative failures
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r4'
+          report=json.loads((root/'00_S5R4_RESULTS.json').read_bytes())
+          assert report['schema']=='ENGINE001_BPRED_S5R4_FOUR_ORIGINALS_V1'
+          assert report['source_original_only'] and report['smooth'] is False
+          assert report['native_Egret']=='NOT_RUN' and report['exact_game_chalk']=='NOT_RUN'
+          assert len(report['sources'])==4
+          assert report['frozen_model_feasibility'] in ('PASS_RELATIVE_MODEL_FEASIBILITY',
+                                                        'FAIL_RELATIVE_MODEL_FEASIBILITY')
+          for row in report['sources']:
+              assert row['double_fresh_determinism']=='PASS'
+              for key in ['r3','r4']:
+                  raw=(root/row[key+'_file']).read_bytes()
+                  assert hashlib.sha256(raw).hexdigest()==row[key+'_sha256']
+                  obj=json.loads(raw)
+                  assert obj['smooth'] is False and obj['drawing_mode']=='normal'
+                  assert obj['safe_to_execute'] is False and obj['admissible_for_gameplay'] is False
+                  assert obj['source_owner_status']=='MISSING'
+                  assert obj['native_calibration']=='UNVERIFIED'
+          visual=report['sources'][0]['visual']
+          raw=(root/visual['preview_file']).read_bytes()
+          assert raw[:8]==b'\x89PNG\r\n\x1a\n'
+          assert hashlib.sha256(raw).hexdigest()==visual['preview_sha256']
+          assert visual['potential_px']==report['sources'][0]['r4_covered']
+          print('S5R4_4ORIGINALS_FROZEN_FEASIBILITY',report['frozen_model_feasibility'])
+          PY
+      - name: Archive actual algorithm preview, original source comparisons and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r4-four-originals-source-offset-lanes-model-PNG
+          path: ${{ runner.temp }}/s5r4
+          if-no-files-found: error
+          retention-days: 30
