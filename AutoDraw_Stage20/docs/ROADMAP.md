@@ -1,3 +1,7 @@
+## ENGINE-001 S5-LANE-P1 adjacent-pass native E0 frozen (2026-11-23)
+
+[Explicit prereg](ENGINE001_S5_ADJACENT_LANE_NATIVE_SPACING_PREREG_2026-11-23.md) follows measured widths1..10 E2. First implement fixed 180-case overlap matrix using unchanged game Egret and existing harness, capture A/B/native AB + alpha≥24/128 seam coverage, then decide S5-R4 lane pitch (not arbitrary guess based on mean width). No native P1 run yet, no historical rerender, no game/source-owner admission.
+
 ## ENGINE-001 S5 brush-width evidence obtained; overlap before multi-lane E0 (2026-11-23)
 
 [Native E2 measured width1..10 from historical real Egret P4D3/P4D4](ENGINE001_S5_NATIVE_BRUSH_1TO10_CORE_WIDTH_MEASUREMENTS_E2_2026-11-23.md) resolves effective core area-derived width at alpha24 and alpha128 but not guaranteed lateral continuity. Freeze a narrow adjacent-pair spacing/phase/alpha source-over E0 before choosing S5 lane step; use same Egret harness and widths1..10, no full past matrix reruns. Then implement source-only S5-R4 Boustrophedon/EDT multi-lane paths with independent native audit. Historical S5-R3 coverage remains PARTIAL; normal/smooth=false; game admission blocked.
