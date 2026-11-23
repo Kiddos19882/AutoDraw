@@ -1,5 +1,7 @@
 # ENGINE-001 / S5-LANE-P1 — adjacent real-Egret lane spacing, frozen prospective E0 (2026-11-23)
 
+**Experiment ID:** `ENGINE001_S5_LANE_P1_NATIVE_ADJACENT_STROKE_SPACING_V1`. Frozen original E0 is immutable in scope; this added identifier does not change test variables.
+
 **Purpose:** determine whether nominal lineStyle widths1..10 and native area-derived core widths can be used to choose step/overlap of neighboring straight fill strokes **without visible holes**, before S5-R4 multi-offset regional coverage. This is a NEW sharply scoped experiment distinct from historical P4D3 and P4D4 repeatability; do not repeat old 480-case single-line direction matrix. **Frozen E0 BEFORE code, CI or game test.** Scope native archived Egret offline research only; E3 new NOT_RUN, E4/E5/game CHALK NOT_RUN, production blocked.
 
 ## Known baseline
