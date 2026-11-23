@@ -132,6 +132,23 @@ def main():
         if (r4_content != FROZEN_R4_NONWHITE[index]
                 or r5_content != FROZEN_R5_NONWHITE[index]):
             raise ValueError('BLOCKED_S5R6_BASELINE_CONTENT_DRIFT')
+        # Reconstruct the full actual source-owner graph for independent
+        # reproducibility, not just the 60-event summary stored in the plan.
+        full_graph = cells.decompose(
+            arrays['paintable_id'], arrays['original_rgba'][:, :, 3] == 255)
+        if (len(full_graph['cells']) != r6['topology']['cell_count']
+                or len(full_graph['edges']) != r6['topology']['edge_count']
+                or full_graph['runs'] != r6['topology']['run_count']
+                or full_graph['opaque_pixels'] != r6['visible_pixel_count']
+                or full_graph['split_events'] != r6['topology']['split_events']
+                or full_graph['merge_events'] != r6['topology']['merge_events']):
+            raise ValueError('BLOCKED_S5R6_FULL_CELL_GRAPH_DRIFT')
+        graph_name = f'{index:02d}_S5R6_FULL_CELLGRAPH.json.gz'
+        graph_raw = json.dumps(
+            full_graph, ensure_ascii=False, sort_keys=True,
+            separators=(',', ':'), allow_nan=False).encode('utf8')
+        graph_z = gzip.compress(graph_raw, compresslevel=9, mtime=0)
+        (out / graph_name).write_bytes(graph_z)
         names = [f'{index:02d}_{version}.json'
                  for version in ('R3', 'R4', 'R5', 'R6')]
         bytes_all = [r3_bytes, r4_bytes, r5_bytes, r6_bytes]
@@ -153,6 +170,15 @@ def main():
             'r6_phase_trials': r6['phase_trials'],
             'r6_phase_strokes': r6['phase_strokes'],
             'r6_topology': r6['topology'],
+            'topology_full_graph': {
+                'file': graph_name,
+                'sha256': sha(graph_z),
+                'uncompressed_sha256': sha(graph_raw),
+                'total_owner_area': full_graph['opaque_pixels'],
+                'cells': len(full_graph['cells']),
+                'runs': full_graph['runs'],
+                'edges': len(full_graph['edges']),
+                'events': len(full_graph['events'])},
             'r6_content': metrics,
             'frozen_nonwhite_threshold': limit,
             'nonwhite_all4_gate': metrics['nonwhite6'] >= limit,
