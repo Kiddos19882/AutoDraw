@@ -1,5 +1,6 @@
 """Eight-color wV. Unrestricted, full-scene Egret normal redraw on one board."""
 from collections import Counter
+import argparse
 import gzip
 import json
 import os
@@ -71,9 +72,9 @@ def measure_segments(driver):
     return masks
 
 
-def choose_segment(x,y,owner,owners,masks):
+def choose_segment(x,y,owner,owners,masks,extra_percent=0):
     c=binding.board_point(x,y)
-    best=None
+    candidates=[]
     for k,(vx,vy) in enumerate(DIRECTIONS):
         dx,dy=masks[x%4,y%4,k]
         sx=np.floor((int(3*c['x'])+dx+.5-465)/2.25).astype(int)
@@ -84,9 +85,13 @@ def choose_segment(x,y,owner,owners,masks):
         hit=int(((sx==x)&(sy==y)).sum())
         spill=int((~same).sum())
         rank=(hit>0,-spill,hit)
-        if best is None or rank>best[0]:
-            best=(rank,segment(c['x'],c['y'],vx,vy))
-    return best[1],best[0]
+        candidates.append((rank,segment(c['x'],c['y'],vx,vy)))
+    baseline=max(candidates,key=lambda candidate:candidate[0])[0]
+    allowed_spill=(-baseline[1])*(100+extra_percent)//100
+    eligible=[(rank,path) for rank,path in candidates
+              if rank[0]==baseline[0] and -rank[1]<=allowed_spill]
+    rank,path=max(eligible,key=lambda candidate:(candidate[0][2],candidate[0][1]))
+    return path,rank
 
 
 def score(name,rgba,target):
@@ -110,7 +115,7 @@ def score(name,rgba,target):
                 mean_absolute_rgb_error=float(abs(arr-want).mean()))
 
 
-def main():
+def main(extra_percent=0):
     OUT.mkdir()
     src=OUT/"source"
     binding.pipeline.run(binding.ROOT,binding.pipeline.reference.original.dev.SOURCES[0],src,second_lane_audit=True)
@@ -134,9 +139,9 @@ def main():
         for i,p in enumerate(original):
             x,y=map(int,p["points"][0])
             color=int.from_bytes(bytes(target[y,x]),"big")
-            width=max((n for n,s in enumerate(SPANS,1) if s<=2.25*p['brush_value']),default=1)
+            width=max((n for n,s in enumerate(SPANS,1) if 400*s<=9*p['brush_value']*(100+extra_percent)),default=1)
             if len(p["points"])==1:
-                points,rank=choose_segment(x,y,p['paintable_id'],owners,masks)
+                points,rank=choose_segment(x,y,p['paintable_id'],owners,masks,extra_percent)
                 diagnostics["predicted_target_hit"]+=int(rank[0])
                 diagnostics["predicted_outside_owner"]+=int(rank[1]<0)
                 repairs.append(stroke(points,width,color,i))
@@ -152,9 +157,11 @@ def main():
             rgba=render(driver,name,group)
             metrics[name]=score(name,rgba,target)
     binding.write_json(OUT/"results.json",dict(sha=os.environ['GITHUB_SHA'],run=os.environ['GITHUB_RUN_ID'],
-        base=len(base),repairs=len(repairs),colors=8,diagnostics=dict(diagnostics),metrics=metrics))
+        extra_tolerance_percent=extra_percent,base=len(base),repairs=len(repairs),colors=8,diagnostics=dict(diagnostics),metrics=metrics))
     print(metrics)
 
 
 if __name__=="__main__":
-    main()
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--extra-tolerance-percent",type=int,choices=(0,10),default=0)
+    main(parser.parse_args().extra_tolerance_percent)

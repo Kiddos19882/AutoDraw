@@ -10,6 +10,9 @@ permissions:
   contents: read
 jobs:
   board:
+    strategy:
+      matrix:
+        tolerance: [0, 10]
     runs-on: windows-latest
     timeout-minutes: 25
     steps:
@@ -19,10 +22,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install selenium==4.38.0 numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 requests==2.32.5
-      - run: python AutoDraw_Stage20/tests/run_engine001_s5_wv_full_native.py
+      - run: python AutoDraw_Stage20/tests/run_engine001_s5_wv_full_native.py --extra-tolerance-percent ${{ matrix.tolerance }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: S5-wV-full-native
+          name: S5-wV-full-native-${{ matrix.tolerance }}
           path: ${{ runner.temp }}/wv-full
           if-no-files-found: error
