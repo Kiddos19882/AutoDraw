@@ -1,3 +1,5 @@
+**ENGINE-001 S5 · 2026-11-23.** Native E3 CI 45203361169 passed technical controls; original singleton and direct-width footprint assumptions failed on sampled strokes. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).
+
 **ENGINE-001 S5 · 2026-11-23.** E2 wV two-lane comparison on the eight-color target. Full-scene native NOT_RUN. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
 
 **ENGINE-001 S5 eight-color zone strokes (2026-11-23), code c9083f9.** Local E2 all four fresh sources, independent footprint-owner/swatch/opacity audit and RGB equality PASS. Counts in order (zones, multi-point strokes, dots, eligible pixels): wV (2968,6227,2812,64000), Hello (1423,4148,1454,72112), EZAL (14020,53717,18621,2371200), Pink (2605,6175,3690,306916). Separate replay of all width-one residual paths verified final pixel equality. 28 local regression tests PASS. [wV CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/45180498585). Offline ideal brush, normal, smooth=false, uncapped. CHALK NOT_RUN.

@@ -1,3 +1,5 @@
+**ENGINE-001 S5 · 2026-11-23.** Native full redraw left the sampled width-1 singleton blank and crossed two sampled source owners. Full-scene native remains open. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).
+
 **ENGINE-001 S5 · 2026-11-23.** wV model broad coverage reached 4,869 colored pixels, with 2,880 residual dots. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
 
 **ENGINE-001 S5 eight-color zone strokes (2026-11-23).** Fresh source-space plans for wV, Hello, EZAL and Pink cover all eligible pixels with exact prepared RGB. wV has 6,227 multi-point strokes and 2,812 dots. [Validation](TEST_RESULTS.md). Native whole-scene output and CHALK remain unmeasured.
