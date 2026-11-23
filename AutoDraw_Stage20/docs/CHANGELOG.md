@@ -1,3 +1,5 @@
+**2026-11-23 · ENGINE-001.** Added an offline connected-cell brush experiment, source-model previews for all four originals and reproducible evidence export. [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).
+
 ## 2026-11-23 — ENGINE-001 S5-R7 dual-axis model negative, S5-P2 real normal joints E3, prospective R8
 
 New experimental source-only dynamic two-axis S5-R7 cell planner/tests and original4×2 CI, [signed scientific FAIL](ENGINE001_BPRED_S5R7_DUAL_AXIS_MARGINAL_SIGNED_E2_AND_VISUAL_2026-11-23.md) although source owner topology E2 PASS; P2 pinned real Egret normal smooth=false 120 connected vs split joins [signed E3](ENGINE001_S5_LANE_P2_NATIVE_NORMAL_JOINTS_SIGNED_E3_2026-11-23.md) native ZIP/PNG SHA PASS, archive E3 joints differed but no overshoot beyond width/2+3 in tested scenes. Separate [S5-R8 prospective E0](ENGINE001_BPRED_S5R8_CONNECTED_CELL_SWEEPS_PREREG_2026-11-23.md) for owner-safe multi-vertex cell connected sweeps and vertex budgets. Historical native/CHI samples preserved. Production, master, S4.6 source owner, game calibration and exact CHALK untouched.
