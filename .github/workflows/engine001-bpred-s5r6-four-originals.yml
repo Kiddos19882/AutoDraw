@@ -1,0 +1,90 @@
+name: ENGINE-001 S5-R6 true cellular sweeps four fresh originals E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r6-four-originals.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r6_four_originals.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r6_boustrophedon_cells.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r6_cells.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r6-four-originals
+  cancel-in-progress: true
+jobs:
+  true-source-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned research prerequisites
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Frozen experiment, engine and topological E2
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          prereg=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R6_CELLULAR_SWEEP_COVERAGE_PREREG_2026-11-23.md')
+          assert prereg.is_file() and 'PROSPECTIVE FROZEN E0 before S5-R6 code' in prereg.read_text('utf8')
+          source=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          blob=hashlib.sha1(b'blob '+str(len(source)).encode()+b'\0'+source).hexdigest()
+          assert blob=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388'
+          print('S5R6_PREREG_AND_ENGINE_SOURCE_PIN_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r6_four_originals.py
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r6_cells
+      - name: Original source4x2 R3 R4 R5 and true-cellular R6
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r6_four_originals.py \
+            --root AutoDraw_Stage20 --output "${RUNNER_TEMP}/s5r6"
+      - name: Independently validate 4x2 hashes and frozen FEASIBILITY outcome
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r6'
+          report=json.loads((root/'00_S5R6_RESULTS.json').read_bytes())
+          assert report['experiment']=='ENGINE001_BPRED_S5R6_BOUSTROPHEDON_SWEEP_CELLS_V1'
+          assert report['source_original_only'] and report['smooth'] is False
+          assert report['native_Egret']=='NOT_RUN' and report['exact_game_chalk']=='NOT_RUN'
+          assert report['admissible_for_gameplay'] is False
+          assert len(report['sources'])==4
+          assert report['frozen_cellular_feasibility'] in (
+              'PASS_CELLULAR_CONTENT_FEASIBILITY','FAIL_CELLULAR_CONTENT_FEASIBILITY')
+          for s in report['sources']:
+              assert s['double_fresh_determinism']=='PASS'
+              for v in ('r3','r4','r5','r6'):
+                  ref=s['models'][v]
+                  data=(root/ref['file']).read_bytes()
+                  assert hashlib.sha256(data).hexdigest()==ref['sha256']
+                  plan=json.loads(data)
+                  assert plan['smooth'] is False
+                  assert plan['safe_to_execute'] is False
+                  assert plan['admissible_for_gameplay'] is False
+                  assert plan['source_owner_status']=='MISSING'
+                  assert plan['native_calibration']=='UNVERIFIED'
+              assert s['r6_topology']['source_owner_area_verified']>0
+          v=report['sources'][0]['visual']
+          raw=(root/v['preview_file']).read_bytes()
+          assert raw.startswith(b'\x89PNG\r\n\x1a\n')
+          assert hashlib.sha256(raw).hexdigest()==v['preview_sha256']
+          assert v['potential_px']==report['sources'][0]['r6_covered']
+          print('S5R6_FROZEN_CONTENT_FEASIBILITY',report['frozen_cellular_feasibility'])
+          PY
+      - name: Preserve actual model preview + all raw data and negative outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r6-cellular-four-originals-source-model-actual-PNG
+          path: ${{ runner.temp }}/s5r6
+          if-no-files-found: error
+          retention-days: 30
