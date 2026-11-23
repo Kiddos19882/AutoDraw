@@ -1,3 +1,7 @@
+## 2026-11-23 — ENGINE-001 S5-R6 Boustrophedon source topology E2, scientific negative and R7 plan
+
+Added research-only row sweep split/merge graph and source-owner model lane generator, 6 tests (existing R4+R5 regression16/16), frozen original4×2 runner and Actions. [Full signed E2](ENGINE001_BPRED_S5R6_CELLULAR_SWEEP_SIGNED_E2_AND_FAILURE_ANALYSIS_2026-11-23.md) CI45119531408 exact SHA d9628bc, full native-independent source cell DAG archived SHA/CRC; owner topology PASS but relative coverage gates FAIL. [Future R7 cell-marginal allocator E0](ENGINE001_BPRED_S5R7_CELL_BALANCED_MARGINAL_COVERAGE_PREREG_2026-11-23.md) fixed before any R7 code. No production/Stage6/Bridge/Monitor/master modification, game CHALK/E4 NOT_RUN.
+
 ## 2026-11-23 — ENGINE-001 S5-R5 research-only content region policy, E2 negative retained
 
 Added opt-in content-stratified policy to existing S5-R4 candidate generator; default R4 unchanged, [source4×2 E2 signed](ENGINE001_BPRED_S5R5_CONTENT_LANES_FOUR_ORIGINALS_SIGNED_E2_2026-11-23.md) CI45092117700 technical PASS and scientific FAIL on EZAL nonwhite (−749), synthetic CI45092117681 10/10 PASS after preserved negative test. Added first-hand actual model wV PNG and web-method use/not-use ledger. [DEC-053](DECISIONS.md) selects non-microfix topology-first [S5-R6 prospective E0](ENGINE001_BPRED_S5R6_CELLULAR_SWEEP_COVERAGE_PREREG_2026-11-23.md). No native S5 full painting, game CHALK or production modifications.
