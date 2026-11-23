@@ -91,7 +91,7 @@ def build_candidates(arrays, *, max_trials=None, max_strokes=None):
     """Current development entry point. Explicit budgets replay the historical R8 protocol."""
     unlimited = max_trials is None and max_strokes is None
     if unlimited:
-        version = "ENGINE001_S5_UNCAPPED_CONNECTED_V1"
+        version = "ENGINE001_S5_UNCAPPED_ZONE_RUNS_V2"
     else:
         version = VERSION
         max_trials = 2000 if max_trials is None else max_trials
@@ -101,7 +101,7 @@ def build_candidates(arrays, *, max_trials=None, max_strokes=None):
                                 version, unlimited=unlimited)
     plan["web_methods"]["parallel_sweep_lanes"] = "APPLIED_connected_in_cell_snake"
     for stroke in plan["proposals"]:
-        if stroke["phase"] == "detail":
+        if not unlimited and stroke["phase"] == "detail":
             # A single source dot, with one geometric vertex.
             stroke["points"] = stroke["points"][:1]
     plan["result_sha256"] = r7.r3._digest({k:v for k,v in plan.items() if k != "result_sha256"})

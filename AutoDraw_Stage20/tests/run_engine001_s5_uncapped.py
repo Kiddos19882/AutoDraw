@@ -51,6 +51,11 @@ def run(root, relative, output, *, palette_only=False):
     (output / "palette.json").write_text(json.dumps(info, indent=2) + "\n")
     if palette_only:
         return
+    ids = arrays["paintable_id"]
+    zone_colors = np.random.default_rng(0).integers(30, 232, (int(ids.max())+1, 3), dtype=np.uint8)
+    zone_colors[0] = 255
+    Image.fromarray(zone_colors[ids]).save(output / "zones.png")
+    np.savez_compressed(output / "zones.npz", paintable_id=ids, game_index=game)
     plan = connected.build_candidates(arrays)
     metrics = reference.independent(plan, arrays)
     h, w = game.shape
@@ -74,7 +79,10 @@ def run(root, relative, output, *, palette_only=False):
         Image.fromarray(image).save(output / filename)
     if int(painted.sum()) != metrics["total"]:
         raise ValueError("Coverage mismatch")
-    report = dict(schema=plan["schema"], input_sha256=original.sha(data),
+    dots = sum(len(s["points"]) == 1 for s in plan["proposals"])
+    if not np.array_equal(painted, visible) or not np.array_equal(image, target):
+        raise ValueError("Zone fill does not reproduce the prepared source")
+    report = dict(single_dots=dots, multi_point_strokes=plan["stroke_count"]-dots, schema=plan["schema"], input_sha256=original.sha(data),
                   source_manifest_sha256=original.sha(manifest), plan_sha256=plan["result_sha256"],
                   drawing_mode="normal", smooth=False, metrics=metrics, cumulative=phase_counts,
                   phase_strokes=plan["phase_strokes"], phase_trials=plan["phase_trials"],

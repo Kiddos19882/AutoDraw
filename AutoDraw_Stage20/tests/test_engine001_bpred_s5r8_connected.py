@@ -62,6 +62,23 @@ class ConnectedSweeps(unittest.TestCase):
         arrays = sample()
         plan = r8.build_candidates(arrays)
         self.assertGreater(plan["phase_strokes"]["detail"], 120)
-        self.assertGreater(plan["trials"], 2000)
+        self.assertTrue(any(s["phase"] == "detail" and len(s["points"]) == 2
+                            for s in plan["proposals"]))
         self.assertEqual(plan["uncovered_potential_pixel_count"], 0)
         self.assertFalse(plan["smooth"])
+
+    def test_residual_runs_partition_each_owner_without_bridging_holes(self):
+        ids = np.array([[1,1,1,2,0], [0,0,0,2,0], [3,3,3,2,4]], np.int32)
+        remaining = ids > 0
+        remaining[2,1] = False
+        observed = set()
+        paths = list(r8.r7._detail_paths(remaining, ids, True))
+        self.assertEqual(len(paths), 5)
+        self.assertEqual({axis for _,_,points,axis in paths if len(points)>1}, {0,90})
+        for x,y,points,_ in paths:
+            cells = r8.r7.source.swept_capsule_pixel_masks(
+                points,1,1.,1.,5,3)["potential_cells"]
+            self.assertTrue(all(ids[py,px] == ids[y,x] for px,py in cells))
+            self.assertTrue(observed.isdisjoint(cells))
+            observed.update(cells)
+        self.assertEqual(observed, set(zip(*np.nonzero(remaining.T))))

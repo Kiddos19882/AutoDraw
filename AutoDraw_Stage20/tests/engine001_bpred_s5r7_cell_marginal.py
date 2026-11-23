@@ -136,6 +136,36 @@ def _validate_candidates(proposals, ids, game, opaque, *, max_calls=1400):
     return pool, tried, dict(rejected)
 
 
+def _detail_paths(mask, ids, unlimited):
+    if not unlimited:
+        for y, x in zip(*np.nonzero(mask)):
+            point = (float(x), float(y))
+            yield x, y, (point, point), 0
+        return
+
+    # Choose the direction requiring fewer straight runs for each owner.
+    residual = np.where(mask, ids, 0)
+    horizontal = residual.copy()
+    horizontal[:, 1:] *= residual[:, 1:] != residual[:, :-1]
+    vertical = residual.copy()
+    vertical[1:] *= residual[1:] != residual[:-1]
+    size = int(residual.max()) + 1
+    column_owner = (np.bincount(vertical.ravel(), minlength=size)
+                    < np.bincount(horizontal.ravel(), minlength=size))
+    for axis, rows in enumerate((residual, residual.T)):
+        for row, values in enumerate(rows):
+            bounds = np.flatnonzero(np.diff(values, prepend=-1, append=-1))
+            for start, end in zip(bounds[:-1], bounds[1:]):
+                owner = values[start]
+                if owner == 0 or column_owner[owner] != bool(axis):
+                    continue
+                x, y = (row, start) if axis else (start, row)
+                last = (row, end-1) if axis else (end-1, row)
+                first = (float(x), float(y))
+                points = (first,) if end-start == 1 else (first, tuple(map(float, last)))
+                yield x, y, points, axis * 90
+
+
 def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
     return _build_candidates(arrays, max_trials, max_strokes, _generate,
                              _validate_candidates, VERSION)
@@ -247,16 +277,15 @@ def _build_candidates(arrays, max_trials, max_strokes, generate, validate, versi
     if unlimited or (max_trials>1400 and max_strokes>80):
         detail_strokes = float("inf") if unlimited else min(120, max_strokes-80)
         detail_trials = float("inf") if unlimited else min(600, max_trials-1400)
-        for mask in (protected & ~covered, opaque & ~covered):
-            yy,xx = np.nonzero(mask)
-            for y,x in zip(yy.tolist(),xx.tolist()):
+        masks = (opaque & ~covered,) if unlimited else (protected & ~covered, opaque & ~covered)
+        for mask in masks:
+            for x, y, pt, axis in _detail_paths(mask, ids, unlimited):
                 if accepted["detail"] >= detail_strokes or \
                         trials["detail"] >= detail_trials:
                     break
                 if covered[y,x]:
                     continue
                 trials["detail"] += 1
-                pt = ((float(x),float(y)),(float(x),float(y)))
                 model = source.swept_capsule_pixel_masks(pt,1,1.,1.,w,h)
                 ink = model["potential_cells"]
                 if not ink or any(ids[py,px] != ids[y,x] or
@@ -275,8 +304,8 @@ def _build_candidates(arrays, max_trials, max_strokes, generate, validate, versi
                 proposed.append({
                     "phase":"detail", "paintable_id":int(ids[y,x]),
                     "color_index":int(game[y,x]),
-                    "points": [[float(x),float(y)],[float(x),float(y)]],
-                    "brush_value":1, "axis_degrees":0,
+                    "points": [list(point) for point in pt],
+                    "brush_value":1, "axis_degrees":axis,
                     "cell_id":None, "drawing_mode":"normal", "smooth":False,
                     "safe_to_execute":False, "status":"MODEL_ONLY_NON_EXECUTABLE",
                     "modeled_new_potential_cells":len(fresh),
