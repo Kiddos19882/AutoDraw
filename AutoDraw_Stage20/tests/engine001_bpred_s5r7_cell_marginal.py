@@ -271,6 +271,8 @@ def _build_candidates(arrays, max_trials, max_strokes, generate, validate, versi
             "safe_to_execute":False, "status":"MODEL_ONLY_NON_EXECUTABLE",
             "modeled_new_potential_cells": best_gain,
             "modeled_protected_dots_newly_touched": touch})
+        if "lane_axis" in meta:
+            proposed[-1]["lane_axis_degrees"] = meta["lane_axis"]
         pool[best] = (meta, model, None)
 
     # Same reserved detail phase as R3-R6; exact source-owner/model oracle.

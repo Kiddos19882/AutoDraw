@@ -5,12 +5,13 @@ from functools import partial
 import numpy as np
 
 import engine001_bpred_s5r7_cell_marginal as r7
+from engine001_s5_second_lane import second_lane
 
 
 VERSION = "ENGINE001_BPRED_S5R8_CONNECTED_CELL_SWEEPS_V1"
 
 
-def _generate(ids, game, clearance, graphs, *, unlimited=False):
+def _generate(ids, game, clearance, graphs, *, unlimited=False, lane_audit=None):
     _, axes = r7._generate(ids, game, clearance, graphs)
     proposals = []
     for axis, graph in enumerate(graphs):
@@ -35,6 +36,24 @@ def _generate(ids, game, clearance, graphs, *, unlimited=False):
                 length = sum(lane["estimated_gain"] / lane["width"] for lane in group)
                 proposals.append(dict(group[0], lanes=group, width=width,
                                       estimated_gain=length * width))
+    if lane_audit is not None:
+        extra = []
+        for proposal in proposals:
+            if proposal["color"] == 6 or len(proposal["lanes"]) != 1:
+                continue
+            cell = graphs[proposal["axis"] // 90]["cells"][proposal["cell"]]
+            options, status = second_lane(proposal, cell)
+            lane_audit.append(dict(owner=proposal["owner"], cell=proposal["cell"],
+                                   axis=proposal["axis"], width=proposal["width"],
+                                   original_points=proposal["points"], status=status,
+                                   options=options))
+            if options:
+                winner = max(options, key=lambda o:o["gain"])
+                a,b,c,d = winner["points"]
+                lanes = [dict(points=(a,b)), dict(points=(d,c))]
+                extra.append(dict(proposal, lanes=lanes, width=winner["width"],
+                                  lane_axis=winner["axis"]))
+        proposals.extend(extra)
     proposals.sort(key=lambda p: (-p["estimated_gain"], p["owner"], p["cell"]))
     return proposals, axes
 
@@ -87,17 +106,21 @@ def _validate(proposals, ids, game, opaque, *, max_calls):
     return pool, calls, dict(rejected)
 
 
-def build_candidates(arrays, *, max_trials=None, max_strokes=None):
+def build_candidates(arrays, *, max_trials=None, max_strokes=None, lane_audit=None):
     """Current development entry point. Explicit budgets replay the historical R8 protocol."""
     unlimited = max_trials is None and max_strokes is None
+    if lane_audit is not None and not unlimited:
+        raise ValueError("Second-lane study requires uncapped mode")
     if unlimited:
         version = "ENGINE001_S5_UNCAPPED_ZONE_RUNS_V2"
     else:
         version = VERSION
         max_trials = 2000 if max_trials is None else max_trials
         max_strokes = 200 if max_strokes is None else max_strokes
+    if lane_audit is not None:
+        version = "ENGINE001_S5_SECOND_LANE_WITNESS_V1"
     plan = r7._build_candidates(arrays, max_trials, max_strokes,
-                                partial(_generate, unlimited=unlimited), _validate,
+                                partial(_generate, unlimited=unlimited, lane_audit=lane_audit), _validate,
                                 version, unlimited=unlimited)
     plan["web_methods"]["parallel_sweep_lanes"] = "APPLIED_connected_in_cell_snake"
     for stroke in plan["proposals"]:

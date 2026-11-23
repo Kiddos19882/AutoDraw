@@ -1,3 +1,5 @@
+**ENGINE-001 S5 · 2026-11-23.** wV model broad coverage reached 4,869 colored pixels, with 2,880 residual dots. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
+
 **ENGINE-001 S5 eight-color zone strokes (2026-11-23).** Fresh source-space plans for wV, Hello, EZAL and Pink cover all eligible pixels with exact prepared RGB. wV has 6,227 multi-point strokes and 2,812 dots. [Validation](TEST_RESULTS.md). Native whole-scene output and CHALK remain unmeasured.
 
 **S5 · 2026-11-23.** [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes) applies to the unrestricted runner for every source. On wV its default 8-color target took 136 broad paths and 42,529 residual dots. Final model RGB matched the 8-color target.

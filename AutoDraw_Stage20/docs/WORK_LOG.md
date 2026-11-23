@@ -1,3 +1,5 @@
+**ENGINE-001 S5 · 2026-11-23.** Completed the unrestricted wV second-lane experiment against the fresh baseline. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
+
 **2026-11-23 · ENGINE-001.** Rebuilt zones from all four originals, filled the residuals with horizontal or vertical same-owner runs, selected the direction per owner by run count and exported zone maps, plans and stroke-only previews. [Results](TEST_RESULTS.md).
 
 **2026-11-23 · ENGINE-001.** Implemented per-image reduced palettes and region rebuilding in the unrestricted source workflow. [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes).

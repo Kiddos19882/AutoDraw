@@ -1,3 +1,5 @@
+**ENGINE-001 S5 · 2026-11-23.** The wV second-lane diagnostic is complete. Next comes Egret source/board binding. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
+
 **S5 palette preparation.** Apply [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes) before diagnosing broad coverage on new images. Continue unrestricted stroke development.
 
 **S5 development order.** During fill-algorithm development all new S5 quality runs use unrestricted stroke, detail, evaluation and path-vertex counts. Record counts as measurements. Defer budgeted comparisons until development is complete. Frozen R8 replays use explicit historical budgets. Continue the wV second-lane and width diagnosis under unrestricted counts, reporting broad coverage separately from single-pixel residuals. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development).

@@ -13,7 +13,7 @@ import engine001_bpred_s5r8_connected as connected
 import run_engine001_bpred_s5r7_four_originals as reference
 
 
-def run(root, relative, output, *, palette_only=False):
+def run(root, relative, output, *, palette_only=False, second_lane_audit=False):
     original = reference.original
     data = (root / relative).read_bytes()
     palette, provenance = original.palette.read_engine_palette(root / "gameEngine/main.min_653f95bc.js")
@@ -56,7 +56,10 @@ def run(root, relative, output, *, palette_only=False):
     zone_colors[0] = 255
     Image.fromarray(zone_colors[ids]).save(output / "zones.png")
     np.savez_compressed(output / "zones.npz", paintable_id=ids, game_index=game)
-    plan = connected.build_candidates(arrays)
+    audit = [] if second_lane_audit else None
+    plan = connected.build_candidates(arrays, lane_audit=audit)
+    if audit is not None:
+        (output / "second-lanes.json").write_bytes(original.canonical(audit))
     metrics = reference.independent(plan, arrays)
     h, w = game.shape
     target = np.full((h,w,3), 255, np.uint8)
@@ -100,5 +103,6 @@ if __name__ == "__main__":
     parser.add_argument("--source", type=Path, default=Path(reference.original.dev.SOURCES[0]))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--palette-only", action="store_true")
+    parser.add_argument("--second-lane-audit", action="store_true")
     args = parser.parse_args()
-    run(args.root, args.source, args.output, palette_only=args.palette_only)
+    run(args.root, args.source, args.output, palette_only=args.palette_only, second_lane_audit=args.second_lane_audit)
