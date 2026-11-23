@@ -7,6 +7,7 @@ on:
       - 'AutoDraw_Stage20/tests/engine001_bpred_s5r4_offset_lanes.py'
       - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r4_offset_lanes.py'
       - 'AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md'
+      - 'AutoDraw_Stage20/docs/README.md'
   workflow_dispatch:
 permissions:
   contents: read
