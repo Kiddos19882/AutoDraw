@@ -1,3 +1,7 @@
+## ENGINE-001 S5-LANE-P1 E3 signed; S5-R4 repeated source-region offset lanes (2026-11-23)
+
+[Native seam real Egret E3 report](ENGINE001_S5_LANE_P1_SIGNED_NATIVE_E3_180_CASES_2026-11-23.md) CI45089280114 raw artifact ZIP SHA PASS, 180/180 alpha24/128 centerline interiors gap-free tested widths1..10, 0/45/90°, separation75/90/100%, phases2. Does not establish 100% image coverage or full Egret space. [S5-R4 prospective frozen E0](ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md) reuses S4.6 original source+CTR1 and existing capsule oracle, regions with multiple offset lanes, immutable2000/200 budgets, protected120 per original, smooth=false. Synthetic E2 CI45090038737 6/6 PASS, source original4×2 CI45090117499 pending at this update, maintain negative E2 reports and fail-closed production.
+
 ## ENGINE-001 S5-LANE-P1 adjacent-pass native E0 frozen (2026-11-23)
 
 [Explicit prereg](ENGINE001_S5_ADJACENT_LANE_NATIVE_SPACING_PREREG_2026-11-23.md) follows measured widths1..10 E2. First implement fixed 180-case overlap matrix using unchanged game Egret and existing harness, capture A/B/native AB + alpha≥24/128 seam coverage, then decide S5-R4 lane pitch (not arbitrary guess based on mean width). No native P1 run yet, no historical rerender, no game/source-owner admission.
