@@ -1,0 +1,40 @@
+name: ENGINE-001 S5-R6 genuine sweep-cell topology synthetic E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r6-topology-synthetic.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r6_boustrophedon_cells.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r6_cells.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R6_CELLULAR_SWEEP_COVERAGE_PREREG_2026-11-23.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r6-topology-synthetic
+  cancel-in-progress: true
+jobs:
+  s5r6-topology-and-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned numerical dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0
+      - name: Frozen source protocol and Python compilation
+        run: |
+          test -s AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R6_CELLULAR_SWEEP_COVERAGE_PREREG_2026-11-23.md
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r6_boustrophedon_cells.py AutoDraw_Stage20/tests/test_engine001_bpred_s5r6_cells.py
+      - name: Six source-owner topology tests plus existing R4/R5 regression
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r4_offset_lanes test_engine001_bpred_s5r5_content_lanes test_engine001_bpred_s5r6_cells
+      - name: Audit docs navigation
+        run: |
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
