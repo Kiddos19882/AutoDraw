@@ -93,7 +93,12 @@ def main(method):
             last = initial if n == 1 else rgba
             extra, detected = patches(last, prepared, method, 1000000 * n)
             assert detected == diagnostic(last, prepared)["alpha24_missing"]
-            assert len(extra) > 0, "No holes remain: stop, report this as successful instead."
+            if not extra:
+                history.append(dict(phase="feedback-round%d-no-holes" % n,
+                                    diagnostic=diagnostic(last, prepared),
+                                    added_strokes=0, detected_missing=0,
+                                    cumulative_strokes=len(all_paths)))
+                break
             all_paths.extend(extra)
             with gzip.open(out / ("feedback-round%d-plan.json.gz" % n), "wt") as f:
                 json.dump(all_paths, f, separators=(",", ":"))
