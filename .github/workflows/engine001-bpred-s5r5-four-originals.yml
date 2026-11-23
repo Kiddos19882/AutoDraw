@@ -1,0 +1,86 @@
+name: ENGINE-001 S5-R5 four fresh originals content lanes E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r5-four-originals.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r5_four_originals.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r4_offset_lanes.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r5_content_lanes.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r5-four-originals
+  cancel-in-progress: true
+jobs:
+  four-originals-source-content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned numerical original-source dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Verify frozen E0 and historic engine + compile + synthetic E2
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          e0=Path('AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R5_CONTENT_STRATIFIED_REGION_LANES_PREREG_2026-11-23.md')
+          assert e0.is_file() and 'BEFORE new S5-R5 code/tests' in e0.read_text('utf8')
+          raw=Path('AutoDraw_Stage20/gameEngine/main.min_653f95bc.js').read_bytes()
+          blob=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+          assert blob=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388'
+          print('S5R5_PROVENANCE_PIN_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r5_four_originals.py AutoDraw_Stage20/tests/engine001_bpred_s5r4_offset_lanes.py
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r4_offset_lanes test_engine001_bpred_s5r5_content_lanes
+      - name: Four original inputs fresh repeated twice, R3 R4 R5
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r5_four_originals.py \
+            --root AutoDraw_Stage20 \
+            --output "${RUNNER_TEMP}/s5r5"
+      - name: Verify outputs with independent raw SHA and frozen E0 statuses
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r5'
+          r=json.loads((root/'00_S5R5_RESULTS.json').read_bytes())
+          assert r['source_original_only'] and r['smooth'] is False
+          assert r['native_Egret']=='NOT_RUN' and r['exact_game_chalk']=='NOT_RUN'
+          assert not r['production_promotion']
+          assert len(r['sources'])==4
+          assert r['frozen_content_feasibility'] in ('PASS_CONTENT_FEASIBILITY','FAIL_CONTENT_FEASIBILITY')
+          for row in r['sources']:
+              assert row['deterministic_fresh_rebuilds']=='PASS'
+              for name in ('r3','r4','r5'):
+                  raw=(root/row[name+'_file']).read_bytes()
+                  assert hashlib.sha256(raw).hexdigest()==row[name+'_sha256']
+                  obj=json.loads(raw)
+                  assert obj['smooth'] is False and not obj['safe_to_execute']
+                  assert not obj['admissible_for_gameplay']
+                  assert obj['source_owner_status']=='MISSING'
+                  assert obj['native_calibration']=='UNVERIFIED'
+          visual=r['sources'][0]['visual']
+          raw=(root/visual['preview_file']).read_bytes()
+          assert raw[:8]==b'\x89PNG\r\n\x1a\n'
+          assert hashlib.sha256(raw).hexdigest()==visual['preview_sha256']
+          assert visual['potential_px']==r['sources'][0]['r5_covered']
+          print('S5R5_SIGNED_MODEL_E2',r['frozen_content_feasibility'])
+          PY
+      - name: Preserve original raw plans, actual model PNG and negatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r5-four-originals-content-lanes-model-PNG
+          path: ${{ runner.temp }}/s5r5
+          if-no-files-found: error
+          retention-days: 30
