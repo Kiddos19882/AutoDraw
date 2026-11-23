@@ -163,5 +163,5 @@ def main(extra_percent=0):
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--extra-tolerance-percent",type=int,choices=(0,10),default=0)
+    parser.add_argument("--extra-tolerance-percent",type=int,choices=(0,10,15,20),default=0)
     main(parser.parse_args().extra_tolerance_percent)
