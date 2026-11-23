@@ -34,7 +34,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200, allocation="ar
     if content_mode:
         source_edge = arrays.get("source_edge")
         if (not isinstance(source_edge, np.ndarray) or source_edge.shape != game.shape
-                or source_edge.dtype != np.bool_ or np.any(source_edge & ~opaque)):
+                or source_edge.dtype != np.bool_):
             raise source.BlockedS5R2("BLOCKED_S5R5_SOURCE_EDGE_CONTRACT")
         exterior_ids = set(int(v) for v in np.unique(np.concatenate((
             ids[0], ids[-1], ids[:, 0], ids[:, -1])))) - {0}
