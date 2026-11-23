@@ -1,3 +1,7 @@
+## ENGINE-001 S5 brush-width evidence obtained; overlap before multi-lane E0 (2026-11-23)
+
+[Native E2 measured width1..10 from historical real Egret P4D3/P4D4](ENGINE001_S5_NATIVE_BRUSH_1TO10_CORE_WIDTH_MEASUREMENTS_E2_2026-11-23.md) resolves effective core area-derived width at alpha24 and alpha128 but not guaranteed lateral continuity. Freeze a narrow adjacent-pair spacing/phase/alpha source-over E0 before choosing S5 lane step; use same Egret harness and widths1..10, no full past matrix reruns. Then implement source-only S5-R4 Boustrophedon/EDT multi-lane paths with independent native audit. Historical S5-R3 coverage remains PARTIAL; normal/smooth=false; game admission blocked.
+
 ## S5 next prerequisite: measured game brush widths before multi-lane coverage (2026-11-23)
 
 [Web literature / reuse-first native brush footprint inventory](ENGINE001_S5_GEOMETRIC_COVERAGE_RESEARCH_AND_BRUSH_CALIBRATION_2026-11-23.md) (E1 research reference, not E0 or CI): recover physical size/phase/angle/alpha from P4A2/P4D3/P4D4 first, then freeze only missing-case measurements. After that preregister S5 region multi-offset sweeps with EDT and optionally Boustrophedon/medial-axis/contour-parallel candidates. No code/test run or game-admission promotion; keep S5-R3 result, DEC-052 normal/smooth=false and exact CHALK restrictions.
