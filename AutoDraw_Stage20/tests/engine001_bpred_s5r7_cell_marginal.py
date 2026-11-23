@@ -85,11 +85,23 @@ def _generate(ids, game, clearance, graphs, max_pool=8000):
                 if p is not None and p["estimated_gain"] >= 8:
                     proposals.append(p)
                     chosen.append(span)
-    # Large sparse scenes generate many tiny source cells; prioritize
-    # meaningful length/width while keeping owners and both axes represented.
+    # E0 geometric orientation decision BEFORE calling the capsule oracle:
+    # each source-owner region (which can comprise many sweep cells) chooses
+    # the direction with the greatest sum of its six longest safe spans.
+    # This is a deterministic region-level approximation, explicitly not
+    # a per-pixel/semantic or result-dependent orientation search.
+    by_axis=defaultdict(list)
+    for p in proposals:
+        by_axis[(p["owner"],p["axis"])].append(p["estimated_gain"])
+    axes={}
+    for owner in set(p["owner"] for p in proposals):
+        cost={a:sum(sorted(by_axis.get((owner,a),()),reverse=True)[:6])
+              for a in (0,90)}
+        axes[owner]=90 if cost[90]>cost[0] else 0
+    proposals=[p for p in proposals if p["axis"]==axes[p["owner"]]]
     proposals.sort(key=lambda p: (-p["estimated_gain"], -p["cell_area"],
                                   p["owner"], p["axis"], p["cell"]))
-    return proposals[:max_pool]
+    return proposals[:max_pool], axes
 
 
 def _validate_candidates(proposals, ids, game, opaque, *, max_calls=1400):
@@ -146,7 +158,12 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
     walls[:-1, :] |= changed
     walls |= ~opaque
     clearance = ndimage.distance_transform_edt(~walls)
-    raw = _generate(ids, game, clearance, graphs)
+    raw, chosen_axes = _generate(ids, game, clearance, graphs)
+    owner_area = np.bincount(ids[opaque], minlength=int(ids.max())+1)
+    owner_edge = np.bincount(ids[edge & opaque], minlength=len(owner_area))
+    owner_protected = np.bincount(ids[protected], minlength=len(owner_area))
+    border_owner = set(int(x) for x in np.unique(np.concatenate(
+        (ids[0], ids[-1], ids[:,0], ids[:,-1]))))
     accepted = {"broad":0, "detail":0}
     trials = {"broad":0, "detail":0}
     rejected = Counter()
@@ -163,7 +180,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
     trials["broad"] = n_trials
     rejected.update(counters)
     flat_cover = covered.ravel()
-    owner_areas = np.bincount(ids[opaque], minlength=int(ids.max())+1)
+    owner_areas = owner_area
 
     for _ in range(min(80, max_strokes)):
         best = None
@@ -181,8 +198,17 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
             fraction = owner_covered[region] / max(1, int(owner_areas[region]))
             novelty = 1.5 if owner_strokes[region] == 0 else 1.0
             deficit = max(.15, 1.0-fraction)
-            score = gain * (1.0 + 0.35*novelty + 0.35*deficit) / (
-                1.0 + 0.18*owner_strokes[region] + 0.12*swatch_strokes[meta["color"]])
+            boundary_proxy = min(1.0, owner_edge[region] /
+                                 max(1,owner_areas[region]))
+            detail_proxy = float(owner_protected[region] > 0)
+            internal_white = float(meta["color"] == 6 and region not in border_owner)
+            # E0 source-geometry proxies, NOT semantic ground truth.
+            # All coefficients fixed before original4x2 outcome is reviewed.
+            score = gain * (
+                1.0 + 0.35*novelty + 0.35*deficit +
+                0.10*boundary_proxy + 0.10*detail_proxy + 0.10*internal_white
+            ) / (1.0 + 0.18*owner_strokes[region] +
+                 0.12*swatch_strokes[meta["color"]])
             if score > best_score:
                 best, best_score, best_gain = i, score, gain
         if best is None:
@@ -286,7 +312,9 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
             "orientation_broad":{str(a):sum(s["axis_degrees"]==a for s in proposed
                                         if s["phase"]=="broad") for a in (0,90)},
             "covered_cell_count":len(cell_strokes),
-            "marginal_formula":"gain*(1+.35*novelty+.35*deficit)/(1+.18*owner_strokes+.12*swatch_strokes)",
+            "marginal_formula":"gain*(1+.35*novelty+.35*deficit+.10*edge_ratio+.10*protected_owner+.10*interior_white)/(1+.18*owner_strokes+.12*swatch_strokes)",
+            "chosen_axis_per_owner":{str(k):v for k,v in sorted(chosen_axes.items())},
+            "orientation_cost_rule":"highest sum of 6 longest EDT-safe lane area proxies per owner, tie angle0",
             "native_pitch_semantics":"SOURCE_ONLY_NOT_EGRET"},
         "phase_strokes":accepted,"phase_trials":trials,
         "stroke_count":len(proposed),"trials":sum(trials.values()),
