@@ -1,3 +1,5 @@
+**ENGINE-001 S5 visually accepted baseline (2026-11-23):** user **fully satisfied** with current full-original real-Egret simulated P1 renders wV/Hello Kitty/Pink `VISUAL_ACCEPTED_USER`, [DEC-058](DECISIONS.md#dec-058-s5-native-egret-p1-human-visual-acceptance-2026-11-23), [signed true-Egret evidence](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#s5-native-overlap-p1-native-measured-brush-footprints-results-2026-11-23). Other images, E4, E5, exact CHALK and production remain unvalidated.
+
 **ENGINE-001 S5 current native brush geometry (2026-11-23).** [80 real Egret width/direction/phase footprints and full-original two-axis overlap E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#s5-native-overlap-p1-native-measured-brush-footprints-results-2026-11-23); [DEC-057](DECISIONS.md#dec-057-native-egret-measurements-for-s5-two-axis-overlap). Do not use ideal mathematical brush radii as physical Egret evidence; normal/smooth=false only. Native P1 quality PARTIAL; next controlled geometry ablation.
 
 **ENGINE-001 S5.** [Second-lane experiment on eight-color wV](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
