@@ -1,6 +1,7 @@
 """Eight-color wV. Unrestricted, full-scene Egret normal redraw on one board."""
 from collections import Counter
 import argparse
+import hashlib
 import gzip
 import json
 import os
@@ -72,7 +73,7 @@ def measure_segments(driver):
     return masks
 
 
-def choose_segment(x,y,owner,owners,masks,extra_percent=0):
+def choose_segment(x,y,owner,owners,masks,extra_percent=0,orientation='balanced'):
     c=binding.board_point(x,y)
     candidates=[]
     for k,(vx,vy) in enumerate(DIRECTIONS):
@@ -85,13 +86,37 @@ def choose_segment(x,y,owner,owners,masks,extra_percent=0):
         hit=int(((sx==x)&(sy==y)).sum())
         spill=int((~same).sum())
         rank=(hit>0,-spill,hit)
-        candidates.append((rank,segment(c['x'],c['y'],vx,vy)))
+        candidates.append((rank,segment(c['x'],c['y'],vx,vy),k))
     baseline=max(candidates,key=lambda candidate:candidate[0])[0]
     allowed_spill=(-baseline[1])*(100+extra_percent)//100
-    eligible=[(rank,path) for rank,path in candidates
+    eligible=[(rank,path,k) for rank,path,k in candidates
               if rank[0]==baseline[0] and -rank[1]<=allowed_spill]
-    rank,path=max(eligible,key=lambda candidate:(candidate[0][2],candidate[0][1]))
+    if orientation == "balanced":
+        rank,path,k=max(eligible,key=lambda candidate:(candidate[0][2],candidate[0][1]))
+    else:
+        assert orientation in ("axis-first","diagonal-first")
+        preferred=(0,1,2,3) if orientation=="axis-first" else (2,3,0,1)
+        rank,path,k=min(eligible,key=lambda candidate:(preferred.index(candidate[2]),-candidate[0][2],-candidate[0][1]))
     return path,rank
+
+
+def luminance(rgb):
+    return 2126*((rgb>>16)&255)+7152*((rgb>>8)&255)+722*(rgb&255)
+
+
+def arrange_strokes(records,strategy):
+    """Same strokes, alternate compositing order only. Phase 0=source sweep, 1=residual."""
+    if strategy in ("global","axis-first","diagonal-first"):
+        ordered=sorted(records,key=lambda r:(r["phase"],r["index"]))
+    elif strategy=="owner-paired":
+        ordered=sorted(records,key=lambda r:(r["owner"],r["phase"],r["index"]))
+    elif strategy=="light-to-dark":
+        ordered=sorted(records,key=lambda r:(-luminance(r["color"]),r["phase"],r["index"]))
+    elif strategy=="dark-to-light":
+        ordered=sorted(records,key=lambda r:(luminance(r["color"]),r["phase"],r["index"]))
+    else:
+        raise ValueError("unknown strategy "+strategy)
+    return [r["path"] for r in ordered]
 
 
 def score(name,rgba,target):
@@ -115,7 +140,8 @@ def score(name,rgba,target):
                 mean_absolute_rgb_error=float(abs(arr-want).mean()))
 
 
-def main(extra_percent=0):
+def main(extra_percent=0,strategy='global'):
+    assert strategy=='global' or extra_percent==20, 'variant requires frozen 20% policy'
     OUT.mkdir()
     src=OUT/"source"
     binding.pipeline.run(binding.ROOT,binding.pipeline.reference.original.dev.SOURCES[0],src,second_lane_audit=True)
@@ -127,6 +153,7 @@ def main(extra_percent=0):
     with gzip.open(src/"plan.json.gz") as f:
         original=json.load(f)["proposals"]
     base, repairs=[],[]
+    records=[]
     diagnostics=Counter()
     with binding.native.p4b7.native_egret_session(Path.cwd()) as driver:
         driver.set_script_timeout(480)
@@ -141,15 +168,26 @@ def main(extra_percent=0):
             color=int.from_bytes(bytes(target[y,x]),"big")
             width=max((n for n,s in enumerate(SPANS,1) if 400*s<=9*p['brush_value']*(100+extra_percent)),default=1)
             if len(p["points"])==1:
-                points,rank=choose_segment(x,y,p['paintable_id'],owners,masks,extra_percent)
+                orient=strategy if strategy in ("axis-first","diagonal-first") else "balanced"
+                points,rank=choose_segment(x,y,p['paintable_id'],owners,masks,extra_percent,orient)
+                if orient!="balanced":
+                    reference,_=choose_segment(x,y,p['paintable_id'],owners,masks,extra_percent,"balanced")
+                    diagnostics["changed_residual_direction"]+=int(points!=reference)
                 diagnostics["predicted_target_hit"]+=int(rank[0])
                 diagnostics["predicted_outside_owner"]+=int(rank[1]<0)
-                repairs.append(stroke(points,width,color,i))
+                path=stroke(points,width,color,i)
+                repairs.append(path)
+                phase=1
             else:
                 points=[binding.board_point(*xy) for xy in p["points"]]
-                base.append(stroke(points,width,color,i))
-        paths=base+repairs
+                path=stroke(points,width,color,i)
+                base.append(path)
+                phase=0
+            records.append(dict(owner=int(p['paintable_id']),color=color,phase=phase,index=i,path=path))
+        paths=arrange_strokes(records,strategy)
         assert len(paths)==len(original) and len(set(p["colorRgb"] for p in paths))==8
+        assert len(base)==6042 and len(repairs)==2880
+        diagnostics["changed_path_order"]=sum(a["strokeId"]!=b["strokeId"] for a,b in zip(paths,base+repairs))
         with gzip.open(OUT/"native-plan.json.gz","wt") as f:
             json.dump(paths,f,separators=(",",":"))
         metrics={}
@@ -157,11 +195,16 @@ def main(extra_percent=0):
             rgba=render(driver,name,group)
             metrics[name]=score(name,rgba,target)
     binding.write_json(OUT/"results.json",dict(sha=os.environ['GITHUB_SHA'],run=os.environ['GITHUB_RUN_ID'],
-        extra_tolerance_percent=extra_percent,base=len(base),repairs=len(repairs),colors=8,diagnostics=dict(diagnostics),metrics=metrics))
+        extra_tolerance_percent=extra_percent,strategy=strategy,
+        native_plan_sha256=hashlib.sha256(json.dumps(paths,separators=(",",":")).encode()).hexdigest(),
+        source_sha256=result["input_sha256"],source_plan_sha256=result["plan_sha256"],
+        base=len(base),repairs=len(repairs),colors=8,diagnostics=dict(diagnostics),metrics=metrics))
     print(metrics)
 
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--extra-tolerance-percent",type=int,choices=(0,10,15,20),default=0)
-    main(parser.parse_args().extra_tolerance_percent)
+    parser.add_argument("--strategy",choices=("global","owner-paired","light-to-dark","dark-to-light","axis-first","diagonal-first"),default="global")
+    args=parser.parse_args()
+    main(args.extra_tolerance_percent,args.strategy)
