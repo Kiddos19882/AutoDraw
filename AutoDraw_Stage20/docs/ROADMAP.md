@@ -1,3 +1,5 @@
+**ENGINE-001 S5 native feedback next (2026-11-23).** True-Egret four-pass color/alpha feedback on wV closes zero-alpha and false opaque-white colored holes, [signed E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-egret-feedback-fills-signed-e3-progression-and-remaining-limitations-2026-11-23). Next extract the real native feedback-based gap detector/repair planner into a reusable research component; run multiple fresh original images and verify critical details before any production integration. Do not confuse wV engineering E3 with cross-image acceptance or live E4/CHALK.
+
 **ENGINE-001 S5 · 2026-11-23.** The wV second-lane diagnostic is complete. Next comes Egret source/board binding. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
 
 **S5 palette preparation.** Apply [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes) before diagnosing broad coverage on new images. Continue unrestricted stroke development.
