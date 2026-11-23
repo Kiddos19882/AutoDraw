@@ -1,3 +1,7 @@
+## 2026-11-23 — ENGINE-001 S5-R5 research-only content region policy, E2 negative retained
+
+Added opt-in content-stratified policy to existing S5-R4 candidate generator; default R4 unchanged, [source4×2 E2 signed](ENGINE001_BPRED_S5R5_CONTENT_LANES_FOUR_ORIGINALS_SIGNED_E2_2026-11-23.md) CI45092117700 technical PASS and scientific FAIL on EZAL nonwhite (−749), synthetic CI45092117681 10/10 PASS after preserved negative test. Added first-hand actual model wV PNG and web-method use/not-use ledger. [DEC-053](DECISIONS.md) selects non-microfix topology-first [S5-R6 prospective E0](ENGINE001_BPRED_S5R6_CELLULAR_SWEEP_COVERAGE_PREREG_2026-11-23.md). No native S5 full painting, game CHALK or production modifications.
+
 ## 2026-11-23 — ENGINE-001 S5-R4 experimental multi-offset model and frozen S5-R5 next
 
 New source-only `tests/engine001_bpred_s5r4_offset_lanes.py`, six tests, original4×2 source-runner, separate synthetic/4DEV workflows; [signed S5-R4 result](ENGINE001_BPRED_S5R4_FOUR_ORIGINALS_SIGNED_E2_AND_CONTENT_REVIEW_2026-11-23.md) CI45090117499 E2 relative feasibility PASS, full visual detail PARTIAL and wV non-WHITE6 regression. Recorded next [content-aware region scheduler E0](ENGINE001_BPRED_S5R5_CONTENT_STRATIFIED_REGION_LANES_PREREG_2026-11-23.md), keeping old E0 and raw negative cases untouched. No native S5 paint/production/CHALK changes.
