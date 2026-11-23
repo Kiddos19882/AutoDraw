@@ -49,7 +49,7 @@ jobs:
       - name: Independently validate 4x2 hashes and frozen FEASIBILITY outcome
         run: |
           python - <<'PY'
-          import hashlib,json,os
+          import gzip,hashlib,json,os
           from pathlib import Path
           root=Path(os.environ['RUNNER_TEMP'])/'s5r6'
           report=json.loads((root/'00_S5R6_RESULTS.json').read_bytes())
@@ -73,6 +73,23 @@ jobs:
                   assert plan['source_owner_status']=='MISSING'
                   assert plan['native_calibration']=='UNVERIFIED'
               assert s['r6_topology']['source_owner_area_verified']>0
+              ref=s['topology_full_graph']
+              compressed=(root/ref['file']).read_bytes()
+              assert hashlib.sha256(compressed).hexdigest()==ref['sha256']
+              raw=gzip.decompress(compressed)
+              assert hashlib.sha256(raw).hexdigest()==ref['uncompressed_sha256']
+              full=json.loads(raw)
+              assert len(full['cells'])==ref['cells']==s['r6_topology']['cell_count']
+              assert full['runs']==ref['runs']==s['r6_topology']['run_count']
+              assert len(full['edges'])==ref['edges']==s['r6_topology']['edge_count']
+              assert len(full['events'])==ref['events']
+              assert full['opaque_pixels']==ref['total_owner_area']==s['r6_topology']['source_owner_area_verified']
+              assert sum(c['area'] for c in full['cells'])==full['opaque_pixels']
+              assert sum(len(c['spans']) for c in full['cells'])==full['runs']
+              assert full['split_events']==s['r6_topology']['split_events']
+              assert full['merge_events']==s['r6_topology']['merge_events']
+              assert all(0<=parent<child<len(full['cells']) for parent,child in full['edges'])
+              print('S5R6_FULL_CELL_GRAPH_SHA_AND_TOPOLOGY_PASS',s['source'],ref['cells'],full['runs'])
           v=report['sources'][0]['visual']
           raw=(root/v['preview_file']).read_bytes()
           assert raw.startswith(b'\x89PNG\r\n\x1a\n')
