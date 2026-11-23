@@ -1,3 +1,5 @@
+**ENGINE-001 S5.** Full-scene native Egret E3, run 45205918003. Native PNG metrics independently recomputed. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).
+
 **ENGINE-001 S5 · 2026-11-23.** Native E3 CI 45203361169 passed technical controls; original singleton and direct-width footprint assumptions failed on sampled strokes. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).
 
 **ENGINE-001 S5 · 2026-11-23.** E2 wV two-lane comparison on the eight-color target. Full-scene native NOT_RUN. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).

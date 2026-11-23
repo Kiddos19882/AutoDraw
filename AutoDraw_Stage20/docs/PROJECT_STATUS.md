@@ -1,3 +1,5 @@
+**ENGINE-001 S5.** Eight-color wV full native baseline rendered. Foreground misses decreased after repair; total agreement fell slightly. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).
+
 **ENGINE-001 S5 · 2026-11-23.** Native full redraw left the sampled width-1 singleton blank and crossed two sampled source owners. Full-scene native remains open. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).
 
 **ENGINE-001 S5 · 2026-11-23.** wV model broad coverage reached 4,869 colored pixels, with 2,880 residual dots. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).

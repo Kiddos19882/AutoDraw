@@ -1,3 +1,5 @@
+**ENGINE-001 S5.** Completed the unrestricted full wV redraw with measured native widths and two-point residual calibration. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).
+
 **ENGINE-001 S5 · 2026-11-23.** Measured all ten native brush widths plus three actual paths from the unrestricted wV plan on the 150×240 bench ROI. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-result-run-45203361169).
 
 **ENGINE-001 S5 · 2026-11-23.** Completed the unrestricted wV second-lane experiment against the fresh baseline. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
