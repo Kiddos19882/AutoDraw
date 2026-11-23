@@ -1,3 +1,5 @@
+**2026-11-23 · ENGINE-001.** Rebuilt zones from all four originals, filled the residuals with horizontal or vertical same-owner runs, selected the direction per owner by run count and exported zone maps, plans and stroke-only previews. [Results](TEST_RESULTS.md).
+
 **2026-11-23 · ENGINE-001.** Implemented per-image reduced palettes and region rebuilding in the unrestricted source workflow. [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes).
 
 **2026-11-23 · ENGINE-001.** Removed development stroke quotas, checked model footprints against source and exported the broad-only and final wV previews. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development); [CI 45148571835](https://github.com/Kiddos19882/AutoDraw/actions/runs/45148571835).

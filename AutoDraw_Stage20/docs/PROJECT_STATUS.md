@@ -1,3 +1,5 @@
+**ENGINE-001 S5 eight-color zone strokes (2026-11-23).** Fresh source-space plans for wV, Hello, EZAL and Pink cover all eligible pixels with exact prepared RGB. wV has 6,227 multi-point strokes and 2,812 dots. [Validation](TEST_RESULTS.md). Native whole-scene output and CHALK remain unmeasured.
+
 **S5 · 2026-11-23.** [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes) applies to the unrestricted runner for every source. On wV its default 8-color target took 136 broad paths and 42,529 residual dots. Final model RGB matched the 8-color target.
 
 **ENGINE-001 unrestricted development baseline, 2026-11-23.** [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development). On wV (43fad67), 124 broad paths covered 19,227 of 64,000 opaque source pixels, including 2,259 nonwhite. The 44,773 remaining pixels used one dot each. Final model RGB equals the prepared target. Native Egret and exact CHALK NOT_RUN. [CI 45148571835](https://github.com/Kiddos19882/AutoDraw/actions/runs/45148571835).
