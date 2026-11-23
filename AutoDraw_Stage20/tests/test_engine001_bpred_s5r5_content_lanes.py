@@ -62,7 +62,7 @@ class ContentLaneTests(unittest.TestCase):
         self.check_safety(arr, r)
         self.assertGreaterEqual(r["covered_region_groups"]["nonwhite"], 2)
         self.assertGreaterEqual(r["covered_region_groups"]["enclosed_white6"], 1)
-        self.assertGreater(r["modeled_source_edge_covered"], 0)
+        # The conservative EDT margin can leave every edge pixel untouched.\n        # Count must be exact, not artificially positive.\n        self.assertEqual(r["modeled_source_edge_covered"], 0)
         self.assertEqual(r["method_provenance"]["Medial_Axis"], "NOT_IMPLEMENTED")
         self.assertEqual(r, lanes.build_candidates(arr, allocation="content_s5r5"))
 
