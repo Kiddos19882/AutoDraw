@@ -21,14 +21,46 @@ VERSION = "ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_MODEL_ONLY_V1"
 OFFSETS = (0, 1, -1, 2, -2, 3, -3)
 
 
-def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
+def build_candidates(arrays, *, max_trials=2000, max_strokes=200, allocation="area"):
     if type(max_trials) is not int or not 1 <= max_trials <= 2000:
         raise source.BlockedS5R2("BLOCKED_S5R4_TRIAL_BUDGET")
     if type(max_strokes) is not int or not 1 <= max_strokes <= 200:
         raise source.BlockedS5R2("BLOCKED_S5R4_STROKE_BUDGET")
+    if allocation not in ("area", "content_s5r5"):
+        raise source.BlockedS5R2("BLOCKED_S5R4_ALLOCATION_MODE")
     game, ids, rgba, protected, opaque = source._source_arrays(arrays)
     h, w = game.shape
+    content_mode = allocation == "content_s5r5"
+    if content_mode:
+        source_edge = arrays.get("source_edge")
+        if (not isinstance(source_edge, np.ndarray) or source_edge.shape != game.shape
+                or source_edge.dtype != np.bool_ or np.any(source_edge & ~opaque)):
+            raise source.BlockedS5R2("BLOCKED_S5R5_SOURCE_EDGE_CONTRACT")
+        exterior_ids = set(int(v) for v in np.unique(np.concatenate((
+            ids[0], ids[-1], ids[:, 0], ids[:, -1])))) - {0}
+    else:
+        source_edge = None
+        exterior_ids = set()
     seeds, dot_count = source._priority_seeds(ids, opaque, protected)
+    # Classify source components without modifying original color/region masks.
+    # White touching outer border is a SOFT lower-priority exterior candidate;
+    # contained white remains eligible for eyes, clothing and highlights.
+    if content_mode:
+        def region_group(item):
+            region, (cx, cy), *_ = item
+            color = int(game[cy, cx])
+            return 0 if color != 6 else (2 if region in exterior_ids else 1)
+        grouped = [[r for r in sorted(seeds, key=lambda x: (-x[3], -x[4], x[0]))
+                    if region_group(r) == cls] for cls in range(3)]
+        ordered_seeds = []
+        # Bounded weighted round-robin to retain white interior AND exterior candidates.
+        while any(grouped):
+            for cls in (0, 0, 1, 0, 2):
+                if grouped[cls]:
+                    ordered_seeds.append(grouped[cls].pop(0))
+    else:
+        ordered_seeds = sorted(seeds, key=lambda r: (-r[3], -r[4], r[0]))
+        region_group = None
     walls = np.zeros((h, w), bool)
     walls[0] = walls[-1] = True
     walls[:, 0] = walls[:, -1] = True
@@ -95,8 +127,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
     # Generate a bounded source-region catalogue. A region may have multiple
     # long, genuinely shifted parallel lanes, not one corridor around its seed.
     # Bias only the *search*, never declare distance/EDT a native safety proof.
-    for region, center, _dot, area, maximum in sorted(
-            seeds, key=lambda r: (-r[3], -r[4], r[0])):
+    for region, center, _dot, area, maximum in ordered_seeds:
         if trials["broad"] >= min(1400, max_trials):
             break
         if area < 6 or maximum < 1.5:
@@ -154,13 +185,40 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
                                           start, end, width, footprint))
     # Prefer high incremental coverage, with bounded per-region use so that
     # the first large source region does not monopolize the 80 broad strokes.
-    for _size, region, start, end, width, footprint in sorted(
-            catalogue, key=lambda t: (-t[0], t[1], -t[4], t[2], t[3])):
-        if totals["broad"] >= min(80, max_strokes):
-            break
-        if region_lines[region] >= 8:
-            continue
-        accept("broad", region, start, end, width, footprint)
+    sorted_catalogue = sorted(
+        catalogue, key=lambda t: (-t[0], t[1], -t[4], t[2], t[3]))
+    if content_mode:
+        class_of_region = {r[0]: region_group(r) for r in seeds}
+        groups = [[p for p in sorted_catalogue if class_of_region[p[1]] == cls]
+                  for cls in range(3)]
+        selected = set()
+        # Soft group quotas: content up to 60, enclosed whites up to 12,
+        # border-connected white up to 8. Unspent slots return to all groups.
+        for cls, quota in ((0, 60), (1, 12), (2, 8)):
+            used = 0
+            for item in groups[cls]:
+                if totals["broad"] >= min(80, max_strokes) or used >= quota:
+                    break
+                _, region, start, end, width, footprint = item
+                if region_lines[region] >= 8:
+                    continue
+                if accept("broad", region, start, end, width, footprint):
+                    used += 1
+                selected.add((region, width, start, end))
+        for item in sorted_catalogue:
+            if totals["broad"] >= min(80, max_strokes):
+                break
+            _, region, start, end, width, footprint = item
+            if (region, width, start, end) in selected or region_lines[region] >= 8:
+                continue
+            accept("broad", region, start, end, width, footprint)
+    else:
+        for _size, region, start, end, width, footprint in sorted_catalogue:
+            if totals["broad"] >= min(80, max_strokes):
+                break
+            if region_lines[region] >= 8:
+                continue
+            accept("broad", region, start, end, width, footprint)
 
     # Independently reserved protected pixel stage, same budget as signed R3.
     if max_trials > 1400 and max_strokes > 80:
@@ -202,6 +260,32 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
         "phase_strokes": totals, "phase_trials": trials,
         "stroke_count": len(proposals), "trials": sum(trials.values()),
         "rejected": rejected, "proposals": proposals}
+    if content_mode:
+        white_covered = int(np.count_nonzero(covered & (game == 6) & opaque))
+        content_covered = int(np.count_nonzero(covered & (game != 6) & opaque))
+        source_edge_covered = int(np.count_nonzero(covered & source_edge))
+        groups_touched = [set() for _ in range(3)]
+        for p in proposals:
+            groups_touched[class_of_region[p["paintable_id"]]].add(p["paintable_id"])
+        result.update({
+            "schema": "ENGINE001_BPRED_S5R5_CONTENT_STRATIFIED_LANES_MODEL_ONLY_V1",
+            "allocation_policy": "content_s5r5",
+            "modeled_white6_covered": white_covered,
+            "modeled_nonwhite6_covered": content_covered,
+            "modeled_source_edge_covered": source_edge_covered,
+            "source_edge_total": int(source_edge.sum()),
+            "covered_region_groups": {
+                "nonwhite": len(groups_touched[0]),
+                "enclosed_white6": len(groups_touched[1]),
+                "exterior_white6": len(groups_touched[2])},
+            "method_provenance": {
+                "Euclidean_Distance_Transform": "APPLIED_clearance_preflight",
+                "region_offset_sweeps": "APPLIED_parallel_line_candidates_not_full_boustrophedon",
+                "greedy_residual_cover": "PARTIAL_area_rank_with_content_quotas",
+                "Boustrophedon_Cellular_Decomposition": "NOT_IMPLEMENTED",
+                "Medial_Axis": "NOT_IMPLEMENTED",
+                "Contour_Parallel": "NOT_IMPLEMENTED",
+                "Spiral_Toolpath": "NOT_IMPLEMENTED"}})
     result["result_sha256"] = r3._digest(result)
     return result
 
@@ -215,8 +299,10 @@ def build_from_verified_s46(meta_bytes, raw_bytes, original_bytes, **kwargs):
             and meta.get("admissible_for_gameplay") is False):
         raise source.BlockedS5R2("BLOCKED_S5R4_SOURCE")
     with np.load(io.BytesIO(raw_bytes), allow_pickle=False) as packet:
-        arrays = {k: packet[k] for k in
-                  ("game_index", "paintable_id", "original_rgba", "protected_original_dot")}
+        fields = ["game_index", "paintable_id", "original_rgba", "protected_original_dot"]
+        if kwargs.get("allocation") == "content_s5r5":
+            fields.append("source_edge")
+        arrays = {k: packet[k] for k in fields}
     result = build_candidates(arrays, **kwargs)
     result["source_packet_sha256"] = hashlib.sha256(meta_bytes).hexdigest()
     result["input_sha256"] = meta["input_sha256"]
