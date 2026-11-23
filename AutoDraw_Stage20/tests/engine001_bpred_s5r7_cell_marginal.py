@@ -137,6 +137,11 @@ def _validate_candidates(proposals, ids, game, opaque, *, max_calls=1400):
 
 
 def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
+    return _build_candidates(arrays, max_trials, max_strokes, _generate,
+                             _validate_candidates, VERSION)
+
+
+def _build_candidates(arrays, max_trials, max_strokes, generate, validate, version):
     if type(max_trials) is not int or not 1 <= max_trials <= 2000:
         raise source.BlockedS5R2("BLOCKED_S5R7_TRIAL_BUDGET")
     if type(max_strokes) is not int or not 1 <= max_strokes <= 200:
@@ -158,7 +163,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
     walls[:-1, :] |= changed
     walls |= ~opaque
     clearance = ndimage.distance_transform_edt(~walls)
-    raw, chosen_axes = _generate(ids, game, clearance, graphs)
+    raw, chosen_axes = generate(ids, game, clearance, graphs)
     owner_area = np.bincount(ids[opaque], minlength=int(ids.max())+1)
     owner_edge = np.bincount(ids[edge & opaque], minlength=len(owner_area))
     owner_protected = np.bincount(ids[protected], minlength=len(owner_area))
@@ -175,7 +180,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
     cell_strokes = Counter()
     proposed = []
 
-    pool, n_trials, counters = _validate_candidates(
+    pool, n_trials, counters = validate(
         raw, ids, game, opaque, max_calls=min(1400,max_trials))
     trials["broad"] = n_trials
     rejected.update(counters)
@@ -279,7 +284,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
                 break
     total = int(opaque.sum())
     result = {
-        "schema":VERSION, "status":"PARTIAL" if total>covered.sum() else "MODEL_ONLY",
+        "schema":version, "status":"PARTIAL" if total>covered.sum() else "MODEL_ONLY",
         "source_shape":[int(h),int(w)],
         "drawing_mode":"normal","smooth":False,
         "source_owner_status":"MISSING", "native_calibration":"UNVERIFIED",
@@ -304,7 +309,7 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
             "column_area":graphs[1]["opaque_pixels"]},
         "scheduler":{
             "raw_candidate_count":len(raw),
-            "valid_source_candidates":int(n_trials-sum(counters.values())),
+            "valid_source_candidates":len(pool),
             "owner_broad_count":len(owner_strokes),
             "swatch_broad_count":len(swatch_strokes),
             "per_owner_broad":{str(k):v for k,v in sorted(owner_strokes.items())},

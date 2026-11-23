@@ -1,0 +1,32 @@
+name: ENGINE-001 S5-R8 connected source-cell sweeps
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r8-connected.yml'
+      - 'AutoDraw_Stage20/tests/*s5r8*.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original4x2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original-source numerical dependencies
+        run: python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Synthetic checks and baseline regressions
+        working-directory: AutoDraw_Stage20/tests
+        run: python -m unittest -v test_engine001_bpred_s5r4_offset_lanes test_engine001_bpred_s5r5_content_lanes test_engine001_bpred_s5r6_cells test_engine001_bpred_s5r7_cell_marginal test_engine001_bpred_s5r8_connected
+      - name: Double-fresh source coverage and residuals
+        run: python AutoDraw_Stage20/tests/run_engine001_bpred_s5r8_four_originals.py --root AutoDraw_Stage20 --output "${RUNNER_TEMP}/s5r8"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engine001-s5r8-four-originals
+          path: ${{ runner.temp }}/s5r8
+          if-no-files-found: error
