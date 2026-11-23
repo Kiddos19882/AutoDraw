@@ -1,3 +1,7 @@
+## 2026-11-23 — ENGINE-001 native brush seam E3 validated, S5-R4 experimental lane planner
+
+Validated [native S5-LANE-P1 full archived E3](ENGINE001_S5_LANE_P1_SIGNED_NATIVE_E3_180_CASES_2026-11-23.md) from CI45089280114 exact source SHA and independently checked PNG/manifest. [Frozen S5-R4 E0](ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md) and new research-only offset-lane module, 6 synthetic E2 tests CI45090038737 PASS, original4×2 reproducible comparison runner and workflow (running at time of record). Original missing-artifact/Markdown audit failures preserved. No production, executor, engine or CHALK estimator modification.
+
 ## 2026-11-23 — S5 physical brush width post-analysis and native lane-spacing experiment preparation
 
 Added [native width1..10 E2 extraction](ENGINE001_S5_NATIVE_BRUSH_1TO10_CORE_WIDTH_MEASUREMENTS_E2_2026-11-23.md), reproducible archive-only analyzer; frozen [S5-LANE-P1 E0](ENGINE001_S5_ADJACENT_LANE_NATIVE_SPACING_PREREG_2026-11-23.md) with new experimental runner, unit checks, dedicated [Actions workflow](../../.github/workflows/engine001-s5-lane-p1-native-spacing.yml). New native CI UNKNOWN, no E4/CHALK, no production/default behavior changes.
