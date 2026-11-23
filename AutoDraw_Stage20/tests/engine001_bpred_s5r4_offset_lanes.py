@@ -50,7 +50,14 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200, allocation="ar
             region, (cx, cy), *_ = item
             color = int(game[cy, cx])
             return 0 if color != 6 else (2 if region in exterior_ids else 1)
-        grouped = [[r for r in sorted(seeds, key=lambda x: (-x[3], -x[4], x[0]))
+        edge_by_region = np.bincount(
+            ids[source_edge & opaque].ravel(),
+            minlength=int(ids.max()) + 1)
+        # Source-edge evidence ranks source components within their content
+        # class; it is never a license to overpaint the protected border.
+        grouped = [[r for r in sorted(seeds,
+                        key=lambda x: (-int(edge_by_region[x[0]] > 0),
+                                       -x[3], -x[4], x[0]))
                     if region_group(r) == cls] for cls in range(3)]
         ordered_seeds = []
         # Bounded weighted round-robin to retain white interior AND exterior candidates.
