@@ -1,0 +1,40 @@
+name: ENGINE-001 S5-R7 dual-axis cells and fair marginal synthetic E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r7-synthetic.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r7_cell_marginal.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r7_cell_marginal.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R7_CELL_BALANCED_MARGINAL_COVERAGE_PREREG_2026-11-23.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r7-synthetic
+  cancel-in-progress: true
+jobs:
+  dual-axis-topology-owner-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen research dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0
+      - name: Source-only E0 and code syntax
+        run: |
+          test -s AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R7_CELL_BALANCED_MARGINAL_COVERAGE_PREREG_2026-11-23.md
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r7_cell_marginal.py AutoDraw_Stage20/tests/test_engine001_bpred_s5r7_cell_marginal.py
+      - name: Existing R4 R5 R6 and new R7 synthetic tests
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r4_offset_lanes test_engine001_bpred_s5r5_content_lanes test_engine001_bpred_s5r6_cells test_engine001_bpred_s5r7_cell_marginal
+      - name: Markdown documentation audit
+        run: |
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
