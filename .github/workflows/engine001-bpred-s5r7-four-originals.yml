@@ -1,0 +1,94 @@
+name: ENGINE-001 S5-R7 dual-axis cell marginal four fresh originals E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r7-four-originals.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_bpred_s5r7_four_originals.py'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r7_cell_marginal.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r7_cell_marginal.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r7-four-originals
+  cancel-in-progress: true
+jobs:
+  source-original4x2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen original source numerical dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
+      - name: Confirm pre-registered E0, original bundle and code syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          root=Path('AutoDraw_Stage20')
+          e0=root/'docs'/'ENGINE001_BPRED_S5R7_CELL_BALANCED_MARGINAL_COVERAGE_PREREG_2026-11-23.md'
+          assert e0.is_file() and 'FROZEN BEFORE S5-R7 CODE' in e0.read_text('utf8')
+          raw=(root/'gameEngine'/'main.min_653f95bc.js').read_bytes()
+          blob=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+          assert blob=='46cc74de00b6cb5d207b1e1a2ffcd81613b6d388'
+          print('S5R7_SOURCE_AND_PROSPECTIVE_E0_PIN_PASS')
+          PY
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_bpred_s5r7_four_originals.py
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r7_cell_marginal
+      - name: All four fresh original sources rebuilt twice, R3 R4 R5 R6 R7
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_bpred_s5r7_four_originals.py \
+            --root AutoDraw_Stage20 \
+            --output "${RUNNER_TEMP}/s5r7"
+      - name: Independent raw SHA, source-safety and original visual audit
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'s5r7'
+          r=json.loads((root/'00_S5R7_RESULTS.json').read_bytes())
+          assert r['source_original_only'] and r['smooth'] is False
+          assert r['native_Egret']=='NOT_RUN' and r['exact_game_chalk']=='NOT_RUN'
+          assert not r['production_promotion']
+          assert len(r['sources'])==4
+          assert r['frozen_cell_fair_feasibility'] in (
+              'PASS_CELL_FAIR_COVERAGE_FEASIBILITY',
+              'FAIL_CELL_FAIR_COVERAGE_FEASIBILITY')
+          for s in r['sources']:
+              assert s['double_fresh_determinism']=='PASS'
+              assert s['r7_trials']['broad']<=1400 and s['r7_trials']['detail']<=600
+              assert s['r7_strokes']['broad']<=80 and s['r7_strokes']['detail']<=120
+              assert s['r7_topology']['row_area']==s['r7_topology']['column_area']
+              assert s['r7_metrics']['total']==s['r7_covered']
+              for key in ('r3','r4','r5','r6','r7'):
+                  ref=s['models'][key]
+                  raw=(root/ref['file']).read_bytes()
+                  assert hashlib.sha256(raw).hexdigest()==ref['sha256']
+                  model=json.loads(raw)
+                  assert not model['smooth']
+                  assert not model['safe_to_execute'] and not model['admissible_for_gameplay']
+                  assert model['source_owner_status']=='MISSING'
+                  assert model['native_calibration']=='UNVERIFIED'
+          v=r['sources'][0]['visual']
+          img=(root/v['preview_file']).read_bytes()
+          assert img[:8]==b'\x89PNG\r\n\x1a\n'
+          assert hashlib.sha256(img).hexdigest()==v['preview_sha256']
+          assert v['potential_px']==r['sources'][0]['r7_covered']
+          print('S5R7_FROZEN_CONTENT_GATE',r['frozen_cell_fair_feasibility'])
+          PY
+      - name: Archive original R3-R7 plans, model preview and negatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5r7-dual-axis-source4x2-cell-marginal-actual-model-PNG
+          path: ${{ runner.temp }}/s5r7
+          if-no-files-found: error
+          retention-days: 30
