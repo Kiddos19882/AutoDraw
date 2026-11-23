@@ -1,3 +1,5 @@
+**ENGINE-001 S5.** [Second-lane experiment on eight-color wV](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
+
 **Current S5 image preparation.** [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes) selects 5/8/10-color variants per image. The 8-color variant feeds zone construction and the unrestricted stroke planner.
 
 **Current S5 quality mode.** [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development). Use the unrestricted runner in (ф) `tests/run_engine001_s5_uncapped.py`.
