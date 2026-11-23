@@ -1,3 +1,5 @@
+**ENGINE-001 S5 FIRST NEXT after six +20% Egret variants (2026-11-23).** [Six fill results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-s5-six-brush-fill-variants-fixed-20-2026-11-23). Diagonal-first improves small net over global; owner-paired saves some tiny detail but damages backgrounds; color layering often damages boundaries. Next preregister local source-owner/edge-aware candidate selection/repair order, then native and multi-image validation. No global 20% production default, no frozen gate modification; CHALK NOT_RUN.
+
 **ENGINE-001 S5 NEXT (four-way tolerance measured, 2026-11-23).** Compare native target-owner damage, protected boundaries and residual white cracks before proposing local/adaptive tolerance; 20% is experimental best on wV, **not** a production default. [Four-way evidence](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#four-way-native-tolerance-0101520-2026-11-23).
 
 **ENGINE-001 S5.** Assess the native before/after frames and select residual repairs by measured gain and neighboring-color damage. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).

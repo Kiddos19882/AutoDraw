@@ -1,3 +1,5 @@
+**ENGINE-001 S5 native fixed 20% six fills (2026-11-23).** [Six actual Egret renders and independent audit](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-s5-six-brush-fill-variants-fixed-20-2026-11-23): CI45217356373 E3 PASS; diagonal-first best on wV (+78 total, +180 owner-edge correct), all quality PARTIAL; other layer orders regress total. SHA `6c5095a`, game CHALK NOT_RUN.
+
 **ENGINE-001 S5 · 2026-11-23 four-way native tolerance.** 0/10/15/20% E3 completed at SHA `1bd22ce`; 20% measured best but quality PARTIAL, local spill/edge and CHALK unverified. [Full four-way evidence](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#four-way-native-tolerance-0101520-2026-11-23).
 
 **ENGINE-001 S5.** Eight-color wV full native baseline rendered. Foreground misses decreased after repair; total agreement fell slightly. [Native results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#full-native-result-on-wv).

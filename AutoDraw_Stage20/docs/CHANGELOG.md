@@ -1,3 +1,5 @@
+**2026-11-23 · ENGINE-001 S5 six brush-fill schemes with fixed 20% tolerance.** Research-only native Egret matrix: global, owner-paired, two game-color layer orders, axis-first and diagonal-first residual directions; [E3 six-way signed report](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-s5-six-brush-fill-variants-fixed-20-2026-11-23) records both gains and regressions. Best diagonal-first on wV, production unchanged.
+
 **2026-11-23 · ENGINE-001 S5 tolerance experiment.** Extended existing full-native Egret study to 0/10/15/20% (research-only width/spill allowances), [four-way E3 evidence](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#four-way-native-tolerance-0101520-2026-11-23) shows 20% best on tested wV but quality PARTIAL; no global default or threshold change.
 
 **ENGINE-001.** New S5 images now get authentic 5/8/10-color variants and an 8-color default stroke target. [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes).
