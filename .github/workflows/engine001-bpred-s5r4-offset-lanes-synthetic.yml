@@ -1,0 +1,40 @@
+name: ENGINE-001 S5-R4 source offset-lanes synthetic E2
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-bpred-s5r4-offset-lanes-synthetic.yml'
+      - 'AutoDraw_Stage20/tests/engine001_bpred_s5r4_offset_lanes.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_bpred_s5r4_offset_lanes.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-bpred-s5r4-offset-lanes-synthetic
+  cancel-in-progress: true
+jobs:
+  s5r4-synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned numerical dependencies
+        run: |
+          python -m pip install numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0
+      - name: Confirm frozen E0 is present and syntax
+        run: |
+          test -s AutoDraw_Stage20/docs/ENGINE001_BPRED_S5R4_REGION_OFFSET_LANES_PREREG_2026-11-23.md
+          python -m py_compile AutoDraw_Stage20/tests/engine001_bpred_s5r4_offset_lanes.py AutoDraw_Stage20/tests/test_engine001_bpred_s5r4_offset_lanes.py
+      - name: Run source owner and repeated-lane six synthetic tests
+        run: |
+          cd AutoDraw_Stage20/tests
+          python -m unittest -v test_engine001_bpred_s5r4_offset_lanes
+      - name: Audit markdown document links
+        run: |
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
