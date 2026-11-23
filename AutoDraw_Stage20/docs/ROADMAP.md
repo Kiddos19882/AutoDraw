@@ -1,3 +1,5 @@
+**S5 development order.** During fill-algorithm development all new S5 quality runs use unrestricted stroke, detail, evaluation and path-vertex counts. Record counts as measurements. Defer budgeted comparisons until development is complete. Frozen R8 replays use explicit historical budgets. Continue the wV second-lane and width diagnosis under unrestricted counts, reporting broad coverage separately from single-pixel residuals. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development).
+
 **ENGINE-001 S5 after the R8 original4×2 decision (2026-11-23).** Compare feasible second lanes in the two existing sweep directions on wV, with separate counts for cell geometry, width/clearance and candidate enumeration. [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).
 
 ## ENGINE-001 S5-R7 E2 source model negative → native P2 joints E3 signed → S5-R8 connected sweeps (2026-11-23)

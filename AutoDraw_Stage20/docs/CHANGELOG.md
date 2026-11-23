@@ -1,3 +1,5 @@
+**ENGINE-001.** Development defaults to unlimited strokes and evaluations with full in-cell paths. Added a reproducible unrestricted source runner and CI artifact. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development).
+
 **2026-11-23 · ENGINE-001.** Added an offline connected-cell brush experiment, source-model previews for all four originals and reproducible evidence export. [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).
 
 ## 2026-11-23 — ENGINE-001 S5-R7 dual-axis model negative, S5-P2 real normal joints E3, prospective R8

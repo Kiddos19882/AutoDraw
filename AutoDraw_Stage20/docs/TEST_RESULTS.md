@@ -1,3 +1,5 @@
+**ENGINE-001 unrestricted wV E2, SHA 43fad67.** 24 local regression tests PASS. Fresh input SHA256 07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a; plan SHA256 b9b97905091796bb87530eef031feaeffec322730b183e2245c763466bbb9d0c. Model covered 64,000/64,000 source pixels with 124 connected paths and 44,773 dots. All 604 protected pixels covered. [CI 45148571835](https://github.com/Kiddos19882/AutoDraw/actions/runs/45148571835).
+
 **ENGINE-001 S5-R8 · E2/E3 (2026-11-23).** SHA 20bfb6a, 23 tests PASS, source4×2 technical PASS, frozen coverage FAIL (wV). [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).
 
 ## 2026-11-23 / ENGINE-001 S5-R7 original4×2 scientific negative and S5-LANE-P2 native turns E3 positive conditional

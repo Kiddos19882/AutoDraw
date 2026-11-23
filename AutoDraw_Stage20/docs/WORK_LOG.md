@@ -1,3 +1,5 @@
+**2026-11-23 · ENGINE-001.** Removed development stroke quotas, checked model footprints against source and exported the broad-only and final wV previews. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development); [CI 45148571835](https://github.com/Kiddos19882/AutoDraw/actions/runs/45148571835).
+
 **2026-11-23 · ENGINE-001.** Implemented connected source sweeps, ran 23 synthetic/regression tests and four originals twice. Recorded the negative wV result and candidate inventory. [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).
 
 ## 2026-11-23 — ENGINE-001 S5-R7 and S5-LANE-P2, archival native and forward connected-sweep E0

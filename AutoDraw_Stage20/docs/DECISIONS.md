@@ -1,3 +1,7 @@
+## DEC-054 Unrestricted strokes during fill development
+
+User decision, 2026-11-23. During fill-algorithm development all new S5 quality runs use unrestricted stroke, detail, evaluation and path-vertex counts. Record counts as measurements. Defer budgeted comparisons until development is complete. Frozen R8 replays use explicit historical budgets. Keep normal mode and smoothing off. Compare the prepared target, broad sweeps and final residual pass in source space; a native Egret baseline requires separate calibration.
+
 ## DEC-053. ENGINE-001 / S5: после S5-R5 перейти от глобальных квот цветов к геометрическим sweep-cells (2026-11-23)
 
 **Статус: ENGINEERING RESEARCH DECISION, не пользовательская приёмка S5.** [Подписанный S5-R5 original4×2 E2](ENGINE001_BPRED_S5R5_CONTENT_LANES_FOUR_ORIGINALS_SIGNED_E2_2026-11-23.md) CI45092117700 SHA`e8e64b1` технически PASS, но научный `FAIL_CONTENT_FEASIBILITY`: небелое покрытие улучшилось на wV, Hello, Pink, а EZAL ухудшилось на749 модельных пикселей против S5-R4 (110777→110028). R4 и R5 оба дают низкую узнаваемость на визуальном исходном wV. Не пересматривать замороженный E0 ради PASS и не заниматься микроподстройкой 60/12/8 квот только из-за 749 клеток.
