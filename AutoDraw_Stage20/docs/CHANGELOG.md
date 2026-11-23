@@ -1,3 +1,7 @@
+## 2026-11-23 — S5 physical brush width post-analysis and native lane-spacing experiment preparation
+
+Added [native width1..10 E2 extraction](ENGINE001_S5_NATIVE_BRUSH_1TO10_CORE_WIDTH_MEASUREMENTS_E2_2026-11-23.md), reproducible archive-only analyzer; frozen [S5-LANE-P1 E0](ENGINE001_S5_ADJACENT_LANE_NATIVE_SPACING_PREREG_2026-11-23.md) with new experimental runner, unit checks, dedicated [Actions workflow](../../.github/workflows/engine001-s5-lane-p1-native-spacing.yml). New native CI UNKNOWN, no E4/CHALK, no production/default behavior changes.
+
 ## 2026-11-23 — ENGINE-001 S4.6 quarantined source contract E2
 
 Added `tests/engine001_bpred_s4r1_s46_source_contract.py`, unit test and four-original runner, and isolated source-only GitHub workflow; [signed E2 technical PASS](ENGINE001_BPRED001_S4R1_S46_SOURCE_CONTRACT_E2_RESULTS_2026-11-23.md) SHA86c5133/CI45074109363 after preserved first CI FAIL. No acceptance of DG1 original colors, source owner, S5, native or production changes.
