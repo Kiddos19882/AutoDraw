@@ -19,6 +19,8 @@ def original_native_full(proposals,target,g,driver,case):
     if case!="wv":
         return transfer.original_paths(proposals,target,g)[0]
     masks=native.measure_segments(driver)
+    with np.load(native.OUT/"source"/"zones.npz") as zone:
+        owners=zone["paintable_id"].copy()
     broad,repair=[],[]
     for i,p in enumerate(proposals):
         x,y=map(int,p["points"][0])
@@ -26,8 +28,6 @@ def original_native_full(proposals,target,g,driver,case):
         width=max((n for n,s in enumerate(native.SPANS,1)
                    if 400*s<=9*p["brush_value"]*120),default=1)
         if len(p["points"])==1:
-            with np.load(native.OUT/"source"/"zones.npz") as zone:
-                owners=zone["paintable_id"]
             points,_=native.choose_segment(x,y,p["paintable_id"],owners,masks,20)
             repair.append(native.stroke(points,width,rgb,i))
         else:
