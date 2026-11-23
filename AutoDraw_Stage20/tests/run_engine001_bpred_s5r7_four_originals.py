@@ -131,6 +131,7 @@ def main():
                        if x["color_index"]!=6)
             if actual!=reference:
                 raise ValueError("BLOCKED_S5R7_FROZEN_CONTENT_BASELINE")
+        e=plans[4]
         # Full owner-preserving cell/edge/event graphs in both orientations.
         # This is an evidence-only re-extraction; the candidate planner's
         # geometry and frozen scientific gates remain unchanged.
