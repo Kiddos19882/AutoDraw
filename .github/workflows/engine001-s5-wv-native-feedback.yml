@@ -1,0 +1,33 @@
+name: ENGINE-001 S5 real Egret alpha-hole feedback
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-s5-wv-native-feedback.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_s5_wv_native_feedback.py'
+permissions:
+  contents: read
+jobs:
+  feedback:
+    strategy:
+      fail-fast: false
+      matrix:
+        method: [source-centroid, backing-points]
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install selenium==4.38.0 numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 requests==2.32.5
+      - run: python -m py_compile AutoDraw_Stage20/tests/run_engine001_s5_wv_native_feedback.py
+      - run: python AutoDraw_Stage20/tests/run_engine001_s5_wv_native_feedback.py --method ${{ matrix.method }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: S5-wV-alpha-feedback-${{ matrix.method }}
+          path: ${{ runner.temp }}/wv-full
+          if-no-files-found: error
