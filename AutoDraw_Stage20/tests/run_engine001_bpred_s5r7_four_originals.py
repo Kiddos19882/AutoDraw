@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import io
 import json
 import time
@@ -130,6 +131,32 @@ def main():
                        if x["color_index"]!=6)
             if actual!=reference:
                 raise ValueError("BLOCKED_S5R7_FROZEN_CONTENT_BASELINE")
+        # Full owner-preserving cell/edge/event graphs in both orientations.
+        # This is an evidence-only re-extraction; the candidate planner's
+        # geometry and frozen scientific gates remain unchanged.
+        owner=first_arrays if i==0 else arrays
+        dual=r7.dual_graphs(
+            owner["paintable_id"],owner["original_rgba"][:,:,3]==255)
+        full_graphs={}
+        for axis,graph in zip((0,90),dual):
+            reference=e["topology"]
+            if (len(graph["cells"]) != reference[
+                    "row_cells" if axis==0 else "column_cells"]
+                    or graph["opaque_pixels"] != reference[
+                    "row_area" if axis==0 else "column_area"]):
+                raise ValueError("BLOCKED_S5R7_FULL_GRAPH_DRIFT")
+            raw=json.dumps(graph,ensure_ascii=False,sort_keys=True,
+                           separators=(',',':'),allow_nan=False).encode('utf8')
+            packed=gzip.compress(raw,compresslevel=9,mtime=0)
+            graph_file=f"{i:02d}_AXIS{axis}_FULL_SWEEP_GRAPH.json.gz"
+            (out/graph_file).write_bytes(packed)
+            full_graphs[str(axis)]={
+                "file":graph_file,"gzip_sha256":sha(packed),
+                "raw_sha256":sha(raw),"cells":len(graph["cells"]),
+                "runs":graph["runs"],"edges":len(graph["edges"]),
+                "events":len(graph["events"]),
+                "source_area":graph["opaque_pixels"],
+                "split":graph["split_events"],"merge":graph["merge_events"]}
         names=[f"{i:02d}_{key}.json" for key in ("R3","R4","R5","R6","R7")]
         for n,raw in zip(names,plans_raw):
             (out/n).write_bytes(raw)
@@ -146,6 +173,7 @@ def main():
             "r7_guaranteed":e["guaranteed_covered_pixel_count"],
             "r7_trials":e["phase_trials"],"r7_strokes":e["phase_strokes"],
             "r7_topology":e["topology"],"r7_scheduler":e["scheduler"],
+            "complete_source_cell_graphs":full_graphs,
             "frozen_nonwhite_minimum":minimum,
             "nonwhite_gate":metric["nonwhite"]>=minimum,
             "strict_10percent_gain":metric["nonwhite"]>=minimum*1.1,
