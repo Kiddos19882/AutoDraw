@@ -1,3 +1,5 @@
+**ENGINE-001.** For the next wV lane/width diagnosis, use the default 8-color regions and compare broad coverage separately from residual dots under DEC-054. [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes).
+
 **ENGINE-001 current priority.** Continue the wV second-lane and width diagnosis under unrestricted counts, reporting broad coverage separately from single-pixel residuals. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development).
 
 **ENGINE-001 next after S5-R8 (2026-11-23).** Compare feasible second lanes in the two existing sweep directions on wV, with separate counts for cell geometry, width/clearance and candidate enumeration. [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).

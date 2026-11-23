@@ -1,3 +1,7 @@
+## DEC-055 Per-image game palettes
+
+For every new S5 source, generate previews with up to 5, 8 and 10 distinct colors chosen independently from the authentic game swatches present in that image. Use the 8-color target for the unrestricted development plan. Preserve smaller palettes when possible. Rebuild four-connected painting regions from the original source surface and the new swatch; paint fully opaque input pixels only. The comparison does not establish a single preferred palette for every scene. DEC-054 stays in effect.
+
 ## DEC-054 Unrestricted strokes during fill development
 
 User decision, 2026-11-23. During fill-algorithm development all new S5 quality runs use unrestricted stroke, detail, evaluation and path-vertex counts. Record counts as measurements. Defer budgeted comparisons until development is complete. Frozen R8 replays use explicit historical budgets. Keep normal mode and smoothing off. Compare the prepared target, broad sweeps and final residual pass in source space; a native Egret baseline requires separate calibration.

@@ -1,3 +1,5 @@
+**ENGINE-001.** New S5 images now get authentic 5/8/10-color variants and an 8-color default stroke target. [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes).
+
 **ENGINE-001.** Development defaults to unlimited strokes and evaluations with full in-cell paths. Added a reproducible unrestricted source runner and CI artifact. [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development).
 
 **2026-11-23 · ENGINE-001.** Added an offline connected-cell brush experiment, source-model previews for all four originals and reproducible evidence export. [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).

@@ -1,3 +1,5 @@
+**Current S5 image preparation.** [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes) selects 5/8/10-color variants per image. The 8-color variant feeds zone construction and the unrestricted stroke planner.
+
 **Current S5 quality mode.** [DEC-054](DECISIONS.md#dec-054-unrestricted-strokes-during-fill-development). Use the unrestricted runner in (ф) `tests/run_engine001_s5_uncapped.py`.
 
 **ENGINE-001 S5-R8 completed (2026-11-23).** [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md). Technical E2/E3 PASS, frozen coverage FAIL on wV.

@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/engine001-s5-uncapped.yml'
       - 'AutoDraw_Stage20/tests/run_engine001_s5_uncapped.py'
+      - 'AutoDraw_Stage20/tests/*engine001_s5_palette.py'
       - 'AutoDraw_Stage20/tests/*s5r8_connected.py'
       - 'AutoDraw_Stage20/tests/engine001_bpred_s5r7_cell_marginal.py'
 permissions:
@@ -22,7 +23,7 @@ jobs:
         run: python -m pip install numpy==2.2.6 scipy==1.15.3 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 Pillow==11.3.0 requests==2.32.5
       - name: Test unlimited and historical modes
         working-directory: AutoDraw_Stage20/tests
-        run: python -m unittest -v test_engine001_bpred_s5r7_cell_marginal test_engine001_bpred_s5r8_connected
+        run: python -m unittest -v test_engine001_s5_palette test_engine001_bpred_s5r7_cell_marginal test_engine001_bpred_s5r8_connected
       - name: Build fresh wV and verify footprints
         run: python AutoDraw_Stage20/tests/run_engine001_s5_uncapped.py --root AutoDraw_Stage20 --output "${RUNNER_TEMP}/uncapped"
       - uses: actions/upload-artifact@v4

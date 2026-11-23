@@ -1,3 +1,5 @@
+**ENGINE-001 · reduced game palette E2.** wV 5/8/10 RGB previews exactly reproduce the three reviewed targets. Default wV 8-color broad coverage 21,471 pixels (2,886 nonwhite); final 64,000/64,000 after 42,529 dots. [DEC-055](DECISIONS.md#dec-055-per-image-game-palettes).
+
 **ENGINE-001 unrestricted wV E2, SHA 43fad67.** 24 local regression tests PASS. Fresh input SHA256 07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a; plan SHA256 b9b97905091796bb87530eef031feaeffec322730b183e2245c763466bbb9d0c. Model covered 64,000/64,000 source pixels with 124 connected paths and 44,773 dots. All 604 protected pixels covered. [CI 45148571835](https://github.com/Kiddos19882/AutoDraw/actions/runs/45148571835).
 
 **ENGINE-001 S5-R8 · E2/E3 (2026-11-23).** SHA 20bfb6a, 23 tests PASS, source4×2 technical PASS, frozen coverage FAIL (wV). [R8 experiment and visual review](ENGINE001_BPRED_S5R8_ORIGINAL4X2_RESULTS_2026-11-23.md).
