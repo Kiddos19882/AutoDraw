@@ -49,6 +49,11 @@ class R7Tests(unittest.TestCase):
         self.assertGreaterEqual(r["scheduler"]["owner_broad_count"],2)
         self.assertEqual(sum(r["scheduler"]["orientation_broad"].values()),
                          r["phase_strokes"]["broad"])
+        chosen=r["scheduler"]["chosen_axis_per_owner"]
+        for stroke in r["proposals"]:
+            if stroke["phase"]=="broad":
+                self.assertEqual(stroke["axis_degrees"],
+                                 chosen[str(stroke["paintable_id"])])
         self.assertEqual(r["web_methods"]["Medial_Axis"],"NOT_IMPLEMENTED")
         self.assertEqual(r,r7.build_candidates(a))
 
