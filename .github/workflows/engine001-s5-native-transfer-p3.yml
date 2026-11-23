@@ -1,0 +1,65 @@
+name: ENGINE-001 S5 P3 full EZAL segmented native Egret
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-s5-native-transfer-p3.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_s5_native_transfer_p3.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_s5_native_transfer_p3.py'
+permissions:
+  contents: read
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install numpy==2.2.6 Pillow==11.3.0
+      - run: python -m py_compile AutoDraw_Stage20/tests/run_engine001_s5_native_transfer_p3.py
+      - run: python AutoDraw_Stage20/tests/test_engine001_s5_native_transfer_p3.py -v
+  native:
+    needs: geometry
+    strategy:
+      fail-fast: false
+      matrix:
+        row: [0, 1, 2, 3, 4, 5, 6]
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install selenium==4.38.0 numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0 scikit-image==0.25.2 opencv-python-headless==4.11.0.86 requests==2.32.5
+      - run: python AutoDraw_Stage20/tests/run_engine001_s5_native_transfer_p3.py --row ${{ matrix.row }} --out "${{ runner.temp }}/s5-p3-row-${{ matrix.row }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: S5-P3-row-${{ matrix.row }}
+          path: ${{ runner.temp }}/s5-p3-row-${{ matrix.row }}
+          if-no-files-found: error
+  assemble:
+    needs: native
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install numpy==2.2.6 Pillow==11.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: S5-P3-row-*
+          path: ${{ runner.temp }}/p3-rows
+      - run: python AutoDraw_Stage20/tests/run_engine001_s5_native_transfer_p3.py --assemble "${{ runner.temp }}/p3-rows" --out "${{ runner.temp }}/p3-assembled"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: S5-P3-full-EZAL-actual-Egret
+          path: ${{ runner.temp }}/p3-assembled
+          if-no-files-found: error
