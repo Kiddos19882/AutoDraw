@@ -1,0 +1,103 @@
+name: ENGINE-001 S5-LANE-P2 true Egret normal multi-vertex turns
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-s5-lane-p2-native-turns.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_s5_lane_p2_native_turns.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_s5_lane_p2_native_turns.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_S5_LANE_P2_NATIVE_NORMAL_MULTI_VERTEX_JOINTS_PREREG_2026-11-23.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-s5-lane-p2-normal-turns
+  cancel-in-progress: true
+jobs:
+  real-native-egret-joins:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen Egret native E3 dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: Verify frozen P2 E0, geometry, existing renderer and Markdown
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_s5_lane_p2_native_turns.py AutoDraw_Stage20/tests/test_engine001_s5_lane_p2_native_turns.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_s5_lane_p2_native_turns.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Restore exact pinned Egret native E3 scripts on Windows (no LF drift)
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert blob==expected,(path,blob,expected)
+              Path(path).write_bytes(raw)
+              print("S5P2_SOURCE_PIN",path,blob)
+          PY
+      - name: 120 connected vs split Egret P2 cases plus real blank control
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_s5_lane_p2_native_turns.py \
+            --workspace . \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.s5-lane-p2-native
+      - name: Independently verify native 241 PNG, SHA, provenance and threshold metrics
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.s5-lane-p2-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_S5_LANE_P2_NORMAL_NATIVE_POLYLINE_JOINTS_V1"
+          assert r["technical_status"]=="PASS_COMPLETE_NATIVE_EVIDENCE"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["game_engine_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["renderer_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["case_count"]==120 and r["native_png_count"]==241
+          assert len(r["cases"])==120 and len(set(c["id"] for c in r["cases"]))==120
+          assert len([p for p in r["member_sha256"] if p.endswith(".png")])==241
+          for path,digest in r["member_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest,path
+          for c in r["cases"]:
+              assert "alpha24" in c["metrics"] and "alpha128" in c["metrics"]
+              assert c["width"] in range(1,11) and c["turn_angle"] in (45,90,135)
+          assert r["production_promotion"] is False
+          assert r["E4_game"]=="NOT_RUN" and r["exact_CHALK"]=="NOT_RUN"
+          print("S5_P2_SIGNED_NATIVE_PASS",r["case_count"],r["native_png_count"])
+          PY
+      - name: Preserve ALL P2 raw positive and negative normal native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5-lane-p2-normal-multipoint-joints-120-native-cases
+          path: AutoDraw_Stage20/.s5-lane-p2-native
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
