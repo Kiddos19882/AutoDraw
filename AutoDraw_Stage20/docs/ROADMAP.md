@@ -1,3 +1,5 @@
+**ENGINE-001 S5 transfer roadmap, 2026-11-23.** [True-Egret E3 three-source transfer](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#s5-cross-original-native-feedback-transfer-executed-e3-2026-11-23) has native gap reductions but quality PARTIAL; Pink RGB/edges regress after round1. Next real-native local feedback damage-aware selection/stopping, then full EZAL source via native tiles; no production/CHALK promotion.
+
 **ENGINE-001 S5 native feedback next (2026-11-23).** True-Egret four-pass color/alpha feedback on wV closes zero-alpha and false opaque-white colored holes, [signed E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#native-egret-feedback-fills-signed-e3-progression-and-remaining-limitations-2026-11-23). Next extract the real native feedback-based gap detector/repair planner into a reusable research component; run multiple fresh original images and verify critical details before any production integration. Do not confuse wV engineering E3 with cross-image acceptance or live E4/CHALK.
 
 **ENGINE-001 S5 · 2026-11-23.** The wV second-lane diagnostic is complete. Next comes Egret source/board binding. [Experiment results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md).
