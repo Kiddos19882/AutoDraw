@@ -101,5 +101,6 @@ jobs:
         with:
           name: engine001-s5-lane-p1-180cases-normal-real-egret
           path: AutoDraw_Stage20/.s5-lane-p1-native
-          if-no-files-found: warn
+          if-no-files-found: error
+          include-hidden-files: true
           retention-days: 30
