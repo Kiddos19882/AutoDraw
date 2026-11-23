@@ -1,0 +1,105 @@
+name: ENGINE-001 S5-LANE-P1 real Egret adjacent-lane alpha coverage
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - '.github/workflows/engine001-s5-lane-p1-native-spacing.yml'
+      - 'AutoDraw_Stage20/tests/run_engine001_s5_lane_p1_native_spacing.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_s5_lane_p1_native_spacing.py'
+      - 'AutoDraw_Stage20/docs/ENGINE001_S5_ADJACENT_LANE_NATIVE_SPACING_PREREG_2026-11-23.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engine001-s5-lane-p1-native-spacing
+  cancel-in-progress: true
+jobs:
+  native-adjacent-lane-evidence:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned archived-Egret runner dependencies
+        shell: bash
+        run: |
+          python -m pip install selenium==4.38.0 numpy==2.2.6 opencv-python-headless==4.11.0.86 Pillow==11.3.0 scikit-image==0.25.2 scipy==1.15.3 requests==2.32.5
+      - name: E2 frozen geometry/alpha masks and existing renderer/docs
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_s5_lane_p1_native_spacing.py AutoDraw_Stage20/tests/test_engine001_s5_lane_p1_native_spacing.py AutoDraw_Stage20/tests/measure_engine001_s5_native_brush_footprints.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_s5_lane_p1_native_spacing.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Recover pinned game bundle and renderer bytes without Windows checkout EOL drift
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          pins={
+            "AutoDraw_Stage20/gameEngine/main.min_653f95bc.js":"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+            "AutoDraw_Stage20/tests/game_renderer_reference.js":"76d950e0a8911888a9df3b675b866519ecf7bba4",
+            "AutoDraw_Stage20/tests/run_engine001_b1r_p4b7_native_stroke_attribution.py":"87ea292c01c75e594c4ff09acf716c4500e88644",
+            "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py":"1985af2763ba0169039e70eae693af854908783c",
+          }
+          for path,expected in pins.items():
+              raw=subprocess.check_output(["git","show","HEAD:"+path])
+              actual=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+              assert actual==expected,(path,actual,expected)
+              Path(path).write_bytes(raw)
+              print("S5_LANE_P1_SOURCE_PIN",path,actual)
+          PY
+      - name: Real Egret all widths 1-10 x angles 0 45 90 x 3 gap ratios x 2 phases
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_s5_lane_p1_native_spacing.py \
+            --workspace . \
+            --engine-js AutoDraw_Stage20/gameEngine/main.min_653f95bc.js \
+            --renderer AutoDraw_Stage20/tests/game_renderer_reference.js \
+            --output AutoDraw_Stage20/.s5-lane-p1-native
+      - name: Independently check report cases, 541 native PNG and member SHA256
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path("AutoDraw_Stage20/.s5-lane-p1-native")
+          r=json.loads((root/"report.json").read_text("utf8"))
+          assert r["experiment"]=="ENGINE001_S5_LANE_P1_NATIVE_ADJACENT_STROKE_SPACING_V1"
+          assert r["technical_status"]=="PASS_COMPLETE_NATIVE_EVIDENCE"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["source_game_blob"]=="46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          assert r["renderer_blob"]=="76d950e0a8911888a9df3b675b866519ecf7bba4"
+          assert r["widths"]==list(range(1,11))
+          assert r["angles"]==[0,45,90]
+          assert r["ratios"]==[.75,.9,1.]
+          assert len(r["phases"])==2 and r["cases_count"]==180
+          assert r["png_count"]==541
+          assert len(r["cases"])==180
+          assert len(set(c["id"] for c in r["cases"]))==180
+          assert len([n for n in r["members_sha256"] if n.endswith(".png")])==541
+          for rel,digest in r["members_sha256"].items():
+              assert hashlib.sha256((root/rel).read_bytes()).hexdigest()==digest,rel
+          assert r["production_promotion"] is False
+          assert r["E4_game"]=="NOT_RUN" and r["CHALK_exact"]=="NOT_RUN"
+          print("S5_LANE_P1_E3_SIGNED",r["cases_count"],r["png_count"],
+                r["alpha24_gapfree_cases"],r["alpha128_gapfree_cases"])
+          PY
+      - name: Archive all raw positive/negative native evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5-lane-p1-180cases-normal-real-egret
+          path: AutoDraw_Stage20/.s5-lane-p1-native
+          if-no-files-found: warn
+          retention-days: 30
