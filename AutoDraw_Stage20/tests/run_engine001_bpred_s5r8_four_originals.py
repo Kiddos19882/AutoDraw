@@ -29,7 +29,7 @@ def run_source(index, relative, root, out, palette):
         with np.load(io.BytesIO(packet), allow_pickle=False) as archive:
             arrays = {k: archive[k] for k in ("original_rgba", "game_index", "paintable_id",
                                               "protected_original_dot", "source_edge")}
-        plan = r8.build_candidates(arrays)
+        plan = r8.build_candidates(arrays, max_trials=2000, max_strokes=200)
         original.verifier.validate_model(plan, arrays)
         metrics = prior.independent(plan, arrays)
         raw = original.canonical(plan)

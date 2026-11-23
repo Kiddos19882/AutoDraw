@@ -141,10 +141,10 @@ def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
                              _validate_candidates, VERSION)
 
 
-def _build_candidates(arrays, max_trials, max_strokes, generate, validate, version):
-    if type(max_trials) is not int or not 1 <= max_trials <= 2000:
+def _build_candidates(arrays, max_trials, max_strokes, generate, validate, version, *, unlimited=False):
+    if not unlimited and (type(max_trials) is not int or not 1 <= max_trials <= 2000):
         raise source.BlockedS5R2("BLOCKED_S5R7_TRIAL_BUDGET")
-    if type(max_strokes) is not int or not 1 <= max_strokes <= 200:
+    if not unlimited and (type(max_strokes) is not int or not 1 <= max_strokes <= 200):
         raise source.BlockedS5R2("BLOCKED_S5R7_STROKE_BUDGET")
     game, ids, rgba, protected, opaque = source._source_arrays(arrays)
     edge = arrays.get("source_edge")
@@ -181,13 +181,13 @@ def _build_candidates(arrays, max_trials, max_strokes, generate, validate, versi
     proposed = []
 
     pool, n_trials, counters = validate(
-        raw, ids, game, opaque, max_calls=min(1400,max_trials))
+        raw, ids, game, opaque, max_calls=float("inf") if unlimited else min(1400,max_trials))
     trials["broad"] = n_trials
     rejected.update(counters)
     flat_cover = covered.ravel()
     owner_areas = owner_area
 
-    for _ in range(min(80, max_strokes)):
+    for _ in range(len(pool) if unlimited else min(80, max_strokes)):
         best = None
         best_score = -1.0
         best_gain = 0
@@ -244,12 +244,14 @@ def _build_candidates(arrays, max_trials, max_strokes, generate, validate, versi
         pool[best] = (meta, model, None)
 
     # Same reserved detail phase as R3-R6; exact source-owner/model oracle.
-    if max_trials>1400 and max_strokes>80:
+    if unlimited or (max_trials>1400 and max_strokes>80):
+        detail_strokes = float("inf") if unlimited else min(120, max_strokes-80)
+        detail_trials = float("inf") if unlimited else min(600, max_trials-1400)
         for mask in (protected & ~covered, opaque & ~covered):
             yy,xx = np.nonzero(mask)
             for y,x in zip(yy.tolist(),xx.tolist()):
-                if accepted["detail"] >= min(120,max_strokes-80) or \
-                        trials["detail"] >= min(600,max_trials-1400):
+                if accepted["detail"] >= detail_strokes or \
+                        trials["detail"] >= detail_trials:
                     break
                 if covered[y,x]:
                     continue
@@ -280,7 +282,7 @@ def _build_candidates(arrays, max_trials, max_strokes, generate, validate, versi
                     "modeled_new_potential_cells":len(fresh),
                     "modeled_protected_dots_newly_touched":int(touch)})
                 accepted["detail"]+=1
-            if accepted["detail"] >= min(120,max_strokes-80):
+            if accepted["detail"] >= detail_strokes:
                 break
     total = int(opaque.sum())
     result = {

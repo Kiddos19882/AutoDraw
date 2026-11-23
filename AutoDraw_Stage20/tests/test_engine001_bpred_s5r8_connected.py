@@ -25,9 +25,9 @@ class ConnectedSweeps(unittest.TestCase):
             rgba[row, 85:88, 3] = 0
         with patch.object(r8.r7.source, "swept_capsule_pixel_masks",
                           wraps=r8.r7.source.swept_capsule_pixel_masks) as oracle:
-            result = r8.build_candidates(arrays)
+            result = r8.build_candidates(arrays, max_trials=2000, max_strokes=200)
             self.assertEqual(oracle.call_count, result["trials"])
-        self.assertEqual(result, r8.build_candidates(arrays))
+        self.assertEqual(result, r8.build_candidates(arrays, max_trials=2000, max_strokes=200))
         broad = [s for s in result["proposals"] if s["phase"] == "broad"]
         self.assertTrue(any(len(s["points"]) >= 6 for s in broad))
         self.assertTrue(all(2 <= len(s["points"]) <= 32 for s in broad))
@@ -57,3 +57,11 @@ class ConnectedSweeps(unittest.TestCase):
             self.assertEqual(len(pool),expected)
             if limit == 3:
                 self.assertEqual(rejected["split_unsafe_connector"],1)
+
+    def test_development_default_exhausts_residuals(self):
+        arrays = sample()
+        plan = r8.build_candidates(arrays)
+        self.assertGreater(plan["phase_strokes"]["detail"], 120)
+        self.assertGreater(plan["trials"], 2000)
+        self.assertEqual(plan["uncovered_potential_pixel_count"], 0)
+        self.assertFalse(plan["smooth"])

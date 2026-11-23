@@ -1,5 +1,6 @@
 """Research-only connected source-cell sweeps. All geometry is in source pixels."""
 from collections import Counter
+from functools import partial
 
 import numpy as np
 
@@ -9,7 +10,7 @@ import engine001_bpred_s5r7_cell_marginal as r7
 VERSION = "ENGINE001_BPRED_S5R8_CONNECTED_CELL_SWEEPS_V1"
 
 
-def _generate(ids, game, clearance, graphs):
+def _generate(ids, game, clearance, graphs, *, unlimited=False):
     _, axes = r7._generate(ids, game, clearance, graphs)
     proposals = []
     for axis, graph in enumerate(graphs):
@@ -25,8 +26,11 @@ def _generate(ids, game, clearance, graphs):
                     continue
                 last_row = span[0]
                 lanes.append(lane)
-            for start in range(0, len(lanes), 10):
-                group = lanes[start:start + 10]
+            if not lanes:
+                continue
+            group_size = len(lanes) if unlimited else 10
+            for start in range(0, len(lanes), group_size):
+                group = lanes[start:start + group_size]
                 width = min(lane["width"] for lane in group)
                 length = sum(lane["estimated_gain"] / lane["width"] for lane in group)
                 proposals.append(dict(group[0], lanes=group, width=width,
@@ -83,8 +87,18 @@ def _validate(proposals, ids, game, opaque, *, max_calls):
     return pool, calls, dict(rejected)
 
 
-def build_candidates(arrays, *, max_trials=2000, max_strokes=200):
-    plan = r7._build_candidates(arrays, max_trials, max_strokes, _generate, _validate, VERSION)
+def build_candidates(arrays, *, max_trials=None, max_strokes=None):
+    """Current development entry point. Explicit budgets replay the historical R8 protocol."""
+    unlimited = max_trials is None and max_strokes is None
+    if unlimited:
+        version = "ENGINE001_S5_UNCAPPED_CONNECTED_V1"
+    else:
+        version = VERSION
+        max_trials = 2000 if max_trials is None else max_trials
+        max_strokes = 200 if max_strokes is None else max_strokes
+    plan = r7._build_candidates(arrays, max_trials, max_strokes,
+                                partial(_generate, unlimited=unlimited), _validate,
+                                version, unlimited=unlimited)
     plan["web_methods"]["parallel_sweep_lanes"] = "APPLIED_connected_in_cell_snake"
     for stroke in plan["proposals"]:
         if stroke["phase"] == "detail":
