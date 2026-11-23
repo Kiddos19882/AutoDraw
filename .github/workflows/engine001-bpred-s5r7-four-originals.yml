@@ -51,7 +51,7 @@ jobs:
       - name: Independent raw SHA, source-safety and original visual audit
         run: |
           python - <<'PY'
-          import hashlib,json,os
+          import gzip,hashlib,json,os
           from pathlib import Path
           root=Path(os.environ['RUNNER_TEMP'])/'s5r7'
           r=json.loads((root/'00_S5R7_RESULTS.json').read_bytes())
@@ -68,6 +68,26 @@ jobs:
               assert s['r7_strokes']['broad']<=80 and s['r7_strokes']['detail']<=120
               assert s['r7_topology']['row_area']==s['r7_topology']['column_area']
               assert s['r7_metrics']['total']==s['r7_covered']
+              for axis in ('0','90'):
+                  graphref=s['complete_source_cell_graphs'][axis]
+                  zipped=(root/graphref['file']).read_bytes()
+                  assert hashlib.sha256(zipped).hexdigest()==graphref['gzip_sha256']
+                  content=gzip.decompress(zipped)
+                  assert hashlib.sha256(content).hexdigest()==graphref['raw_sha256']
+                  graph=json.loads(content)
+                  assert graphref['cells']==len(graph['cells'])
+                  assert graphref['runs']==graph['runs']
+                  assert graphref['edges']==len(graph['edges'])
+                  assert graphref['events']==len(graph['events'])
+                  assert graphref['source_area']==graph['opaque_pixels']
+                  assert graphref['split']==graph['split_events']
+                  assert graphref['merge']==graph['merge_events']
+                  assert graph['opaque_pixels']==s['r7_topology']['row_area']
+                  assert sum(c['area'] for c in graph['cells'])==graph['opaque_pixels']
+                  assert sum(len(c['spans']) for c in graph['cells'])==graph['runs']
+                  assert all(0<=old<new<len(graph['cells'])
+                             for old,new in graph['edges'])
+                  print('S5R7_SIGNED_FULL_AXIS_GRAPH',axis,graph['runs'],graphref['cells'])
               for key in ('r3','r4','r5','r6','r7'):
                   ref=s['models'][key]
                   raw=(root/ref['file']).read_bytes()
