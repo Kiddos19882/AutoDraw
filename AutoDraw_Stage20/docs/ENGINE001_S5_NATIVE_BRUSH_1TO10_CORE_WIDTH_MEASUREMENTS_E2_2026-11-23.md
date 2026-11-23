@@ -7,7 +7,7 @@
 | Study | GitHub workflow / SHA | Archive ID | Retrieved ZIP SHA256 | ZIP validation |
 |---|---|---:|---|---|
 | P4A2 | [44298271642](https://github.com/Kiddos19882/AutoDraw/actions/runs/44298271642) `bc2732c` | [14423584387](https://github.com/Kiddos19882/AutoDraw/actions/runs/44298271642/artifacts/14423584387) | `dd7f7b6bc8241c69ff3251787d691299fee25b1b2338245dbb97099940b0c64a` | digest + CRC PASS, 48 members |
-| P4D3 | [44417716689](https://github.com/Kiddos19882/AutoDraw/actions/runs/44417716689) `77e9ddd` | [14480461909](https://github.com/Kiddos19882/AutoDraw/actions/runs/44417716689/artifacts/14480461909) | `690fab5a021efac16ffa6bf67e3c6cef3bc39d5e7eefc57b93a0cd87b2d7bb2d` | digest + CRC PASS, 1687 members |
+| P4D3 | [44417716689](https://github.com/Kiddos19882/AutoDraw/actions/runs/44417716689) `77e9ddd` | [14480461909](https://github.com/Kiddos19882/AutoDraw/actions/runs/44417716689/artifacts/14480461909) | `690fab5a021efac16ffa6bf67e3c6cef3bc39d5e7eefc57b93a0cd87b2e7bb2d` | digest + CRC PASS, 1687 members |
 | P4D4 | [44419171411](https://github.com/Kiddos19882/AutoDraw/actions/runs/44419171411) `e6f561a` | [14482220143](https://github.com/Kiddos19882/AutoDraw/actions/runs/44419171411/artifacts/14482220143) | `e28b065fbc6880f8180f110e3ae934a7f807055c77bc1e188256c09fcf67772a` | digest + CRC PASS, 1447 members |
 
 All three artifacts were downloaded and exact ZIP SHA256 rechecked against historical frozen digests. Native replay equivalence independently spot-checked on three P4D3 scenes (`W01_A000_L34`, `W05_A045_L34`, `W10_A090_L34`) R1 versus R2 full RGBA arrays: PASS. The historical complete 480/480 replay test was not rerun.
