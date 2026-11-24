@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A9 relaxed geometry pending
+
+[A9 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a9-relaxed-brush-geometry-e0-2026-11-24), [CI45340892910](https://github.com/Kiddos19882/AutoDraw/actions/runs/45340892910) code SHA 8dcb5ca; IN_PROGRESS at observation (contracts running). E2/E3 results PENDING; E4/E5/exact CHALK NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 A8 native minimum brush4 E3
 
 [A8 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a8-minimum-brush-4-native-results-e3-2026-11-24), [CI45336684115](https://github.com/Kiddos19882/AutoDraw/actions/runs/45336684115) SHA 0a92821 4/4 SUCCESS; six artwork plans/scene meter/hash checks PASS, three ZIP digests/225 CRC PASS. Assistant visual FAIL for complex images, user review PENDING; E4/E5/exact CHALK NOT_RUN.
