@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A8 minimum brush4 native test pending
+
+[A8 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a8-minimum-brush-4-e0-2026-11-24), [CI45336684115](https://github.com/Kiddos19882/AutoDraw/actions/runs/45336684115) SHA 0a92821, IN_PROGRESS at observation; no E3 result or visual acceptance for A8 yet. A7 visual accepted by user. Exact CHALK/E4/E5 NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 A7 selected zoning native E3
 
 [A7 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a7-native-results-e3-2026-11-24), [CI45314721360](https://github.com/Kiddos19882/AutoDraw/actions/runs/45314721360) code e031850, contracts + 3 native jobs 4/4 SUCCESS; 3 artifact digest/366 CRC/30 scene-plan-meter pair/3 control RGBA checks PASS. Meter actual offline BoardPane accepted vertex counter verified, no limit; optimization PARTIAL, visual PENDING, E4/exact CHALK/E5 NOT_RUN.
