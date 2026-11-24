@@ -1,4 +1,4 @@
-name: ENGINE-001 S5 A14 routes A-F
+name: ENGINE-001 S5 A14 routes A-F unlimited vertices
 on:
   workflow_dispatch:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/engine001-s5-native-a14-routes.yml'
       - 'AutoDraw_Stage20/tests/run_engine001_s5_native_a14_routes.py'
+      - 'AutoDraw_Stage20/tests/engine001_s5_a14_routes.py'
 permissions:
   contents: read
 env:
@@ -42,6 +43,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: S5-A14-routes-${{ matrix.case }}-r${{ matrix.radius }}
+          name: S5-A14-routes-unlimited-${{ matrix.case }}-r${{ matrix.radius }}
           path: ${{ runner.temp }}/s5-a14-routes-${{ matrix.case }}-r0${{ matrix.radius }}
           if-no-files-found: error

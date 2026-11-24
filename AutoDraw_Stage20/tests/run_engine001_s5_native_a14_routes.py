@@ -46,8 +46,24 @@ def main(case,radius):
         assert not native.render(driver,"blank",[])[:,:,3].any()
         control=[native.stroke(native.segment(200,100,12,0),4,0,0)]
         first=native.render(driver,"reference-original",control)
-        driver.execute_script(native.full_fixture())
+        js=native.full_fixture()
+        first_guard=js.index("function renderComplexHoldoutColorProbe(")
+        last_guard=js.index("const board = makeTemporalBoard(",first_guard)
+        guard=js[first_guard:last_guard]
+        anchor=" ||\n          stroke.points.length > 128"
+        assert guard.count(anchor)==1
+        js=js[:first_guard]+guard.replace(anchor,"")+js[last_guard:]
+        driver.execute_script(js)
         assert np.array_equal(first,native.render(driver,"reference-expanded",control))
+        # Native proof: one continuous stroke with 512 distinct adjacent points.
+        probe=[]
+        for i in range(512):
+            y,x=divmod(i,64)
+            probe.append(dict(x=180+(x if y%2==0 else 63-x),y=40+y))
+        probe_rgba=native.render(driver,"unlimited-512-vertex-probe",[native.stroke(probe,1,0,0)])
+        probe_meta=json.loads((out/"unlimited-512-vertex-probe.json").read_text("utf8"))
+        assert probe_meta["strokeCount"]==1 and probe_meta["paintCounter"]["used"]==512
+        assert probe_rgba[:,:,3].any()
         proof=physical.native_footprints(driver)
         native.binding.write_json(out/"egret-physical-footprints.json",proof)
         for variant in routes.VARIANTS:
@@ -61,7 +77,7 @@ def main(case,radius):
             else:
                 paths=routes.plan(band,geom,proof,variant,native.stroke,native.segment)
                 params=dict(variant=variant,source_center_model=True)
-            assert paths and all(2<=len(p["points"])<=128 for p in paths)
+            assert paths and all(len(p["points"])>=2 for p in paths)
             assert all(p["width"]==1 and p["colorRgb"]!=0xffffff for p in paths)
             with gzip.open(out/(name+"-plan.json.gz"),"wt",encoding="utf8") as f:
                 json.dump(paths,f,separators=(",",":"))
@@ -75,10 +91,10 @@ def main(case,radius):
                 ink=alpha>threshold
                 audit[str(threshold)]=dict(within=int((ink&allowed).sum()),outside_band=int((ink&~allowed).sum()),outside_crop=int((raw[:,:,3]>threshold).sum()-ink.sum()))
             meta=json.loads((out/(name+".json")).read_text("utf8"))
-            results[name]=dict(radius_source_px=radius,source_band_pixels=int(mask.sum()),strokes=len(paths),vertices=sum(len(p['points']) for p in paths),logical_length=sum(float(np.hypot(q['x']-p['x'],q['y']-p['y'])) for s in paths for p,q in zip(s['points'],s['points'][1:])),planner=params,metrics=metrics,alpha_audit=audit,simulation_counter=meta.get("paintCounter"),raw_sha256=sha(out/(name+".png")),plan_sha256=sha(out/(name+"-plan.json.gz")))
+            results[name]=dict(radius_source_px=radius,source_band_pixels=int(mask.sum()),strokes=len(paths),max_vertices_per_stroke=max(len(p["points"]) for p in paths),vertices=sum(len(p['points']) for p in paths),logical_length=sum(float(np.hypot(q['x']-p['x'],q['y']-p['y'])) for s in paths for p,q in zip(s['points'],s['points'][1:])),planner=params,metrics=metrics,alpha_audit=audit,simulation_counter=meta.get("paintCounter"),raw_sha256=sha(out/(name+".png")),plan_sha256=sha(out/(name+"-plan.json.gz")))
             p2.make_comparison(out,Image.fromarray(original),Image.fromarray(band),Image.open(out/(name+"-crop.png")))
             (out/"actual-egret-three-way.png").rename(out/(name+"-comparison.png"))
-    native.binding.write_json(out/"a14-routes-results.json",dict(schema="ENGINE001_S5_A14_ROUTES_V1",radii_source_px=[radius],case=case,run=os.environ["GITHUB_RUN_ID"],sha=os.environ["GITHUB_SHA"],source=rel,source_sha256=sha(root/rel),geometry=geom,brush_widths=[1],smooth=False,mode="normal",interior_fill=False,strict_spill=False,results=results,exact_CHALK="NOT_RUN",human_visual_review="PENDING"))
+    native.binding.write_json(out/"a14-routes-results.json",dict(schema="ENGINE001_S5_A14_ROUTES_UNLIMITED_V2",per_stroke_vertex_cap=None,radii_source_px=[radius],case=case,run=os.environ["GITHUB_RUN_ID"],sha=os.environ["GITHUB_SHA"],source=rel,source_sha256=sha(root/rel),geometry=geom,brush_widths=[1],smooth=False,mode="normal",interior_fill=False,strict_spill=False,results=results,exact_CHALK="NOT_RUN",human_visual_review="PENDING"))
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()

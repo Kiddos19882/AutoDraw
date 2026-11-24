@@ -97,12 +97,8 @@ def compress(walk):
             result.append(b)
     return result+[walk[-1]]
 
-def bounded(walk):
-    pts=compress(walk)
-    return [pts[i:i+128] for i in range(0,max(1,len(pts)-1),127)]
-
 def cost(walks):
-    return sum(max(2,len(p)) for w in walks for p in bounded(w))
+    return sum(max(2,len(compress(w))) for w in walks)
 
 def choose(mask,scale,proof,variant):
     if variant=="b":
@@ -145,12 +141,12 @@ def plan(target,g,proof,variant,stroke,segment):
                     assert local[y,x]
                     visited[y,x]=True
                 assert all(abs(a[0]-b[0])+abs(a[1]-b[1])==1 for a,b in zip(walk,walk[1:]))
-                for pts in bounded(walk):
-                    board=[dict(x=g["left"]+scale*(x+sl[1].start+.5),
-                                y=g["top"]+scale*(y+sl[0].start+.5)) for x,y in pts]
-                    if len(board)==1:
-                        board=segment(board[0]["x"],board[0]["y"],.5,0)
-                    result.append(stroke(board,1,rgb,len(result)))
+                pts=compress(walk)
+                board=[dict(x=g["left"]+scale*(x+sl[1].start+.5),
+                            y=g["top"]+scale*(y+sl[0].start+.5)) for x,y in pts]
+                if len(board)==1:
+                    board=segment(board[0]["x"],board[0]["y"],.5,0)
+                result.append(stroke(board,1,rgb,len(result)))
             assert np.array_equal(visited,local)
     return result
 
@@ -167,8 +163,21 @@ def contracts():
         assert seen==set(zip(*np.nonzero(m.T)))
         assert all(abs(a[0]-b[0])+abs(a[1]-b[1])==1 for w in walks for a,b in zip(w,w[1:]))
         assert walks==choose(m,.3,proof,variant)
-        assert all(1<=len(p)<=128 for w in walks for p in bounded(w))
+        assert all(len(compress(w))>=1 for w in walks)
     assert len(axis(np.ones((1,300),bool),.3,proof,length=24))<len(axis(np.ones((1,300),bool),.3,proof,length=12))
-    print("A14 route source contracts PASS")
+    # Alternating unit steps create more than 128 genuine turns.
+    walk=[(0,0)]
+    for i in range(511):
+        x,y=walk[-1]
+        walk.append((x+1,y) if i%2==0 else (x,y+1))
+    assert len(compress(walk))==512 and cost([walk])==512
+    staircase=np.zeros((257,257,3),np.uint8)+255
+    for x,y in walk:
+        staircase[y,x]=0
+    planned=plan(staircase,dict(left=155,top=0,scale=.3),proof,"e",
+                 lambda pts,width,rgb,i:dict(points=pts,width=width,colorRgb=rgb),
+                 lambda x,y,dx,dy:[dict(x=x-dx/2,y=y),dict(x=x+dx/2,y=y)])
+    assert len(planned)==1 and len(planned[0]["points"])==512
+    print("A14 route source contracts PASS; one 512-vertex stroke preserved")
 if __name__=="__main__":
     contracts()
