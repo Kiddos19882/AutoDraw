@@ -707,3 +707,30 @@ User explicitly authorized a NEW A12 research experiment after A11 negative visu
 ## ENGINE-001 S5 A13 strict contour-only radius sweep E0 (2026-11-24)
 
 User-directed new experiment, baseline A12 E3 at 57784a / CI45379060389; remote baseline b742e8922cecaf780f60c37b65e38812ea4b5ba8. A12 and A7 evidence frozen. The attached wV PNG is byte-identical to repository `testImages/wV6VeZI9S1Y.png` (git blob d3cd95b846f036a3f8acecf75d2a237e46dcf13a, SHA256 07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a). Sample: wV plus previous A12 Home/Illustration/Second PNG, same 04 RTV and 08 CN-Chroma-DE2000 preparations, each radius 3/5/10/15/20 source pixels, 40 contour-only native scenes. White background unpainted; narrow same-color zones wholly within band may be covered completely. No interior-fill phase, broad control artwork, repair or quota. All and only measured widths 1–4 eligible (actual width usage recorded, not forced); normal smooth=false, two-valid-endpoint routes, strict zero MODEL_ONLY support spill against entire same-color band (not merely centerline); bands calculated with existing A12 distance transform and projection scale. Use native Egret archived reference and existing measured-footprint atlas/fixture; calibration controls remain separate from artwork. Save original/prepared/zone maps, masks, plans, route ledger, actual RGBA/crops, metadata/hashes, per-radius native alpha>0/24/128 outside-band counts and within-band coverage; any alpha>0 beyond allowed union is native strict-band FAIL, report rather than hide. No quality threshold on coverage; human inspection pending. Exact CHALK/E4/E5 NOT_RUN. Preserve historical batches, production, Stage6, Bridge, master. E0 preregistration only, implementation/CI NOT_RUN.
+
+## ENGINE-001 S5 A13 strict contour-only native results E3 (2026-11-24)
+
+Frozen E0 at 14abeaaa875ae99091e96b968e9ed65e623a3251; code **ad45e6a274ced8521279d420734562d12167aab2**. [CI45431171193](https://github.com/Kiddos19882/AutoDraw/actions/runs/45431171193) all 5/5 jobs SUCCESS; [AutoDraw validation CI45431171157](https://github.com/Kiddos19882/AutoDraw/actions/runs/45431171157) SUCCESS on same SHA. 4 original sources × 2 methods 04 RTV/08 CN-Chroma-DE2000 × 5 radii 3/5/10/15/20 source px = 40 native Egret outputs including 8 empty plans. No interior phase, no repair, normal smooth=false, widths 1–4 only, unlimited synthetic simulation meter. All four widths actually used in 22/40 scenes. Empty plans are negative quality evidence, not successful artwork.
+
+Independent artifact inspection: SHA256 matches GitHub published digest for all 4 archives; 532/532 ZIP members CRC PASS, all 40 native raw PNG and gzipped plan SHA256, per-width histograms, two distinct endpoints, strict model ledger entries, simulated vertex counts and alpha audit recomputed from raw PNG against allowed masks (alpha >0/24/128). Zero nontransparent backing pixels outside the union of same-color allowed bands or crop in all 40. This is union-band compliance, not proof of native per-color owner purity. No game runtime/exact CHALK/E5.
+
+| Original | Artifact ID | SHA256 |
+| --- | ---: | --- |
+| Home | 14937713506 | 7bdf8d8244824bfe609b3d9800a07bc638fb0aba0a7c468f4e4b91dbcf6afbb7 |
+| Illustration | 14938368410 | a9654425c52487beb33da5534da9c9c0ed8e7408f1ecdd652c4d5e56081c5973 |
+| Second PNG | 14938919335 | fd2263ca3728346dd185bb671311bbf66639a839a1000945667982b694ab54ce |
+| wV | 14938903969 | 01743bdcf0b1397988ff51d8068d57a1edd7aa75347b8acc052fbe2dd47f7621 |
+
+04 RTV actual alpha>128 coverage of allowed band (NOT whole image):
+ 
+| Radius | wV | Home | Illustration | Second PNG |
+| ---: | ---: | ---: | ---: | ---: |
+| 3 | 5.44% | 0% | 0% | 0% |
+| 5 | 24.89% | 0% | 2.45% | 1.41% |
+| 10 | 32.59% | 12.16% | 32.79% | 42.39% |
+| 15 | 32.82% | 54.48% | 42.79% | 49.14% |
+| 20 | 32.82% | 65.88% | 47.25% | 53.17% |
+
+08 joint results similar. Both wV methods have identical stroke counts for 15/20 within method. The 40-sample observed width1 support union spans 9×9 backing pixels (45 support pixels, 7 core), while projected source radius3 is 2.64 Home, 3.26 Illustration, 3.75 Second PNG, 6.75 wV; strict full-support containment and two-center route requirement constrain small bands and fine contours. This is a supported explanation of geometric bottleneck, not a claim that native width1 diameter is 9. Assistant visual review of wV and Illustration RTV sheets: missing facial, clothing and hair outlines; radius3 mostly blank, radius5 fragmented, 10–20 wider color strips but incomplete outlines. No user visual acceptance. No coverage acceptance threshold retroactively imposed; user-requested useful contour depiction is PARTIAL/negative. A13 strictly differs from A12's center-only band guard. Recommended next after human review: phase/direction-specific measured support and native readback validation to recover thin same-color contours without increasing 0% tolerance; no production or automatic promotion.
+
+Visual review ZIP `S5-A13-visual-review.zip`, 119 members, CRC PASS, SHA256 a743d40692d4bcedeaf71e18958071b8e0a5fbd437861528506ffdc160525040, 3056873 bytes. Contains 40 actual native crops, 40 allowed masks, 8 comparison sheets, prepared and source images, metrics.csv and independent audit.json. Source wV attachment SHA independently matches E0. Original raw artifacts remain immutable. E2/E3 technical PASS; band union PASS, useful contour quality PARTIAL/negative, human review PENDING, E4/exact CHALK/E5 NOT_RUN. No production, Stage6, Bridge or master changes.

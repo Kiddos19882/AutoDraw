@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A13 E3
+
+[A13 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a13-strict-contour-only-native-results-e3-2026-11-24), [CI45431171193](https://github.com/Kiddos19882/AutoDraw/actions/runs/45431171193), code ad45e6a: 5/5 SUCCESS; 40 native contour-only scenes, measured widths1–4, radii3/5/10/15/20, 4 ZIP SHA/532 CRC PASS, independent alpha union-band audit zero outside all40; 8 empty, thin contour quality PARTIAL/negative; user review PENDING. Exact CHALK/E4/E5 NOT_RUN. Visual ZIP 119 members CRC PASS, SHA256 a743d40692d4bcedeaf71e18958071b8e0a5fbd437861528506ffdc160525040.
+
 ## 2026-11-24 — ENGINE-001 S5 A12 E3
 
 [A12 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a12-contour-band-width-sweep-native-results-e3-2026-11-24), [CI45379060389](https://github.com/Kiddos19882/AutoDraw/actions/runs/45379060389), code SHA57784a: 4/4 native/contracts SUCCESS, AutoDraw validation CI45379060327 SUCCESS, 3 signed artifacts/1245 CRC, 60 final and120 phase original Egret scenes, complete per-width and source-distance endpoint checks, controls PASS. Prior CI45351302317 FAIL singleton, CI45378369786 FAIL module shadow recorded. User visual review ZIP SHA7eacc6e0...300 members, 9.56MB. Technical PASS, complex image quality worse than A10 raw, E4/E5/exact CHALK NOT_RUN.
