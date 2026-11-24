@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A12 E3
+
+[A12 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a12-contour-band-width-sweep-native-results-e3-2026-11-24), [CI45379060389](https://github.com/Kiddos19882/AutoDraw/actions/runs/45379060389), code SHA57784a: 4/4 native/contracts SUCCESS, AutoDraw validation CI45379060327 SUCCESS, 3 signed artifacts/1245 CRC, 60 final and120 phase original Egret scenes, complete per-width and source-distance endpoint checks, controls PASS. Prior CI45351302317 FAIL singleton, CI45378369786 FAIL module shadow recorded. User visual review ZIP SHA7eacc6e0...300 members, 9.56MB. Technical PASS, complex image quality worse than A10 raw, E4/E5/exact CHALK NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 A11 E3
 
 [A11 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a11-mixed-strict-and-relaxed-native-results-e3-2026-11-24), [CI45346195619](https://github.com/Kiddos19882/AutoDraw/actions/runs/45346195619) code ff84777: four required jobs SUCCESS, 357 ZIP CRC and 3 SHA256 PASS, 24 native scenes plus 6 A8 controls, 24 A10 comparator plans, all 280 small-lane strict0 and 644 broad-lane10/20 ledger entries verified. Visual quality PARTIAL/negative, human review PENDING. E4/E5/exact CHALK NOT_RUN.
