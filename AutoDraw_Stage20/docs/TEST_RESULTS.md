@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 Z2 comparative native E3 technical PASS
+
+[signed Z2 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a6-z2-multi-method-results-e3-2026-11-24), [CI45311156361](https://github.com/Kiddos19882/AutoDraw/actions/runs/45311156361) SHA c7e1b72 10/10 SUCCESS, 29 contracts, nine native jobs, 30 treatment frames. Nine ZIP SHA, 1041 CRC, 78 scene/plan SHA/count/width/length checks, 24 repeated A5 frames pixel-identical, 30 region/foreground/palette/protected-dot/neutral invariants PASS. Real CN table SHA 97b1f0ec… consistent across six jobs. Zero #EEEEEE→#FCD2BC. Visual review pending; no E4/E5/CHALK.
+
 ## 2026-11-24 — ENGINE-001 S5 A6-Z1 native zoning E3 technical PASS, overall PARTIAL
 
 [signed A6-Z1 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a6-z1-native-results-e3-2026-11-24), [CI45306349676](https://github.com/Kiddos19882/AutoDraw/actions/runs/45306349676) SHA8f3513a four jobs SUCCESS, 15 prior +7 new contracts, three fresh originals. Independent 270 Z1 and 240 archived A5 CRC, 18 scene/plan SHA and path counts/lengths, 12 baseline PNG pixel matches, per-color counts on 9 source maps and protected-dot/foreground/palette invariants PASS. Both zone objectives PASS (5719→4867/2987), total paths 34808→32245/24551; length increases to 151054.358/157359.517. Strong detail loss visible in assistant review, human verdict PENDING; no E4/E5/exact CHALK claim.
