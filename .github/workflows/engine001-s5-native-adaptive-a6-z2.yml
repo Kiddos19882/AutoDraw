@@ -1,6 +1,11 @@
-name: ENGINE-001 S5 A6 Z2 seven methods and joint variants
+name: ENGINE-001 S5 A7 selected zoning and lane optimization
 on:
   workflow_dispatch:
+    inputs:
+      historical_z2:
+        description: 'Repeat historical all-method Z2 comparison instead of A7'
+        type: boolean
+        default: false
   push:
     branches: [feature/image-geometry-optimization]
     paths:
@@ -8,6 +13,8 @@ on:
       - 'AutoDraw_Stage20/tests/run_engine001_s5_native_adaptive_a6_z2.py'
       - 'AutoDraw_Stage20/tests/engine001_s5_zone_methods.py'
       - 'AutoDraw_Stage20/tests/test_engine001_s5_zone_methods.py'
+      - 'AutoDraw_Stage20/tests/engine001_s5_lane_phase.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_s5_lane_phase.py'
 permissions:
   contents: read
 env:
@@ -29,13 +36,14 @@ jobs:
       - run: python AutoDraw_Stage20/tests/test_engine001_s5_native_adaptive_a5.py -v
       - run: python AutoDraw_Stage20/tests/test_engine001_s5_zone_merge.py -v
       - run: python AutoDraw_Stage20/tests/test_engine001_s5_zone_methods.py -v
+      - run: python AutoDraw_Stage20/tests/test_engine001_s5_lane_phase.py -v
   native:
     needs: contracts
     strategy:
       fail-fast: false
       matrix:
         case: [home, illustration, second-png]
-        batch: [local, global, combined]
+        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected"]') }}
     runs-on: windows-latest
     timeout-minutes: 120
     steps:

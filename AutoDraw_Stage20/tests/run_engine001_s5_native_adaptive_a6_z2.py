@@ -1,5 +1,6 @@
 """Z2 independent and joint zoning methods -> fresh A5 -> actual Egret."""
 import argparse
+import json
 import os
 from pathlib import Path
 import numpy as np
@@ -15,6 +16,7 @@ import run_engine001_s5_native_adaptive_a5 as f
 A5_BLOB = "08bbd613e4ec1e827d18c189ab42578d7309f617"
 A5_COUNTS = {"home":1376, "illustration":22000, "second-png":11432}
 ZONE_COUNTS = {"home":1, "illustration":3134, "second-png":2584}
+SELECTED = ("rtv", "cn-chroma-de2000")
 
 
 def panel(out, original, target, maps):
@@ -25,6 +27,9 @@ def panel(out, original, target, maps):
         cells.append((key.upper()+" SOURCE",Image.fromarray(img)))
     for key in ("a5", *maps):
         cells.append((key.upper()+" EGRET",Image.open(out/(key+"-crop.png"))))
+        improved=out/(key+"-a7-crop.png")
+        if improved.exists():
+            cells.append((key.upper()+" A7 EGRET",Image.open(improved)))
     w,h=450,760
     atlas=Image.new("RGB",(w*len(cells),h),(245,245,245))
     draw=ImageDraw.Draw(atlas)
@@ -38,6 +43,10 @@ def panel(out, original, target, maps):
 
 def main(case,batch):
     import engine001_s5_native_brush_overlap as physical
+    selected = batch == "selected"
+    presets = SELECTED if selected else methods.BATCHES[batch]
+    if selected:
+        import engine001_s5_lane_phase as phase
     import run_engine001_s5_native_transfer_p2 as p2
     import run_engine001_s5_originals_native_transfer as transfer
     import run_engine001_s5_wv_full_native as native
@@ -72,7 +81,7 @@ def main(case,batch):
     failures={}
     cn=None
     cn_meta=None
-    if any("cn" in methods.FLAGS[key] for key in methods.BATCHES[batch]):
+    if any("cn" in methods.FLAGS[key] for key in presets):
         try:
             cn,cn_meta=methods.load_cn()
             np.save(out/"cn-probabilities.npy",cn)
@@ -91,7 +100,7 @@ def main(case,batch):
                  cn_probabilities=methods.cn_probabilities(palette,cn).tolist() if cn is not None else None,
                  engine=provenance,cn=cn_meta)
     a.write_json(out/"game128-compatibility.json",payload)
-    for preset in methods.BATCHES[batch]:
+    for preset in presets:
         try:
             img,before_ids,after_ids,protected,report,ledger=methods.run_variant(original,target,preset,cn)
             a.require(np.array_equal(ids,before_ids),"baseline labels drift")
@@ -121,6 +130,8 @@ def main(case,batch):
         first=native.render(driver,"reference-original",control)
         driver.execute_script(p.fixture(native))
         a.require(np.array_equal(first,native.render(driver,"reference-expanded",control)),"fixture drift")
+        if selected:
+            a.require(not native.render(driver,"meter-blank",[])[:,:,3].any(),"meter blank nonzero")
         proof=physical.native_footprints(driver)
         a.write_json(out/"egret-physical-footprints.json",proof)
         stamps,_=a.measure_stamps(driver,native,out)
@@ -138,6 +149,12 @@ def main(case,batch):
                  original_foreground_rgb_mae=float(err[fg].mean()) if fg.any() else None,
                  continuity=p.continuity(paths),raw_sha256=a.sha(out/(name+".png")),
                  plan_sha256=a.sha(out/(name+"-plan.json.gz")))
+            if selected:
+                meta=json.loads((out/(name+".json")).read_text("utf8"))
+                meter=meta["paintCounter"]
+                a.require(meter["used"]==sum(len(s["points"]) for s in paths) and meter["unlimited"] and meter["budget"] is None,"meter mismatch")
+                results[name]["simulation_paint_counter"]=meter
+                results[name]["broad_continuity"]=p.continuity([s for s in paths if s["width"]>1])
         for key,img in {"a5":target,**maps}.items():
             projected,_,_=transfer.projected(img,geom)
             baseline,params=physical.plan_same_color_overlap(img,geom,proof)
@@ -158,12 +175,28 @@ def main(case,batch):
             results[key]["broad_counts"]=counts
             results[key]["broad_route_metrics"]=q.route_metrics(broad)
             a.write_json(out/(key+"-route-ledger.json"),ledger)
+            if selected and key in SELECTED:
+                name=key+"-a7"
+                improved,counts7,ledger7=phase.broad_plan(projected,atlas,proof,native.stroke)
+                raw7=native.render(driver,name+"-broad",improved)
+                save(name+"-broad",improved,raw7,img,projected)
+                detail7,reasons7=a.retain_detail(baseline,projected,raw7[:,a.OX:a.OX+450],pad)
+                detail7,union7=f.union_detail(detail7)
+                final7=a.combine(improved,detail7)
+                a.require(final7 and all(1<=s["width"]<=10 and s["colorRgb"]!=0xffffff for s in final7),"invalid A7 final")
+                save(name,final7,native.render(driver,name,final7),img,projected)
+                results[name].update(detail_selection=reasons7,detail_union=union7,broad_counts=counts7,broad_route_metrics=q.route_metrics(improved))
+                a.write_json(out/(name+"-route-ledger.json"),ledger7)
+        if selected:
+            a.require(not native.render(driver,"meter-reset",[])[:,:,3].any(),"meter reset nonzero")
+            meters=json.loads((out/"paint-counter-summary.json").read_text("utf8"))
+            a.require(meters["meter-blank"]["used"]==meters["meter-reset"]["used"]==0,"meter reset mismatch")
     panel(out,original,target,maps)
     (out/"comparison.png").rename(out/"batch-comparison.png")
     for key,img in maps.items():
         panel(out,original,target,{key:img})
         (out/"comparison.png").rename(out/(key+"-comparison.png"))
-    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A6_Z2_V1",
+    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1",
         batch=batch,cn_provenance=cn_meta,failures=failures,
         case=case,sha=os.environ["GITHUB_SHA"],run=os.environ["GITHUB_RUN_ID"],
         source=rel,source_git_blob=expected,source_sha256=a.sha(root/rel),
@@ -179,6 +212,6 @@ def main(case,batch):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--case",choices=tuple(A5_COUNTS),required=True)
-    parser.add_argument("--batch",choices=tuple(methods.BATCHES),required=True)
+    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected"),required=True)
     args=parser.parse_args()
     main(args.case,args.batch)
