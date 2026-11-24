@@ -100,6 +100,23 @@ class RelaxedTests(unittest.TestCase):
         self.assertEqual(counts,sorted(counts))
         self.assertEqual(s.A12_RADII,(3,5,10,15,20))
 
+    def test_a12_singleton_guard_applies_to_both_phases(self):
+        # A12 must not rely on the historical tap_end() fallback because
+        # the second endpoint could be outside its assigned region.
+        core=np.zeros((73,73),bool);core[36,36]=True
+        valid=np.zeros((7,7),bool);valid[3,3]=True
+        benefit=valid.astype(np.float32)
+        delta=valid.astype(np.int32)
+        self.assertIsNone(s.choose(valid,benefit,delta,core,1,strict=True))
+        self.assertIsNotNone(s.choose(valid,benefit,delta,core,1,strict=False))
+        valid[3,4]=True
+        chosen=s.choose(valid,valid.astype(np.float32),
+                        valid.astype(np.int32),core,1,strict=True)
+        self.assertIsNotNone(chosen)
+        self.assertTrue(all(u != v for u,v in chosen[0]))
+        self.assertTrue(all(valid[y,x] for u,v in chosen[0]
+                            for x,y in (u,v)))
+
     def test_a12_phase_allocation(self):
         support=np.zeros((73,73),bool);support[36,36]=True
         want=np.full((26,26,3),255,np.uint8)

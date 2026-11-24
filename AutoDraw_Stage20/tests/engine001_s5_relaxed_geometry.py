@@ -231,13 +231,13 @@ def a12_plan(want, atlas, proof, stroke, broad_tolerance, band_radius, scale,
                 spans=[proof["measurements"][f"{d}:{width}"]["lateral_min_backing_px"]
                        for d in ("horizontal","vertical")]
                 pitch=max(1,math.floor(.8*min(spans)))
-                selected=choose(valid,benefit,delta,core,pitch,strict=phase=="boundary")
+                selected=choose(valid,benefit,delta,core,pitch,strict=True)
                 if selected is None:
                     continue
                 runs,mask,direction,improvement=selected
                 for start,end in runs:
                     if start==end:
-                        raise ValueError("A12 strict singleton leaked")
+                        raise ValueError("A12 unconverted singleton; both phases need two valid centers")
                     pts=[dict(x=ORIGIN_X+x/3,y=y/3) for x,y in (start,end)]
                     s=stroke(pts,width,rgb,offset+len(paths))
                     paths.append(s)
