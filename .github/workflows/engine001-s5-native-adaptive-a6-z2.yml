@@ -1,4 +1,4 @@
-name: ENGINE-001 S5 A7 selected zoning and lane optimization
+name: ENGINE-001 S5 A9 relaxed brush geometry
 on:
   workflow_dispatch:
     inputs:
@@ -15,6 +15,8 @@ on:
       - 'AutoDraw_Stage20/tests/test_engine001_s5_zone_methods.py'
       - 'AutoDraw_Stage20/tests/engine001_s5_lane_phase.py'
       - 'AutoDraw_Stage20/tests/test_engine001_s5_lane_phase.py'
+      - 'AutoDraw_Stage20/tests/engine001_s5_relaxed_geometry.py'
+      - 'AutoDraw_Stage20/tests/test_engine001_s5_relaxed_geometry.py'
 permissions:
   contents: read
 env:
@@ -37,13 +39,14 @@ jobs:
       - run: python AutoDraw_Stage20/tests/test_engine001_s5_zone_merge.py -v
       - run: python AutoDraw_Stage20/tests/test_engine001_s5_zone_methods.py -v
       - run: python AutoDraw_Stage20/tests/test_engine001_s5_lane_phase.py -v
+      - run: python AutoDraw_Stage20/tests/test_engine001_s5_relaxed_geometry.py -v
   native:
     needs: contracts
     strategy:
       fail-fast: false
       matrix:
         case: [home, illustration, second-png]
-        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected"]') }}
+        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected-a9"]') }}
     runs-on: windows-latest
     timeout-minutes: 120
     steps:
@@ -57,6 +60,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: S5-A6-Z2-${{ matrix.case }}-${{ matrix.batch }}
+          name: S5-A9-${{ matrix.case }}-${{ matrix.batch }}
           path: ${{ runner.temp }}/s5-adaptive-a6-z2-${{ matrix.case }}-${{ matrix.batch }}
           if-no-files-found: error
