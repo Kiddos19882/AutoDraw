@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A10 native E3
+
+[A10 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a10-all-brushes-native-results-e3-2026-11-24) [CI45343217767](https://github.com/Kiddos19882/AutoDraw/actions/runs/45343217767) SHA bce2a53, 4/4 jobs SUCCESS; independent ZIP SHA all3, 423 entries CRC, 36 artifact-plan/width/vertex/meter/crop checks, controls/inputs PASS. Simulation is not live CHALK. Complexity/visual PARTIAL, user review PENDING, E4/E5/exact CHALK NOT_RUN.
+
 **2026-11-24 — ENGINE-001 S5 A10 all widths.** E0 f3c2fb1 frozen, code bce2a53 at [CI45343217767](https://github.com/Kiddos19882/AutoDraw/actions/runs/45343217767) IN_PROGRESS. Modified research A9 geometry module, unit tests, native runner and workflow; scope only selected 04/08, width1–10, 10/20/30, same original inputs. Historical A9 defaults preserved. No production/master changes.
 
 **2026-11-24 — ENGINE-001 S5 A9 native results.** [A9 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a9-relaxed-brush-geometry-native-results-e3-2026-11-24), [CI45340892910](https://github.com/Kiddos19882/AutoDraw/actions/runs/45340892910) SHA 8dcb5ca 4/4 SUCCESS; 3 ZIP digests/555 CRC, 66 native PNG/plan/meter and pixel metrics independently checked, six A8 control comparisons equal. Visual review ZIP supplied, complex RTV visual FAIL, user review pending. Documentation only.
