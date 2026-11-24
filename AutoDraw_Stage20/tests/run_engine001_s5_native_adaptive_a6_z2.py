@@ -232,10 +232,10 @@ def main(case,batch):
                                 soft.validate(trial,range(1,11))
                                 # Preserve both stages as native images, plus their
                                 # corresponding complete 2-point route plans.
-                                for phase in ("boundary","interior"):
-                                    subset=phases[phase]
-                                    raw_part=native.render(driver,variant+"-"+phase,subset)
-                                    save(variant+"-"+phase,subset,raw_part,img,projected)
+                                for phase_name in ("boundary","interior"):
+                                    subset=phases[phase_name]
+                                    raw_part=native.render(driver,variant+"-"+phase_name,subset)
+                                    save(variant+"-"+phase_name,subset,raw_part,img,projected)
                                 raw=native.render(driver,variant,trial)
                                 save(variant,trial,raw,img,projected)
                                 for rgb,(band,interior,_) in layers.items():

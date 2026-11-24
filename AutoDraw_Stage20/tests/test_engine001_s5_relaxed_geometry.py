@@ -100,6 +100,18 @@ class RelaxedTests(unittest.TestCase):
         self.assertEqual(counts,sorted(counts))
         self.assertEqual(s.A12_RADII,(3,5,10,15,20))
 
+    def test_a12_runner_does_not_shadow_lane_phase_module(self):
+        import ast
+        from pathlib import Path
+        src=Path(__file__).with_name("run_engine001_s5_native_adaptive_a6_z2.py").read_text("utf8")
+        fn=next(n for n in ast.parse(src).body if isinstance(n,ast.FunctionDef) and n.name=="main")
+        bindings=[]
+        for n in ast.walk(fn):
+            if isinstance(n,(ast.For,ast.AsyncFor)):
+                bindings.extend(v.id for v in ast.walk(n.target) if isinstance(v,ast.Name))
+        self.assertNotIn("phase",bindings)
+        self.assertIn("phase.broad_plan",src)
+
     def test_a12_singleton_guard_applies_to_both_phases(self):
         # A12 must not rely on the historical tap_end() fallback because
         # the second endpoint could be outside its assigned region.
