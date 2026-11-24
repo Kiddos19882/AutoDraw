@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A8 native minimum brush4 E3
+
+[A8 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a8-minimum-brush-4-native-results-e3-2026-11-24), [CI45336684115](https://github.com/Kiddos19882/AutoDraw/actions/runs/45336684115) SHA 0a92821 4/4 SUCCESS; six artwork plans/scene meter/hash checks PASS, three ZIP digests/225 CRC PASS. Assistant visual FAIL for complex images, user review PENDING; E4/E5/exact CHALK NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 A8 minimum brush4 native test pending
 
 [A8 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a8-minimum-brush-4-e0-2026-11-24), [CI45336684115](https://github.com/Kiddos19882/AutoDraw/actions/runs/45336684115) SHA 0a92821, IN_PROGRESS at observation; no E3 result or visual acceptance for A8 yet. A7 visual accepted by user. Exact CHALK/E4/E5 NOT_RUN.

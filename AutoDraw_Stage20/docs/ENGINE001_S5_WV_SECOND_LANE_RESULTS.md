@@ -524,3 +524,27 @@ User Android archive S5-A7-visual-review.zip, 105 members, CRC PASS, SHA256 40d6
 ## ENGINE-001 S5-ADAPTIVE-A8 minimum brush 4 E0 (2026-11-24)
 
 User visually accepts the latest A7 outputs and explicitly requests forbidding game brush values 1, 2, 3 and drawing again. Baseline 0d9e79e (A7 code e031850, CI45314721360); this is a new research-only ablation, not production promotion. Fresh same three originals (home, illustration, second-png), selected 04 RTV and 08 CN+Chroma+DE2000, unchanged source zoning, measured Egret support and phase/orientation route choice. Only widths 4–10 enter candidate planning and artwork plans; no width1 residual repair or small-brush fallback, including for missing regions. Calibration/control scenes remain independent and may measure all widths; never count calibration as artwork. Keep normal/smooth=false, unlimited strokes/vertices/simulation paint, no new quota. Preserve A7 as historical comparator, not a generative input. Hypothesis: wide-only artwork is potentially much cheaper but may lose fine detail; report missing regions honestly, not silently relax geometry or quality thresholds. Require each planned artwork stroke width in [4,10] before rendering, record width histogram, route lengths, native RGBA, target/source maps, plan and raw SHA256, per-scene native meter crosscheck and zero/reset controls. A blank result is a valid negative visual outcome, not fabricated coverage. E3 native workflow on three cases; human visual review required before any optimization claim. E4/exact CHALK/E5 NOT_RUN; master and production unchanged.
+
+
+## ENGINE-001 S5-ADAPTIVE-A8 minimum brush 4 native results E3 (2026-11-24)
+
+Frozen E0 99f4f96, code 0a92821d9135c11db90c4724f6832b3c85c80bcc, [CI45336684115](https://github.com/Kiddos19882/AutoDraw/actions/runs/45336684115) contracts and three native jobs 4/4 SUCCESS. Independent downloads: 225 ZIP members CRC PASS, SHA256 all match GitHub digest, six final artwork plans/scene JSON/summary counters and raw/plan SHA256 verified. Every final stroke width in 4–10, no small-brush repair, normal/smooth=false, all three original/expanded control RGBA equal, blank/reset meter zero. Fresh originals identical across A7/A8 by SHA; prepared maps of Home and second-png identical; Illustration baseline/RTV/joint each differ by one source pixel (not byte-identical), comparison qualified. No failures in native runner. A7 user visual PASS, A8 assistant visual negative for complex images: Home recognizable with minor contour irregularities, Illustration face and contours largely missing, second-png eyes/mouth and facial contours missing. A8 user visual review PENDING. Technical PASS, visual quality FAIL by assistant review, no promotion or exact live CHALK claim.
+
+| Case | Method | A7 paths | A8 paths | A7 simulation points | A8 simulation points | A8 correct foreground / total | A8 gap union |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| home | RTV | 1376 | 44 | 4676 | 1518 | 53380/65409 | 12029 |
+| home | joint | 1376 | 44 | 4676 | 1518 | 53380/65409 | 12029 |
+| illustration | RTV | 21502 | 158 | 46115 | 1909 | 94513/236250 | 140303 |
+| illustration | joint | 21572 | 157 | 46240 | 1898 | 94317/236250 | 140494 |
+| second-png | RTV | 6784 | 40 | 15641 | 1060 | 40106/134158 | 92922 |
+| second-png | joint | 7401 | 38 | 16711 | 932 | 39238/134158 | 93824 |
+
+Totals RTV paths 29662→242, simulated accepted vertices 66432→4487, length 151699.278→19079; joint paths 30349→239, simulated vertices 67627→4348, length 151475.803→18947. Gap union 5799→245254/246347. Reduction is not quality-preserving. Simulator counter does not measure live frame-sampled exact CHALK. E4/exact CHALK/E5 NOT_RUN. Candidate width restriction remains in A8; no silent reintroduction of smaller brushes. Next: user visual review, then inspect measured width4 feasible-center support and whether controlled overlap / color-order planning can recover coverage without violating the user's restriction; do not change thresholds retrospectively.
+
+| Artifact | ID | SHA256 |
+| --- | ---: | --- |
+| home | 14893468996 | 8cb138fd77dea0fd91409c60c90c64cc7091a0a06f34a3c741aec0eb65754104 |
+| illustration | 14894018663 | 96b33e2fdb6d4076500013a0735bf541975c9457834100c2f3135788ed942071 |
+| second-png | 14894148388 | 2e978a59a666f0d316ff9898b2239cdd1cc21dd26eada9c0d734636cf737416c |
+
+User ZIP S5-A8-visual-review.zip: 79 members, CRC PASS, SHA256 b394e609a751aa075c655aa2519334a7cd24c772c7d4186eded10ad9ae462f15; original, A7/A8 native PNGs, maps, plans, metrics and audit. No production/master changes.
