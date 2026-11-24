@@ -553,3 +553,43 @@ User ZIP S5-A8-visual-review.zip: 79 members, CRC PASS, SHA256 b394e609a751aa075
 ## ENGINE-001 S5-ADAPTIVE-A9 relaxed brush geometry E0 (2026-11-24)
 
 User authorizes lifting A8 restrictive geometry and a new native experiment. Baseline HEAD bd662c5599ded8faf67b6a51af28b43b065375e7; A8 code 0a92821, CI45336684115; A7 accepted history retained. Fresh three pinned P2 originals, selected RTV and CN+Chroma+DE2000, unchanged zoning and board projection. Hypothesis: permitting controlled cross-color painting and native feedback with widths4–10 recovers coverage without width1–3. Test independent 10%, 20%, 30%, 50% and unrestricted (no hard spill cap) measured support overlap treatments against fresh strict A8; these are MODEL_ONLY candidate filters, not guarantees of actual native spill. Rank whole candidate sweeps by predicted RGB absolute-error improvement, then fewer paths and shorter length; no stroke, length, point or paint quota. Largest color areas first; allow later colors to overpaint previous ones and white correction only if present in target. Fractional logical grid at backing-pixel resolution; first test four axis/diagonal directions (not exhaustive angles), short two-distinct-point equivalent taps, measured core proxy, no requirement for a fully contained center or connected route inside a color. Record full native Egret smooth=false after each treatment and one width4 residual correction pass based on actual white-composited RGB; keep rejected repair and report both, no iterative resource cap. Compare foreground correctness, gaps, edge correctness, leakage, source RGB error, paths/widths/length and simulation meter; select no winner by numbers alone. Native feedback RGB error improvement is a diagnostic, not visual acceptance. E2 synthetic overlap, fractional/diagonal, short path and width tests; E3 all three cases, raw PNGs, prepared/maps, plan and meter SHA, blank/reset and control verification. No production or live calibration change; E4/exact CHALK/E5 NOT_RUN. Historical A8 negative result remains; no threshold retroactive changes.
+
+
+## ENGINE-001 S5-ADAPTIVE-A9 relaxed brush geometry native results E3 (2026-11-24)
+
+Frozen E0 f60b1f2, code 8dcb5cab8023396b9f263f59c30eddd683baf447, [CI45340892910](https://github.com/Kiddos19882/AutoDraw/actions/runs/45340892910) all four required jobs SUCCESS (contracts + three native originals). Three downloaded ZIP SHA256 match GitHub digest; 555 archive member CRC PASS; 66 actual Egret scene/plan SHA, independently reconstructed width histograms, path counts, lengths, accepted vertex count, scene/summary meter agreement, crop compositing, nearest-palette foreground/edge correctness, gaps and RGB error PASS. Three blank/reset counters zero, three original/expanded control RGBA equal, all six fresh prepared maps and six A8 control RGBA pixel-identical to archived A8; fresh original PNG hashes equal. All artwork widths4–10; smooth=false, no budget. All five treatments and each width4 feedback outcome retained. The 30/30 feedback variants improve absolute target RGB error, not necessarily foreground correctness or visual quality. The old alpha-on-white metric includes opaque WHITE correction strokes and is not a visible leakage measure; independent CSV also records target-white pixels with nearest nonwhite palette color and RGB deviation >24.
+
+| Method / variant | Paths | Simulation points | Foreground correct / 435817 | Gap union | Visible nearest-nonwhite leakage on target white | Edge correct |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| RTV A8 | 242 | 4487 | 187999 | 245254 | 0 | 18118 |
+| RTV 10 | 2072 | 4144 | 287354 | 136287 | 4009 | 27201 |
+| RTV 10 repair | 2911 | 5822 | 303872 | 119886 | 3235 | 27614 |
+| RTV 20 | 2190 | 4380 | 335051 | 68287 | 14110 | 36329 |
+| RTV 20 repair | 3425 | 6850 | 346453 | 58901 | 3157 | 39039 |
+| RTV 30 | 2487 | 4974 | 361424 | 24058 | 30201 | 40172 |
+| RTV 30 repair | 3779 | 7558 | 359544 | 31163 | 6882 | 41789 |
+| RTV 50 | 3182 | 6364 | 357370 | 947 | 96334 | 38038 |
+| RTV 50 repair | 4889 | 9778 | 323283 | 59106 | 2401 | 41002 |
+| RTV free | 671 | 1342 | 265951 | 0 | 144194 | 29552 |
+| RTV free repair | 1748 | 3496 | 302064 | 25810 | 85438 | 34297 |
+| Joint A8 | 239 | 4348 | 186935 | 246347 | 0 | 18118 |
+| Joint 10 | 2045 | 4090 | 286186 | 137507 | 4012 | 27471 |
+| Joint 10 repair | 2891 | 5782 | 302654 | 121133 | 3235 | 27899 |
+| Joint 20 | 2145 | 4290 | 333884 | 69265 | 13947 | 36731 |
+| Joint 20 repair | 3347 | 6694 | 345151 | 59873 | 3158 | 39399 |
+| Joint 30 | 2443 | 4886 | 360828 | 24270 | 30082 | 40854 |
+| Joint 30 repair | 3641 | 7282 | 358640 | 31291 | 6814 | 42504 |
+| Joint 50 | 3641 | 7282 | 357662 | 632 | 97359 | 38840 |
+| Joint 50 repair | 5383 | 10766 | 322522 | 59293 | 2389 | 41695 |
+| Joint free | 779 | 1558 | 260721 | 0 | 144281 | 29036 |
+| Joint free repair | 1901 | 3802 | 296825 | 25810 | 85467 | 34784 |
+
+Illustration RTV A8 94513/236250 correct -> 189477/236250 (50 repair), gaps 140303 -> 2692, points 1909 -> 4722; joint 94317 -> 189248, gaps 140494 -> 2695, points 1898 -> 4798. Assistant visual review of RTV contact sheets: Home recognizable, 10/20 repair retain general form but edges irregular; Illustration 30/50 repair recover broad areas but eyes, facial features and thin outlines severely degraded; second-png 30 repair improves silhouette and fills but thin eyes/mouth/outline detail remains absent; free merges colors into long bands and corrupts details, zero gap is not quality preservation. No final winner or user visual approval. TECH PASS / optimization PARTIAL / complex visual FAIL by assistant RTV review; joint numeric results independently audited, visual verdict by user pending. A9 removes strict containment but still uses positive modeled error-gain, four directions, fixed lateral pitch per width, fractional backing lattice and one feedback pass; A9 output is separate two-vertex lanes rather than connected A8 routes (more paths, not necessarily more sim points). Do not call it fully unconstrained or arbitrary-angle. Next: user review A9 images before modifying planner or proceeding to remaining originals. Potential follow-up: actual narrow-feature coverage/color ordering, orientation-specific measured supports and continuous routing with controlled overlap; no automatic change to brush min4 or production. E4/E5/exact CHALK NOT_RUN.
+
+| Case | Artifact ID | ZIP SHA256 |
+| --- | ---: | --- |
+| Home | 14895294468 | 53995e5e54984866b56d745fe0388eef84baab0a194afeedc3e4ddcfb167ce68 |
+| Illustration | 14895799785 | 6b574c94737154a592574379036db18a5d19bccfe7d6119a66e041302cad8189 |
+| Second PNG | 14895968847 | 815d6ccd8f21043068794e67619629ae7d0b003927415b96372ed3dde9ed28ee |
+
+User visual ZIP S5-A9-visual-review.zip: 168 entries, CRC PASS, SHA256 c6bf02badafd38740776d03b1a6a6c0be694a202c47b9d0080158efeb79d9eb0; 66 native crops and plans, six prepared/maps/galleries, original PNGs, results, meter summaries, independent metrics CSV and audit JSON. Raw full-board native PNGs remain in the original CI artifacts. No production/master changes.

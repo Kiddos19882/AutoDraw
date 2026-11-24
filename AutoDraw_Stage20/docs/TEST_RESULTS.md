@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A9 relaxed geometry E3
+
+[A9 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a9-relaxed-brush-geometry-native-results-e3-2026-11-24), [CI45340892910](https://github.com/Kiddos19882/AutoDraw/actions/runs/45340892910) SHA 8dcb5ca 4/4 SUCCESS; independent 555 CRC, 3 digests, 66 scene/plan/meter and pixel-metric checks PASS. A8 comparison controls identical; width restriction PASS. Optimization PARTIAL, complex RTV visual FAIL, user review PENDING; exact CHALK/E4/E5 NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 A9 relaxed geometry pending
 
 [A9 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a9-relaxed-brush-geometry-e0-2026-11-24), [CI45340892910](https://github.com/Kiddos19882/AutoDraw/actions/runs/45340892910) code SHA 8dcb5ca; IN_PROGRESS at observation (contracts running). E2/E3 results PENDING; E4/E5/exact CHALK NOT_RUN.
