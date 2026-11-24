@@ -17,6 +17,13 @@ A5_BLOB = "08bbd613e4ec1e827d18c189ab42578d7309f617"
 A5_COUNTS = {"home":1376, "illustration":22000, "second-png":11432}
 ZONE_COUNTS = {"home":1, "illustration":3134, "second-png":2584}
 SELECTED = ("rtv", "cn-chroma-de2000")
+A8_WIDTHS = frozenset(range(4, 11))
+
+
+def validate_a8(paths):
+    a.require(all(s["width"] in A8_WIDTHS and s["colorRgb"] != 0xffffff for s in paths),
+              "A8 forbidden artwork brush or color")
+
 
 
 def panel(out, original, target, maps):
@@ -26,7 +33,12 @@ def panel(out, original, target, maps):
     for key, img in maps.items():
         cells.append((key.upper()+" SOURCE",Image.fromarray(img)))
     for key in ("a5", *maps):
-        cells.append((key.upper()+" EGRET",Image.open(out/(key+"-crop.png"))))
+        previous=out/(key+"-crop.png")
+        if previous.exists():
+            cells.append((key.upper()+" EGRET",Image.open(previous)))
+        restricted=out/(key+"-a8-crop.png")
+        if restricted.exists():
+            cells.append((key.upper()+" A8 MIN4 EGRET",Image.open(restricted)))
         improved=out/(key+"-a7-crop.png")
         if improved.exists():
             cells.append((key.upper()+" A7 EGRET",Image.open(improved)))
@@ -43,7 +55,8 @@ def panel(out, original, target, maps):
 
 def main(case,batch):
     import engine001_s5_native_brush_overlap as physical
-    selected = batch == "selected"
+    restricted = batch == "selected"
+    selected = batch in ("selected", "selected-a7")
     presets = SELECTED if selected else methods.BATCHES[batch]
     if selected:
         import engine001_s5_lane_phase as phase
@@ -134,8 +147,9 @@ def main(case,batch):
             a.require(not native.render(driver,"meter-blank",[])[:,:,3].any(),"meter blank nonzero")
         proof=physical.native_footprints(driver)
         a.write_json(out/"egret-physical-footprints.json",proof)
-        stamps,_=a.measure_stamps(driver,native,out)
-        pad=a.width1_pad(stamps,proof)
+        if not restricted:
+            stamps,_=a.measure_stamps(driver,native,out)
+            pad=a.width1_pad(stamps,proof)
         atlas,summary=p.measure(driver,native,out)
         def save(name,paths,raw,img,projected):
             a.save_plan(out,name,paths)
@@ -155,8 +169,24 @@ def main(case,batch):
                 a.require(meter["used"]==sum(len(s["points"]) for s in paths) and meter["unlimited"] and meter["budget"] is None,"meter mismatch")
                 results[name]["simulation_paint_counter"]=meter
                 results[name]["broad_continuity"]=p.continuity([s for s in paths if s["width"]>1])
-        for key,img in {"a5":target,**maps}.items():
+        # A8 never constructs A5/old-Z2 or width1 repair artwork. The historical
+        # A7 mode remains reproducible with --batch selected-a7.
+        eligible_atlas={w:m for w,m in atlas.items() if w in A8_WIDTHS}
+        if restricted:
+            a.require(bool(eligible_atlas),"A8 no validated allowed widths")
+        for key,img in (maps if restricted else {"a5":target,**maps}).items():
             projected,_,_=transfer.projected(img,geom)
+            if restricted:
+                name=key+"-a8"
+                paths,counts8,ledger8=phase.broad_plan(projected,eligible_atlas,proof,native.stroke)
+                validate_a8(paths)
+                raw8=native.render(driver,name,paths)
+                save(name,paths,raw8,img,projected)
+                results[name].update(allowed_widths=sorted(A8_WIDTHS),
+                    eligible_widths=sorted(eligible_atlas),small_brush_repair=False,
+                    broad_counts=counts8,broad_route_metrics=q.route_metrics(paths))
+                a.write_json(out/(name+"-route-ledger.json"),ledger8)
+                continue
             baseline,params=physical.plan_same_color_overlap(img,geom,proof)
             if key=="a5":
                 a.require(len(baseline)==a.CASES[case],"P1 count drift")
@@ -196,7 +226,9 @@ def main(case,batch):
     for key,img in maps.items():
         panel(out,original,target,{key:img})
         (out/"comparison.png").rename(out/(key+"-comparison.png"))
-    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1",
+    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1"),
+        allowed_artwork_widths=sorted(A8_WIDTHS) if restricted else list(range(1,11)),
+        small_brush_repair=not restricted,
         batch=batch,cn_provenance=cn_meta,failures=failures,
         case=case,sha=os.environ["GITHUB_SHA"],run=os.environ["GITHUB_RUN_ID"],
         source=rel,source_git_blob=expected,source_sha256=a.sha(root/rel),
@@ -212,6 +244,6 @@ def main(case,batch):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--case",choices=tuple(A5_COUNTS),required=True)
-    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected"),required=True)
+    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7"),required=True)
     args=parser.parse_args()
     main(args.case,args.batch)
