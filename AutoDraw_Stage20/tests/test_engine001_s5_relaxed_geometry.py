@@ -35,6 +35,43 @@ class RelaxedTests(unittest.TestCase):
     def test_no_forbidden_width(self):
         with self.assertRaises(ValueError):
             s.validate([dict(width=3,points=[dict(x=1,y=1),dict(x=2,y=2)])])
+    def test_a10_treatments_and_compatibility(self):
+        self.assertEqual(tuple(k for k,_ in s.A10_TREATMENTS),("10","20","30"))
+        self.assertEqual(tuple(k for k,_ in s.TREATMENTS),("10","20","30","50","free"))
+        support,core=masks()
+        want=np.full((21,21,3),255,np.uint8)
+        want[4:17,4:17]=0
+        proof={"measurements":{f"{d}:{w}":{"lateral_min_backing_px":3}
+                for d in ("horizontal","vertical") for w in range(1,11)}}
+        stroke=lambda pts,w,rgb,i:dict(points=pts,width=w,colorRgb=rgb,strokeId=f"icon-{i}")
+        atlas={w:(support,core) for w in range(1,11)}
+        allpaths,_=s.plan(want,atlas,proof,stroke,.3,widths=range(1,11))
+        self.assertTrue(allpaths)
+        s.validate(allpaths,range(1,11))
+        self.assertTrue(all(1<=p["width"]<=10 for p in allpaths))
+        legacy,_=s.plan(want,atlas,proof,stroke,.3)
+        self.assertTrue(legacy)
+        s.validate(legacy)
+        self.assertTrue(all(4<=p["width"]<=10 for p in legacy))
+        with self.assertRaises(ValueError):
+            s.validate([dict(width=11,points=[dict(x=1,y=1),dict(x=2,y=2)])],range(1,11))
+
+    def test_all_widths_eligible_and_repair(self):
+        support,core=masks()
+        want=np.full((15,15,3),255,np.uint8)
+        want[3:12,3:12]=0
+        proof={"measurements":{f"{d}:{w}":{"lateral_min_backing_px":3}
+                for d in ("horizontal","vertical") for w in range(1,11)}}
+        atlas={w:(support,core) for w in range(1,11)}
+        stroke=lambda pts,w,rgb,i:dict(points=pts,width=w,colorRgb=rgb,strokeId=f"icon-{i}")
+        paths,_=s.plan(want,atlas,proof,stroke,.2,widths=range(1,11))
+        self.assertTrue(paths)
+        actual=np.full_like(want,255)
+        corrections,_=s.plan(want,atlas,proof,stroke,.2,actual,repair=True,widths=range(1,11))
+        s.validate(corrections,range(1,11))
+        self.assertTrue(all(p["width"] in atlas for p in corrections))
+        self.assertTrue(all(p["width"] in range(1,11) for p in paths+corrections))
+
     def test_white_repair(self):
         support,core=masks()
         want=np.full((15,15,3),255,np.uint8)

@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 
 TREATMENTS = (("10", .1), ("20", .2), ("30", .3), ("50", .5), ("free", None))
+A10_TREATMENTS = (("10", .1), ("20", .2), ("30", .3))
 DIRS = ((1,0), (0,1), (1,1), (1,-1))
 WHITE = np.array([255,255,255], np.uint8)
 ORIGIN_X = 155
@@ -84,7 +85,11 @@ def choose(valid, benefit, delta, core, pitch):
     return best
 
 
-def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offset=0):
+def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offset=0, widths=None):
+    """widths=None preserves historical A9; A10 passes measured eligible 1..10."""
+    selected_widths = (4,) if repair else tuple(range(10,3,-1))
+    if widths is not None:
+        selected_widths = tuple(sorted(set(widths),reverse=True))
     current = np.full_like(want,255) if actual is None else actual.copy()
     colors, areas = np.unique(want.reshape(-1,3),axis=0,return_counts=True)
     order = sorted(range(len(colors)),key=lambda i:(np.all(colors[i]==WHITE),-int(areas[i]),tuple(colors[i])))
@@ -96,7 +101,7 @@ def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offse
             continue
         target=np.all(want==color,axis=2)
         new_error=np.abs(target16-color.astype(np.int16)).sum(axis=2)
-        for width in ((4,) if repair else range(10,3,-1)):
+        for width in selected_widths:
             if width not in atlas:
                 continue
             support,core=atlas[width]
@@ -131,9 +136,9 @@ def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offse
     return paths,ledger
 
 
-def validate(paths):
+def validate(paths, allowed=range(4,11)):
     for s in paths:
-        if s["width"] not in range(4,11) or len(s["points"])<2:
+        if s["width"] not in allowed or len(s["points"])<2:
             raise ValueError("A9 forbidden brush or invalid path")
         if not all(0<=p["x"]<460 and 0<=p["y"]<240 for p in s["points"]):
             raise ValueError("A9 point outside board")

@@ -44,6 +44,11 @@ def panel(out, original, target, maps):
                 candidate=out/(key+"-a9-"+label+suffix+"-crop.png")
                 if candidate.exists():
                     cells.append((key.upper()+" A9 "+label+suffix,Image.open(candidate)))
+        for label in ("10","20","30"):
+            for suffix in ("","-repair"):
+                candidate=out/(key+"-a10-"+label+suffix+"-crop.png")
+                if candidate.exists():
+                    cells.append((key.upper()+" A10 "+label+suffix,Image.open(candidate)))
         improved=out/(key+"-a7-crop.png")
         if improved.exists():
             cells.append((key.upper()+" A7 EGRET",Image.open(improved)))
@@ -60,9 +65,10 @@ def panel(out, original, target, maps):
 
 def main(case,batch):
     import engine001_s5_native_brush_overlap as physical
-    relaxed = batch == "selected-a9"
-    restricted = batch in ("selected", "selected-a9")
-    selected = batch in ("selected", "selected-a7", "selected-a9")
+    allbrush = batch == "selected-a10"
+    relaxed = batch in ("selected-a9", "selected-a10")
+    restricted = batch in ("selected", "selected-a9", "selected-a10")
+    selected = batch in ("selected", "selected-a7", "selected-a9", "selected-a10")
     if relaxed:
         import engine001_s5_relaxed_geometry as soft
     presets = SELECTED if selected else methods.BATCHES[batch]
@@ -180,6 +186,10 @@ def main(case,batch):
         # A8 never constructs A5/old-Z2 or width1 repair artwork. The historical
         # A7 mode remains reproducible with --batch selected-a7.
         eligible_atlas={w:m for w,m in atlas.items() if w in A8_WIDTHS}
+        a10_atlas={w:m for w,m in atlas.items() if 1<=w<=10}
+        if allbrush:
+            a.require(set(a10_atlas)==set(range(1,11)),
+                "A10 requires measured eligible widths 1..10")
         if restricted:
             a.require(bool(eligible_atlas),"A8 no validated allowed widths")
         for key,img in (maps if restricted else {"a5":target,**maps}).items():
@@ -196,17 +206,21 @@ def main(case,batch):
                 a.write_json(out/(name+"-route-ledger.json"),ledger8)
                 if relaxed:
                     a.require(4 in eligible_atlas,"A9 missing measured width4")
-                    for label,tolerance in soft.TREATMENTS:
-                        variant=key+"-a9-"+label
-                        trial,ledger=soft.plan(projected,eligible_atlas,proof,native.stroke,tolerance)
-                        soft.validate(trial)
+                    treatments=soft.A10_TREATMENTS if allbrush else soft.TREATMENTS
+                    trial_atlas=a10_atlas if allbrush else eligible_atlas
+                    selected_widths=range(1,11) if allbrush else None
+                    for label,tolerance in treatments:
+                        variant=key+("-a10-" if allbrush else "-a9-")+label
+                        trial,ledger=soft.plan(projected,trial_atlas,proof,native.stroke,
+                            tolerance,widths=selected_widths)
+                        soft.validate(trial,range(1,11) if allbrush else range(4,11))
                         raw=native.render(driver,variant,trial)
                         save(variant,trial,raw,img,projected)
                         actual=a.white_rgb(raw[:,a.OX:a.OX+450])
-                        repair,repair_ledger=soft.plan(projected,eligible_atlas,proof,native.stroke,
-                            tolerance,actual,repair=True,offset=len(trial))
+                        repair,repair_ledger=soft.plan(projected,trial_atlas,proof,native.stroke,
+                            tolerance,actual,repair=True,offset=len(trial),widths=selected_widths)
                         final=trial+repair
-                        soft.validate(final)
+                        soft.validate(final,range(1,11) if allbrush else range(4,11))
                         final_name=variant+"-repair"
                         final_raw=native.render(driver,final_name,final)
                         save(final_name,final,final_raw,img,projected)
@@ -215,8 +229,12 @@ def main(case,batch):
                             return int(np.abs(rgb.astype(np.int16)-projected.astype(np.int16)).sum(dtype=np.int64))
                         e0,e1=error(actual),error(final_actual)
                         results[variant].update(spill_proxy_limit=tolerance,
+                            allowed_widths=list(range(1,11)) if allbrush else list(range(4,11)),
+                            eligible_widths=sorted(trial_atlas),
                             native_target_rgb_absolute_error=e0,repair_name=final_name)
                         results[final_name].update(spill_proxy_limit=tolerance,
+                            allowed_widths=list(range(1,11)) if allbrush else list(range(4,11)),
+                            eligible_widths=sorted(trial_atlas),
                             native_target_rgb_absolute_error=e1,repair_paths=len(repair),
                             native_error_improved=e1<e0)
                         a.write_json(out/(variant+"-route-ledger.json"),
@@ -261,9 +279,10 @@ def main(case,batch):
     for key,img in maps.items():
         panel(out,original,target,{key:img})
         (out/"comparison.png").rename(out/(key+"-comparison.png"))
-    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A9_RELAXED_V1" if relaxed else ("ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1")),
-        allowed_artwork_widths=sorted(A8_WIDTHS) if restricted else list(range(1,11)),
-        small_brush_repair=not restricted, width4_native_feedback=relaxed,
+    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A10_ALL_BRUSHES_V1" if allbrush else ("ENGINE001_S5_ADAPTIVE_A9_RELAXED_V1" if relaxed else ("ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1"))),
+        allowed_artwork_widths=list(range(1,11)) if allbrush else (sorted(A8_WIDTHS) if restricted else list(range(1,11))),
+        small_brush_repair=not restricted or allbrush, native_feedback=relaxed,
+        feedback_widths=list(range(1,11)) if allbrush else ([4] if relaxed else []),
         batch=batch,cn_provenance=cn_meta,failures=failures,
         case=case,sha=os.environ["GITHUB_SHA"],run=os.environ["GITHUB_RUN_ID"],
         source=rel,source_git_blob=expected,source_sha256=a.sha(root/rel),
@@ -279,6 +298,6 @@ def main(case,batch):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--case",choices=tuple(A5_COUNTS),required=True)
-    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7","selected-a9"),required=True)
+    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7","selected-a9","selected-a10"),required=True)
     args=parser.parse_args()
     main(args.case,args.batch)
