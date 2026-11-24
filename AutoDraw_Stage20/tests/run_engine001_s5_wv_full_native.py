@@ -24,6 +24,62 @@ def segment(x,y,dx,dy):
     return [dict(x=x-dx/2,y=min(239.999,max(0,y-dy/2))), dict(x=x+dx/2,y=min(239.999,max(0,y+dy/2)))]
 
 
+def with_paint_counter(js):
+    """Instrument only the in-memory unrestricted research fixture.
+
+    The original archived JS/bundle stay pinned. The counter is the actual
+    BoardPane quota delta for injected accepted samples, not live game CHALK.
+    """
+    def replace_once(source, old, new):
+        if source.count(old) != 1:
+            raise ValueError("Unexpected native counter fixture anchor: " + old)
+        return source.replace(old, new, 1)
+
+    start = js.index("function makeTemporalBoard(")
+    end = js.index("function renderTemporalStudy", start)
+    part = js[start:end]
+    part = replace_once(part, "board.atom.clear();", """board.atom.clear();
+    board.updateLess();
+    const pointCountBefore = board.max - board.less;""")
+    part = replace_once(part, "return {\n      shape: board, accepted,", """const pointCountAfter = board.max - board.less;
+    const atomPointCount = board.atom.points.reduce((n, points) => n + points.length, 0);
+    const used = pointCountAfter - pointCountBefore;
+    if (!Number.isSafeInteger(used) || pointCountBefore !== 0 ||
+        pointCountAfter !== atomPointCount || used !== accepted) {
+      throw new Error("Native simulation paint counter mismatch.");
+    }
+    const paintCounter = {
+      schema: "ENGINE001_NATIVE_SIM_CHALK_V1",
+      source: "BoardPane.updateLess/max-minus-less",
+      pointCountBefore, pointCountAfter, atomPointCount, used,
+      unlimited: true, budget: null, sampleMode: "synthetic-accepted-vertices",
+      exactGameChalk: "NOT_RUN"
+    };
+    // Keep the meter outside the canvas: the native PNG remains pure evidence.
+    let meter = document.getElementById("autodraw-sim-paint-counter");
+    if (!meter) {
+      meter = document.createElement("output");
+      meter.id = "autodraw-sim-paint-counter";
+      meter.setAttribute("aria-live", "polite");
+      document.body.appendChild(meter);
+    }
+    meter.textContent = "CHALK (simulation): " + used + " / ∞";
+    return {
+      paintCounter, shape: board, accepted,""")
+    js = js[:start] + part + js[end:]
+    start = js.index("function renderComplexHoldoutColorProbe(")
+    end = js.index("function renderV35LayeredColorProbe(", start)
+    part = replace_once(js[start:end],
+        'mode:"normal",syntheticAcceptedVerticesNotChalk:count,',
+        'mode:"normal",syntheticAcceptedVerticesNotChalk:count, paintCounter:board.paintCounter,')
+    js = js[:start] + part + js[end:]
+    start = js.index("function renderP4A2BrushWidths1to10Probe(")
+    end = js.index("api.renderP4A2BrushWidths1to10Probe", start)
+    part = replace_once(js[start:end], "syntheticAcceptedVerticesNotChalk:0,",
+        "syntheticAcceptedVerticesNotChalk:0, paintCounter:board.paintCounter,")
+    return js[:start] + part + js[end:]
+
+
 def full_fixture():
     js = binding.os_pinned_source(binding.ROOT / "tests/game_renderer_reference.js")
     first = js.index("function makeTemporalBoard(")
@@ -38,7 +94,7 @@ def full_fixture():
     for old in (" || strokes.length > 3000", 'if (count > 5900) throw new Error("V5 point budget exceeded.");'):
         assert part.count(old) == 1
         part = part.replace(old,"")
-    return js[:first]+part+js[last:]
+    return with_paint_counter(js[:first]+part+js[last:])
 
 
 def render(driver, name, paths):
@@ -48,6 +104,23 @@ def render(driver, name, paths):
     if paths:
         assert meta["mode"]=="normal" and meta["strokeCount"]==len(paths)
         assert meta["syntheticAcceptedVerticesNotChalk"]==sum(len(p["points"]) for p in paths)
+    meter = meta.get("paintCounter")
+    if meter is not None:
+        expected = sum(len(p["points"]) for p in paths)
+        if (meter["schema"] != "ENGINE001_NATIVE_SIM_CHALK_V1"
+                or meter["pointCountBefore"] != 0
+                or meter["pointCountAfter"] != expected
+                or meter["atomPointCount"] != expected
+                or meter["used"] != expected
+                or meter["unlimited"] is not True
+                or meter["budget"] is not None
+                or meter["exactGameChalk"] != "NOT_RUN"):
+            raise ValueError("Invalid native simulation paint counter")
+        summary_path = OUT/"paint-counter-summary.json"
+        summary = json.loads(summary_path.read_text("utf8")) if summary_path.exists() else {}
+        summary[name] = dict(meter, strokeCount=len(paths))
+        binding.write_json(summary_path, summary)
+        print(f"{name}: CHALK(sim)={meter['used']} / unlimited", flush=True)
     binding.write_json(OUT/(name+".json"),meta)
     return rgba
 
