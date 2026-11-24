@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A10 E0 in progress
+
+[A10 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a10-all-measured-brushes-and-102030-tolerance-e0-2026-11-24), [CI45343217767](https://github.com/Kiddos19882/AutoDraw/actions/runs/45343217767), code SHA bce2a53. CI outcome PENDING. All 10 measured widths required eligible in A10; plan width histogram and meter must be independently checked before accepting E3. E4/exact CHALK/E5 NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 A9 relaxed geometry E3
 
 [A9 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a9-relaxed-brush-geometry-native-results-e3-2026-11-24), [CI45340892910](https://github.com/Kiddos19882/AutoDraw/actions/runs/45340892910) SHA 8dcb5ca 4/4 SUCCESS; independent 555 CRC, 3 digests, 66 scene/plan/meter and pixel-metric checks PASS. A8 comparison controls identical; width restriction PASS. Optimization PARTIAL, complex RTV visual FAIL, user review PENDING; exact CHALK/E4/E5 NOT_RUN.
