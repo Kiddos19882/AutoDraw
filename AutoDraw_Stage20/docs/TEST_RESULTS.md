@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A11 E3
+
+[A11 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a11-mixed-strict-and-relaxed-native-results-e3-2026-11-24), [CI45346195619](https://github.com/Kiddos19882/AutoDraw/actions/runs/45346195619) code ff84777: four required jobs SUCCESS, 357 ZIP CRC and 3 SHA256 PASS, 24 native scenes plus 6 A8 controls, 24 A10 comparator plans, all 280 small-lane strict0 and 644 broad-lane10/20 ledger entries verified. Visual quality PARTIAL/negative, human review PENDING. E4/E5/exact CHALK NOT_RUN.
+
 **2026-11-24 — ENGINE-001 S5 A10 native E3 verification.** [A10 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a10-all-brushes-native-results-e3-2026-11-24), [CI45343217767](https://github.com/Kiddos19882/AutoDraw/actions/runs/45343217767) 4/4 SUCCESS at bce2a53, independently verified 3 artifact digests, 423 CRC, 36 A10 plans+images+meter, 6 A8 native control comparisons, six unchanged prepared maps, and 6 crop RGB. Assistant visually compared 04/08: Illustration and Second PNG details improved but not quality PASS; Home correction harms metrics. 114-file visual ZIP (SHA 22041496...) provided. No code changed for review, production/master untouched.
 
 ## 2026-11-24 — ENGINE-001 S5 A10 E0 in progress

@@ -1,3 +1,5 @@
+**2026-11-24 — ENGINE-001 S5 A11 native review.** [A11 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a11-mixed-strict-and-relaxed-native-results-e3-2026-11-24), [CI45346195619](https://github.com/Kiddos19882/AutoDraw/actions/runs/45346195619) code ff84777, independent 24 scene plan/PNG/meter, controls, eligibility, per-width tolerances PASS; generated review ZIP 96 members SHA adf6fe20. A11 brush1–3 strict0 improves stroke count but loses complex details; Home feedback harmful. No code changes in this review; master/production untouched.
+
 ## 2026-11-24 — ENGINE-001 S5 A10 native E3
 
 [A10 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a10-all-brushes-native-results-e3-2026-11-24) [CI45343217767](https://github.com/Kiddos19882/AutoDraw/actions/runs/45343217767) SHA bce2a53, 4/4 jobs SUCCESS; independent ZIP SHA all3, 423 entries CRC, 36 artifact-plan/width/vertex/meter/crop checks, controls/inputs PASS. Simulation is not live CHALK. Complexity/visual PARTIAL, user review PENDING, E4/E5/exact CHALK NOT_RUN.
