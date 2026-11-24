@@ -631,3 +631,8 @@ A10 uses all 10 eligible game widths but emits massive numbers of disconnected t
 | Home | 14896602879 | 8850af924b652e68f063b96f2b5b8995b6332197f616be7de36f50f54a977b2e |
 | Illustration | 14896937505 | 5141e2660f9e542bf2d45b3934860be69516ae1287baea7df1a7c4aaba4c896e |
 | Second PNG | 14896334919 | c82e981e24ac37b37f16d3cf5718ebf4fb31e501d8c0094dd51ad74114627569 |
+
+
+## ENGINE-001 S5 A11 mixed brush tolerance E0 (2026-11-24)
+
+User-directed follow-up to A10, baseline b2dab71d81e9fe72c91336df18e75bec66199b73, CI45343217767. Hypothesis: strict measured-support containment for widths1–3 preserves fine features while widths4–10 retain broad coverage. Two independent treatments: 0% for widths1–3 and 10% or 20% for widths4–10, in both initial and native feedback passes. All measured widths1–10 eligible; no forced usage quota. Strict singleton taps require a second valid center; otherwise omit the tap rather than bypass containment. This is MODEL_ONLY support containment, not a native zero-leakage guarantee. Preserve A9/A10 behavior, fresh 04/08 zoning, three originals, four directions, fractional lattice, color order, one feedback pass, smooth=false, unlimited simulated meter. 24 A11 native scenes plus six A8 controls; compare archived A10 at matching tolerance and stage. Record per-width tolerance, actual width histogram, paths, native PNG, meter, gaps, edge/color accuracy and visual review; verify strict singleton endpoints and historical compatibility by contracts. Retain both initial and feedback results, no automatic acceptance of correction. No production promotion; E4/E5/exact CHALK NOT_RUN.
