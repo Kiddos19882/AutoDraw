@@ -10,9 +10,10 @@ from scipy.ndimage import distance_transform_edt
 from PIL import Image
 
 RADII=(5,10)
+NARROW_RADII=(1,2,3)
 
 def bands(rgb,radius):
-    if rgb.ndim!=3 or rgb.shape[2]!=3 or rgb.dtype!=np.uint8 or radius not in RADII:
+    if rgb.ndim!=3 or rgb.shape[2]!=3 or rgb.dtype!=np.uint8 or radius not in (*RADII,*NARROW_RADII):
         raise ValueError("invalid band input")
     fg=np.any(rgb!=255,axis=2)
     edge=np.zeros(fg.shape,bool)
@@ -45,9 +46,19 @@ def contracts():
     assert np.array_equal(rgb,original)
     solid=np.zeros((40,40,3),np.uint8)
     assert bands(solid,5)[1][0,20] and not bands(solid,5)[1][20,20]
-    print("A14 source band contracts PASS")
+    previous=np.zeros(rgb.shape[:2],bool)
+    for radius in NARROW_RADII:
+        narrow,mask,edge=bands(rgb,radius)
+        assert mask[20,24-radius] and not mask[20,23-radius]
+        assert mask[20,25+radius] and not mask[20,26+radius]
+        assert np.all(~previous|mask) and mask.sum()>previous.sum()
+        assert np.array_equal(narrow[mask],rgb[mask]) and np.all(narrow[~mask]==255)
+        assert np.array_equal(rgb,original)
+        previous=mask
+    assert np.all(~previous|m)
+    print("A14 source band contracts PASS (1/2/3 and 5/10)")
 
-def main(case):
+def main(case,narrow=False):
     import engine001_s5_native_brush_overlap as physical
     import engine001_s5_zone_methods as methods
     import run_engine001_s5_native_transfer_p2 as p2
@@ -58,7 +69,7 @@ def main(case):
     assert p2.git_blob((root/rel).read_bytes())==blob
     for module,expected in ((physical,"a268ee57aa4eeebe1c17927495cb8d8905d0e38b"),(methods,"f482f99ab80654f8bd36a61bd999b42bebf0d19f")):
         assert p2.git_blob(Path(module.__file__).read_bytes())==expected
-    out=Path(os.environ["RUNNER_TEMP"])/("s5-a14-"+case)
+    out=Path(os.environ["RUNNER_TEMP"])/(("s5-a14-narrow-" if narrow else "s5-a14-")+case)
     out.mkdir(parents=True,exist_ok=False)
     native.OUT=out
     src=out/"source"
@@ -85,7 +96,7 @@ def main(case):
         assert np.array_equal(first,native.render(driver,"reference-expanded",control))
         proof=physical.native_footprints(driver)
         native.binding.write_json(out/"egret-physical-footprints.json",proof)
-        for radius in RADII:
+        for radius in (NARROW_RADII if narrow else RADII):
             name=f"p2-rtv-r{radius:02d}"
             band,mask,edge=bands(rtv,radius)
             Image.fromarray(edge.astype(np.uint8)*255).save(out/"contour.png")
@@ -108,14 +119,15 @@ def main(case):
             results[name]=dict(radius_source_px=radius,source_band_pixels=int(mask.sum()),strokes=len(paths),planner=params,metrics=metrics,alpha_audit=audit,simulation_counter=meta.get("paintCounter"),raw_sha256=sha(out/(name+".png")),plan_sha256=sha(out/(name+"-plan.json.gz")))
             p2.make_comparison(out,Image.fromarray(original),Image.fromarray(band),Image.open(out/(name+"-crop.png")))
             (out/"actual-egret-three-way.png").rename(out/(name+"-comparison.png"))
-    native.binding.write_json(out/"a14-results.json",dict(schema="ENGINE001_S5_A14_V1",case=case,run=os.environ["GITHUB_RUN_ID"],sha=os.environ["GITHUB_SHA"],source=rel,source_sha256=sha(root/rel),geometry=geom,brush_widths=[1],smooth=False,mode="normal",interior_fill=False,strict_spill=False,results=results,exact_CHALK="NOT_RUN",human_visual_review="PENDING"))
+    native.binding.write_json(out/"a14-results.json",dict(schema="ENGINE001_S5_A14_V1",radii_source_px=list(NARROW_RADII if narrow else RADII),case=case,run=os.environ["GITHUB_RUN_ID"],sha=os.environ["GITHUB_SHA"],source=rel,source_sha256=sha(root/rel),geometry=geom,brush_widths=[1],smooth=False,mode="normal",interior_fill=False,strict_spill=False,results=results,exact_CHALK="NOT_RUN",human_visual_review="PENDING"))
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--case",choices=("home","illustration","second-png","wv"))
     parser.add_argument("--contracts",action="store_true")
+    parser.add_argument("--narrow",action="store_true")
     args=parser.parse_args()
     if args.contracts:
         contracts()
     else:
-        main(args.case)
+        main(args.case,args.narrow)
