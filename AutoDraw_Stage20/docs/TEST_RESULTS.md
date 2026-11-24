@@ -1,3 +1,7 @@
+## 2026-11-24 — ENGINE-001 S5 A7 selected zoning native E3
+
+[A7 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a7-native-results-e3-2026-11-24), [CI45314721360](https://github.com/Kiddos19882/AutoDraw/actions/runs/45314721360) code e031850, contracts + 3 native jobs 4/4 SUCCESS; 3 artifact digest/366 CRC/30 scene-plan-meter pair/3 control RGBA checks PASS. Meter actual offline BoardPane accepted vertex counter verified, no limit; optimization PARTIAL, visual PENDING, E4/exact CHALK/E5 NOT_RUN.
+
 ## 2026-11-24 — ENGINE-001 S5 Z2 comparative native E3 technical PASS
 
 [signed Z2 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a6-z2-multi-method-results-e3-2026-11-24), [CI45311156361](https://github.com/Kiddos19882/AutoDraw/actions/runs/45311156361) SHA c7e1b72 10/10 SUCCESS, 29 contracts, nine native jobs, 30 treatment frames. Nine ZIP SHA, 1041 CRC, 78 scene/plan SHA/count/width/length checks, 24 repeated A5 frames pixel-identical, 30 region/foreground/palette/protected-dot/neutral invariants PASS. Real CN table SHA 97b1f0ec… consistent across six jobs. Zero #EEEEEE→#FCD2BC. Visual review pending; no E4/E5/CHALK.

@@ -496,3 +496,26 @@ User selected 04 RTV and 08 CN+Chroma+DE2000 (DEC-066) and explicitly deferred s
 Hypothesis: existing A4 selects direction by bounding box and a single initial row phase; choose among both axis orientations and every integer lateral pitch phase per measured-valid connected center component and width, 10 down to 2. Preserve maximal lanes, always include first/last occupied rows as candidate boundaries; retain original orientation/phase as a candidate. Rank candidates by new target backing pixels covered by union of measured alpha128 core footprints along lanes (model selection only), then fewer lanes then shorter lane length, deterministic order. Candidate coverage uses current residual before width placement; accepted continuous route uses existing A4 shorter local-vs-original route, valid centers only, actual route nodes update coverage for next width. No artificial length/point/path/paint quota, no fragmenting lanes for scores, normal smooth=false. Width1 repair remains same actual broad readback + A5 interval union. Compare same target old/new broad and final RGBA, width histogram, continuous paths/length, original RGB, gaps and edge diagnostics, raw and plan SHA. Do not equate modeled gain to native quality; human visual decision required, no threshold weakening.
 
 Meter: verify zero/reset on native blank after expanded fixture, compare original/expanded control RGBA, require actual BoardPane counter for each broad/final scene, independently cross-check saved plan accepted vertex count and no budget. Report each final scene separately, not sum of broad preview plus final; no resource-driven planner decisions. E4/exact game CHALK/E5 NOT_RUN. E2 synthetic phase/orientation/valid-center checks, E3 full native jobs on three cases; archive failures. No production/master change.
+
+
+## ENGINE-001 S5-ADAPTIVE-A7 native results E3 (2026-11-24)
+
+Frozen E0 5420655; actual code e031850f6d277601c32d16b6b7f5adc73af49b50; [CI45314721360](https://github.com/Kiddos19882/AutoDraw/actions/runs/45314721360) contracts + 3 selected native jobs SUCCESS 4/4. Same three originals, 04 RTV and 08 CN+Chroma+DE2000, original Egret normal/smooth=false. Independent downloaded ZIP SHA256 match and CRC 366/366, 30 raw/plan hash matches and scene-plan meter crosschecks, 3 original-expanded control RGBA equal, 3 blank/reset counters zero. Neutral/chromatic report both directions zero; independent Illustration original #EEEEEE 35778 pixels, 35026 stay #EEEEEE in both methods, zero #FCD2BC transitions. Six paired old/new final native RGBA differ on only 9/9 home, 31/31 Illustration, 102/54 second-png backing pixels (RTV/joint respectively). No apparent new detail degradation in assistant visual preview; user visual review PENDING. Prior zoning-related hair highlight flattening and forehead tone changes vs A5 remain on second-png, not fixed by A7.
+
+| Final method | paths | width1 | width2-10 | length logical | simulated accepted points | broad foreground correct | broad paths <=3 logical |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A5 | 34808 | 34073 | 735 | 148420.832 | 75598 | 204007 | 292 |
+| RTV old | 29657 | 28912 | 745 | 152280.727 | 65956 | 222798 | 294 |
+| RTV A7 | 29662 | 28915 | 747 | 151699.278 | 66432 | 223959 | 272 |
+| Joint3 old | 30343 | 29603 | 740 | 152051.419 | 67247 | 221523 | 287 |
+| Joint3 A7 | 30349 | 29607 | 742 | 151475.803 | 67627 | 222775 | 268 |
+
+A7 TECH PASS / optimization PARTIAL: modest broad gain and fewer short broad paths, total length falls ~0.38% on both, but width1 count slightly increases and simulated points +476/+380. Home length +835 and points +226 for both; longest wide path falls from 1484 to 1217 in Illustration and 1143 to 1088 second-png. No general reduction in width1 or paint. Final foreground and edge correct and gap-union counts unchanged within each pair. Meter verified in actual experiment as user requested: 30 scene/plan pairs all actual BoardPane point delta == atom count == plan accepted vertices; 66 summary entries incl calibration, 3 blank/reset zero; maximum 46904, exceeds historical 6000, unlimited true/budget null. No claim of frame-timed live point consumption; E4/exact CHALK/E5 NOT_RUN. Standalone meter regression not required/not run.
+
+| Case | Artifact ID | ZIP SHA256 |
+| --- | --- | --- |
+| home | 14884537611 | c85b02fb8ffc31406862ff230c78ca941e27e9e2098c6667e8355e0cf3ce0074 |
+| illustration | 14885460029 | 313204e459ec40ada49d4f5e0cf7f80f7dfe99c2df650537b05805ca59ea0ec3 |
+| second-png | 14885327148 | 593442c8e40bc14ae5fd15788527bf4a6c5a4eb674ce0f4e2c13c80a4cb1bb38 |
+
+User Android archive S5-A7-visual-review.zip, 105 members, CRC PASS, SHA256 40d6ca280a2a89d0802d54dd41182537f7f03cc3befdca35732fda74ce0f67a4; raw native/crop images, source maps, metrics CSV/audit, per-case visual overview. Next visual review, then remaining originals and measured brush geometry iteration with actual native evidence, no production/master changes.
