@@ -84,6 +84,44 @@ class RelaxedTests(unittest.TestCase):
         valid[2,1]=True
         self.assertEqual(s.strict_taps(runs,valid),[((2,2),(1,2))])
 
+    def test_a12_distance_partition(self):
+        want=np.full((30,30,3),255,np.uint8)
+        want[2:28,2:28]=[70,80,90]
+        want[12:18,12:18]=[20,40,60]
+        maps=s.a12_distance_masks(want,5,1/3)
+        self.assertEqual(set(maps),{0x46505a,0x14283c})
+        for band,inside,distance in maps.values():
+            self.assertFalse(np.any(band&inside))
+            self.assertTrue(np.all(distance[band]>0))
+        for color,(band,inside,_) in maps.items():
+            target=np.all(want==np.array([(color>>16)&255,(color>>8)&255,color&255]),axis=2)
+            self.assertTrue(np.array_equal(band|inside,target))
+        counts=[int(sum(b.sum() for b,_,_ in s.a12_distance_masks(want,r,1/3).values())) for r in s.A12_RADII]
+        self.assertEqual(counts,sorted(counts))
+        self.assertEqual(s.A12_RADII,(3,5,10,15,20))
+
+    def test_a12_phase_allocation(self):
+        support=np.zeros((73,73),bool);support[36,36]=True
+        want=np.full((26,26,3),255,np.uint8)
+        want[1:25,1:25]=0
+        atlas={w:(support, support.copy()) for w in range(1,11)}
+        proof={"measurements":{f"{d}:{w}":{"lateral_min_backing_px":3}
+                for d in ("horizontal","vertical") for w in range(1,11)}}
+        stroke=lambda pts,w,rgb,i:dict(points=pts,width=w,colorRgb=rgb,strokeId=f"icon-{i}")
+        for radius in s.A12_RADII:
+            for _,spill in s.A12_BROAD:
+                paths,ledger,phases,regions=s.a12_plan(want,atlas,proof,stroke,spill,radius,1/3)
+                s.validate(paths,range(1,11))
+                self.assertEqual(len(paths),len(phases["boundary"])+len(phases["interior"]))
+                self.assertTrue(all(p["width"]<=3 for p in phases["boundary"]))
+                self.assertTrue(all(p["width"]>=4 for p in phases["interior"]))
+                self.assertTrue(all(x["spill_proxy_limit"]==0 for x in ledger if x["phase"]=="boundary"))
+                self.assertTrue(all(x["spill_proxy_limit"]==spill for x in ledger if x["phase"]=="interior"))
+        with self.assertRaises(ValueError):
+            s.a12_distance_masks(want,7,1)
+        with self.assertRaises(ValueError):
+            s.a12_plan(want,atlas,proof,stroke,.3,3,1/3)
+
     def test_white_repair(self):
         support,core=masks()
         want=np.full((15,15,3),255,np.uint8)

@@ -6,6 +6,8 @@ import numpy as np
 TREATMENTS = (("10", .1), ("20", .2), ("30", .3), ("50", .5), ("free", None))
 A10_TREATMENTS = (("10", .1), ("20", .2), ("30", .3))
 A11_TREATMENTS = (("10", .1), ("20", .2))
+A12_RADII = (3,5,10,15,20)
+A12_BROAD = (("10",.1),("20",.2))
 
 
 def width_tolerance(width, tolerance, mixed=False):
@@ -87,6 +89,26 @@ def strict_taps(runs, valid):
     return result
 
 
+def a12_distance_masks(want, radius_source, scale):
+    """Binary contour ring and interior in native backing pixels; no resize shortcut."""
+    if radius_source not in A12_RADII or scale <= 0:
+        raise ValueError("A12 invalid source radius or geometry scale")
+    radius = radius_source * scale * 3.0
+    masks = {}
+    colors = np.unique(want.reshape(-1,3),axis=0)
+    for color in colors:
+        if np.all(color==WHITE):
+            continue
+        target = np.all(want==color,axis=2)
+        # OpenCV's image-edge handling requires an explicit exterior black border.
+        padded = np.pad(target.astype(np.uint8),1)
+        distance = cv2.distanceTransform(padded,cv2.DIST_L2,cv2.DIST_MASK_PRECISE)[1:-1,1:-1]
+        band = target & (distance <= radius + 1e-6)
+        interior = target & ~band
+        masks[int.from_bytes(bytes(color),"big")] = (band,interior,distance)
+    return masks
+
+
 def choose(valid, benefit, delta, core, pitch, strict=False):
     best,rank = None,None
     for direction in DIRS:
@@ -155,6 +177,78 @@ def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offse
                                predicted_rgb_improvement=improvement,
                                candidate_centers=int(valid.sum())))
     return paths,ledger
+
+
+def a12_plan(want, atlas, proof, stroke, broad_tolerance, band_radius, scale,
+             actual=None, offset=0):
+    """Two research phases per color: strict 1–3 boundary, relaxed 4–10 interior.
+
+    The contour guard checks candidate centers and measured support against
+    foreign-color protected bands; native render remains the only artwork proof.
+    """
+    if broad_tolerance not in (.1,.2) or set(atlas) != set(range(1,11)):
+        raise ValueError("A12 treatment or native eligible widths invalid")
+    layers = a12_distance_masks(want,band_radius,scale)
+    current = np.full_like(want,255) if actual is None else actual.copy()
+    colors, areas = np.unique(want.reshape(-1,3),axis=0,return_counts=True)
+    order = sorted(range(len(colors)),
+                   key=lambda i:(np.all(colors[i]==WHITE),-int(areas[i]),tuple(colors[i])))
+    # Every known RGB boundary is protected, including contours painted by other
+    # colors later. This prevents broad-width predicted overwrites of detail.
+    protected = np.zeros(want.shape[:2],bool)
+    for band,_,_ in layers.values():
+        protected |= band
+    target16 = want.astype(np.int16)
+    paths, ledger, phase_paths = [],[],{"boundary":[],"interior":[]}
+    for i in order:
+        color=colors[i]
+        if np.all(color==WHITE):
+            continue
+        rgb=int.from_bytes(bytes(color),"big")
+        band,interior,_=layers[rgb]
+        target=np.all(want==color,axis=2)
+        new_error=np.abs(target16-color.astype(np.int16)).sum(axis=2)
+        # The protected first phase is always placed before the broad phase.
+        for phase, centers, sizes, limit in (
+                ("boundary",band,(3,2,1),0.0),
+                ("interior",interior,tuple(range(10,3,-1)),broad_tolerance)):
+            for width in sizes:
+                support,core=atlas[width]
+                old_error=np.abs(current.astype(np.int16)-target16).sum(axis=2)
+                delta=(old_error-new_error).astype(np.int32)
+                if not np.any(delta>0):
+                    continue
+                benefit=correlate(delta,core)
+                valid=candidate_mask(target,support,core,limit) & centers
+                if phase=="interior":
+                    # Native-footprint MODEL_ONLY exclusion from all *foreign*
+                    # color border bands; broad may overlap same-color border.
+                    foreign=protected & ~band
+                    collision=correlate(foreign,support)>0.5
+                    valid &= ~collision
+                if not np.any(valid & (benefit>0)):
+                    continue
+                spans=[proof["measurements"][f"{d}:{width}"]["lateral_min_backing_px"]
+                       for d in ("horizontal","vertical")]
+                pitch=max(1,math.floor(.8*min(spans)))
+                selected=choose(valid,benefit,delta,core,pitch,strict=phase=="boundary")
+                if selected is None:
+                    continue
+                runs,mask,direction,improvement=selected
+                for start,end in runs:
+                    if start==end:
+                        raise ValueError("A12 strict singleton leaked")
+                    pts=[dict(x=ORIGIN_X+x/3,y=y/3) for x,y in (start,end)]
+                    s=stroke(pts,width,rgb,offset+len(paths))
+                    paths.append(s)
+                    phase_paths[phase].append(s)
+                current[mask]=color
+                ledger.append(dict(phase=phase,width=width,color=rgb,
+                    source_band_px=band_radius,projected_band_px=band_radius*scale*3,
+                    spill_proxy_limit=limit,direction=direction,lanes=len(runs),
+                    candidate_centers=int(valid.sum()),
+                    predicted_rgb_improvement=improvement))
+    return paths,ledger,phase_paths,layers
 
 
 def validate(paths, allowed=range(4,11)):

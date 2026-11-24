@@ -1,4 +1,4 @@
-name: ENGINE-001 S5 A11 mixed brush tolerance
+name: ENGINE-001 S5 A12 contour bands 3-5-10-15-20
 on:
   workflow_dispatch:
     inputs:
@@ -46,7 +46,7 @@ jobs:
       fail-fast: false
       matrix:
         case: [home, illustration, second-png]
-        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected-a11"]') }}
+        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected-a12"]') }}
     runs-on: windows-latest
     timeout-minutes: 120
     steps:
@@ -60,6 +60,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: S5-A11-${{ matrix.case }}-${{ matrix.batch }}
+          name: S5-A12-${{ matrix.case }}-${{ matrix.batch }}
           path: ${{ runner.temp }}/s5-adaptive-a6-z2-${{ matrix.case }}-${{ matrix.batch }}
           if-no-files-found: error
