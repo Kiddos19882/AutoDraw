@@ -1,3 +1,7 @@
+## DEC-065. S5 Z1 Illustration visual FAIL; Z2 comparative methods (2026-11-24)
+
+**USER REVIEW:** both Balanced and Strong wrongly recolor light neutral #EEEEEE to peach #FCD2BC in Illustration. Both are visually rejected for that case; earlier assistant preference does not constitute acceptance. User requests each researched method separately and jointly with real render per variant. [Z2 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a6-z2-multi-method-comparison-e0-2026-11-24). Keep A5/Z1 evidence; no production admission. Neutral/chromatic compatibility is a hard experiment invariant, not a relaxation of historical scientific gates.
+
 ## DEC-064. S5 A6 zone consolidation before brush optimization (2026-11-24)
 
 **ACCEPTED BY USER:** maximize reduction of fragmented same/near-color zones and form larger connected areas of arbitrary shape, including long thin outline bands. A6 zoning is first before lane phase/orientation optimization; preserve visible meaningful contours and details, do not force geometric primitives or erase details by size alone. [A6-Z1 E0](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-adaptive-a6-z1-source-guided-connected-color-zones-e0-2026-11-24). A5 frozen; research-only new source maps → fresh native A5 drawing, no formal S4/E4/E5/CHALK or production admission. A4/A5 explicit human verdict remains pending.
