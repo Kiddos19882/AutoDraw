@@ -60,6 +60,11 @@ def panel(out, original, target, maps):
                 candidate=out/(stem+"-crop.png")
                 if candidate.exists():
                     cells.append((stem.upper()+" EGRET",Image.open(candidate)))
+        for radius in (3,5,10,15,20):
+            stem=key+f"-a13-r{radius:02d}"
+            candidate=out/(stem+"-crop.png")
+            if candidate.exists():
+                cells.append((stem.upper()+" EGRET",Image.open(candidate)))
         improved=out/(key+"-a7-crop.png")
         if improved.exists():
             cells.append((key.upper()+" A7 EGRET",Image.open(improved)))
@@ -76,12 +81,13 @@ def panel(out, original, target, maps):
 
 def main(case,batch):
     import engine001_s5_native_brush_overlap as physical
+    contour_only = batch == "selected-a13"
     boundary = batch == "selected-a12"
     mixed = batch == "selected-a11"
-    allbrush = batch in ("selected-a10", "selected-a11", "selected-a12")
-    relaxed = batch in ("selected-a9", "selected-a10", "selected-a11", "selected-a12")
-    restricted = batch in ("selected", "selected-a9", "selected-a10", "selected-a11", "selected-a12")
-    selected = batch in ("selected", "selected-a7", "selected-a9", "selected-a10", "selected-a11", "selected-a12")
+    allbrush = batch in ("selected-a10", "selected-a11", "selected-a12", "selected-a13")
+    relaxed = batch in ("selected-a9", "selected-a10", "selected-a11", "selected-a12", "selected-a13")
+    restricted = batch in ("selected", "selected-a9", "selected-a10", "selected-a11", "selected-a12", "selected-a13")
+    selected = batch in ("selected", "selected-a7", "selected-a9", "selected-a10", "selected-a11", "selected-a12", "selected-a13")
     if relaxed:
         import engine001_s5_relaxed_geometry as soft
     presets = SELECTED if selected else methods.BATCHES[batch]
@@ -93,7 +99,8 @@ def main(case,batch):
     import engine001_bpred_s4r1_rag3_hierarchy as rag
     import engine001_bpred_s4r1_dg1_source_detail_atoms as dg
     root=native.binding.ROOT
-    rel,expected=p2.CASE[case]
+    rel,expected=(("testImages/wV6VeZI9S1Y.png","d3cd95b846f036a3f8acecf75d2a237e46dcf13a") if case=="wv" else p2.CASE[case])
+    a.require(case!="wv" or contour_only,"wV is admitted only to A13")
     for module,blob in ((physical,a.PLANNER_BLOB),(a,v.A1_BLOB),(v,p.A2_BLOB),
             (p,q.A3_BLOB),(q,f.A4_BLOB),(f,A5_BLOB),
             (rag,"f600e3580f1a3d09bd96f5688e5212fd0b178039"),(dg,"840b3b24cee38f044600dc9a9e18af617a263b7f")):
@@ -115,7 +122,8 @@ def main(case,batch):
     Image.fromarray(target,"RGB").save(out/"prepared.png")
     Image.fromarray(want,"RGB").save(out/"projected-target.png")
     before,ids=z.region_counts(target)
-    a.require(before["zones"]==ZONE_COUNTS[case],"A5 zone count drift")
+    if case!="wv":
+        a.require(before["zones"]==ZONE_COUNTS[case],"A5 zone count drift")
     maps={}
     zone_reports={}
     failures={}
@@ -207,6 +215,36 @@ def main(case,batch):
             a.require(bool(eligible_atlas),"A8 no validated allowed widths")
         for key,img in (maps if restricted else {"a5":target,**maps}).items():
             projected,_,_=transfer.projected(img,geom)
+            if contour_only:
+                for radius in soft.A12_RADII:
+                    variant=key+f"-a13-r{radius:02d}"
+                    trial,ledger,layers=soft.a13_plan(projected,a10_atlas,proof,native.stroke,radius,geom["scale"])
+                    soft.validate(trial,range(1,5))
+                    raw=native.render(driver,variant,trial)
+                    save(variant,trial,raw,img,projected)
+                    union=np.zeros(projected.shape[:2],bool)
+                    for band,_,_ in layers.values():
+                        union |= band
+                    Image.fromarray(union.astype(np.uint8)*255,"L").save(out/(variant+"-allowed-band.png"))
+                    alpha=raw[:,a.OX:a.OX+450,3]
+                    audit={}
+                    for threshold in (0,24,128):
+                        ink=alpha>threshold
+                        outside=int(np.count_nonzero(ink & ~union))
+                        exterior=int(np.count_nonzero(raw[:,:,3]>threshold)-np.count_nonzero(ink))
+                        audit[str(threshold)]=dict(within=int(np.count_nonzero(ink & union)),
+                            outside_band=outside,outside_crop=exterior)
+                    n=int(union.sum())
+                    results[variant].update(band_radius_source_px=radius,
+                        band_radius_projected_px=radius*geom["scale"]*3,
+                        band_pixels=n,allowed_widths=[1,2,3,4],spill_proxy_limit=0.0,
+                        interior_fill=False,native_feedback=False,alpha_audit=audit,
+                        strict_native_band_status="PASS" if not (audit["0"]["outside_band"] or audit["0"]["outside_crop"]) else "FAIL",
+                        band_coverage_alpha_gt_128=(audit["128"]["within"]/n if n else None))
+                    a.write_json(out/(variant+"-route-ledger.json"),dict(initial=ledger,
+                        model_only=True,band_radius_source_px=radius,interior_fill=False,
+                        brush_tolerances={str(w):0.0 for w in range(1,5)}))
+                continue
             if restricted:
                 name=key+"-a8"
                 paths,counts8,ledger8=phase.broad_plan(projected,eligible_atlas,proof,native.stroke)
@@ -333,10 +371,10 @@ def main(case,batch):
     for key,img in maps.items():
         panel(out,original,target,{key:img})
         (out/"comparison.png").rename(out/(key+"-comparison.png"))
-    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A12_CONTOUR_BANDS_V1" if boundary else ("ENGINE001_S5_ADAPTIVE_A11_MIXED_V1" if mixed else ("ENGINE001_S5_ADAPTIVE_A10_ALL_BRUSHES_V1" if allbrush else ("ENGINE001_S5_ADAPTIVE_A9_RELAXED_V1" if relaxed else ("ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1"))))),
-        allowed_artwork_widths=list(range(1,11)) if allbrush else (sorted(A8_WIDTHS) if restricted else list(range(1,11))),
-        small_brush_repair=not restricted or (allbrush and not boundary), native_feedback=relaxed and not boundary,
-        feedback_widths=[] if boundary else (list(range(1,11)) if allbrush else ([4] if relaxed else [])),
+    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A13_STRICT_CONTOUR_ONLY_V1" if contour_only else "ENGINE001_S5_ADAPTIVE_A12_CONTOUR_BANDS_V1" if boundary else ("ENGINE001_S5_ADAPTIVE_A11_MIXED_V1" if mixed else ("ENGINE001_S5_ADAPTIVE_A10_ALL_BRUSHES_V1" if allbrush else ("ENGINE001_S5_ADAPTIVE_A9_RELAXED_V1" if relaxed else ("ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1"))))),
+        allowed_artwork_widths=[1,2,3,4] if contour_only else list(range(1,11)) if allbrush else (sorted(A8_WIDTHS) if restricted else list(range(1,11))),
+        small_brush_repair=not contour_only and (not restricted or (allbrush and not boundary)), native_feedback=relaxed and not boundary and not contour_only,
+        feedback_widths=[] if boundary or contour_only else (list(range(1,11)) if allbrush else ([4] if relaxed else [])),
         batch=batch,cn_provenance=cn_meta,failures=failures,
         case=case,sha=os.environ["GITHUB_SHA"],run=os.environ["GITHUB_RUN_ID"],
         source=rel,source_git_blob=expected,source_sha256=a.sha(root/rel),
@@ -351,7 +389,7 @@ def main(case,batch):
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--case",choices=tuple(A5_COUNTS),required=True)
-    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7","selected-a9","selected-a10","selected-a11","selected-a12"),required=True)
+    parser.add_argument("--case",choices=(*A5_COUNTS,"wv"),required=True)
+    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7","selected-a9","selected-a10","selected-a11","selected-a12","selected-a13"),required=True)
     args=parser.parse_args()
     main(args.case,args.batch)

@@ -251,6 +251,43 @@ def a12_plan(want, atlas, proof, stroke, broad_tolerance, band_radius, scale,
     return paths,ledger,phase_paths,layers
 
 
+def a13_plan(want, atlas, proof, stroke, radius, scale):
+    """Strict MODEL_ONLY support within the same-color contour band only."""
+    if not set(range(1,5)).issubset(atlas):
+        raise ValueError("A13 missing measured widths 1–4")
+    layers = a12_distance_masks(want,radius,scale)
+    current = np.full_like(want,255)
+    paths,ledger = [],[]
+    for rgb,(band,_,_) in layers.items():
+        color=np.array([(rgb>>16)&255,(rgb>>8)&255,rgb&255],np.uint8)
+        for width in (4,3,2,1):
+            support,core=atlas[width]
+            delta=(band & np.any(current!=color,axis=2)).astype(np.int32)
+            benefit=correlate(delta,core)
+            valid=candidate_mask(band,support,core,0.0) & band
+            if not np.any(valid & (benefit>0)):
+                continue
+            spans=[proof["measurements"][f"{d}:{width}"]["lateral_min_backing_px"]
+                   for d in ("horizontal","vertical")]
+            pitch=max(1,math.floor(.8*min(spans)))
+            selected=choose(valid,benefit,delta,core,pitch,strict=True)
+            if selected is None:
+                continue
+            runs,mask,direction,improvement=selected
+            if np.any(mask & ~band):
+                raise ValueError("A13 modeled core outside same-color band")
+            for start,end in runs:
+                if start==end:
+                    raise ValueError("A13 invalid singleton")
+                pts=[dict(x=ORIGIN_X+x/3,y=y/3) for x,y in (start,end)]
+                paths.append(stroke(pts,width,rgb,len(paths)))
+            current[mask]=color
+            ledger.append(dict(width=width,color=rgb,source_band_px=radius,
+                spill_proxy_limit=0.0,direction=direction,lanes=len(runs),
+                candidate_centers=int(valid.sum()),predicted_new_band_pixels=improvement))
+    return paths,ledger,layers
+
+
 def validate(paths, allowed=range(4,11)):
     for s in paths:
         if s["width"] not in allowed or len(s["points"])<2:

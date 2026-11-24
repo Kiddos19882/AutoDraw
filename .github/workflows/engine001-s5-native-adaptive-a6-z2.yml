@@ -1,4 +1,4 @@
-name: ENGINE-001 S5 A12 contour bands 3-5-10-15-20
+name: ENGINE-001 S5 A13 strict contour-only 3-5-10-15-20
 on:
   workflow_dispatch:
     inputs:
@@ -45,8 +45,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        case: [home, illustration, second-png]
-        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected-a12"]') }}
+        case: ${{ fromJSON(inputs.historical_z2 && '["home","illustration","second-png"]' || '["home","illustration","second-png","wv"]') }}
+        batch: ${{ fromJSON(inputs.historical_z2 && '["local","global","combined"]' || '["selected-a13"]') }}
     runs-on: windows-latest
     timeout-minutes: 120
     steps:
@@ -60,6 +60,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: S5-A12-${{ matrix.case }}-${{ matrix.batch }}
+          name: S5-A13-${{ matrix.case }}-${{ matrix.batch }}
           path: ${{ runner.temp }}/s5-adaptive-a6-z2-${{ matrix.case }}-${{ matrix.batch }}
           if-no-files-found: error

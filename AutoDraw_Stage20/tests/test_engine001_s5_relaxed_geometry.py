@@ -151,6 +151,33 @@ class RelaxedTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             s.a12_plan(want,atlas,proof,stroke,.3,3,1/3)
 
+    def test_a13_strict_contour_only(self):
+        import cv2
+        want=np.full((55,55,3),255,np.uint8)
+        want[2:53,2:53]=[20,40,60]
+        support,core=masks()
+        atlas={w:(support,core) for w in range(1,11)}
+        proof={"measurements":{f"{d}:{w}":{"lateral_min_backing_px":3}
+               for d in ("horizontal","vertical") for w in range(1,5)}}
+        stroke=lambda pts,w,rgb,i:dict(points=pts,width=w,colorRgb=rgb,strokeId=f"icon-{i}")
+        for radius in s.A12_RADII:
+            paths,ledger,layers=s.a13_plan(want,atlas,proof,stroke,radius,1/3)
+            self.assertTrue(paths)
+            s.validate(paths,range(1,5))
+            band,inside,_=layers[0x14283c]
+            self.assertFalse(band[27,27])
+            valid=s.candidate_mask(band,support,core,0.0)&band
+            for path in paths:
+                self.assertIn(path["width"],range(1,5))
+                points=[(round((p["x"]-s.ORIGIN_X)*3),round(p["y"]*3)) for p in path["points"]]
+                self.assertNotEqual(*points)
+                line=np.zeros(band.shape,np.uint8)
+                cv2.line(line,*points,1,1,cv2.LINE_8)
+                self.assertFalse(np.any(line.astype(bool)&~valid))
+            self.assertTrue(all(x["spill_proxy_limit"]==0 for x in ledger))
+        with self.assertRaises(ValueError):
+            s.a13_plan(want,{1:(support,core)},proof,stroke,3,1/3)
+
     def test_white_repair(self):
         support,core=masks()
         want=np.full((15,15,3),255,np.uint8)
