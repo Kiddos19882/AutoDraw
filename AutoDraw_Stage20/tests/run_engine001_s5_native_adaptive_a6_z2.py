@@ -49,6 +49,11 @@ def panel(out, original, target, maps):
                 candidate=out/(key+"-a10-"+label+suffix+"-crop.png")
                 if candidate.exists():
                     cells.append((key.upper()+" A10 "+label+suffix,Image.open(candidate)))
+        for label in ("10","20"):
+            for suffix in ("","-repair"):
+                candidate=out/(key+"-a11-"+label+suffix+"-crop.png")
+                if candidate.exists():
+                    cells.append((key.upper()+" A11 "+label+suffix,Image.open(candidate)))
         improved=out/(key+"-a7-crop.png")
         if improved.exists():
             cells.append((key.upper()+" A7 EGRET",Image.open(improved)))
@@ -65,10 +70,11 @@ def panel(out, original, target, maps):
 
 def main(case,batch):
     import engine001_s5_native_brush_overlap as physical
-    allbrush = batch == "selected-a10"
-    relaxed = batch in ("selected-a9", "selected-a10")
-    restricted = batch in ("selected", "selected-a9", "selected-a10")
-    selected = batch in ("selected", "selected-a7", "selected-a9", "selected-a10")
+    mixed = batch == "selected-a11"
+    allbrush = batch in ("selected-a10", "selected-a11")
+    relaxed = batch in ("selected-a9", "selected-a10", "selected-a11")
+    restricted = batch in ("selected", "selected-a9", "selected-a10", "selected-a11")
+    selected = batch in ("selected", "selected-a7", "selected-a9", "selected-a10", "selected-a11")
     if relaxed:
         import engine001_s5_relaxed_geometry as soft
     presets = SELECTED if selected else methods.BATCHES[batch]
@@ -206,19 +212,19 @@ def main(case,batch):
                 a.write_json(out/(name+"-route-ledger.json"),ledger8)
                 if relaxed:
                     a.require(4 in eligible_atlas,"A9 missing measured width4")
-                    treatments=soft.A10_TREATMENTS if allbrush else soft.TREATMENTS
+                    treatments=soft.A11_TREATMENTS if mixed else (soft.A10_TREATMENTS if allbrush else soft.TREATMENTS)
                     trial_atlas=a10_atlas if allbrush else eligible_atlas
                     selected_widths=range(1,11) if allbrush else None
                     for label,tolerance in treatments:
-                        variant=key+("-a10-" if allbrush else "-a9-")+label
+                        variant=key+("-a11-" if mixed else ("-a10-" if allbrush else "-a9-"))+label
                         trial,ledger=soft.plan(projected,trial_atlas,proof,native.stroke,
-                            tolerance,widths=selected_widths)
+                            tolerance,widths=selected_widths,mixed=mixed)
                         soft.validate(trial,range(1,11) if allbrush else range(4,11))
                         raw=native.render(driver,variant,trial)
                         save(variant,trial,raw,img,projected)
                         actual=a.white_rgb(raw[:,a.OX:a.OX+450])
                         repair,repair_ledger=soft.plan(projected,trial_atlas,proof,native.stroke,
-                            tolerance,actual,repair=True,offset=len(trial),widths=selected_widths)
+                            tolerance,actual,repair=True,offset=len(trial),widths=selected_widths,mixed=mixed)
                         final=trial+repair
                         soft.validate(final,range(1,11) if allbrush else range(4,11))
                         final_name=variant+"-repair"
@@ -229,10 +235,12 @@ def main(case,batch):
                             return int(np.abs(rgb.astype(np.int16)-projected.astype(np.int16)).sum(dtype=np.int64))
                         e0,e1=error(actual),error(final_actual)
                         results[variant].update(spill_proxy_limit=tolerance,
+                            spill_proxy_by_width={str(w):soft.width_tolerance(w,tolerance,mixed) for w in trial_atlas},
                             allowed_widths=list(range(1,11)) if allbrush else list(range(4,11)),
                             eligible_widths=sorted(trial_atlas),
                             native_target_rgb_absolute_error=e0,repair_name=final_name)
                         results[final_name].update(spill_proxy_limit=tolerance,
+                            spill_proxy_by_width={str(w):soft.width_tolerance(w,tolerance,mixed) for w in trial_atlas},
                             allowed_widths=list(range(1,11)) if allbrush else list(range(4,11)),
                             eligible_widths=sorted(trial_atlas),
                             native_target_rgb_absolute_error=e1,repair_paths=len(repair),
@@ -279,7 +287,7 @@ def main(case,batch):
     for key,img in maps.items():
         panel(out,original,target,{key:img})
         (out/"comparison.png").rename(out/(key+"-comparison.png"))
-    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A10_ALL_BRUSHES_V1" if allbrush else ("ENGINE001_S5_ADAPTIVE_A9_RELAXED_V1" if relaxed else ("ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1"))),
+    a.write_json(out/"a6-z2-results.json",dict(schema="ENGINE001_S5_ADAPTIVE_A11_MIXED_V1" if mixed else ("ENGINE001_S5_ADAPTIVE_A10_ALL_BRUSHES_V1" if allbrush else ("ENGINE001_S5_ADAPTIVE_A9_RELAXED_V1" if relaxed else ("ENGINE001_S5_ADAPTIVE_A8_MIN4_V1" if restricted else ("ENGINE001_S5_ADAPTIVE_A7_V1" if selected else "ENGINE001_S5_ADAPTIVE_A6_Z2_V1")))),
         allowed_artwork_widths=list(range(1,11)) if allbrush else (sorted(A8_WIDTHS) if restricted else list(range(1,11))),
         small_brush_repair=not restricted or allbrush, native_feedback=relaxed,
         feedback_widths=list(range(1,11)) if allbrush else ([4] if relaxed else []),
@@ -298,6 +306,6 @@ def main(case,batch):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--case",choices=tuple(A5_COUNTS),required=True)
-    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7","selected-a9","selected-a10"),required=True)
+    parser.add_argument("--batch",choices=(*methods.BATCHES,"selected","selected-a7","selected-a9","selected-a10","selected-a11"),required=True)
     args=parser.parse_args()
     main(args.case,args.batch)

@@ -5,6 +5,11 @@ import numpy as np
 
 TREATMENTS = (("10", .1), ("20", .2), ("30", .3), ("50", .5), ("free", None))
 A10_TREATMENTS = (("10", .1), ("20", .2), ("30", .3))
+A11_TREATMENTS = (("10", .1), ("20", .2))
+
+
+def width_tolerance(width, tolerance, mixed=False):
+    return 0.0 if mixed and width <= 3 else tolerance
 DIRS = ((1,0), (0,1), (1,1), (1,-1))
 WHITE = np.array([255,255,255], np.uint8)
 ORIGIN_X = 155
@@ -69,11 +74,26 @@ def sweep(runs, core, shape):
                       borderType=cv2.BORDER_CONSTANT,borderValue=0)>0
 
 
-def choose(valid, benefit, delta, core, pitch):
+def strict_taps(runs, valid):
+    result = []
+    for start,end in runs:
+        if start == end:
+            x,y = start
+            neighbors = [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
+            end = next((q for q in neighbors if 0<=q[0]<valid.shape[1] and 0<=q[1]<valid.shape[0] and valid[q[1],q[0]]), None)
+            if end is None:
+                continue
+        result.append((start,end))
+    return result
+
+
+def choose(valid, benefit, delta, core, pitch, strict=False):
     best,rank = None,None
     for direction in DIRS:
         stride = max(1,int(round(pitch*math.hypot(*direction))))
         runs = runs_for_direction(valid,benefit,direction,stride)
+        if strict:
+            runs = strict_taps(runs,valid)
         if not runs:
             continue
         mask = sweep(runs,core,valid.shape)
@@ -85,7 +105,7 @@ def choose(valid, benefit, delta, core, pitch):
     return best
 
 
-def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offset=0, widths=None):
+def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offset=0, widths=None, mixed=False):
     """widths=None preserves historical A9; A10 passes measured eligible 1..10."""
     selected_widths = (4,) if repair else tuple(range(10,3,-1))
     if widths is not None:
@@ -110,13 +130,14 @@ def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offse
             if not np.any(delta>0):
                 continue
             benefit=correlate(delta,core)
-            valid=candidate_mask(target,support,core,tolerance)
+            limit=width_tolerance(width,tolerance,mixed)
+            valid=candidate_mask(target,support,core,limit)
             if not np.any(valid & (benefit>0)):
                 continue
             spans=[proof["measurements"][f"{d}:{width}"]["lateral_min_backing_px"]
                    for d in ("horizontal","vertical")]
             pitch=max(1,math.floor(.8*min(spans)))
-            selected=choose(valid,benefit,delta,core,pitch)
+            selected=choose(valid,benefit,delta,core,pitch,strict=mixed and width<=3)
             if selected is None:
                 continue
             runs,mask,direction,improvement=selected
@@ -129,7 +150,7 @@ def plan(want, atlas, proof, stroke, tolerance, actual=None, repair=False, offse
                 points=[dict(x=ORIGIN_X+x/3,y=y/3) for x,y in (start,end)]
                 paths.append(stroke(points,width,rgb,offset+len(paths)))
             current[mask]=color
-            ledger.append(dict(width=width,color=rgb,direction=direction,
+            ledger.append(dict(width=width,color=rgb,direction=direction,spill_proxy_limit=limit,
                                lanes=len(runs),taps=taps,pitch_backing=pitch,
                                predicted_rgb_improvement=improvement,
                                candidate_centers=int(valid.sum())))

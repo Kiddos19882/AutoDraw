@@ -72,6 +72,18 @@ class RelaxedTests(unittest.TestCase):
         self.assertTrue(all(p["width"] in atlas for p in corrections))
         self.assertTrue(all(p["width"] in range(1,11) for p in paths+corrections))
 
+    def test_a11_mixed_limits_and_strict_taps(self):
+        self.assertEqual(s.A11_TREATMENTS,(("10",.1),("20",.2)))
+        for _,limit in s.A11_TREATMENTS:
+            for w in range(1,11):
+                self.assertEqual(s.width_tolerance(w,limit,True),0 if w<=3 else limit)
+                self.assertEqual(s.width_tolerance(w,limit),limit)
+        valid=np.zeros((5,5),bool);valid[2,2]=True
+        runs=[((2,2),(2,2))]
+        self.assertEqual(s.strict_taps(runs,valid),[])
+        valid[2,1]=True
+        self.assertEqual(s.strict_taps(runs,valid),[((2,2),(1,2))])
+
     def test_white_repair(self):
         support,core=masks()
         want=np.full((15,15,3),255,np.uint8)
