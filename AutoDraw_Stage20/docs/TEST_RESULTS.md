@@ -1,3 +1,7 @@
+## 2026-11-25 — ENGINE-001 S5 A15.1 E3 and user visual acceptance
+
+ENGINE-001 S5 A15.1 R2/T10 user visual PASS (2026-11-25). [A15.1 visual acceptance](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a151-r2-t10-user-visual-acceptance-2026-11-25); [CI45517456255](https://github.com/Kiddos19882/AutoDraw/actions/runs/45517456255), code d58950a, all 5 jobs SUCCESS. Illustration, RTV04, F4-L5 contour radius2 source px, 10% per-stroke native spill, width10→4 then3→1, smoothing off, no dots or source arc length <=5. Simulation CHALK 27536 contour +1252 large +4476 small =33264 (CI job logs). Frozen research baseline only; exact live CHALK/E4/E5 NOT_RUN, no production promotion. Other variants not user-accepted. Failed first CI45516979619 retained; job138880743171 counter reconfirmed.
+
 ## 2026-11-24 — ENGINE-001 S5 A13 E3
 
 [A13 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a13-strict-contour-only-native-results-e3-2026-11-24), [CI45431171193](https://github.com/Kiddos19882/AutoDraw/actions/runs/45431171193), code ad45e6a: 5/5 SUCCESS; 40 native contour-only scenes, measured widths1–4, radii3/5/10/15/20, 4 ZIP SHA/532 CRC PASS, independent alpha union-band audit zero outside all40; 8 empty, thin contour quality PARTIAL/negative; user review PENDING. Exact CHALK/E4/E5 NOT_RUN. Visual ZIP 119 members CRC PASS, SHA256 a743d40692d4bcedeaf71e18958071b8e0a5fbd437861528506ffdc160525040.
