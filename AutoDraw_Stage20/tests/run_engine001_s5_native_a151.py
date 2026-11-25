@@ -173,7 +173,8 @@ def main(radius,baseline,source,tolerance):
                     if key in seen:continue
                     seen.add(key)
                     assert len(p["points"])>=2 and length_source(p,g["scale"])>5+1e-9
-                    p=dict(p,strokeId=f"a151-{width}-{len(seen)}")
+                    p=dict(p,strokeId=f"icon-{1000000+width*100000+len(seen)}")
+                    assert p["strokeId"] not in {q["strokeId"] for q in paths+accepted}
                     # Render using the same native fixture, but avoid writing hundreds of
                     # full-size PNGs: retain the per-stroke audit and packed native alpha crop.
                     response=driver.execute_script(native.binding.native.CMD,[p])
