@@ -1,3 +1,33 @@
+## ENGINE-001 S5 A16 single dark contour native Egret E3 (2026-11-25)
+
+**Status:** `TECHNICAL E3 PASS`, 2/2 GitHub Actions jobs SUCCESS, **quality optimization FAIL/PARTIAL**; no human visual acceptance of A16, no game E4/exact CHALK/E5 or production promotion. [CI45526033549](https://github.com/Kiddos19882/AutoDraw/actions/runs/45526033549) code `68ffdfbcf6858e584077bb9a0ade3d6ce4d540d7`; [artifact 14981824834](https://github.com/Kiddos19882/AutoDraw/actions/runs/45526033549/artifacts/14981824834) download with **15 actual native Egret RGBA PNG + 15 plans + reports/target/contact sheet**; downloaded archive SHA256 `d53b8272ac1dcc1b88aa40c45a93262ce0a3f837b9a836af23b636c223576e7e`; 61 member CRC PASS, plan/raw SHA256 **15/15 each** and independent recomputation of stroke/vertex counts and source-length cutoff >5 PASS. Original sources are unchanged. [Frozen prereg](ENGINE001_S5_A16_DARK_CONTOUR_SINGLE_COLOR_PREREG_2026-11-25.md).
+
+**Color-selection evidence:** Illustration original `data/generated_autodraw_plan/images_31_first/4534364.jpg`, Git blob `27050fbd1661f1c36a0abea3ee0dc25eb84d86a5`, source SHA256 `fbce38d2640e39992d50d2402666fa03d31a8e8ff6d39c9afdf735cde23de4a9`. Archived A14 F4-L5 R2 and RTV04 mask SHA pinned and asserted; `rtv-prepared.png` SHA256 `f639ef6ea1c2a4a72ba102305c13f87abb7654d9dfcb63f9047c636732e696d0`. Choose largest-count among dark contour colors Rec.709 luminance <=128: **#535353**, source RGB (83,83,83), **10474 source pixels** (all contour band pixels 88713); this is the *most prevalent dark*, not an assertion about the darkest overall swatch. Source target PNG SHA256 `fccc2316eccc181e75e9613f74041386355cc882363dd093eb7f7ca933d8dde5`. Source dimensions 414×483; game logical transform `scale=0.36231884057971014`, left=155.0, top=32.5; backing ×3.
+
+**A16 comparisons.** `F4-L5` is **only the chosen color filtered from frozen A15.1 stage-1 contour**; it is NOT the complete accepted A15.1 R2/T10 image. All other colors excluded. Native normal/smooth=false, actual Egret widths1/2/3, unlimited stroke count, no dots, strict source arc length >5 source px. "Mix" variants choose brush width by independent horizontal-lane length; they are NOT full native feedback-assisted repair. `alpha128 coverage` = target source-color projected pixels inked at alpha>=128. `outside ink` is percentage of alpha>=128 ink outside this **one-color source target** across one native scene; it is NOT the per-stroke A15.1 10% acceptance check. Geometric length is in **source px**, not CHALK.
+
+| Route | Width1/2/3 stroke count | Strokes | Source length total px | Mean source length px | alpha128 coverage % | alpha128 outside ink % | Simulation meter |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Frozen F4-L5 / A16 control | 355/0/0 | 355 | 9021.03 | 25.41 | 70.79 | 54.77 | 3340 |
+| B short routing | 328/0/0 | 328 | 3857.00 | 11.76 | 39.25 | 50.06 | 656 |
+| Cfree horizontal width1 | 178/0/0 | 178 | 1591.00 | 8.94 | 21.49 | 43.43 | 356 |
+| Cfree horizontal width2 | 0/178/0 | 178 | 1591.00 | 8.94 | 35.50 | 50.56 | 356 |
+| Cfree horizontal width3 | 0/0/178 | 178 | 1591.00 | 8.94 | 41.29 | 60.90 | 356 |
+| Cfree mixed2/1 | 138/40/0 | 178 | 1591.00 | 8.94 | 25.97 | 48.04 | 356 |
+| Cfree mixed3/2/1 | 138/35/5 | 178 | 1591.00 | 8.94 | 26.11 | 49.95 | 356 |
+| D connected | 477/0/0 | 477 | 6098.00 | 12.78 | 59.10 | 52.99 | 3292 |
+| E shells | 298/0/0 | 298 | 3127.00 | 10.49 | 31.16 | 59.53 | 2015 |
+| F routes | 469/0/0 | 469 | 5865.00 | 12.51 | 57.42 | 53.08 | 1958 |
+| F1 diagonal | 275/0/0 | 275 | 10948.37 | 39.81 | 77.17 | 58.49 | 7666 |
+| F2 shortcuts | 371/0/0 | 371 | 4368.64 | 11.78 | 46.95 | 52.14 | 923 |
+| F3 RDP | 451/0/0 | 451 | 5440.29 | 12.06 | 55.13 | 51.79 | 1305 |
+| F4 join | 355/0/0 | 355 | 9021.03 | 25.41 | 70.79 | 54.77 | 3340 |
+| F6 combined | 229/0/0 | 229 | 4405.20 | 19.24 | 50.37 | 59.47 | 1074 |
+
+**Interpretation:** horizontal routing cuts 355→178 strokes (−49.86%) and source length 9021→1591 but native coverage falls 70.79→21.49% for width1 and reaches only 41.29% for width3. F1 diagonal cuts 355→275 (−22.54%), improves coverage 70.79→77.17%, but increases source path length 9021→10948 (+21.37%) and also increases out-of-target ink 54.77→58.49%; not a quality-equivalent accepted contour candidate. All native scene-wide leak fractions >43%, so no candidate can be claimed as meeting a 10% scene-wise support gate, **and per-stroke 10% was NOT_RUN**. The apparent difference of 10% benchmark versus isolated frozen contour is expected: A15.1 10% was measured on its *added per-stroke fill probes*, not retrospectively proven for this stage1 isolated contour. Do not conflate. User visual review of these one-color native scenes PENDING.
+
+**Next:** test source-contour long connected diagonals/centerline, but enforce meaningful coverage and actual native *per-stroke* support (as prospective new experiment), without modifying accepted A15.1 baseline, frozen thresholds, Stage6/Bridge/Monitor/CHALK estimator, or historically rejected results.
+
 # ENGINE-001 · wV second-lane search, 2026-11-23
 
 Baseline b079e755, fresh default eight-color wV, unrestricted counts, normal mode, smoothing disabled. Both runs share the input and source manifest. The opt-in second-lane experiment uses the original sweep cell, both axes, integer widths from two to the original value, four or more consecutive safe centers and two parallel spans separated by at least one brush width. Both connection ends are tested with the whole ideal capsule. The existing scheduler sees the original proposal and the best extra candidate.
