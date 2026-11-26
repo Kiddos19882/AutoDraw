@@ -1,8 +1,8 @@
-**ENGINE-001 S5 FIRST NEXT A28.3:** [shared FILL-001 live launch](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a283--shared-fill-001-live-launch-2026-11-26).
-- [x] A28.2 E4 BLOCKED: two eligible boards, no strokes/CHALK; preserve negative result.
-- [x] Reuse shared FILL-001 launcher, Monitor/Bridge, Win32 foreground and passive ROI; isolate A28 execution. Code `97bc6eb86d62c5d5bbf31e53499fe1167c4cb246`; E2 15/15 PASS with frozen artifact.
-- [x] [CI45846950126](https://github.com/Kiddos19882/AutoDraw/actions/runs/45846950126) and [FILL series CI45846950157](https://github.com/Kiddos19882/AutoDraw/actions/runs/45846950157) SUCCESS (5/5 mandatory jobs, FILL series PASS; Markdown PASS).
-- [ ] Run A28 using FILL-001 button with original A27 Joined archive, confirmed clean board. Obtain A28 report and same-session Bridge evidence. Exact CHALK/quality and E5 remain unverified.
+**ENGINE-001 S5 FIRST NEXT A28.4:** [visible BoardPane and native ROI capture](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a284--visible-boardpane-and-native-roi-capture-2026-11-26).
+- [x] A28.3 live startup PARTIAL, execution BLOCKED on full-canvas viewport containment; one Monitor-owned BoardPane verified, no strokes/CHALK.
+- [x] A28.4 board containment + Monitor rectangle identity + fresh native capture reuse; code `eb199acba1e29dff0850ec64ba62d6155ab6838c`; local E2 18/18 PASS.
+- [x] [CI45891429497](https://github.com/Kiddos19882/AutoDraw/actions/runs/45891429497) SUCCESS (5/5 mandatory validation jobs; Markdown PASS; optional research/benchmark/portable build SKIPPED).
+- [ ] Run A28.4 in existing tab 8 FILL-001 with original A27 Joined archive and confirmed blank board. Obtain report/Bridge session/PNG; exact CHALK and visual validation pending.
 
 **ENGINE-001 S5 FIRST NEXT:** [A16 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a16-single-dark-contour-native-egret-e3-2026-11-25). A16 technical 2/2 jobs PASS, 15 native scenes; one-color route ablation reveals stroke/coverage tradeoff. User review of archive14981824834 PENDING; next permitted research should use continuous routes with native per-stroke 10% auditing and coverage comparable to frozen F4-L5 control, not promote A16 to production. Accepted A15.1 R2/T10 frozen unchanged; exact game CHALK/E4/E5 NOT_RUN.\n\n**ENGINE-001 S5 FIRST NEXT:** [A15.1 visual acceptance](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a151-r2-t10-user-visual-acceptance-2026-11-25). R2/T10 accepted by user. Preserve baseline; next contour optimization or broader validation only after authorization. No automatic production promotion.
 
