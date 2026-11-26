@@ -1,8 +1,8 @@
-**ENGINE-001 S5 FIRST NEXT A28.4:** [visible BoardPane and native ROI capture](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a284--visible-boardpane-and-native-roi-capture-2026-11-26).
-- [x] A28.3 live startup PARTIAL, execution BLOCKED on full-canvas viewport containment; one Monitor-owned BoardPane verified, no strokes/CHALK.
-- [x] A28.4 board containment + Monitor rectangle identity + fresh native capture reuse; code `eb199acba1e29dff0850ec64ba62d6155ab6838c`; local E2 18/18 PASS.
-- [x] [CI45891429497](https://github.com/Kiddos19882/AutoDraw/actions/runs/45891429497) SUCCESS (5/5 mandatory validation jobs; Markdown PASS; optional research/benchmark/portable build SKIPPED).
-- [ ] Run A28.4 in existing tab 8 FILL-001 with original A27 Joined archive and confirmed blank board. Obtain report/Bridge session/PNG; exact CHALK and visual validation pending.
+**ENGINE-001 S5 FIRST NEXT A28.5:** [physical Stage6 replay](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a285--physical-stage6-replay-2026-11-27).
+- [x] A28.4 E4 PARTIAL/BLOCKED twice; Monitor exact 323/3415, runner exact CHALK null; visual not verified.
+- [x] A28.5 implementation: immutable A27, native Stage6 palette/slider and mouse, exact RGB and same-session mapping gates; local E2 7/7 PASS.
+- [ ] Verify A28.5 mandatory CI jobs.
+- [ ] Operator A28.5 run with confirmed saved palette and slider, clean board and smoothing off; report + strokes + session/Monitor + native PNG. E4/E5 NOT_RUN.
 
 **ENGINE-001 S5 FIRST NEXT:** [A16 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a16-single-dark-contour-native-egret-e3-2026-11-25). A16 technical 2/2 jobs PASS, 15 native scenes; one-color route ablation reveals stroke/coverage tradeoff. User review of archive14981824834 PENDING; next permitted research should use continuous routes with native per-stroke 10% auditing and coverage comparable to frozen F4-L5 control, not promote A16 to production. Accepted A15.1 R2/T10 frozen unchanged; exact game CHALK/E4/E5 NOT_RUN.\n\n**ENGINE-001 S5 FIRST NEXT:** [A15.1 visual acceptance](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a151-r2-t10-user-visual-acceptance-2026-11-25). R2/T10 accepted by user. Preserve baseline; next contour optimization or broader validation only after authorization. No automatic production promotion.
 

@@ -274,11 +274,11 @@ assert.ok(call('bind').discovery.error);
         self.assertNotIn("open_firefox",start_src)
         code=ast.unparse(worker)
         for call in ("open_firefox()", "attach_monitor_after_confirmation(", 
-                     "wait_for_operator_firefox_foreground(", "LiveReplay("):
+                     "wait_for_operator_firefox_foreground(", "NativeLiveReplay("):
             self.assertEqual(code.count(call),1)
-        self.assertLess(code.index("attach_monitor_after_confirmation("),code.index("LiveReplay("))
-        self.assertLess(code.index("wait_for_operator_firefox_foreground("),code.index("LiveReplay("))
-        self.assertLess(code.index("LiveReplay("),code.index("self._run_fill001_series_in_firefox("))
+        self.assertLess(code.index("attach_monitor_after_confirmation("),code.index("NativeLiveReplay("))
+        self.assertLess(code.index("wait_for_operator_firefox_foreground("),code.index("NativeLiveReplay("))
+        self.assertLess(code.index("NativeLiveReplay("),code.index("self._run_fill001_series_in_firefox("))
 
     def test_bridge_required_before_board_access(self):
         r=LiveReplay(None,Path("test"),threading.Event(),lambda _:None)

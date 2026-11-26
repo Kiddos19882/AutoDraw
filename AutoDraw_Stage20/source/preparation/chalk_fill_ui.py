@@ -184,7 +184,7 @@ class Fill001Tab:
             command=self.stop_firefox_monitor,
         ).pack(side="left")
         ttk.Button(
-            bridge_controls, text="A28: A27 Joined ZIP — штатный Firefox + Monitor + Bridge",
+            bridge_controls, text="A28.5: A27 Joined — Stage6 мышь + Monitor + Bridge",
             command=self.start_a28_live,
         ).pack(anchor="w", pady=(5, 0))
         ttk.Checkbutton(
@@ -418,11 +418,13 @@ class Fill001Tab:
             pass
 
     def start_a28_live(self) -> None:
-        """Research-only A28, using the exact same Firefox worker as FILL-001."""
+        """A28.5: use existing Firefox worker, physical Stage6 tool selection and drawing."""
         if self._firefox_thread is not None and self._firefox_thread.is_alive():
             self.bridge_status_var.set("BLOCKED: Firefox уже занят.")
             return
         from engine001_a28_live import load_plan, error_summary
+        from engine001_a285_native import palette_targets
+        from palette_profiles import load_palette_profile
         selected = filedialog.askopenfilename(
             parent=self.root, title="A28: оригинальный ZIP A27 Joined Illustration",
             filetypes=(("ZIP", "*.zip"),),
@@ -431,17 +433,28 @@ class Fill001Tab:
             return
         try:
             paths, reference, target = load_plan(selected)
+            palette_path = filedialog.askopenfilename(
+                parent=self.root, title="A28.5: сохранённый профиль палитры вкладки 3",
+                filetypes=(("JSON", "*.json"),),
+            )
+            if not palette_path:
+                return
+            profile = load_palette_profile(palette_path)
+            palette_targets(paths, profile)  # require exact confirmed colors before Firefox
+            control = self.brush_tab.get_brush_control()
+            if not isinstance(control, dict) or control.get("mode") != "slider" or not control.get("start") or not control.get("end"):
+                raise ValueError("A28.5: сохраните калибровку расширенного ползунка 1–30 на вкладке 9.")
             if not messagebox.askyesno(
-                "A28", "Откройте чистую тестовую доску. A28 рисует 3270 штрихов до лимита "
-                "мела или Stop; без Clear и Stage6. Продолжить?",
+                "A28.5", "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
+                "Stage6 управляет физической мышью, резерв 300 CHALK, Alt/Stop для остановки; без Clear. Продолжить?",
                 icon="warning", parent=self.root,
             ):
                 return
-            out = self.output_dir / "engine001_s5_a28_live" / ("a28-" + uuid.uuid4().hex)
+            out = self.output_dir / "engine001_s5_a285_native" / ("a285-" + uuid.uuid4().hex)
             out.mkdir(parents=True, exist_ok=False)
             (out / "a27-native-reference.png").write_bytes(reference)
             (out / "a27-target.png").write_bytes(target)
-            self._a28_pending = (paths, out)
+            self._a28_pending = (paths, out, profile, control)
             self._firefox_execute_series = False
             self.start_firefox_monitor()
         except Exception as exc:
@@ -454,11 +467,11 @@ class Fill001Tab:
         if pending is None:
             return
         from engine001_a28_live import BASE_SHA, PLAN_SHA, ARCHIVE_SHA, utc
-        _, out = pending
+        _, out, _, _ = pending
         report = out / "report.json"
         if not report.exists():
             with report.open("x", encoding="utf-8") as f:
-                json.dump(dict(schema="ENGINE001_S5_A28_LIVE_V1", run_id=out.name,
+                json.dump(dict(schema="ENGINE001_S5_A285_NATIVE_STAGE6_V1", run_id=out.name,
                                startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
                                baseline_sha=BASE_SHA, plan_sha256=PLAN_SHA,
                                archive_sha256=ARCHIVE_SHA, status="BLOCKED",
@@ -605,13 +618,13 @@ class Fill001Tab:
                     "Начинается пассивная ROI-проверка без кликов.",
                 ))
                 if getattr(self, "_a28_pending", None):
-                    from engine001_a28_live import LiveReplay
-                    paths, out = self._a28_pending
-                    replay = LiveReplay(
+                    from engine001_a285_native import NativeLiveReplay
+                    paths, out, profile, control = self._a28_pending
+                    replay = NativeLiveReplay(
                         driver, out, self._firefox_stop,
                         lambda msg: self._firefox_messages.put(("A28", msg)),
                         bridge_root=bridge_root, session_id=ready["session_id"],
-                        native_mouse=pyautogui,
+                        native_mouse=pyautogui, profile=profile, brush_control=control,
                     )
                     result = replay.run(paths)
                     self._firefox_messages.put((
