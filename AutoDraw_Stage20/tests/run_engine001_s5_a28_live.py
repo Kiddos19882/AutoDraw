@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import queue
+import re
 import sys
 import threading
 import time
@@ -36,6 +37,14 @@ class Blocked(RuntimeError):
 def require(ok, reason):
     if not ok:
         raise Blocked(reason)
+
+
+def error_summary(exc):
+    # WebDriver stack traces may include the login token in the game iframe URL.
+    first = str(exc).splitlines()[0] if str(exc) else ""
+    first = re.sub(r"https?://[^\s]+", "[URL REDACTED]", first)
+    first = re.sub(r"(?i)token=[^\s&]+", "token=[REDACTED]", first)
+    return f"{type(exc).__name__}: {first[:1000]}"
 
 
 def digest(data):
@@ -133,20 +142,72 @@ def exact(snapshot):
 # on its current EMPTY stroke slot. Never call onDrawing, atom.pushPoint or clear.
 BOARD_SCRIPT = """
 const op=arguments[0], id=arguments[1], options=arguments[2];
+// Unbind is independent of rediscovery: the board may have disappeared.
+if(location.origin!==arguments[3])throw Error('Wrong game frame');
+if(op==='unbind'){
+ const saved=window.__autodrawA28;
+ if(!saved)return null;
+ if(saved.id!==id)throw Error('A28 session identity changed');
+ window.removeEventListener('mousemove',saved.listener,false);
+ delete window.__autodrawA28;
+ return null;
+}
 const cls=window.com?.magnetjoy?.pet?.ui?.board?.BoardPane;
 const stage=window.egret?.MainContext?.instance?.stage;
-if(location.origin!==arguments[3] || !cls || !stage) throw Error('Wrong game frame');
-const stack=[stage], seen=new Set(), boards=[];
-while(stack.length){
- const n=stack.pop(); if(!n||seen.has(n))continue; seen.add(n);
- if(seen.size>50000)throw Error('Stage scan limit');
- if(n instanceof cls && n.width===460 && n.height===240) boards.push(n);
- for(const ch of (n.$children||[]))stack.push(ch);
+const m=window.AutoDrawGameMonitor;
+if(!stage||!m||m.status().version!==arguments[4])throw Error('Wrong game stage/monitor');
+// Mirror the Monitor's structural recognition and child traversal. Constructor
+// identity is a diagnostic, not a prerequisite (bundled constructors may differ).
+const stack=[stage], seen=new Set(), eligible=[], candidates=[];
+let candidateCount=0, constructorMatches=0, structuralMatches=0;
+const finite=v=>typeof v==='number'&&Number.isFinite(v);
+function visibleOnStage(n){
+ const chain=new Set();
+ for(let p=n;p;p=p.$parent||p.parent){
+  if(chain.has(p)||p.visible===false||(finite(p.alpha)&&p.alpha<=0))return false;
+  if(p===stage)return n.stage===stage;
+  chain.add(p);
+ }
+ return false;
 }
-if(boards.length!==1)throw Error('Expected exactly one 460x240 BoardPane');
-const b=boards[0], a=b.atom;
+while(stack.length){
+ const n=stack.pop(); if(!n||typeof n!=='object'||seen.has(n))continue; seen.add(n);
+ if(seen.size>50000)return {discovery:{error:'Stage scan limit',visited:seen.size}};
+ const ctor=typeof cls==='function'&&n instanceof cls;
+ const structural=!!n.atom&&Array.isArray(n.atom.points)&&
+  ['onDrawStart','onDrawing','onDrawingEnd'].every(k=>typeof n[k]==='function');
+ if(ctor||structural){
+  candidateCount++;
+  if(ctor)constructorMatches++;
+  if(structural)structuralMatches++;
+  const visible=visibleOnStage(n);
+  const controls=['setRadius','setColor','setSmooth','updateLess','localToGlobal'].every(k=>typeof n[k]==='function');
+  const ready=structural&&controls&&visible&&n.width===460&&n.height===240;
+  if(ready)eligible.push(n);
+  if(candidates.length<64)candidates.push({
+   constructorMatch:ctor,structural,controls,visible,
+   width:finite(n.width)?n.width:null,height:finite(n.height)?n.height:null,
+   onStage:n.stage===stage,eligible:ready
+  });
+ }
+ const children=Array.isArray(n.$children)?n.$children:
+  Array.isArray(n.children)?n.children:Array.isArray(n._children)?n._children:[];
+ for(const ch of children)stack.push(ch);
+}
+const discovery={visited:seen.size,constructorAvailable:typeof cls==='function',
+ candidateCount,constructorMatches,structuralMatches,eligibleCount:eligible.length,
+ candidates,candidatesTruncated:candidateCount>candidates.length};
+if(eligible.length!==1){
+ discovery.error='Expected exactly one visible structurally verified 460x240 BoardPane';
+ return {discovery};
+}
+if(op==='discover')return {discovery};
+const b=eligible[0], a=b.atom;
 if(op==='bind'){
  if(window.__autodrawA28)throw Error('Existing A28 session');
+ // Explicitly attach the unchanged Monitor to this exact unique candidate,
+ // rather than trusting the first object its automatic scan found.
+ m.attach(b);
  const state={id,board:b,last:null};
  state.listener=e=>{state.last={x:e.clientX,y:e.clientY,buttons:e.buttons,
   trusted:e.isTrusted,canvas:e.target instanceof HTMLCanvasElement};};
@@ -155,8 +216,6 @@ if(op==='bind'){
 }
 const state=window.__autodrawA28;
 if(!state||state.id!==id||state.board!==b||!b.stage)throw Error('Board/session changed');
-if(op==='unbind'){window.removeEventListener('mousemove',state.listener,false);
- delete window.__autodrawA28;return null;}
 const k=a.points.length-1;
 if(!Array.isArray(a.points[k])||a.total!==a.points.length)throw Error('Unexpected atom structure');
 if(op==='selectBrush'){
@@ -169,11 +228,9 @@ if(op==='stroke'){
  return {points:a.points[i].map(p=>({x:p.x,y:p.y})),
   width:a.radius[i],colorRgb:a.colors[i],smooth:a.options[i]};
 }
-const m=window.AutoDrawGameMonitor;
-if(!m||m.status().version!==arguments[4])throw Error('Wrong monitor');
 const ins=m.inspect(), snap=ins.snapshot;
 if(!ins.boardDetected||!snap||snap.pointCount!==b.max-b.less)throw Error('Monitor board mismatch');
-return {snapshot:snap,geometry:ins.renderer,slot:k,empty:a.points[k].length===0,
+return {discovery,snapshot:snap,geometry:ins.renderer,slot:k,empty:a.points[k].length===0,
  active:b._isStart, width:a.radius[k],colorRgb:a.colors[k],smooth:a.options[k],
  witness:state.last,blank:k<=1?a.points.slice(0,k).map((p,i)=>[p.length,a.radius[i],a.colors[i]]):null,
  viewport:{width:innerWidth,height:innerHeight}};
@@ -186,10 +243,16 @@ class LiveReplay:
         self.id = run_dir.name
         self.bounds = None
         self.bound = False
+        self.monitor_owned = False
+        self.discovery = None
         self.max_points = None
 
     def read(self, op="read", options=None):
-        return self.driver.execute_script(BOARD_SCRIPT, op, self.id, options, GAME_ORIGIN, MONITOR_VERSION)
+        result = self.driver.execute_script(BOARD_SCRIPT, op, self.id, options, GAME_ORIGIN, MONITOR_VERSION)
+        if isinstance(result, dict) and "discovery" in result:
+            self.discovery = result["discovery"]
+            require(not self.discovery.get("error"), self.discovery.get("error"))
+        return result
 
     def check(self, state):
         require(mapping(state["geometry"]) == self.bounds, "Board geometry changed")
@@ -231,10 +294,12 @@ class LiveReplay:
         require(find_game_frame(self.driver) is not None,"Verified game iframe not found")
         monitor=(ROOT/"source/game_monitor/game_monitor.js").read_text(encoding="utf-8")
         require(not self.driver.execute_script("return !!window.AutoDrawGameMonitor"),"Use a fresh dedicated Firefox session")
+        self.monitor_owned=True
         self.driver.execute_script(monitor)
         time.sleep(.5)
-        self.bound=True
+        self.read("discover")
         s=self.read("bind")
+        self.bound=True
         self.bounds=mapping(s["geometry"])
         self.max_points=s["snapshot"]["maxPoints"]
         self.canvas()
@@ -356,7 +421,7 @@ class LiveReplay:
             require(exact(self.check(self.read())["snapshot"])==exact(final["snapshot"]),"Counter changed during capture")
             report.update(exact_CHALK=observed,evidence_level="E4_CAPTURE_REQUIRES_REVIEW")
         except Exception as exc:
-            report.update(status="BLOCKED",reason=f"{type(exc).__name__}: {exc}",exact_CHALK=None)
+            report.update(status="BLOCKED",reason=error_summary(exc),exact_CHALK=None)
             if self.bound:
                 try:
                     self.release()
@@ -366,12 +431,21 @@ class LiveReplay:
                 except Exception as capture_error:
                     report["failure_capture_error"]=type(capture_error).__name__
         finally:
-            if self.bound:
-                try:
-                    self.release();self.read("unbind")
-                    self.driver.execute_script("AutoDrawGameMonitor.stop()")
-                except Exception as exc:
-                    report.update(status="BLOCKED",exact_CHALK=None,cleanup_error=type(exc).__name__)
+            # Release and stop independently, even when binding failed before
+            # a session was created. Never rediscover a board to clean up.
+            if self.monitor_owned:
+                failures=[]
+                if self.bound:
+                    try: self.release()
+                    except Exception as exc: failures.append(error_summary(exc))
+                try: self.read("unbind")
+                except Exception as exc: failures.append(error_summary(exc))
+                try: self.driver.execute_script("if(window.AutoDrawGameMonitor) AutoDrawGameMonitor.stop()")
+                except Exception as exc: failures.append(error_summary(exc))
+                if failures:
+                    report.update(status="BLOCKED",exact_CHALK=None,cleanup_error=failures)
+            if self.discovery is not None:
+                report["board_discovery"]=self.discovery
             report["finished"]=utc()
             with (self.out/"report.json").open("x",encoding="utf-8") as f:
                 json.dump(report,f,ensure_ascii=False,indent=2,allow_nan=False)
@@ -416,7 +490,7 @@ def main():
             result=LiveReplay(driver,run_dir,stop,lambda msg:events.put(("status",msg))).run(paths)
             events.put(("status",f"{result['status']}; CHALK={result['exact_CHALK']}; {run_dir}"))
         except Exception as exc:
-            failure=f"{type(exc).__name__}: {exc}"
+            failure=error_summary(exc)
             events.put(("status",f"BLOCKED: {failure}"))
         finally:
             if run_dir is not None and run_dir.is_dir() and not (run_dir/"report.json").exists():

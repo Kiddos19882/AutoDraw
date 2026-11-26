@@ -1,5 +1,6 @@
 """E2 contracts only: no game, driver, or runtime claims."""
 import os
+import subprocess
 from pathlib import Path
 import tempfile
 import threading
@@ -7,7 +8,7 @@ import json
 from unittest.mock import patch
 import unittest
 from run_engine001_s5_a28_live import (
-    Blocked, css_point, exact, load_plan, mapping, validate_plan, LiveReplay, BOARD_SCRIPT,
+    Blocked, css_point, exact, load_plan, mapping, validate_plan, LiveReplay, BOARD_SCRIPT, error_summary,
 )
 
 
@@ -105,6 +106,96 @@ class Contracts(unittest.TestCase):
                 self.assertEqual(report["exact_CHALK"],None if drift else 2)
                 self.assertEqual(report["status"],"BLOCKED" if drift else "REPLAY_COMPLETE_NOT_VISUALLY_VALIDATED")
                 self.assertEqual(json.loads((Path(d)/"report.json").read_text())["status"],report["status"])
+
+    def test_discovery_actual_js_and_cleanup(self):
+        # Execute the real Selenium script using Node, with a minimal synthetic
+        # Egret stage. No game or live renderer outcome is implied.
+        fixture = r"""
+const assert=require('node:assert/strict');
+const script=new Function(process.argv[1]);
+global.window=global;global.location={origin:'test'};
+global.innerWidth=1000;global.innerHeight=800;
+const listeners=new Set();
+window.addEventListener=(k,fn)=>listeners.add(fn);
+window.removeEventListener=(k,fn)=>listeners.delete(fn);
+class ArchivedBoard {}
+window.com={magnetjoy:{pet:{ui:{board:{BoardPane:ArchivedBoard}}}}};
+let stage={children:[]};window.egret={MainContext:{instance:{stage}}};
+let monitored=null;
+window.AutoDrawGameMonitor={
+ status:()=>({version:'v'}),
+ attach:b=>{monitored=b;},
+ inspect:()=>({boardDetected:!!monitored,snapshot:{pointCount:monitored.max-monitored.less},renderer:{}})
+};
+function makeBoard(parent,visible=true,width=460){
+ const b={$parent:parent,stage,width,height:240,visible,alpha:1,max:6000,less:6000,
+  atom:{points:[[]],radius:[1],colors:[0],options:[false],total:1},_isStart:false};
+ for(const key of ['onDrawStart','onDrawing','onDrawingEnd','setRadius','setColor','setSmooth','updateLess','localToGlobal'])b[key]=()=>{};
+ return b;
+}
+function call(op){return script(op,'run',null,'test','v');}
+assert.equal(call('discover').discovery.eligibleCount,0);
+const panel={$parent:stage,stage,_children:[]};
+stage.children=[panel];
+const real=makeBoard(panel);
+const wrong=makeBoard(panel,true,320);
+const hiddenParent={$parent:panel,stage,visible:false,children:[]};
+const hidden=makeBoard(hiddenParent);
+hiddenParent.children=[hidden];panel._children=[real,wrong,hiddenParent];
+const d=call('discover').discovery;
+assert.equal(d.candidateCount,3);
+assert.equal(d.structuralMatches,3);
+assert.equal(d.constructorMatches,0);
+assert.equal(d.eligibleCount,1);
+assert.equal(call('bind').slot,0);
+assert.equal(monitored,real);
+assert.equal(listeners.size,1);
+const second=makeBoard(panel);
+panel._children.push(second);
+const ambiguous=call('read').discovery;
+assert.equal(ambiguous.eligibleCount,2);
+assert.ok(ambiguous.error);
+assert.ok(call('discover').discovery.error);
+stage.children=[];
+assert.equal(call('unbind'),null);
+assert.equal(listeners.size,0);
+assert.equal(call('unbind'),null);
+// Never attach or configure an ambiguous/absent board.
+window.com=undefined;
+assert.equal(call('discover').discovery.constructorAvailable,false);
+assert.ok(call('bind').discovery.error);
+"""
+        result=subprocess.run(["node","-e",fixture,BOARD_SCRIPT],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_report_preserves_discovery_and_stops_owned_monitor_on_failed_bind(self):
+        calls=[]
+        class Driver:
+            def execute_script(self, script, *args):
+                calls.append(script)
+                return None
+        class Replay(LiveReplay):
+            def preflight(self, paths):
+                self.monitor_owned=True
+                self.discovery={"eligibleCount":0,"candidateCount":2,"error":"not unique"}
+                raise Blocked("not unique")
+            def read(self, op="read", options=None):
+                calls.append(op)
+        with tempfile.TemporaryDirectory() as d:
+            r=Replay(Driver(),Path(d),threading.Event(),lambda _:None)
+            report=r.run([{}])
+            self.assertEqual(report["status"],"BLOCKED")
+            self.assertEqual(report["completed_strokes"],0)
+            self.assertIsNone(report["exact_CHALK"])
+            self.assertEqual(report["board_discovery"]["candidateCount"],2)
+            self.assertIn("unbind",calls)
+            self.assertTrue(any("AutoDrawGameMonitor.stop()" in c for c in calls))
+            self.assertNotIn("cleanup_error",report)
+
+    def test_error_redaction(self):
+        reason=error_summary(RuntimeError("https://example.test/?token=secret\nStacktrace: private-secret"))
+        self.assertNotIn("secret",reason)
+        self.assertNotIn("https://",reason)
 
     def test_browser_script_does_not_inject_points_clear_or_quota(self):
         for forbidden in ("pushPoint(", ".onDrawing(", ".onDrawStart(", ".clear(", ".less=", ".max=", "dispatchEvent("):
