@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "source/preparation"))
-from firefox_monitor_session import GAME_ORIGIN, MONITOR_VERSION, open_firefox, find_game_frame
+from firefox_monitor_session import GAME_ORIGIN, MONITOR_VERSION, open_firefox, attach_monitor_after_confirmation
 
 ARCHIVE_SHA = "a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583"
 PLAN_SHA = "08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8"
@@ -291,12 +291,22 @@ class LiveReplay:
         return dict(sha256=digest((self.out/name).read_bytes()),size=list(crop.size))
 
     def preflight(self, paths):
-        require(find_game_frame(self.driver) is not None,"Verified game iframe not found")
-        monitor=(ROOT/"source/game_monitor/game_monitor.js").read_text(encoding="utf-8")
-        require(not self.driver.execute_script("return !!window.AutoDrawGameMonitor"),"Use a fresh dedicated Firefox session")
-        self.monitor_owned=True
-        self.driver.execute_script(monitor)
-        time.sleep(.5)
+        # Reuse the same 45-second iframe/Monitor readiness handshake as
+        # the previously working FILL-001 Firefox+Bridge launcher.
+        self.log("Ожидание игровой доски и Game Monitor (до 45 секунд)…")
+        def own_monitor():
+            self.monitor_owned=True
+        try:
+            attach_monitor_after_confirmation(
+                self.driver, ROOT/"source/game_monitor/game_monitor.js", None,
+                operator_confirmed=True, monitor_only=True,
+                stop_requested=self.stop.is_set, on_monitor_install=own_monitor,
+            )
+        except Exception:
+            if self.monitor_owned:
+                try: self.read("discover")
+                except Exception: pass  # preserve the original readiness failure
+            raise
         self.read("discover")
         s=self.read("bind")
         self.bound=True

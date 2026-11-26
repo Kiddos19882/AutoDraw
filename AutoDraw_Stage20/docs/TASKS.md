@@ -1,7 +1,7 @@
-**ENGINE-001 S5 FIRST NEXT A28.1:** [first live blocker and correction](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a281--board-discovery-repair-after-first-live-blocker-2026-11-26).
-- [x] Record first A28 live BLOCKED, zero completed strokes, CHALK unknown; no calibration evidence.
-- [x] A28.1 structural discovery, safe uniqueness, diagnostics/cleanup; local E2 12/12 PASS.
-- [ ] Verify new CI; operator reruns updated A28 with same A27 Joined ZIP and confirmed clean board. Collect report (including board_discovery if blocked), accepted samples and actual PNG. Exact CHALK only on valid run binding. No promotion to Stage6.
+**ENGINE-001 S5 FIRST NEXT A28.2:** [shared Firefox readiness](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a282--reuse-proven-fill-001-firefox-readiness-handshake-2026-11-26).
+- [x] First A28 E4 BLOCKED before drawing; A28.1 structural discovery and diagnostics/cleanup.
+- [x] Review actual working FILL-001 Selenium/Monitor/Bridge code and archived live geometry; use same readiness helper in A28.2; 18/18 local E2 PASS.
+- [ ] Verify new CI, rerun updated A28 on clean confirmed board with frozen A27 Joined archive, obtain report/board discovery and PNG. Real CHALK and game quality NOT_RUN; no Stage6 promotion.
 
 **ENGINE-001 S5 FIRST NEXT:** [A16 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a16-single-dark-contour-native-egret-e3-2026-11-25). A16 technical 2/2 jobs PASS, 15 native scenes; one-color route ablation reveals stroke/coverage tradeoff. User review of archive14981824834 PENDING; next permitted research should use continuous routes with native per-stroke 10% auditing and coverage comparable to frozen F4-L5 control, not promote A16 to production. Accepted A15.1 R2/T10 frozen unchanged; exact game CHALK/E4/E5 NOT_RUN.\n\n**ENGINE-001 S5 FIRST NEXT:** [A15.1 visual acceptance](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a151-r2-t10-user-visual-acceptance-2026-11-25). R2/T10 accepted by user. Preserve baseline; next contour optimization or broader validation only after authorization. No automatic production promotion.
 

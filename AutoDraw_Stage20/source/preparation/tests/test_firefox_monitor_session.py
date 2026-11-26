@@ -98,6 +98,41 @@ class FirefoxMonitorContractTests(unittest.TestCase):
             self.assertEqual(result["status"], "MONITOR_INJECTED")
             self.assertEqual(len(driver.injected), 2)
 
+    def test_monitor_only_waits_for_delayed_board_without_bridge(self):
+        class Delayed(_Driver):
+            installed = False
+            polls = 0
+
+            def execute_script(self, code):
+                if "return !!(window.AutoDrawGameMonitor" in code:
+                    return self.installed
+                if "return AutoDrawGameMonitor.status()" in code:
+                    self.polls += 1
+                    return {"version": "0.2.4", "boardDetected": self.polls == 2}
+                if code == "window.example = 1;":
+                    self.installed = True
+                return super().execute_script(code)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            monitor=Path(tmp)/"monitor.js"
+            monitor.write_text("window.example = 1;", encoding="utf-8")
+            driver=Delayed()
+            ownership=[]
+            with patch("firefox_monitor_session.time.sleep"):
+                result=attach_monitor_after_confirmation(
+                    driver, monitor, None, operator_confirmed=True, monitor_only=True,
+                    on_monitor_install=lambda:ownership.append(True))
+            self.assertEqual(result["status"],"MONITOR_READY")
+            self.assertEqual(driver.polls,2)
+            self.assertEqual(driver.injected,["window.example = 1;"])
+            self.assertEqual(ownership,[True])
+            with self.assertRaisesRegex(FirefoxMonitorError,"уже установлен"):
+                attach_monitor_after_confirmation(driver,monitor,None,
+                                                  operator_confirmed=True,monitor_only=True)
+            with self.assertRaisesRegex(FirefoxMonitorError,"остановил"):
+                attach_monitor_after_confirmation(_Driver(),monitor,None,
+                    operator_confirmed=True,monitor_only=True,stop_requested=lambda:True)
+
     def test_wrong_board_is_fail_closed(self):
         with tempfile.TemporaryDirectory() as tmp:
             monitor = Path(tmp) / "monitor.js"

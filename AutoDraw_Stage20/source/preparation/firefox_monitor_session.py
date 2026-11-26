@@ -73,34 +73,57 @@ def find_game_frame(driver, *, max_depth: int = 5) -> dict | None:
 
 
 def attach_monitor_after_confirmation(
-    driver, monitor_file: Path, snippet_file: Path, *,
+    driver, monitor_file: Path, snippet_file: Path | None, *,
     operator_confirmed: bool,
     timeout_seconds: float = 45,
+    monitor_only: bool = False,
+    stop_requested=None,
+    on_monitor_install=None,
 ) -> dict:
-    """Attach only read-only telemetry; reject unknown iframe/monitor/board."""
+    """Wait for the existing Monitor readiness gate, then optionally attach Bridge.
+
+    The established Bridge call remains the default. A28 explicitly opts into
+    Monitor-only mode (direct WebDriver telemetry, no fake Bridge session).
+    """
     if operator_confirmed is not True:
         raise FirefoxMonitorError("Оператор не подтвердил открытую игровую доску.")
-    if not monitor_file.is_file() or not snippet_file.is_file():
-        raise FirefoxMonitorError("Monitor/Bridge файлы недоступны.")
+    if not monitor_file.is_file():
+        raise FirefoxMonitorError("Monitor файл недоступен.")
+    if monitor_only:
+        if snippet_file is not None:
+            raise FirefoxMonitorError("Monitor-only режим не принимает Bridge snippet.")
+        snippet = None
+    else:
+        if snippet_file is None or not snippet_file.is_file():
+            raise FirefoxMonitorError("Bridge файл недоступен.")
+        snippet = snippet_file.read_text(encoding="utf-8")
+        validate_bridge_snippet(snippet)
     monitor_source = monitor_file.read_text(encoding="utf-8")
-    snippet = snippet_file.read_text(encoding="utf-8")
-    validate_bridge_snippet(snippet)
+    injected = False
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
+        if stop_requested is not None and stop_requested():
+            raise FirefoxMonitorError("Оператор остановил ожидание игровой доски.")
         try:
             if find_game_frame(driver) is None:
                 time.sleep(1)
                 continue
             installed = driver.execute_script(
                 "return !!(window.AutoDrawGameMonitor && window.AutoDrawGameMonitor.status)")
+            if monitor_only and installed and not injected:
+                raise FirefoxMonitorError("Monitor уже установлен: нужна новая A28 Firefox-сессия.")
             if not installed:
+                if on_monitor_install is not None:
+                    on_monitor_install()
+                injected = True
                 driver.execute_script(monitor_source)
             status = driver.execute_script("return AutoDrawGameMonitor.status()")
             if status.get("version") != MONITOR_VERSION or not status.get("boardDetected"):
                 time.sleep(1)
                 continue
-            driver.execute_script(snippet)
-            return {"status": "MONITOR_INJECTED", "monitor_version": status["version"],
+            if snippet is not None:
+                driver.execute_script(snippet)
+            return {"status": "MONITOR_READY" if monitor_only else "MONITOR_INJECTED", "monitor_version": status["version"],
                     "board_detected": True, "game_origin": GAME_ORIGIN}
         except FirefoxMonitorError:
             raise
