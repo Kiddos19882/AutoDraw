@@ -1,7 +1,8 @@
 **ENGINE-001 S5 FIRST NEXT A28.2:** [shared Firefox readiness](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a282--reuse-proven-fill-001-firefox-readiness-handshake-2026-11-26).
 - [x] First A28 E4 BLOCKED before drawing; A28.1 structural discovery and diagnostics/cleanup.
 - [x] Review actual working FILL-001 Selenium/Monitor/Bridge code and archived live geometry; use same readiness helper in A28.2; 18/18 local E2 PASS.
-- [ ] Verify new CI, rerun updated A28 on clean confirmed board with frozen A27 Joined archive, obtain report/board discovery and PNG. Real CHALK and game quality NOT_RUN; no Stage6 promotion.
+- [x] E3 [CI45844386882](https://github.com/Kiddos19882/AutoDraw/actions/runs/45844386882) code `f08279f0`: all five mandatory jobs SUCCESS; optional benchmarks/portable/FILL research SKIPPED. [Markdown CI45844387206](https://github.com/Kiddos19882/AutoDraw/actions/runs/45844387206) SUCCESS.
+- [ ] Rerun updated A28 on clean confirmed board with frozen A27 Joined archive, obtain report/board discovery and PNG. Real CHALK and game quality NOT_RUN; no Stage6 promotion.
 
 **ENGINE-001 S5 FIRST NEXT:** [A16 E3](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a16-single-dark-contour-native-egret-e3-2026-11-25). A16 technical 2/2 jobs PASS, 15 native scenes; one-color route ablation reveals stroke/coverage tradeoff. User review of archive14981824834 PENDING; next permitted research should use continuous routes with native per-stroke 10% auditing and coverage comparable to frozen F4-L5 control, not promote A16 to production. Accepted A15.1 R2/T10 frozen unchanged; exact game CHALK/E4/E5 NOT_RUN.\n\n**ENGINE-001 S5 FIRST NEXT:** [A15.1 visual acceptance](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a151-r2-t10-user-visual-acceptance-2026-11-25). R2/T10 accepted by user. Preserve baseline; next contour optimization or broader validation only after authorization. No automatic production promotion.
 
