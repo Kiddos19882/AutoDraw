@@ -9,7 +9,7 @@ import json
 from unittest.mock import patch
 import unittest
 from run_engine001_s5_a28_live import (
-    Blocked, css_point, exact, load_plan, mapping, validate_plan, LiveReplay, BOARD_SCRIPT, error_summary,
+    Blocked, css_point, exact, load_plan, mapping, validate_plan, LiveReplay, BOARD_SCRIPT, error_summary, verify_canvas_rects,
 )
 
 
@@ -35,6 +35,68 @@ class Contracts(unittest.TestCase):
         self.assertEqual(css_point(dict(x=155.25,y=100.5),mapping(geometry())),(330,241))
         with self.assertRaises(Blocked):
             css_point(dict(x=459.99,y=239.99),mapping(geometry()))
+
+    def test_canvas_report_a283_half_pixel_overflow(self):
+        # Actual sanitized A28.3 E4 rectangle, not fabricated browser events.
+        bounds=(483.4536882098092,108.22,1176.703295745131,470.62)
+        monitor=dict(left=0,top=-.5,right=1920,bottom=905.5)
+        visible=[0,-.5,1920,905.5,1920,905]
+        self.assertEqual(verify_canvas_rects(bounds,monitor,[visible]),0)
+        self.assertEqual(verify_canvas_rects(bounds,monitor,[[0,0,10,10,1920,905],visible]),1)
+        # Board itself is clipped, ambiguous, missing or Monitor rect differs.
+        for bad in ([],[visible,visible],[[0,-.5,1000,905.5,1920,905]],
+                    [[0,-.5,1920,905.5,1100,905]],
+                    [[0,0,1920,905,1920,905]],
+                    [[0,-.5,1920,float("nan"),1920,905]]):
+            with self.assertRaises(Blocked):verify_canvas_rects(bounds,monitor,bad)
+        with self.assertRaises(Blocked):verify_canvas_rects(bounds,None,[visible])
+
+    def test_projection_drift_after_native_calibration(self):
+        from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
+        g=geometry()
+        g["windowGeometry"]={"screenX":0,"screenY":0}
+        r=LiveReplay(None,Path("test"),None,None)
+        r.bounds=mapping(g)
+        r.capture_reference={"boardpane_mapping_sha256":_boardpane_mapping_fingerprint(g)}
+        r.check(dict(geometry=g,snapshot=snap(1)))
+        with self.assertRaisesRegex(Blocked,"desktop projection changed"):
+            r.check(dict(geometry=dict(g,windowGeometry={"screenX":5,"screenY":0}),snapshot=snap(1)))
+
+    def test_native_capture_requires_fresh_bound_roi(self):
+        from PIL import Image
+        from types import SimpleNamespace
+        from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
+        g=geometry()
+        mapping_hash=_boardpane_mapping_fingerprint(g)
+        roi={"x":20,"y":40,"width":920,"height":480}
+        screen={"width":1000,"height":600}
+        reference={"source":"verified_boardpane_native_probe","user_confirmed_blank":True,
+                   "session_id":"sid","boardpane_mapping_sha256":mapping_hash,
+                   "board_region":roi,"screen_size":screen}
+        class Replay(LiveReplay):
+            def read(self):return dict(geometry=g,snapshot=snap(1),slot=1,active=False,empty=True)
+            def canvas(self,state):return None
+            def verify_bridge(self,**kwargs):return None
+            def probe_roi(self):return {"boardpane_mapping_sha256":mapping_hash},dict(roi)
+        with tempfile.TemporaryDirectory() as d:
+            r=Replay(None,Path(d),threading.Event(),lambda _:None,
+                     bridge_root=Path(d),session_id="sid",
+                     native_mouse=SimpleNamespace(size=lambda:SimpleNamespace(**screen)))
+            r.bounds=mapping(g)
+            with self.assertRaisesRegex(Blocked,"No calibrated"):
+                r.capture("no.png")
+            r.capture_reference=reference
+            with patch("PIL.ImageGrab.grab",return_value=Image.new("RGB",(1000,600),"white")) as grab:
+                meta=r.capture("before.png")
+                self.assertEqual(meta["size"],[920,480])
+                self.assertEqual(meta["capture_method"],"FILL001_VERIFIED_NATIVE_ROI")
+                self.assertEqual(meta["session_id"],"sid")
+                grab.assert_called_once()
+            with patch.object(r,"probe_roi",return_value=({"boardpane_mapping_sha256":mapping_hash},
+                              dict(roi,x=21))),patch("PIL.ImageGrab.grab") as grab:
+                with self.assertRaises(ValueError):r.capture("wrong.png")
+                grab.assert_not_called()
+                self.assertFalse((Path(d)/"wrong.png").exists())
 
     def test_mapping_fails_closed(self):
         for key,value in [("renderMode","canvas"),("playerCount",2),("engineVersion","unknown")]:
