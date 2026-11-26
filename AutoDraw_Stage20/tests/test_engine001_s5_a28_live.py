@@ -1,5 +1,6 @@
 """E2 contracts only: no game, driver, or runtime claims."""
 import os
+import ast
 import subprocess
 from pathlib import Path
 import tempfile
@@ -99,7 +100,7 @@ class Contracts(unittest.TestCase):
             def read(self, *a):
                 return self.state(3,1)
         for drift in (False,True):
-            with tempfile.TemporaryDirectory() as d, patch("run_engine001_s5_a28_live.time.sleep"):
+            with tempfile.TemporaryDirectory() as d, patch("engine001_a28_live.time.sleep"):
                 r=Replay(Driver(),Path(d),threading.Event(),lambda _:None)
                 if drift:r.driver.execute_script=lambda s:dict(snap(4),pointCountMatches=True)
                 report=r.run([{}])
@@ -123,15 +124,20 @@ window.com={magnetjoy:{pet:{ui:{board:{BoardPane:ArchivedBoard}}}}};
 let stage={children:[]};window.egret={MainContext:{instance:{stage}}};
 let monitored=null;
 window.AutoDrawGameMonitor={
- status:()=>({version:'v'}),
- attach:b=>{monitored=b;},
- inspect:()=>({boardDetected:!!monitored,snapshot:{pointCount:monitored.max-monitored.less},renderer:{}})
+ status:()=>({version:'v',active:true,boardDetected:true,inputTelemetryEnabled:true}),
+ attach:()=>{throw Error("A28 must never reattach");},
+ inspect:()=>({boardDetected:!!monitored,snapshot:{pointCount:monitored.max-monitored.less},renderer:{players:[{boardStageCorners:{topLeft:{x:0,y:0},topRight:{x:460,y:0},bottomRight:{x:460,y:240},bottomLeft:{x:0,y:240}}}]}})
 };
 function makeBoard(parent,visible=true,width=460){
  const b={$parent:parent,stage,width,height:240,visible,alpha:1,max:6000,less:6000,
   atom:{points:[[]],radius:[1],colors:[0],options:[false],total:1},_isStart:false};
  for(const key of ['onDrawStart','onDrawing','onDrawingEnd','setRadius','setColor','setSmooth','updateLess','localToGlobal'])b[key]=()=>{};
+ b.localToGlobal=(x,y)=>({x,y});
  return b;
+}
+function mark(b){
+ for(const key of ["onDrawStart","onDrawing","onDrawingEnd","setRadius","updateLess"])
+  b[key].__autoDrawMonitorWrapped=true;
 }
 function call(op){return script(op,'run',null,'test','v');}
 assert.equal(call('discover').discovery.eligibleCount,0);
@@ -142,6 +148,7 @@ const wrong=makeBoard(panel,true,320);
 const hiddenParent={$parent:panel,stage,visible:false,children:[]};
 const hidden=makeBoard(hiddenParent);
 hiddenParent.children=[hidden];panel._children=[real,wrong,hiddenParent];
+mark(real);monitored=real;
 const d=call('discover').discovery;
 assert.equal(d.candidateCount,3);
 assert.equal(d.structuralMatches,3);
@@ -154,7 +161,10 @@ const second=makeBoard(panel);
 panel._children.push(second);
 const ambiguous=call('read').discovery;
 assert.equal(ambiguous.eligibleCount,2);
-assert.ok(ambiguous.error);
+assert.equal(ambiguous.monitorOwnedCount,1);
+assert.equal(ambiguous.error,undefined);
+mark(second);
+assert.ok(call('read').discovery.error);
 assert.ok(call('discover').discovery.error);
 stage.children=[];
 assert.equal(call('unbind'),null);
@@ -168,7 +178,7 @@ assert.ok(call('bind').discovery.error);
         result=subprocess.run(["node","-e",fixture,BOARD_SCRIPT],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
-    def test_report_preserves_discovery_and_stops_owned_monitor_on_failed_bind(self):
+    def test_report_preserves_discovery_without_touching_shared_monitor_on_failed_bind(self):
         calls=[]
         class Driver:
             def execute_script(self, script, *args):
@@ -176,7 +186,6 @@ assert.ok(call('bind').discovery.error);
                 return None
         class Replay(LiveReplay):
             def preflight(self, paths):
-                self.monitor_owned=True
                 self.discovery={"eligibleCount":0,"candidateCount":2,"error":"not unique"}
                 raise Blocked("not unique")
             def read(self, op="read", options=None):
@@ -188,9 +197,46 @@ assert.ok(call('bind').discovery.error);
             self.assertEqual(report["completed_strokes"],0)
             self.assertIsNone(report["exact_CHALK"])
             self.assertEqual(report["board_discovery"]["candidateCount"],2)
-            self.assertIn("unbind",calls)
-            self.assertTrue(any("AutoDrawGameMonitor.stop()" in c for c in calls))
+            self.assertNotIn("unbind",calls)
+            self.assertFalse(any("AutoDrawGameMonitor.stop()" in c for c in calls))
             self.assertNotIn("cleanup_error",report)
+
+    def test_fill001_worker_is_the_only_launcher(self):
+        source=Path(__file__).resolve().parents[1]/"source/preparation/chalk_fill_ui.py"
+        tree=ast.parse(source.read_text(encoding="utf-8"))
+        methods={n.name:n for n in ast.walk(tree) if isinstance(n,ast.FunctionDef)}
+        worker=methods["_firefox_worker"]
+        start=methods["start_a28_live"]
+        start_src=ast.unparse(start)
+        self.assertIn("self.start_firefox_monitor()",start_src)
+        self.assertNotIn("open_firefox",start_src)
+        code=ast.unparse(worker)
+        for call in ("open_firefox()", "attach_monitor_after_confirmation(", 
+                     "wait_for_operator_firefox_foreground(", "LiveReplay("):
+            self.assertEqual(code.count(call),1)
+        self.assertLess(code.index("attach_monitor_after_confirmation("),code.index("LiveReplay("))
+        self.assertLess(code.index("wait_for_operator_firefox_foreground("),code.index("LiveReplay("))
+        self.assertLess(code.index("LiveReplay("),code.index("self._run_fill001_series_in_firefox("))
+
+    def test_bridge_required_before_board_access(self):
+        r=LiveReplay(None,Path("test"),threading.Event(),lambda _:None)
+        with self.assertRaisesRegex(Blocked,"Launch via FILL-001"):
+            r.preflight([])
+
+    def test_bridge_and_foreground_drift_fail_closed(self):
+        r=LiveReplay(None,Path("test"),threading.Event(),lambda _:None,
+                     bridge_root=Path("fake"),session_id="sid")
+        r.bounds=mapping(geometry())
+        ready=dict(session_id="sid",board_detected=True,board_ambiguous=False,
+                   renderer_geometry=geometry())
+        with patch("firefox_foreground_witness.firefox_foreground_witness",return_value=True), \
+                patch("brush_radius_feedback.read_active_bridge_geometry",return_value=ready) as read:
+            r.verify_bridge(force=True)
+            for bad in (None,dict(ready,session_id="wrong"),dict(ready,board_ambiguous=True)):
+                read.return_value=bad
+                with self.assertRaises(Blocked):r.verify_bridge(force=True)
+        with patch("firefox_foreground_witness.firefox_foreground_witness",return_value=False):
+            with self.assertRaises(Blocked):r.verify_bridge(force=True)
 
     def test_error_redaction(self):
         reason=error_summary(RuntimeError("https://example.test/?token=secret\nStacktrace: private-secret"))

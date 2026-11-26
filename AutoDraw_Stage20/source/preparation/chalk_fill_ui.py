@@ -9,6 +9,7 @@ import json
 import re
 import sys
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
@@ -113,6 +114,7 @@ class Fill001Tab:
         self._series_manifest_path: Path | None = None
         self._series_pending_manifest: dict[str, Any] | None = None
         self._firefox_execute_series = False
+        self._a28_pending = None
         self._build(parent)
         self.root.after(300, self._poll_firefox_messages)
 
@@ -181,6 +183,10 @@ class Fill001Tab:
             firefox, text="Остановить Firefox-сессию",
             command=self.stop_firefox_monitor,
         ).pack(side="left")
+        ttk.Button(
+            bridge_controls, text="A28: A27 Joined ZIP — штатный Firefox + Monitor + Bridge",
+            command=self.start_a28_live,
+        ).pack(anchor="w", pady=(5, 0))
         ttk.Checkbutton(
             bridge_controls,
             text="После ROI выполнить один V5 через Stage6 (только при pointCount=1 и проверенной кисти)",
@@ -411,6 +417,54 @@ class Fill001Tab:
         except tk.TclError:
             pass
 
+    def start_a28_live(self) -> None:
+        """Research-only A28, using the exact same Firefox worker as FILL-001."""
+        if self._firefox_thread is not None and self._firefox_thread.is_alive():
+            self.bridge_status_var.set("BLOCKED: Firefox уже занят.")
+            return
+        from engine001_a28_live import load_plan, error_summary
+        selected = filedialog.askopenfilename(
+            parent=self.root, title="A28: оригинальный ZIP A27 Joined Illustration",
+            filetypes=(("ZIP", "*.zip"),),
+        )
+        if not selected:
+            return
+        try:
+            paths, reference, target = load_plan(selected)
+            if not messagebox.askyesno(
+                "A28", "Откройте чистую тестовую доску. A28 рисует 3270 штрихов до лимита "
+                "мела или Stop; без Clear и Stage6. Продолжить?",
+                icon="warning", parent=self.root,
+            ):
+                return
+            out = self.output_dir / "engine001_s5_a28_live" / ("a28-" + uuid.uuid4().hex)
+            out.mkdir(parents=True, exist_ok=False)
+            (out / "a27-native-reference.png").write_bytes(reference)
+            (out / "a27-target.png").write_bytes(target)
+            self._a28_pending = (paths, out)
+            self._firefox_execute_series = False
+            self.start_firefox_monitor()
+        except Exception as exc:
+            self._finish_a28_startup(error_summary(exc))
+            messagebox.showerror("A28 BLOCKED", error_summary(exc), parent=self.root)
+
+    def _finish_a28_startup(self, reason: str) -> None:
+        pending = getattr(self, "_a28_pending", None)
+        self._a28_pending = None
+        if pending is None:
+            return
+        from engine001_a28_live import BASE_SHA, PLAN_SHA, ARCHIVE_SHA, utc
+        _, out = pending
+        report = out / "report.json"
+        if not report.exists():
+            with report.open("x", encoding="utf-8") as f:
+                json.dump(dict(schema="ENGINE001_S5_A28_LIVE_V1", run_id=out.name,
+                               startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
+                               baseline_sha=BASE_SHA, plan_sha256=PLAN_SHA,
+                               archive_sha256=ARCHIVE_SHA, status="BLOCKED",
+                               completed_strokes=0, exact_CHALK=None,
+                               evidence_level="E4_PENDING", reason=reason, finished=utc()), f, indent=2)
+
     def start_firefox_monitor(self) -> None:
         """Opt-in browser telemetry; never bypass FILL-001 Stage6 preflight."""
         if self._firefox_thread is not None and self._firefox_thread.is_alive():
@@ -426,15 +480,17 @@ class Fill001Tab:
             self.bridge_status_var.set(f"BLOCKED: {exc}")
             self._firefox_execute_series = False
             self._series_pending_manifest = None
+            self._finish_a28_startup("Shared Bridge startup failed")
             return
         if not accepted:
             self.bridge_status_var.set("BLOCKED: Bridge не запущен с Input Telemetry ON.")
             self._firefox_execute_series = False
             self._series_pending_manifest = None
+            self._finish_a28_startup("Shared Bridge did not enable telemetry")
             return
         # Read Tk state on UI thread, never from the Firefox worker.
         self._firefox_selected_candidate = self.v5_candidate_var.get()
-        self._firefox_execute_v5 = bool(self.v5_run_after_probe_var.get()) and not self._firefox_execute_series
+        self._firefox_execute_v5 = bool(self.v5_run_after_probe_var.get()) and not self._firefox_execute_series and not getattr(self, "_a28_pending", None)
         self._firefox_confirm.clear()
         self._firefox_stop.clear()
         self._v5_stage6_completed.set()
@@ -452,7 +508,7 @@ class Fill001Tab:
     def stop_firefox_monitor(self) -> None:
         self._firefox_stop.set()
         self._firefox_confirm.set()
-        if callable(self.on_v5_cancel):
+        if not getattr(self, "_a28_pending", None) and callable(self.on_v5_cancel):
             # Stop Stage6 first: guarantees MouseExecutor releases mouseDown.
             self.on_v5_cancel()
 
@@ -548,6 +604,23 @@ class Fill001Tab:
                     "Активное окно Firefox подтверждено через Win32 PID. "
                     "Начинается пассивная ROI-проверка без кликов.",
                 ))
+                if getattr(self, "_a28_pending", None):
+                    from engine001_a28_live import LiveReplay
+                    paths, out = self._a28_pending
+                    replay = LiveReplay(
+                        driver, out, self._firefox_stop,
+                        lambda msg: self._firefox_messages.put(("A28", msg)),
+                        bridge_root=bridge_root, session_id=ready["session_id"],
+                        native_mouse=pyautogui,
+                    )
+                    result = replay.run(paths)
+                    self._firefox_messages.put((
+                        "A28", f"{result['status']}; CHALK={result['exact_CHALK']}; {out}. "
+                        "Stop — закрыть Firefox."
+                    ))
+                    self.root.after(0, self.root.deiconify)
+                    self._firefox_stop.wait()
+                    return
                 if self._firefox_execute_series:
                     self._run_fill001_series_in_firefox(
                         driver, bridge_root, ready["session_id"]
@@ -621,6 +694,10 @@ class Fill001Tab:
             self._v5_stage6_completed.wait(timeout=30)
         except Exception as exc:
             details = str(exc)
+            if getattr(self, "_a28_pending", None):
+                from engine001_a28_live import error_summary
+                details = error_summary(exc)
+                self._finish_a28_startup(details)
             sid = None
             ready_state = locals().get("ready")
             if isinstance(ready_state, dict):
@@ -645,6 +722,7 @@ class Fill001Tab:
             if driver is not None:
                 self._firefox_stop.wait()
         finally:
+            self._finish_a28_startup("Shared Firefox session stopped before A28 replay")
             # A failed/closed opt-in must not leak a live series request into
             # the next ordinary Firefox/V5 launch.
             self._firefox_execute_series = False
