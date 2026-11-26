@@ -166,6 +166,8 @@ jobs:
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
           python -m pytest -q -ra tests/test_build_helpers.py tests/test_test_runner.py tests/test_brush_experiment_series.py tests/test_import_resolution_diagnostics.py
+      - name: A28 isolated live replay contracts (no game)
+        run: python -m unittest discover -s tests -p test_engine001_s5_a28_live.py -v
       - name: Run root geometry validator and metric tests
         timeout-minutes: 5
         shell: pwsh
