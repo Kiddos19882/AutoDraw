@@ -9,7 +9,8 @@
 - [x] A28.6 startup diagnostic/corrective change: exact game host LNA exception in disposable WebDriver profile only; scoped access includes other local resources for this host; no changes to proxy or Bridge gates. E2 mock contracts 9/9 PASS.
 - [x] E4 retest at 3383bcd3 FAIL: exact-host exception configured, WebSocket closed 1006 after 5 ms before handshake; no strokes. User authorized temporary test-profile LNA disablement (base and WebSocket flags); E2 mock contracts 9/9 PASS. No production promotion.
 - [x] User reports startup succeeds; no new startup artifact supplied. User-authorized A28.6 post-stroke diagnostics: log rejected/mismatched closed stroke and continue from safe idle slot; exact_CHALK null if any warning, separate verified/attempted counts. Focused E2 7/7 PASS; existing input safety gates unchanged.
-- [ ] A28.6 post-change primary runtime artifacts not supplied; next operator replay superseded by A28.7.
+- [x] A28.6 post-change operator report archived (E4 DIAGNOSTIC_ONLY / QUOTA_LIMITED_WITH_WARNINGS, 140 verified / 141 attempted, exact_CHALK null); [results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a286--shared-stage6-ownership-and-calibration-2026-11-27).
+- [x] User accepts A28.6 as working and visually satisfactory in simulation only; freeze code `73cd82b5b53200a40366527a613892ab2c742a5c` and original A27 reference ([DEC-067](DECISIONS.md#dec-067-s5-a286-simulation-visual-acceptance-2026-11-28)). Full game quality, exact CHALK and E5 not accepted; A28.7 remains the next separate experiment.
 
 **ENGINE-001 S5 A28.5 history:** [physical Stage6 replay](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a285--physical-stage6-replay-2026-11-27).
 - [x] A28.4 E4 PARTIAL/BLOCKED twice; Monitor exact 323/3415, runner exact CHALK null; visual not verified.
