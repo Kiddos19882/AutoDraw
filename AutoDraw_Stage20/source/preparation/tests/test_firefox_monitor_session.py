@@ -11,6 +11,7 @@ from unittest.mock import patch
 from firefox_monitor_session import (
     GAME_ORIGIN, FirefoxMonitorError, attach_monitor_after_confirmation,
     find_game_frame, validate_bridge_snippet, write_bridge_diagnostic, bridge_session_diagnostic,
+    open_firefox, PORTAL_URL, GAME_LNA_HOST, LNA_SKIP_DOMAINS_PREF,
 )
 
 
@@ -67,6 +68,46 @@ class FirefoxMonitorContractTests(unittest.TestCase):
 
     def tearDown(self):
         self.modules.stop()
+
+    def test_open_firefox_scopes_lna_exception_to_game_host(self):
+        events = []
+        preferences = {}
+        driver = types.SimpleNamespace(get=lambda url: events.append(("navigate", url)))
+        webdriver = sys.modules["selenium.webdriver"]
+        webdriver.FirefoxOptions = lambda: types.SimpleNamespace(
+            set_preference=lambda name, value: preferences.update({name: value}))
+        def launch(*, options):
+            events.append(("launch", dict(preferences)))
+            return driver
+        webdriver.Firefox = launch
+        sys.modules["selenium"].webdriver = webdriver
+        self.assertIs(open_firefox(diagnostic=lambda event, **fields:
+                      events.append((event, fields))), driver)
+        self.assertEqual(GAME_ORIGIN, "https://" + GAME_LNA_HOST)
+        self.assertEqual(preferences, {
+            "dom.webnotifications.enabled": False,
+            LNA_SKIP_DOMAINS_PREF: "eufbpet.hust.me",
+        })
+        self.assertEqual(events[0][0], "firefox_lna_profile_configured")
+        self.assertEqual(events[0][1]["scope"], "temporary_webdriver_profile")
+        self.assertTrue(events[0][1]["global_lna_unchanged"])
+        self.assertTrue(events[0][1]["proxy_unchanged"])
+        self.assertEqual(events[1], ("launch", preferences))
+        self.assertEqual(events[2], ("navigate", PORTAL_URL))
+
+    def test_open_firefox_quits_when_navigation_fails(self):
+        webdriver = sys.modules["selenium.webdriver"]
+        webdriver.FirefoxOptions = lambda: types.SimpleNamespace(
+            set_preference=lambda name, value: None)
+        closed = []
+        def fail_navigation(url):
+            raise RuntimeError("navigation failed")
+        driver = types.SimpleNamespace(get=fail_navigation, quit=lambda: closed.append(True))
+        webdriver.Firefox = lambda **kwargs: driver
+        sys.modules["selenium"].webdriver = webdriver
+        with self.assertRaisesRegex(RuntimeError, "navigation failed"):
+            open_firefox()
+        self.assertEqual(closed, [True])
 
     def test_session_diagnostic_does_not_copy_raw_payload(self):
         with tempfile.TemporaryDirectory() as tmp:

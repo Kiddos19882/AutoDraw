@@ -561,7 +561,7 @@ class Fill001Tab:
                 return {"process_error_type": type(exc).__name__}
         try:
             note("firefox_opening", **process_exit())
-            driver = open_firefox()
+            driver = open_firefox(diagnostic=note)
             note("firefox_opened")
             self._firefox_messages.put(("READY", "Откройте доску в Firefox, подтвердите её в AutoDraw, затем активируйте Firefox щелчком по верхней панели браузера."))
             # No game input and no Monitor injection until the operator confirms.
@@ -629,7 +629,10 @@ class Fill001Tab:
                 note("bridge_readiness_timeout", stopped=self._firefox_stop.is_set())
                 raise FirefoxMonitorError(
                     "BLOCKED: Monitor внедрён, но Bridge не подтвердил свежую "
-                    "однозначную сессию игровой доски."
+                    "однозначную сессию игровой доски. Проверьте журнал "
+                    f"подключения: {diagnostic_path.name}. Если WebSocket закрыт "
+                    "до авторизации, проверьте сообщения Local Network Access "
+                    "в консоли Firefox (Ctrl+Shift+K)."
                 )
             self._firefox_messages.put((
                 "WAITING_FOR_USER_FOCUS",

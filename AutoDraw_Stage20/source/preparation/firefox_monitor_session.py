@@ -14,6 +14,9 @@ from pathlib import Path
 
 PORTAL_URL = "https://pet-eu.hust.me/"
 GAME_ORIGIN = "https://eufbpet.hust.me"
+# Exact requesting host only; never add localhost, a wildcard or the portal.
+GAME_LNA_HOST = "eufbpet.hust.me"
+LNA_SKIP_DOMAINS_PREF = "network.lna.skip-domains"
 MONITOR_VERSION = "0.2.4"
 
 
@@ -119,8 +122,13 @@ def validate_bridge_snippet(source: str) -> None:
         raise FirefoxMonitorError("Bridge snippet содержит неразрешённый placeholder.")
 
 
-def open_firefox():
-    """Create a dedicated temporary WebDriver session; the operator logs in."""
+def open_firefox(*, diagnostic=None):
+    """Create a dedicated temporary WebDriver session; the operator logs in.
+
+    LNA exception is scoped to the game host in this disposable profile only.
+    It authorizes that host to reach local resources, not just the Bridge port.
+    No system proxy, normal Firefox profile, or general LNA setting is changed.
+    """
     try:
         from selenium import webdriver
     except ImportError as exc:
@@ -129,8 +137,21 @@ def open_firefox():
         ) from exc
     options = webdriver.FirefoxOptions()
     options.set_preference("dom.webnotifications.enabled", False)
+    # Firefox >=153 gates public-to-loopback WebSockets with LNA. The game is
+    # a cross-origin iframe, so a remembered permission is not reliable.
+    # Apply the documented, operator-approved host exception before launch.
+    options.set_preference(LNA_SKIP_DOMAINS_PREF, GAME_LNA_HOST)
+    if diagnostic is not None:
+        diagnostic("firefox_lna_profile_configured",
+                   preference=LNA_SKIP_DOMAINS_PREF, requesting_host=GAME_LNA_HOST,
+                   scope="temporary_webdriver_profile", global_lna_unchanged=True,
+                   proxy_unchanged=True)
     driver = webdriver.Firefox(options=options)
-    driver.get(PORTAL_URL)
+    try:
+        driver.get(PORTAL_URL)
+    except Exception:
+        driver.quit()
+        raise
     return driver
 
 
