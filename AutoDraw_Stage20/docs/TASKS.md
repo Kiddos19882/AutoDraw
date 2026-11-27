@@ -1,6 +1,7 @@
 **ENGINE-001 S5 A29 contour optimization:** [registered experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a29--contour-endpoint-graph-experiment-2026-11-28).
 - [x] Verify A27 archived plan and implement global same-color endpoint graph, four model arms; local contracts PASS.
-- [ ] Complete native Egret contour and full unchanged-tail comparison, review artifacts and quality; no promotion on model count alone.
+- [x] Complete native Egret contour and unchanged-tail comparison; E3 2/2 PASS, immutable archive audited. R6 758, R12 480 contours; strict pixel equality FAIL for all.
+- [ ] User visual review of native R6/R12 vs A27; retain accepted baseline and do not promote A29 before review.
 
 **ENGINE-001 S5 FIRST NEXT A28.7:** [P1 live replay experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a287--p1-live-replay-2026-11-27).
 - [x] Apply research-only P1 timing to A28 using unchanged shared Stage6 and frozen A27.
