@@ -1,7 +1,11 @@
+**ENGINE-001 S5 FIRST NEXT A32:** [A32 protocol](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a32--a316-full-live-replay-with-p1-2026-11-28).
+- [x] Freeze A31.6 and integrate pinned full-plan loader, replace A28.7 Tab 8 opt-in button, preserve shared Stage6/P1 safety and report identity (E1).
+- [ ] Operator A32 game replay with confirmed palette/calibration, clean board and smoothing off; preserve report/strokes/Monitor/Bridge logs and before/after/failure PNG. Full replay subject to quota reserve; exact CHALK only if run-bound verified. E4/E5 NOT_RUN.
+
 **ENGINE-001 S5 A31:** [preregistered R6 optimization](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a31--fixed-r6-budgeted-blossom-routing-2026-11-28).
 - [x] Cycle repair, no-retrace interior contacts, bounded-repeat 5/10/15/20% arms; local E2 and geometry PASS.
 - [x] Native Egret comparison, [CI46072763754](https://github.com/Kiddos19882/AutoDraw/actions/runs/46072763754) 2/2 PASS and archive audit; results [A31 results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a31--fixed-r6-budgeted-blossom-routing-2026-11-28).
-- [ ] User visual review of all six A31 variants, especially 5/10/15/20% repeated routes; exact CHALK/E4/E5 NOT_RUN. No production or live promotion.
+- [x] User visually accepts all six A31 simulation variants ([DEC-069](DECISIONS.md#dec-069-s5-a31-user-visual-acceptance-and-a32-live-experiment-2026-11-28)); selects 20% for A32 operator test.
 
 **ENGINE-001 S5 A29 contour optimization:** [registered experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a29--contour-endpoint-graph-experiment-2026-11-28).
 - [x] Verify A27 archived plan and implement global same-color endpoint graph, four model arms; local contracts PASS.
@@ -12,9 +16,9 @@
 - [x] A30 native Egret matrix (12 candidate pairs): [CI46070708715](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708715) 3/3 PASS; archived and independently audited; positive and negative outcomes in [A30 results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a30--contour-routing-method-comparison-2026-11-28).
 - [ ] A30 user visual review (R6/R12 all six methods); strict equality FAIL, no candidate promoted. Compare Blossom, combined and postman trade-offs; E4/E5/exact CHALK NOT_RUN.
 
-**ENGINE-001 S5 FIRST NEXT A28.7:** [P1 live replay experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a287--p1-live-replay-2026-11-27).
+**ENGINE-001 S5 A28.7 history (superseded by A32):** [P1 live replay experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a287--p1-live-replay-2026-11-27).
 - [x] Apply research-only P1 timing to A28 using unchanged shared Stage6 and frozen A27.
-- [ ] Operator A28.7 live verification; preserve report, strokes, Monitor, PNG and compare actual accepted points/CHALK and visual details. E2/E3 NOT_RUN by request; E4/E5 pending.
+- Superseded by A32 for next operator replay; original A28.7 live verification NOT_RUN, history retained.
 
 **ENGINE-001 S5 A28.6 history:** [shared Stage6 ownership and calibration](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a286--shared-stage6-ownership-and-calibration-2026-11-27).
 - [x] A28.5 E4 BLOCKED before drawing; slider endpoint equality inconsistent with tab 2.

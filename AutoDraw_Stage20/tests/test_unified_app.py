@@ -82,8 +82,8 @@ class UnifiedAppCoreTests(unittest.TestCase):
         tab.brush_tab = Mock()
         tab.on_a28_run = Mock()
         tab._finish_a28_startup = Mock()
-        with patch("chalk_fill_ui.filedialog.askopenfilename", return_value="a27.zip") as dialog, \
-             patch("engine001_a28_live.load_plan", return_value=([], b"", b"")), \
+        with patch("chalk_fill_ui.filedialog.askopenfilename", return_value="a31.zip") as dialog, \
+             patch("engine001_a32_live.load_plan", return_value=([], b"", b"")), \
              patch("engine001_a285_native.palette_targets") as gate, \
              patch("chalk_fill_ui.messagebox.askyesno", return_value=False), \
              patch("chalk_fill_ui.messagebox.showerror") as error:
@@ -128,6 +128,9 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 owner.call_args.args[0]()
                 self.assertEqual(replay.call_args.kwargs["brush_control"],track)
                 self.assertEqual(replay.call_args.kwargs["raw_brush_control"],control)
+                from engine001_a32_live import report_identity, validate_paths
+                self.assertEqual(replay.call_args.kwargs["plan_identity"],report_identity())
+                self.assertIs(replay.call_args.kwargs["plan_validator"],validate_paths)
                 self.assertIs(replay.call_args.args[2],stop)
                 replay.return_value.run.assert_called_once_with([])
         executor.running=True

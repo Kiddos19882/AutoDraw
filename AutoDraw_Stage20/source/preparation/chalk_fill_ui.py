@@ -188,7 +188,7 @@ class Fill001Tab:
             command=self.stop_firefox_monitor,
         ).pack(side="left")
         ttk.Button(
-            bridge_controls, text="A28.7: A27 Joined — Stage6 мышь + Monitor + Bridge",
+            bridge_controls, text="A32: A31.6 R6 / 20% — Stage6 мышь + Monitor + Bridge",
             command=self.start_a28_live,
         ).pack(anchor="w", pady=(5, 0))
         ttk.Checkbutton(
@@ -422,61 +422,63 @@ class Fill001Tab:
             pass
 
     def start_a28_live(self) -> None:
-        """A28.7: use existing Firefox worker, physical Stage6 tool selection and drawing."""
+        """A32: use existing Firefox worker, physical Stage6 tool selection and drawing."""
         if self._firefox_thread is not None and self._firefox_thread.is_alive():
             self.bridge_status_var.set("BLOCKED: Firefox уже занят.")
             return
-        from engine001_a28_live import load_plan, error_summary
+        from engine001_a28_live import error_summary
+        from engine001_a32_live import load_plan
         from engine001_a285_native import palette_targets
         selected = filedialog.askopenfilename(
-            parent=self.root, title="A28: оригинальный ZIP A27 Joined Illustration",
+            parent=self.root, title="A32: оригинальный ZIP S5-A31-R6-budgeted-blossom",
             filetypes=(("ZIP", "*.zip"),),
         )
         if not selected:
             return
         try:
-            paths, reference, target = load_plan(selected)
+            paths, reference, control_reference = load_plan(selected)
             if not callable(self.get_a28_palette_profile):
-                raise ValueError("A28.7: источник сохранённой палитры вкладки 3 не подключён.")
+                raise ValueError("A32: источник сохранённой палитры вкладки 3 не подключён.")
             palette_path, profile = self.get_a28_palette_profile()
             palette_targets(paths, profile)  # require exact confirmed colors before Firefox
             control = self.brush_tab.get_brush_control()
             if not callable(self.on_a28_run):
-                raise ValueError("A28.7: общий исполнитель Stage6 не подключён.")
+                raise ValueError("A32: общий исполнитель Stage6 не подключён.")
             # Tab 9 endpoints are retained as diagnostic data only. Stage6 owns the
             # confirmed track (including the shared averaging of the two Y values).
             if not messagebox.askyesno(
-                "A28.7", f"Палитра вкладки 3: {palette_path.name} ({len(profile['colors'])} цветов).\n"
+                "A32 — A31.6 R6 / 20%", f"План: {len(paths)} штрихов.\nПалитра вкладки 3: {palette_path.name} ({len(profile['colors'])} цветов).\n"
                 "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
                 "Stage6 управляет физической мышью, резерв 300 CHALK, Alt/Stop для остановки; без Clear. Продолжить?",
                 icon="warning", parent=self.root,
             ):
                 return
-            out = self.output_dir / "engine001_s5_a287_native" / ("a287-" + uuid.uuid4().hex)
+            out = self.output_dir / "engine001_s5_a32_native" / ("a32-" + uuid.uuid4().hex)
             out.mkdir(parents=True, exist_ok=False)
-            (out / "a27-native-reference.png").write_bytes(reference)
-            (out / "a27-target.png").write_bytes(target)
+            (out / "a31-native-reference.png").write_bytes(reference)
+            (out / "a27-native-control.png").write_bytes(control_reference)
             self._a28_pending = (paths, out, profile, control)
             self._firefox_execute_series = False
             self.start_firefox_monitor()
         except Exception as exc:
             self._finish_a28_startup(error_summary(exc))
-            messagebox.showerror("A28 BLOCKED", error_summary(exc), parent=self.root)
+            messagebox.showerror("A32 BLOCKED", error_summary(exc), parent=self.root)
 
     def _finish_a28_startup(self, reason: str) -> None:
         pending = getattr(self, "_a28_pending", None)
         self._a28_pending = None
         if pending is None:
             return
-        from engine001_a28_live import BASE_SHA, PLAN_SHA, ARCHIVE_SHA, utc
-        _, out, _, _ = pending
+        from engine001_a28_live import utc
+        from engine001_a32_live import report_identity
+        paths, out, _, _ = pending
         report = out / "report.json"
         if not report.exists():
             with report.open("x", encoding="utf-8") as f:
-                json.dump(dict(schema="ENGINE001_S5_A287_NATIVE_STAGE6_V1", run_id=out.name,
+                json.dump(dict(**report_identity(), run_id=out.name,
                                startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
-                               baseline_sha=BASE_SHA, plan_sha256=PLAN_SHA,
-                               archive_sha256=ARCHIVE_SHA, status="BLOCKED",
+                               planned_strokes=len(paths), planned_vertices=sum(len(p["points"]) for p in paths),
+                               status="BLOCKED",
                                completed_strokes=0, exact_CHALK=None,
                                evidence_level="E4_PENDING", reason=reason, finished=utc(),
                                bridge_diagnostic_log="bridge-startup.jsonl" if (out / "bridge-startup.jsonl").is_file() else None), f, indent=2)
@@ -680,7 +682,7 @@ class Fill001Tab:
                             if not (out / "report.json").exists():
                                 self._finish_a28_startup(result.get("reason", "Stage6 ended without report"))
                             self._firefox_messages.put((
-                                "A28", f"{result['status']}; CHALK={result.get('exact_CHALK')}; "
+                                "A32", f"{result['status']}; CHALK={result.get('exact_CHALK')}; "
                                 f"{result.get('reason','')}; {out}. Stop — закрыть Firefox."
                             ))
                             self.root.deiconify()
@@ -689,13 +691,13 @@ class Fill001Tab:
                     def start_a28_on_ui_thread():
                         try:
                             if self._firefox_stop.is_set():
-                                raise RuntimeError("A28 stopped before Stage6 handoff")
+                                raise RuntimeError("A32 stopped before Stage6 handoff")
                             outcome["accepted"] = bool(self.on_a28_run(
                                 paths=paths, profile=profile, raw_brush_control=control,
                                 driver=driver, bridge_root=bridge_root,
                                 session_id=ready["session_id"], output_dir=out,
                                 stop_event=self._firefox_stop,
-                                log=lambda msg: self._firefox_messages.put(("A28", msg)),
+                                log=lambda msg: self._firefox_messages.put(("A32", msg)),
                                 finished_callback=finished,
                             ))
                         except Exception as exc:
@@ -712,9 +714,9 @@ class Fill001Tab:
                         # already entering Stage6, wait for its stop/release.
                         started.wait()
                         self._v5_stage6_completed.wait()
-                        raise RuntimeError("BLOCKED: Stage6 A28 handoff timed out.")
+                        raise RuntimeError("BLOCKED: Stage6 A32 handoff timed out.")
                     if not outcome.get("accepted"):
-                        raise RuntimeError(outcome.get("error", "Stage6 refused A28"))
+                        raise RuntimeError(outcome.get("error", "Stage6 refused A32"))
                     self._firefox_stop.wait()
                     # Shared owner must finish release/report before the driver closes.
                     self._v5_stage6_completed.wait()
@@ -821,7 +823,7 @@ class Fill001Tab:
             if driver is not None:
                 self._firefox_stop.wait()
         finally:
-            self._finish_a28_startup("Shared Firefox session stopped before A28 replay")
+            self._finish_a28_startup("Shared Firefox session stopped before A32 replay")
             # A failed/closed opt-in must not leak a live series request into
             # the next ordinary Firefox/V5 launch.
             self._firefox_execute_series = False

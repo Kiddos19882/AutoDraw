@@ -1558,12 +1558,13 @@ class Stage6App:
         self, *, paths, profile, raw_brush_control, driver, bridge_root,
         session_id, output_dir, stop_event, log, finished_callback=None,
     ) -> bool:
-        """A27 replay: borrow the confirmed slider track and shared Stage6 ownership."""
+        """A32 replay: borrow the confirmed slider track and shared Stage6 ownership."""
         if self.running or stop_event.is_set():
-            raise RuntimeError("Stage6 busy or A28 stopped")
+            raise RuntimeError("Stage6 busy or A32 stopped")
         # Read Tk fields on the UI thread, just as FILL and ordinary drawing do.
         calibration = self._read_brush_slider_calibration(check_area=False)
         from engine001_a285_native import NativeLiveReplay
+        from engine001_a32_live import report_identity, validate_paths
         from engine001_a28_live import error_summary
         def worker():
             try:
@@ -1572,6 +1573,7 @@ class Stage6App:
                     bridge_root=bridge_root, session_id=session_id,
                     native_mouse=pyautogui, profile=profile,
                     brush_control=calibration, raw_brush_control=raw_brush_control,
+                    plan_identity=report_identity(), plan_validator=validate_paths,
                     progress_callback=lambda current,total,detail:self.root.after(
                         0,self._update_progress,current,total,detail),
                 )
@@ -1581,7 +1583,7 @@ class Stage6App:
                           "reason": error_summary(exc)}
             self.root.after(0, self._finish_a28_single_run, result, finished_callback)
         return self._start_isolated_stage6_worker(
-            worker, label="A28.7 Stage6", thread_name="A28.7-Stage6",
+            worker, label="A32 Stage6", thread_name="A32-Stage6",
             stop_event=stop_event,
         )
 
@@ -1595,7 +1597,7 @@ class Stage6App:
 
     def _finish_a28_single_run(self, result, callback):
         self._release_isolated_stage6_owner()
-        self.execution_state_var.set(f"Состояние: A28.7 {result.get('status', 'BLOCKED')}")
+        self.execution_state_var.set(f"Состояние: A32 {result.get('status', 'BLOCKED')}")
         if callable(callback):
             callback(result)
 

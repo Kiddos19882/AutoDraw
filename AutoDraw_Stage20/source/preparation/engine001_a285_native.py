@@ -21,7 +21,7 @@ READ_ONLY_SCRIPT = BOARD_SCRIPT.replace(SETTERS, "")
 ALLOWED_OPS = frozenset(("discover", "bind", "read", "stroke", "unbind"))
 
 
-def color_plan(paths):
+def color_plan(paths, label="A27 Joined"):
     """Adapt metadata only; keep A27 path order, points, exact RGB and widths."""
     values = list(dict.fromkeys(p["colorRgb"] for p in paths))
     palette = [
@@ -32,7 +32,7 @@ def color_plan(paths):
     indexes = {v: i for i, v in enumerate(values)}
     return dict(
         schema_version=1, plan_type="autodraw_geometry_color_plan",
-        name="A27 Joined frozen", canvas=dict(width=460, height=240),
+        name=label+" frozen", canvas=dict(width=460, height=240),
         palette=palette, summary=dict(stroke_count=len(paths)),
         strokes=[dict(name=p["strokeId"], points=p["points"], closed=False,
                       color=dict(palette[indexes[p["colorRgb"]]],
@@ -46,7 +46,7 @@ def palette_targets(paths, profile):
     return build_palette_targets(color_plan(paths), profile)
 
 
-def desktop_plan(paths, mapped, roi):
+def desktop_plan(paths, mapped, roi, label="A27 Joined"):
     """Use the FILL-001 authenticated transform; adapt only A27 stroke metadata."""
     from models import DrawingPlan, Point, Stroke
     require(mapped.get("coordinate_system") == "local_canvas_pixels"
@@ -71,7 +71,7 @@ def desktop_plan(paths, mapped, roi):
                                          brush_value=str(p["width"]),
                                          line_extension_px_override="0")))
     plan = DrawingPlan(width=roi["width"], height=roi["height"], strokes=rows,
-                       name="A27 Joined desktop", created_at=utc(), schema_version=1)
+                       name=label+" desktop", created_at=utc(), schema_version=1)
     plan.validate_bounds()
     return plan
 
@@ -148,11 +148,16 @@ class NativeLiveReplay(LiveReplay):
     """Reuse A28.4 observation/capture; never invoke the old drawing or setter path."""
     legacy_pointer_witness = False
 
-    def __init__(self, *args, profile, brush_control, raw_brush_control=None, progress_callback=None, **kwargs):
+    def __init__(self, *args, profile, brush_control, raw_brush_control=None, progress_callback=None,
+                 plan_identity=None, plan_validator=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.profile, self.brush_control = profile, brush_control
         self.raw_brush_control = raw_brush_control
         self.progress_callback = progress_callback
+        self.plan_identity = dict(plan_identity) if plan_identity is not None else dict(
+            schema=SCHEMA, baseline_sha=BASE_SHA, baseline_run=SOURCE_RUN,
+            archive_sha256=ARCHIVE_SHA, plan_sha256=PLAN_SHA)
+        self.plan_validator = plan_validator
 
     def read(self, op="read", options=None):
         require(op in ALLOWED_OPS, "A28.7 browser mutation forbidden")
@@ -172,9 +177,7 @@ class NativeLiveReplay(LiveReplay):
         from drawing.mouse_executor import ExecutorConfig, MouseExecutor
         from fill001_v5_live_gate import verify_v5_live_gate
         from fill001_series_stage6_execution import QUOTA_SAFETY_MARGIN
-        report = dict(schema=SCHEMA, run_id=self.id, started=utc(),
-                      baseline_sha=BASE_SHA, baseline_run=SOURCE_RUN,
-                      archive_sha256=ARCHIVE_SHA, plan_sha256=PLAN_SHA,
+        report = dict(**self.plan_identity, run_id=self.id, started=utc(),
                       runner_sha256=digest(Path(__file__).read_bytes()),
                       observer_sha256=digest(Path(__file__).with_name("engine001_a28_live.py").read_bytes()),
                       bridge_session_id=self.session_id, startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
@@ -192,15 +195,18 @@ class NativeLiveReplay(LiveReplay):
         quota_limited = False
         worker_called = False
         try:
+            if self.plan_validator is not None:
+                self.plan_validator(paths)
+            label = self.plan_identity.get("plan_label", "A27 Joined")
             before,witnesses = self.preflight(paths)
             last = before
             report.update(pre=before, passive_witnesses=witnesses,
                           bridge_passive_preflight=self.bridge_witness, board_bounds_css=self.bounds,
                           live_initial_radius=before["width"])
-            require(before["smooth"] is False, "Disable game smoothing manually before A28.7")
+            require(before["smooth"] is False, "Disable game smoothing manually before native replay")
             roi = self.bridge_witness["roi"]
             proof = self.bridge_witness["mapping"]
-            plan = desktop_plan(paths, self.mapped_probe_plan, roi)
+            plan = desktop_plan(paths, self.mapped_probe_plan, roi, label=label)
             screen = self.native_mouse.size()
             cfg = slider_calibration(self.brush_control, before["width"], screen, roi)
 
@@ -215,7 +221,7 @@ class NativeLiveReplay(LiveReplay):
                         return None
                 return dict(radius=g["currentRadius"], session_id=self.session_id, observed_at_utc=stamp)
 
-            hooks = ColorPlanExecutionHooks(color_plan(paths), self.profile,
+            hooks = ColorPlanExecutionHooks(color_plan(paths, label=label), self.profile,
                 current_screen_size_provider=self.native_mouse.size,
                 brush_slider_calibration=cfg, brush_target_area=roi,
                 brush_monitor_radius_provider=radius_provider)
