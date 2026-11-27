@@ -41,6 +41,58 @@ class UnifiedAppCoreTests(unittest.TestCase):
         self._environment_patch.stop()
         self._data_tempdir.cleanup()
 
+    def test_a28_automatically_reads_saved_tab3_profile(self):
+        from palette_detection_ui import PaletteDetectionTab
+        from palette_profiles import PaletteProfileError, save_palette_profile
+
+        tab = object.__new__(PaletteDetectionTab)
+        tab.store_dir = self._test_data_paths["palettes"]
+        tab.profile_dir = tab.store_dir / "profiles"
+        tab.profile_dir.mkdir(parents=True, exist_ok=True)
+        tab.active_profile_path = None
+        tab.active_path = None
+        document = create_palette_document(
+            [dict(name="Gray", hex="#EEEEEE", rgb=[238, 238, 238],
+                  screen_x=20, screen_y=20, local_x=10, local_y=10,
+                  source="confirmed")],
+            screen_size=(120, 90), region=dict(x=10, y=10, width=40, height=30),
+        )
+        profile = create_palette_profile(document, "Saved")
+        with self.assertRaises(PaletteProfileError):
+            tab.get_saved_execution_profile()
+        first = save_palette_profile(tab.profile_dir / "saved.json", profile)
+        path, loaded = tab.get_saved_execution_profile()
+        self.assertEqual(path, first)
+        self.assertEqual(loaded, profile)
+        second = save_palette_profile(tab.profile_dir / "other.json", profile)
+        with self.assertRaises(PaletteProfileError):
+            tab.get_saved_execution_profile()
+        tab.active_profile_path = second
+        self.assertEqual(tab.get_saved_execution_profile()[0], second)
+        second.unlink()
+        with self.assertRaises(PaletteProfileError):
+            tab.get_saved_execution_profile()
+
+    def test_a28_ui_uses_only_archive_dialog_and_tab3_profile(self):
+        from chalk_fill_ui import Fill001Tab
+        tab = object.__new__(Fill001Tab)
+        tab._firefox_thread = None
+        tab.root = Mock()
+        tab.get_a28_palette_profile = Mock(return_value=(Path("saved.json"), {"colors": [1]}))
+        tab.brush_tab = Mock()
+        tab.on_a28_run = Mock()
+        tab._finish_a28_startup = Mock()
+        with patch("chalk_fill_ui.filedialog.askopenfilename", return_value="a27.zip") as dialog, \
+             patch("engine001_a28_live.load_plan", return_value=([], b"", b"")), \
+             patch("engine001_a285_native.palette_targets") as gate, \
+             patch("chalk_fill_ui.messagebox.askyesno", return_value=False), \
+             patch("chalk_fill_ui.messagebox.showerror") as error:
+            tab.start_a28_live()
+        dialog.assert_called_once()
+        tab.get_a28_palette_profile.assert_called_once()
+        gate.assert_called_once_with([], {"colors": [1]})
+        error.assert_not_called()
+
     def test_a28_reuses_tab2_normalized_slider_and_shared_owner(self):
         executor=object.__new__(integrated_app.Stage6App)
         executor.running=False

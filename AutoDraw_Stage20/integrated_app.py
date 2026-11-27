@@ -338,6 +338,7 @@ class AutoDrawUnifiedApp:
             on_v5_run=self._start_fill001_v5_stage6,
             on_series_run=self._start_fill001_series_stage6,
             on_a28_run=self.executor.start_a28_single_run,
+            get_a28_palette_profile=self.palette_detector.get_saved_execution_profile,
             on_v5_cancel=self.executor._stop_execution,
         )
         # Only experiment plans are routed through their own completion handler;

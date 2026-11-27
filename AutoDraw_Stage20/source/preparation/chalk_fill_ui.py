@@ -68,6 +68,7 @@ class Fill001Tab:
         on_v5_run: Callable[..., bool] | None = None,
         on_series_run: Callable[..., bool] | None = None,
         on_a28_run: Callable[..., bool] | None = None,
+        get_a28_palette_profile: Callable[[], tuple[Path, dict[str, Any]]] | None = None,
         on_v5_cancel: Callable[[], None] | None = None,
     ) -> None:
         self.root = root
@@ -79,6 +80,7 @@ class Fill001Tab:
         self.on_v5_run = on_v5_run
         self.on_series_run = on_series_run
         self.on_a28_run = on_a28_run
+        self.get_a28_palette_profile = get_a28_palette_profile
         self.on_v5_cancel = on_v5_cancel
         self.v5_run_after_probe_var = tk.BooleanVar(value=True)
         self.matrix: dict[str, Any] | None = None
@@ -426,7 +428,6 @@ class Fill001Tab:
             return
         from engine001_a28_live import load_plan, error_summary
         from engine001_a285_native import palette_targets
-        from palette_profiles import load_palette_profile
         selected = filedialog.askopenfilename(
             parent=self.root, title="A28: оригинальный ZIP A27 Joined Illustration",
             filetypes=(("ZIP", "*.zip"),),
@@ -435,13 +436,9 @@ class Fill001Tab:
             return
         try:
             paths, reference, target = load_plan(selected)
-            palette_path = filedialog.askopenfilename(
-                parent=self.root, title="A28.6: сохранённый профиль палитры вкладки 3",
-                filetypes=(("JSON", "*.json"),),
-            )
-            if not palette_path:
-                return
-            profile = load_palette_profile(palette_path)
+            if not callable(self.get_a28_palette_profile):
+                raise ValueError("A28.6: источник сохранённой палитры вкладки 3 не подключён.")
+            palette_path, profile = self.get_a28_palette_profile()
             palette_targets(paths, profile)  # require exact confirmed colors before Firefox
             control = self.brush_tab.get_brush_control()
             if not callable(self.on_a28_run):
@@ -449,7 +446,8 @@ class Fill001Tab:
             # Tab 9 endpoints are retained as diagnostic data only. Stage6 owns the
             # confirmed track (including the shared averaging of the two Y values).
             if not messagebox.askyesno(
-                "A28.6", "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
+                "A28.6", f"Палитра вкладки 3: {palette_path.name} ({len(profile['colors'])} цветов).\n"
+                "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
                 "Stage6 управляет физической мышью, резерв 300 CHALK, Alt/Stop для остановки; без Clear. Продолжить?",
                 icon="warning", parent=self.root,
             ):

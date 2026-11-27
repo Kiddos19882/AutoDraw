@@ -749,6 +749,31 @@ class PaletteDetectionTab:
         else:
             self.saved_profile_var.set(names[0] if names else "")
 
+    def get_saved_execution_profile(self) -> tuple[Path, dict[str, Any]]:
+        """Read the saved Tab 3 profile for execution, without a file dialog.
+
+        An explicitly saved/loaded profile takes precedence. On a fresh launch,
+        a single managed profile is unambiguous; never guess between profiles.
+        Legacy palette JSON is still readable but must pass the caller's
+        existing confirmation and live-coordinate gates.
+        """
+        path = self.active_profile_path or self.active_path
+        if path is None:
+            candidates = sorted(
+                item for item in self.profile_dir.glob("*.json") if item.is_file()
+            )
+            if len(candidates) > 1:
+                raise PaletteProfileError(
+                    "На вкладке 3 несколько профилей. Загрузите нужный профиль на вкладке 3."
+                )
+            path = candidates[0] if candidates else self.store_dir / "browser_palette.json"
+        path = Path(path).resolve()
+        if not path.is_file():
+            raise PaletteProfileError(
+                "Сохранённая палитра не найдена. Сохраните профиль на вкладке 3."
+            )
+        return path, load_palette_profile(path)
+
     def load_selected_profile(self) -> None:
         selected = self.saved_profile_var.get().strip()
         if not selected:
