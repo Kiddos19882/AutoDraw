@@ -4,10 +4,12 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 from PIL import Image, ImageDraw
 
-from palette_detection import create_palette_document, load_palette
+from palette_detection import create_palette_document, load_palette, rgb_to_hex
+from palette_detection_ui import PaletteDetectionTab
 from palette_profiles import (
     PaletteProfileError,
     check_profile_freshness,
@@ -252,6 +254,75 @@ class PaletteProfileTests(unittest.TestCase):
         with self.assertRaises(PaletteProfileError):
             validate_palette_profile(invalid)
 
+
+
+class FullPaletteTabSaveTests(unittest.TestCase):
+    """Exercise both Tab 3 save handlers without a Tk display or live browser."""
+
+    def setUp(self):
+        tab = PaletteDetectionTab.__new__(PaletteDetectionTab)
+        self.tab = tab
+        tab.root = Mock()
+        tab.region = {"x": 10, "y": 20, "width": 160, "height": 80}
+        tab.screen_size = (200, 120)
+        tab.palette_captured_at = None
+        tab.palette_reduction_report = None
+        tab.active_profile = None
+        tab.profile_name_var = Mock()
+        tab.profile_name_var.get.return_value = "Full game palette"
+        tab.browser_label_var = Mock()
+        tab.browser_label_var.get.return_value = "Browser"
+        tab.dpi_scale_var = Mock()
+        tab.dpi_scale_var.get.return_value = "100"
+        tab.status_var = Mock()
+        tab._refresh_table = Mock()
+        tab.refresh_saved_profiles = Mock()
+        # Put all eight A27 RGBs after index 32 to catch accidental truncation.
+        a27 = ["535353", "9082BD", "9F9F9F", "B38851",
+               "EEEEEE", "F29C9F", "FCD2BC", "FEFD04"]
+        rgbs = [(i, 1, 2) for i in range(120)]
+        rgbs += [tuple(bytes.fromhex(color)) for color in a27]
+        tab.colors = [
+            dict(name=f"Swatch {i + 1}", hex=rgb_to_hex(rgb), rgb=list(rgb),
+                 local_x=(i % 16) * 10 + 5, local_y=(i // 16) * 10 + 5,
+                 screen_x=(i % 16) * 10 + 15, screen_y=(i // 16) * 10 + 25,
+                 source="manual", status="confirmed", id=f"swatch-{i}")
+            for i, rgb in enumerate(rgbs)
+        ]
+        self.expected = [(c["hex"], c["rgb"], c["screen_x"], c["screen_y"],
+                          c["local_x"], c["local_y"]) for c in tab.colors]
+
+    def assert_all_swatches(self, colors):
+        self.assertEqual(len(colors), 128)
+        actual = [(c["hex"], c["rgb"], c["screen_x"], c["screen_y"],
+                   c["local_x"], c["local_y"]) for c in colors]
+        self.assertEqual(actual, self.expected)
+
+    def test_save_palette_preserves_all_128_colors(self):
+        with tempfile.TemporaryDirectory() as temp:
+            self.tab.store_dir = Path(temp)
+            target = Path(temp) / "palette.json"
+            with patch("palette_detection_ui.filedialog.asksaveasfilename", return_value=str(target)), \
+                 patch("palette_detection_ui.messagebox.askyesno") as reduce_prompt:
+                self.tab.save_dialog()
+                reduce_prompt.assert_not_called()
+            self.assert_all_swatches(load_palette(target)["colors"])
+            self.assert_all_swatches(self.tab.colors)
+
+    def test_save_profile_preserves_all_128_colors_and_confirmations(self):
+        with tempfile.TemporaryDirectory() as temp:
+            self.tab.profile_dir = Path(temp)
+            target = Path(temp) / "profile.json"
+            with patch("palette_detection_ui.filedialog.asksaveasfilename", return_value=str(target)), \
+                 patch("palette_detection_ui.messagebox.askyesno") as reduce_prompt:
+                self.tab.save_profile_dialog()
+                reduce_prompt.assert_not_called()
+            profile = load_palette_profile(target)
+            self.assert_all_swatches(profile["colors"])
+            self.assert_all_swatches(self.tab.colors)
+            self.assertTrue(all(c["status"] == "confirmed" for c in profile["colors"]))
+            self.assertEqual([c["id"] for c in profile["colors"]],
+                             [f"swatch-{i}" for i in range(128)])
 
 if __name__ == "__main__":
     unittest.main()

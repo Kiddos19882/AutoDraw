@@ -229,7 +229,8 @@ class PaletteDetectionTab:
             outer,
             text=("Снимите экран с открытой доской, выделите область палитры, затем запустите поиск цветных образцов "
                   "и вручную добавьте отсутствующие цвета щелчком по их центру. Это этап обнаружения и проверки палитры; "
-                  "цветное рисование пока не выполняется. Сохранённые профили можно перепроверить по новому снимку."),
+                  "Цветное рисование здесь не выполняется. Сохранение включает все найденные и добавленные цвета без сокращения. "
+                  "Сохранённые профили можно перепроверить по новому снимку."),
             wraplength=1220,
         ).pack(anchor="w", pady=(3, 9))
 
@@ -238,7 +239,7 @@ class PaletteDetectionTab:
         ttk.Button(toolbar, text="Снять экран через 3 секунды…", command=self.request_screenshot).pack(side="left")
         ttk.Button(toolbar, text="Выделить область палитры…", command=self.choose_region).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Автопоиск цветных образцов", command=self.auto_detect).pack(side="left", padx=(6, 0))
-        ttk.Button(toolbar, text="Оставить 32 основных цвета", command=self._ensure_palette_limit).pack(side="left", padx=(6, 0))
+        ttk.Button(toolbar, text="Сократить до 32 (необязательно)", command=self._ensure_palette_limit).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Загрузить палитру…", command=self.load_dialog).pack(side="right")
         ttk.Button(toolbar, text="Сохранить палитру…", command=self.save_dialog).pack(side="right", padx=(0, 6))
 
@@ -607,7 +608,7 @@ class PaletteDetectionTab:
         self.status_var.set("Список цветов очищен.")
 
     def _ensure_palette_limit(self) -> bool:
-        """Reduce a large palette to 32 real, representative game swatches."""
+        """Explicit optional reduction only; never called by either save action."""
         if len(self.colors) <= 32:
             self.status_var.set(f"В палитре {len(self.colors)} цветов; сокращение до 32 не требуется.")
             return True
@@ -685,8 +686,6 @@ class PaletteDetectionTab:
         return validate_palette_profile(profile)
 
     def save_profile_dialog(self) -> None:
-        if not self._ensure_palette_limit():
-            return
         try:
             profile = self._make_current_profile()
         except (PaletteProfileError, ValueError, TypeError, KeyError) as exc:
@@ -909,8 +908,6 @@ class PaletteDetectionTab:
             return
         if not self.colors:
             messagebox.showinfo("Палитра пуста", "Найдите или добавьте хотя бы один цвет.", parent=self.root)
-            return
-        if not self._ensure_palette_limit():
             return
         path = filedialog.asksaveasfilename(
             parent=self.root,
