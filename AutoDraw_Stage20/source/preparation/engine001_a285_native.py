@@ -1,4 +1,4 @@
-"""A28.5: frozen A27 replay through existing Stage6 physical mouse controls only."""
+"""A28.6: frozen A27 adapter for shared Stage6 and FILL-001 execution."""
 from __future__ import annotations
 
 import json
@@ -11,9 +11,7 @@ from engine001_a28_live import (
     Blocked, LiveReplay, digest, error_summary, exact, require, utc,
 )
 
-SCHEMA = "ENGINE001_S5_A285_NATIVE_STAGE6_V1"
-# Match established FILL-001 guard, not a new CHALK prediction model.
-QUOTA_RESERVE = 300
+SCHEMA = "ENGINE001_S5_A286_NATIVE_STAGE6_V1"
 SETTERS = """if(op==='selectBrush'){
  if(b._isStart||a.points[k].length!==0)throw Error('Active/nonempty stroke slot');
  b.setRadius(options.width);b.setColor(options.colorRgb);b.setSmooth(false);
@@ -48,17 +46,21 @@ def palette_targets(paths, profile):
     return build_palette_targets(color_plan(paths), profile)
 
 
-def desktop_plan(paths, mapping, roi):
-    """Map the exact A27 vertices into the authenticated physical BoardPane ROI."""
+def desktop_plan(paths, mapped, roi):
+    """Use the FILL-001 authenticated transform; adapt only A27 stroke metadata."""
     from models import DrawingPlan, Point, Stroke
-    corners = mapping["board_screen_corners"]
-    x0, y0, x1, y1 = (corners[k] for k in ("left", "top", "right", "bottom"))
+    require(mapped.get("coordinate_system") == "local_canvas_pixels"
+            and mapped.get("canvas") == {"width": roi["width"], "height": roi["height"]},
+            "Missing FILL-001 mapped plan")
+    frozen = mapped.get("strokes", [])
+    require(len(frozen) == len(paths), "FILL-001 mapped stroke count changed")
     values = list(dict.fromkeys(p["colorRgb"] for p in paths))
     indexes = {v: i for i, v in enumerate(values)}
     rows = []
-    for p in paths:
-        pts = [Point(x0 + q["x"] * (x1-x0)/460 - roi["x"],
-                     y0 + q["y"] * (y1-y0)/240 - roi["y"]) for q in p["points"]]
+    for p, converted in zip(paths, frozen):
+        require(all(converted.get(k) == p[k] for k in ("strokeId", "width", "colorRgb"))
+                and len(converted["points"]) == len(p["points"]), "Mapped A27 identity changed")
+        pts = [Point(q["x"], q["y"]) for q in converted["points"]]
         require(all(0 <= q.x < roi["width"] and 0 <= q.y < roi["height"]
                     and 0 <= round(q.x) < roi["width"] and 0 <= round(q.y) < roi["height"]
                     for q in pts), "A27 desktop vertex outside calibrated ROI")
@@ -80,23 +82,14 @@ def outside_roi(x, y, roi):
 
 
 def slider_calibration(control, initial, screen, roi):
+    """Consume the already-normalized, confirmed Stage6 track, not raw tab-9 clicks."""
     from drawing.color_plan_execution import BrushSliderCalibration
-    require(isinstance(control, dict) and control.get("mode") == "slider",
-            "Save extended brush slider 1–30 calibration in tab 9")
-    start, end = control.get("start"), control.get("end")
-    require(isinstance(start, (tuple, list)) and isinstance(end, (tuple, list))
-            and len(start) == len(end) == 2
-            and all(type(x) is int for x in (*start, *end))
-            and start[1] == end[1], "Missing horizontal slider endpoints")
-    w, h = int(screen.width), int(screen.height)
-    require(control.get("screen_size") == dict(width=w, height=h),
-            "Brush slider screen calibration changed")
-    cfg = BrushSliderCalibration(end[0], start[0], start[1], initial, w, h, True)
+    cfg = BrushSliderCalibration.from_dict(dict(control, initial_value=initial))
     cfg.validate(screen, roi)
-    # All continuous drag positions must stay off the board, not only integer detents.
-    require(not (roi["y"] <= start[1] < roi["y"]+roi["height"]
-                 and min(start[0],end[0]) < roi["x"]+roi["width"]
-                 and max(start[0],end[0]) >= roi["x"]), "Slider intersects BoardPane")
+    # A28 requires the entire continuous drag corridor to remain off BoardPane.
+    require(not (roi["y"] <= cfg.y < roi["y"]+roi["height"]
+                 and min(cfg.x_at_min,cfg.x_at_max) < roi["x"]+roi["width"]
+                 and max(cfg.x_at_min,cfg.x_at_max) >= roi["x"]), "Slider intersects BoardPane")
     return cfg
 
 
@@ -118,12 +111,16 @@ class QuotaLimited(Blocked):
 
 class NativeLiveReplay(LiveReplay):
     """Reuse A28.4 observation/capture; never invoke the old drawing or setter path."""
-    def __init__(self, *args, profile, brush_control, **kwargs):
+    legacy_pointer_witness = False
+
+    def __init__(self, *args, profile, brush_control, raw_brush_control=None, progress_callback=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.profile, self.brush_control = profile, brush_control
+        self.raw_brush_control = raw_brush_control
+        self.progress_callback = progress_callback
 
     def read(self, op="read", options=None):
-        require(op in ALLOWED_OPS, "A28.5 browser mutation forbidden")
+        require(op in ALLOWED_OPS, "A28.6 browser mutation forbidden")
         from firefox_monitor_session import GAME_ORIGIN, MONITOR_VERSION
         result = self.driver.execute_script(READ_ONLY_SCRIPT, op, self.id, options,
                                             GAME_ORIGIN, MONITOR_VERSION)
@@ -133,12 +130,13 @@ class NativeLiveReplay(LiveReplay):
         return result
 
     def draw(self, *_args, **_kwargs):
-        raise Blocked("A28.4 Selenium drawing disabled in A28.5")
+        raise Blocked("A28.4 Selenium drawing disabled in A28.6")
 
     def run(self, paths):
         from drawing.color_plan_execution import ColorPlanExecutionHooks
         from drawing.mouse_executor import ExecutorConfig, MouseExecutor
         from fill001_v5_live_gate import verify_v5_live_gate
+        from fill001_series_stage6_execution import QUOTA_SAFETY_MARGIN
         report = dict(schema=SCHEMA, run_id=self.id, started=utc(),
                       baseline_sha=BASE_SHA, baseline_run=SOURCE_RUN,
                       archive_sha256=ARCHIVE_SHA, plan_sha256=PLAN_SHA,
@@ -147,7 +145,9 @@ class NativeLiveReplay(LiveReplay):
                       bridge_session_id=self.session_id, startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
                       input_transport="STAGE6_PYAUTOGUI", smooth=False, mode="normal",
                       planned_strokes=len(paths), planned_vertices=sum(len(p["points"]) for p in paths),
-                      quota_reserve=QUOTA_RESERVE, status="BLOCKED", exact_CHALK=None,
+                      quota_reserve=QUOTA_SAFETY_MARGIN, status="BLOCKED", exact_CHALK=None,
+                      slider_calibration_source="TAB2_CONFIRMED_STAGE6",
+                      slider_track=self.brush_control, raw_tab9_endpoints=self.raw_brush_control,
                       completed_strokes=0, evidence_level="E4_PENDING")
         before = last = selected = None
         verified = 0
@@ -157,10 +157,13 @@ class NativeLiveReplay(LiveReplay):
         try:
             before,witnesses = self.preflight(paths)
             last = before
-            require(before["smooth"] is False, "Disable game smoothing manually before A28.5")
+            report.update(pre=before, passive_witnesses=witnesses,
+                          bridge_passive_preflight=self.bridge_witness, board_bounds_css=self.bounds,
+                          live_initial_radius=before["width"])
+            require(before["smooth"] is False, "Disable game smoothing manually before A28.6")
             roi = self.bridge_witness["roi"]
             proof = self.bridge_witness["mapping"]
-            plan = desktop_plan(paths, proof, roi)
+            plan = desktop_plan(paths, self.mapped_probe_plan, roi)
             screen = self.native_mouse.size()
             cfg = slider_calibration(self.brush_control, before["width"], screen, roi)
 
@@ -187,26 +190,22 @@ class NativeLiveReplay(LiveReplay):
             config = ExecutorConfig(point_step_px=2.0,line_extension_px=0,
                 point_delay_ms=60,after_mouse_up_ms=100,before_mouse_down_ms=100,
                 after_mouse_down_ms=100,end_hold_ms=100,countdown_seconds=1)
-            report.update(pre=before, passive_witnesses=witnesses,
-                bridge_passive_preflight=self.bridge_witness, board_bounds_css=self.bounds,
-                executor_config=dict(point_step_px=2.0,point_delay_ms=60,line_extension_px=0),
+            report.update(executor_config=config.to_dict(),
                 required_colors=sorted(f"#{p:06X}" for p in {s["colorRgb"] for s in paths}),
                 before_png=self.capture("before.png"))
 
-            replay = self
-            class GuardedExecutor(MouseExecutor):
-                last_guard = 0.
-                def _check_stop(self):
-                    super()._check_stop()
-                    # Check while dragging and moving, not just between strokes.
-                    if time.monotonic()-self.last_guard >= .25:
-                        replay.verify_bridge()
-                        state = replay.check(replay.read())
-                        if selected is not None:
-                            require(state["width"]==selected["width"]
-                                    and state["colorRgb"]==selected["colorRgb"]
-                                    and state["smooth"] is False, "Native stroke tool drift")
-                        self.last_guard = time.monotonic()
+            last_guard = 0.
+            def safety_check():
+                nonlocal last_guard
+                # The same Stage6 loop invokes this during controls and mouse movement.
+                if time.monotonic()-last_guard >= .25:
+                    self.verify_bridge()
+                    state = self.check(self.read())
+                    if selected is not None:
+                        require(state["width"]==selected["width"]
+                                and state["colorRgb"]==selected["colorRgb"]
+                                and state["smooth"] is False, "Native stroke tool drift")
+                    last_guard = time.monotonic()
 
             def preflight(worker):
                 self.verify_bridge(force=True)
@@ -222,7 +221,7 @@ class NativeLiveReplay(LiveReplay):
                 state = self.check(self.read())
                 require(state["slot"]==last["slot"] and exact(state["snapshot"])==exact(last["snapshot"])
                         and state["empty"] and not state["active"], "Board drift before native control")
-                if state["snapshot"]["remainingPoints"] < QUOTA_RESERVE:
+                if state["snapshot"]["remainingPoints"] < QUOTA_SAFETY_MARGIN:
                     quota_limited=True
                     raise QuotaLimited("FILL-001 300-point quota reserve")
                 selected = None
@@ -238,34 +237,38 @@ class NativeLiveReplay(LiveReplay):
                 return detail
 
             with (self.out/"strokes.jsonl").open("x",encoding="utf-8") as f:
-                def progress(current,total,detail):
+                def after_stroke(worker,index,stroke):
                     nonlocal last,selected,verified,observed
-                    if current==verified+1 and detail.startswith("Завершён штрих "):
-                        time.sleep(.1)  # allow game mouse-up/atom closure to settle
-                        self.verify_bridge(force=True)
-                        post=self.check(self.read())
-                        p=paths[verified]
-                        delta=exact(post["snapshot"])-exact(last["snapshot"])
-                        require(not post["active"] and post["empty"] and post["slot"]==last["slot"]+1,
-                                "Native stroke did not close uniquely")
-                        actual=self.read("stroke",{"index":last["slot"]})
-                        row=dict(stroke_id=p["strokeId"],chalk=delta,actual=actual)
-                        f.write(json.dumps(row,allow_nan=False)+"\n");f.flush()
-                        require(delta>0 and delta==len(actual["points"])
-                            and actual["width"]==p["width"] and actual["colorRgb"]==p["colorRgb"]
-                            and actual["smooth"] is False, "Native accepted stroke/counter mismatch")
-                        require(max(path_error(q,p["points"]) for q in actual["points"])<=2,
-                                "Native accepted point outside intended polyline")
-                        observed+=delta; verified+=1; last=post; selected=None
-                        report["completed_strokes"]=verified
-                        self.log(f"{verified}/{total}; CHALK={observed}; остаток {post['snapshot']['remainingPoints']}")
-                    elif current==0:
+                    require(index == verified+1, "Unexpected Stage6 stroke completion")
+                    time.sleep(.1)  # allow game mouse-up/atom closure to settle
+                    self.verify_bridge(force=True)
+                    post=self.check(self.read())
+                    p=paths[verified]
+                    delta=exact(post["snapshot"])-exact(last["snapshot"])
+                    require(not post["active"] and post["empty"] and post["slot"]==last["slot"]+1,
+                            "Native stroke did not close uniquely")
+                    actual=self.read("stroke",{"index":last["slot"]})
+                    row=dict(stroke_id=p["strokeId"],chalk=delta,actual=actual)
+                    f.write(json.dumps(row,allow_nan=False)+"\n");f.flush()
+                    require(delta>0 and delta==len(actual["points"])
+                        and actual["width"]==p["width"] and actual["colorRgb"]==p["colorRgb"]
+                        and actual["smooth"] is False, "Native accepted stroke/counter mismatch")
+                    require(max(path_error(q,p["points"]) for q in actual["points"])<=2,
+                            "Native accepted point outside intended polyline")
+                    observed+=delta; verified+=1; last=post; selected=None
+                    report["completed_strokes"]=verified
+                    self.log(f"{verified}/{len(paths)}; CHALK={observed}; остаток {post['snapshot']['remainingPoints']}")
+
+                def progress(current,total,detail):
+                    if callable(self.progress_callback):
+                        self.progress_callback(current,total,detail)
+                    if current == 0:
                         self.log(detail)
 
-                worker=GuardedExecutor(self.stop,config)
+                worker=MouseExecutor(self.stop,config,safety_check=safety_check)
                 worker_called=True
                 summary=worker.execute(plan,roi["x"],roi["y"],progress=progress,
-                    preflight=preflight,before_stroke=before_stroke)
+                    preflight=preflight,before_stroke=before_stroke,after_stroke=after_stroke)
             report.update(stage6_summary=summary.to_dict(config),tool_selection=hooks.to_report())
             require(summary.mouse_release_succeeded, "Native mouse release not confirmed")
             if self.stop.is_set() or summary.status=="stopped":

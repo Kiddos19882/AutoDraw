@@ -274,11 +274,14 @@ assert.ok(call('bind').discovery.error);
         self.assertNotIn("open_firefox",start_src)
         code=ast.unparse(worker)
         for call in ("open_firefox()", "attach_monitor_after_confirmation(", 
-                     "wait_for_operator_firefox_foreground(", "NativeLiveReplay("):
+                     "wait_for_operator_firefox_foreground(", "self.on_a28_run("):
             self.assertEqual(code.count(call),1)
-        self.assertLess(code.index("attach_monitor_after_confirmation("),code.index("NativeLiveReplay("))
-        self.assertLess(code.index("wait_for_operator_firefox_foreground("),code.index("NativeLiveReplay("))
-        self.assertLess(code.index("NativeLiveReplay("),code.index("self._run_fill001_series_in_firefox("))
+        self.assertLess(code.index("attach_monitor_after_confirmation("),code.index("self.on_a28_run("))
+        self.assertLess(code.index("wait_for_operator_firefox_foreground("),code.index("self.on_a28_run("))
+        self.assertLess(code.index("self.on_a28_run("),code.index("self._run_fill001_series_in_firefox("))
+        self.assertNotIn("NativeLiveReplay(", code)
+        stage6=source.parents[1]/"executor/stage6_execute_plan.py"
+        self.assertIn("replay = NativeLiveReplay(",stage6.read_text(encoding="utf-8"))
 
     def test_bridge_required_before_board_access(self):
         r=LiveReplay(None,Path("test"),threading.Event(),lambda _:None)

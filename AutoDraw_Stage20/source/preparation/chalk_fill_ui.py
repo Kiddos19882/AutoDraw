@@ -67,6 +67,7 @@ class Fill001Tab:
         on_start: Callable[[int, dict[str, Any], Path], bool],
         on_v5_run: Callable[..., bool] | None = None,
         on_series_run: Callable[..., bool] | None = None,
+        on_a28_run: Callable[..., bool] | None = None,
         on_v5_cancel: Callable[[], None] | None = None,
     ) -> None:
         self.root = root
@@ -77,6 +78,7 @@ class Fill001Tab:
         self.on_start = on_start
         self.on_v5_run = on_v5_run
         self.on_series_run = on_series_run
+        self.on_a28_run = on_a28_run
         self.on_v5_cancel = on_v5_cancel
         self.v5_run_after_probe_var = tk.BooleanVar(value=True)
         self.matrix: dict[str, Any] | None = None
@@ -184,7 +186,7 @@ class Fill001Tab:
             command=self.stop_firefox_monitor,
         ).pack(side="left")
         ttk.Button(
-            bridge_controls, text="A28.5: A27 Joined — Stage6 мышь + Monitor + Bridge",
+            bridge_controls, text="A28.6: A27 Joined — Stage6 мышь + Monitor + Bridge",
             command=self.start_a28_live,
         ).pack(anchor="w", pady=(5, 0))
         ttk.Checkbutton(
@@ -418,7 +420,7 @@ class Fill001Tab:
             pass
 
     def start_a28_live(self) -> None:
-        """A28.5: use existing Firefox worker, physical Stage6 tool selection and drawing."""
+        """A28.6: use existing Firefox worker, physical Stage6 tool selection and drawing."""
         if self._firefox_thread is not None and self._firefox_thread.is_alive():
             self.bridge_status_var.set("BLOCKED: Firefox уже занят.")
             return
@@ -434,7 +436,7 @@ class Fill001Tab:
         try:
             paths, reference, target = load_plan(selected)
             palette_path = filedialog.askopenfilename(
-                parent=self.root, title="A28.5: сохранённый профиль палитры вкладки 3",
+                parent=self.root, title="A28.6: сохранённый профиль палитры вкладки 3",
                 filetypes=(("JSON", "*.json"),),
             )
             if not palette_path:
@@ -442,15 +444,17 @@ class Fill001Tab:
             profile = load_palette_profile(palette_path)
             palette_targets(paths, profile)  # require exact confirmed colors before Firefox
             control = self.brush_tab.get_brush_control()
-            if not isinstance(control, dict) or control.get("mode") != "slider" or not control.get("start") or not control.get("end"):
-                raise ValueError("A28.5: сохраните калибровку расширенного ползунка 1–30 на вкладке 9.")
+            if not callable(self.on_a28_run):
+                raise ValueError("A28.6: общий исполнитель Stage6 не подключён.")
+            # Tab 9 endpoints are retained as diagnostic data only. Stage6 owns the
+            # confirmed track (including the shared averaging of the two Y values).
             if not messagebox.askyesno(
-                "A28.5", "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
+                "A28.6", "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
                 "Stage6 управляет физической мышью, резерв 300 CHALK, Alt/Stop для остановки; без Clear. Продолжить?",
                 icon="warning", parent=self.root,
             ):
                 return
-            out = self.output_dir / "engine001_s5_a285_native" / ("a285-" + uuid.uuid4().hex)
+            out = self.output_dir / "engine001_s5_a286_native" / ("a286-" + uuid.uuid4().hex)
             out.mkdir(parents=True, exist_ok=False)
             (out / "a27-native-reference.png").write_bytes(reference)
             (out / "a27-target.png").write_bytes(target)
@@ -471,7 +475,7 @@ class Fill001Tab:
         report = out / "report.json"
         if not report.exists():
             with report.open("x", encoding="utf-8") as f:
-                json.dump(dict(schema="ENGINE001_S5_A285_NATIVE_STAGE6_V1", run_id=out.name,
+                json.dump(dict(schema="ENGINE001_S5_A286_NATIVE_STAGE6_V1", run_id=out.name,
                                startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
                                baseline_sha=BASE_SHA, plan_sha256=PLAN_SHA,
                                archive_sha256=ARCHIVE_SHA, status="BLOCKED",
@@ -618,21 +622,53 @@ class Fill001Tab:
                     "Начинается пассивная ROI-проверка без кликов.",
                 ))
                 if getattr(self, "_a28_pending", None):
-                    from engine001_a285_native import NativeLiveReplay
                     paths, out, profile, control = self._a28_pending
-                    replay = NativeLiveReplay(
-                        driver, out, self._firefox_stop,
-                        lambda msg: self._firefox_messages.put(("A28", msg)),
-                        bridge_root=bridge_root, session_id=ready["session_id"],
-                        native_mouse=pyautogui, profile=profile, brush_control=control,
-                    )
-                    result = replay.run(paths)
-                    self._firefox_messages.put((
-                        "A28", f"{result['status']}; CHALK={result['exact_CHALK']}; {out}. "
-                        "Stop — закрыть Firefox."
-                    ))
-                    self.root.after(0, self.root.deiconify)
+                    started = threading.Event()
+                    outcome = {}
+                    self._v5_stage6_completed.clear()
+                    def finished(result):
+                        try:
+                            if not (out / "report.json").exists():
+                                self._finish_a28_startup(result.get("reason", "Stage6 ended without report"))
+                            self._firefox_messages.put((
+                                "A28", f"{result['status']}; CHALK={result.get('exact_CHALK')}; "
+                                f"{result.get('reason','')}; {out}. Stop — закрыть Firefox."
+                            ))
+                            self.root.deiconify()
+                        finally:
+                            self._v5_stage6_completed.set()
+                    def start_a28_on_ui_thread():
+                        try:
+                            if self._firefox_stop.is_set():
+                                raise RuntimeError("A28 stopped before Stage6 handoff")
+                            outcome["accepted"] = bool(self.on_a28_run(
+                                paths=paths, profile=profile, raw_brush_control=control,
+                                driver=driver, bridge_root=bridge_root,
+                                session_id=ready["session_id"], output_dir=out,
+                                stop_event=self._firefox_stop,
+                                log=lambda msg: self._firefox_messages.put(("A28", msg)),
+                                finished_callback=finished,
+                            ))
+                        except Exception as exc:
+                            from engine001_a28_live import error_summary
+                            outcome["error"] = error_summary(exc)
+                        finally:
+                            if not outcome.get("accepted"):
+                                self._v5_stage6_completed.set()
+                            started.set()
+                    self.root.after(0, start_a28_on_ui_thread)
+                    if not started.wait(timeout=15):
+                        self._firefox_stop.set()
+                        # A queued callback can no longer start input. If it was
+                        # already entering Stage6, wait for its stop/release.
+                        started.wait()
+                        self._v5_stage6_completed.wait()
+                        raise RuntimeError("BLOCKED: Stage6 A28 handoff timed out.")
+                    if not outcome.get("accepted"):
+                        raise RuntimeError(outcome.get("error", "Stage6 refused A28"))
                     self._firefox_stop.wait()
+                    # Shared owner must finish release/report before the driver closes.
+                    self._v5_stage6_completed.wait()
                     return
                 if self._firefox_execute_series:
                     self._run_fill001_series_in_firefox(

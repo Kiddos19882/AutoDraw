@@ -7,7 +7,9 @@ import tkinter as tk
 from tkinter import ttk
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+from types import SimpleNamespace
+import threading
 
 from PIL import Image, ImageDraw
 
@@ -38,6 +40,49 @@ class UnifiedAppCoreTests(unittest.TestCase):
         self._data_paths_patch.stop()
         self._environment_patch.stop()
         self._data_tempdir.cleanup()
+
+    def test_a28_reuses_tab2_normalized_slider_and_shared_owner(self):
+        executor=object.__new__(integrated_app.Stage6App)
+        executor.running=False
+        # Actual shared Tab 9 -> Tab 2 path, including unequal Y coordinates.
+        class Var:
+            def __init__(self, value=None): self.value=value
+            def set(self, value): self.value=value
+            def get(self): return self.value
+        for name, value in (
+            ("brush_slider_x_min_var", ""), ("brush_slider_x_max_var", ""),
+            ("brush_slider_y_var", ""), ("brush_slider_initial_value_var", "30"),
+            ("brush_slider_confirmed_var", False), ("brush_slider_status_var", ""),
+        ):
+            setattr(executor,name,Var(value))
+        screen=SimpleNamespace(width=1920,height=1080)
+        control=dict(mode="slider", start=[1200,800], end=[1450,802],
+                     screen_size=dict(width=1920,height=1080))
+        with patch("stage6_execute_plan.pyautogui.size",return_value=screen):
+            self.assertTrue(executor.apply_brush_control_profile(control))
+            track=executor._read_brush_slider_calibration(check_area=False)
+            self.assertEqual((track["x_at_max"],track["x_at_min"],track["y"]),(1200,1450,801))
+            executor.root=Mock()
+            stop=threading.Event()
+            executor.stop_event=stop
+            with patch.object(executor,"_start_isolated_stage6_worker",return_value=True) as owner, \
+                 patch("engine001_a285_native.NativeLiveReplay") as replay:
+                self.assertTrue(executor.start_a28_single_run(
+                    paths=[],profile={},raw_brush_control=control,driver=None,
+                    bridge_root=Path("unused"),session_id="test",output_dir=Path("unused"),
+                    stop_event=stop,log=lambda _:None,
+                ))
+                self.assertIs(owner.call_args.kwargs["stop_event"],stop)
+                owner.call_args.args[0]()
+                self.assertEqual(replay.call_args.kwargs["brush_control"],track)
+                self.assertEqual(replay.call_args.kwargs["raw_brush_control"],control)
+                self.assertIs(replay.call_args.args[2],stop)
+                replay.return_value.run.assert_called_once_with([])
+        executor.running=True
+        with self.assertRaises(RuntimeError):
+            executor.start_a28_single_run(paths=[],profile={},raw_brush_control=control,
+                driver=None,bridge_root=Path("unused"),session_id="test",
+                output_dir=Path("unused"),stop_event=stop,log=lambda _:None)
 
     def test_environment_routes_both_workflows_to_shared_data(self):
         old_values = {key: os.environ.get(key) for key in (

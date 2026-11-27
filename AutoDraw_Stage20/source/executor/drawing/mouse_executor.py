@@ -112,11 +112,13 @@ class MouseExecutor:
         config: ExecutorConfig | None = None,
         *,
         stop_reason_provider: StopReasonProvider | None = None,
+        safety_check: Callable[[], None] | None = None,
     ):
         self.stop_event = stop_event
         self.config = config or ExecutorConfig()
         self.config.validate()
         self.stop_reason_provider = stop_reason_provider
+        self.safety_check = safety_check
         self._reason_lock = threading.Lock()
         self._hotkey_stop_requested = False
         self.move_calls = 0
@@ -146,6 +148,8 @@ class MouseExecutor:
     def _check_stop(self) -> None:
         if self.stop_event.is_set():
             raise InterruptedError(f"Исполнение остановлено: {self._current_stop_reason()}.")
+        if self.safety_check is not None:
+            self.safety_check()
 
     def _wait_interruptibly(self, seconds: float) -> None:
         """Wait no longer than requested, but return immediately when stop is requested."""
@@ -193,6 +197,7 @@ class MouseExecutor:
         *,
         preflight: PreflightCallback | None = None,
         before_stroke: BeforeStrokeCallback | None = None,
+        after_stroke: Callable[["MouseExecutor", int, object], None] | None = None,
     ) -> ExecutionSummary:
         from datetime import datetime
 
@@ -293,6 +298,8 @@ class MouseExecutor:
                     last_mouse_up = True
 
                 completed += 1
+                if after_stroke is not None:
+                    after_stroke(self, completed, stroke)
                 notify(completed, f"Завершён штрих {completed}/{len(plan.strokes)}: {stroke.name}")
 
         except InterruptedError as exc:

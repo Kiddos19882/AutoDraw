@@ -180,6 +180,39 @@ class MouseExecutorTests(unittest.TestCase):
         self.assertTrue(any("Завершён штрих" in event[2] for event in events))
         self.assertTrue(FakeGlobalHotKeys.last_instance.stopped)
 
+    def test_shared_experiment_hooks_check_safety_and_completion(self):
+        events = []
+        executor = MouseExecutor(FastEvent(), self.config(),
+                                 safety_check=lambda: events.append("guard"))
+        def after(worker, index, stroke):
+            self.assertIs(worker, executor)
+            self.assertGreaterEqual(FAKE_PYAUTOGUI.up_calls, 1)
+            events.append(("after", index, stroke.name))
+        summary = executor.execute(small_plan(), 0, 0, after_stroke=after)
+        self.assertEqual(summary.status, "completed")
+        self.assertIn("guard", events)
+        self.assertEqual(events.count(("after", 1, "line")), 1)
+
+    def test_experiment_guard_failure_releases_mouse_and_refuses_input(self):
+        def blocked():
+            raise ValueError("lost foreground")
+        executor = MouseExecutor(FastEvent(), self.config(), safety_check=blocked)
+        summary = executor.execute(small_plan(), 0, 0)
+        self.assertEqual(summary.status, "failed")
+        self.assertEqual(FAKE_PYAUTOGUI.down_calls, 0)
+        self.assertTrue(summary.mouse_release_succeeded)
+
+    def test_after_stroke_failure_prevents_next_stroke(self):
+        plan=small_plan()
+        plan.strokes.append(Stroke("second", [Point(1,2), Point(9,2)]))
+        def reject(*args):
+            raise ValueError("failed evidence")
+        summary=MouseExecutor(FastEvent(),self.config()).execute(
+            plan,0,0,after_stroke=reject)
+        self.assertEqual(summary.status,"failed")
+        self.assertEqual(FAKE_PYAUTOGUI.down_calls,1)
+        self.assertTrue(summary.mouse_release_succeeded)
+
     def test_external_stop_during_countdown_is_immediate(self):
         stop = FastEvent(stop_after_wait=1)
         summary = MouseExecutor(stop, self.config()).execute(small_plan(), 0, 0)

@@ -997,7 +997,7 @@ class Stage6App:
             # Keep the live calibration; it will be persisted with the next valid run.
             pass
 
-    def _read_brush_slider_calibration(self) -> dict[str, Any]:
+    def _read_brush_slider_calibration(self, *, check_area: bool = True) -> dict[str, Any]:
         if not self.brush_slider_confirmed_var.get() or self.brush_slider_screen_size is None:
             raise ColorPlanExecutionError(
                 "Для адаптивного плана нужно подтвердить координаты ползунка кисти на текущем экране."
@@ -1013,7 +1013,7 @@ class Stage6App:
                 confirmed=True,
             )
             screen = pyautogui.size()
-            candidate.validate(screen, self.area.to_dict() if self.area else None)
+            candidate.validate(screen, self.area.to_dict() if check_area and self.area else None)
         except (ValueError, TypeError) as exc:
             raise ColorPlanExecutionError(f"Неверная калибровка ползунка кисти: {exc}") from exc
         return {
@@ -1533,6 +1533,72 @@ class Stage6App:
         config.validate()
         return config
 
+    def _start_isolated_stage6_worker(self, worker, *, label, thread_name, stop_event=None):
+        """Single owner and lifecycle for opt-in FILL and A28 experimental workers."""
+        if self.running:
+            raise RuntimeError("Stage6 already owns an active execution")
+        self.running = True
+        self.stop_event = stop_event if stop_event is not None else threading.Event()
+        self.stop_reason = None
+        self._set_execution_controls_enabled(False)
+        self.start_button.configure(state="disabled")
+        self.stop_button.configure(state="normal")
+        self.execution_state_var.set(f"Состояние: {label}")
+        self.progress_var.set(0)
+        try:
+            threading.Thread(target=worker, name=thread_name, daemon=True).start()
+        except Exception:
+            self.running = False
+            self._set_execution_controls_enabled(True)
+            self.stop_button.configure(state="disabled")
+            raise
+        return True
+
+    def start_a28_single_run(
+        self, *, paths, profile, raw_brush_control, driver, bridge_root,
+        session_id, output_dir, stop_event, log, finished_callback=None,
+    ) -> bool:
+        """A27 replay: borrow the confirmed slider track and shared Stage6 ownership."""
+        if self.running or stop_event.is_set():
+            raise RuntimeError("Stage6 busy or A28 stopped")
+        # Read Tk fields on the UI thread, just as FILL and ordinary drawing do.
+        calibration = self._read_brush_slider_calibration(check_area=False)
+        from engine001_a285_native import NativeLiveReplay
+        from engine001_a28_live import error_summary
+        def worker():
+            try:
+                replay = NativeLiveReplay(
+                    driver, output_dir, self.stop_event, log,
+                    bridge_root=bridge_root, session_id=session_id,
+                    native_mouse=pyautogui, profile=profile,
+                    brush_control=calibration, raw_brush_control=raw_brush_control,
+                    progress_callback=lambda current,total,detail:self.root.after(
+                        0,self._update_progress,current,total,detail),
+                )
+                result = replay.run(paths)
+            except Exception as exc:
+                result = {"status": "BLOCKED", "exact_CHALK": None,
+                          "reason": error_summary(exc)}
+            self.root.after(0, self._finish_a28_single_run, result, finished_callback)
+        return self._start_isolated_stage6_worker(
+            worker, label="A28.6 Stage6", thread_name="A28.6-Stage6",
+            stop_event=stop_event,
+        )
+
+    def _release_isolated_stage6_owner(self):
+        self.running = False
+        self._set_execution_controls_enabled(True)
+        self.stop_button.configure(state="disabled")
+        self.start_button.configure(
+            state="normal" if self.execution_plan is not None and self.area is not None else "disabled"
+        )
+
+    def _finish_a28_single_run(self, result, callback):
+        self._release_isolated_stage6_owner()
+        self.execution_state_var.set(f"Состояние: A28.6 {result.get('status', 'BLOCKED')}")
+        if callable(callback):
+            callback(result)
+
     def start_fill001_v5_single_run(
         self, *, source: dict[str, Any], mapped: dict[str, Any],
         mapping: dict[str, Any], roi: dict[str, int],
@@ -1551,22 +1617,7 @@ class Stage6App:
         )
         from drawing.color_plan_execution import BrushSliderCalibration
 
-        if not getattr(self, "brush_slider_confirmed_var", None) \
-                or not self.brush_slider_confirmed_var.get() \
-                or self.brush_slider_screen_size is None:
-            raise ValueError(
-                "BLOCKED: Stage6 has no confirmed brush-slider calibration. "
-                "A passive ROI does not calibrate the brush slider."
-            )
-        calibration = {
-            "x_at_min": int(self.brush_slider_x_min_var.get()),
-            "x_at_max": int(self.brush_slider_x_max_var.get()),
-            "y": int(self.brush_slider_y_var.get()),
-            "initial_value": int(self.brush_slider_initial_value_var.get()),
-            "screen_width": self.brush_slider_screen_size[0],
-            "screen_height": self.brush_slider_screen_size[1],
-            "confirmed": True,
-        }
+        calibration = self._read_brush_slider_calibration(check_area=False)
         BrushSliderCalibration.from_dict(calibration).validate(pyautogui.size(), roi)
         from fill001_v5_live_gate import verify_v5_live_gate
         # Only the verified slider track comes from the saved calibration.
@@ -1583,14 +1634,6 @@ class Stage6App:
             session_id=session_id, driver=driver,
             slider_calibration=calibration, screen_size=pyautogui.size(),
         )
-        self.running = True
-        self.stop_event = threading.Event()
-        self.stop_reason = None
-        self._set_execution_controls_enabled(False)
-        self.start_button.configure(state="disabled")
-        self.stop_button.configure(state="normal")
-        self.execution_state_var.set("Состояние: FILL-001 V5 Stage6 single run")
-        self.progress_var.set(0)
         def worker() -> None:
             try:
                 result = execute_v5_with_stage6(
@@ -1610,16 +1653,9 @@ class Stage6App:
                     "stage6_execution_allowed": False,
                 }
             self.root.after(0, self._finish_fill001_v5_single_run, result, finished_callback)
-        try:
-            threading.Thread(
-                target=worker, name="FILL001-V5-Stage6", daemon=True,
-            ).start()
-        except Exception:
-            self.running = False
-            self._set_execution_controls_enabled(True)
-            self.stop_button.configure(state="disabled")
-            raise
-        return True
+        return self._start_isolated_stage6_worker(
+            worker, label="FILL-001 V5 Stage6 single run", thread_name="FILL001-V5-Stage6",
+        )
 
     def start_fill001_series_single_run(
         self, *, manifest: dict[str, Any], task_id: str,
@@ -1641,19 +1677,7 @@ class Stage6App:
         from fill001_v5_live_gate import verify_v5_live_gate
         from firefox_foreground_witness import firefox_foreground_witness
 
-        if (not getattr(self, "brush_slider_confirmed_var", None)
-                or not self.brush_slider_confirmed_var.get()
-                or self.brush_slider_screen_size is None):
-            raise ValueError("Series Stage6 requires existing confirmed brush slider calibration")
-        calibration = {
-            "x_at_min": int(self.brush_slider_x_min_var.get()),
-            "x_at_max": int(self.brush_slider_x_max_var.get()),
-            "y": int(self.brush_slider_y_var.get()),
-            "initial_value": int(self.brush_slider_initial_value_var.get()),
-            "screen_width": self.brush_slider_screen_size[0],
-            "screen_height": self.brush_slider_screen_size[1],
-            "confirmed": True,
-        }
+        calibration = self._read_brush_slider_calibration(check_area=False)
         current = verify_v5_live_gate(
             bridge_root, session_id=session_id,
             expected_mapping_sha256=mapping["boardpane_mapping_sha256"],
@@ -1671,14 +1695,6 @@ class Stage6App:
             ),
             foreground_verified=lambda: firefox_foreground_witness(driver),
         )
-        self.running = True
-        self.stop_event = threading.Event()
-        self.stop_reason = None
-        self._set_execution_controls_enabled(False)
-        self.start_button.configure(state="disabled")
-        self.stop_button.configure(state="normal")
-        self.execution_state_var.set("Состояние: FILL001-SERIES one figure")
-        self.progress_var.set(0)
         def worker() -> None:
             try:
                 result = execute_series_single_stage6(
@@ -1701,27 +1717,13 @@ class Stage6App:
             self.root.after(
                 0,self._finish_fill001_series_single_run,result,finished_callback,
             )
-        try:
-            threading.Thread(
-                target=worker,name="FILL001-SERIES-Stage6",daemon=True,
-            ).start()
-        except Exception:
-            self.running = False
-            self._set_execution_controls_enabled(True)
-            self.stop_button.configure(state="disabled")
-            raise
-        return True
+        return self._start_isolated_stage6_worker(
+            worker, label="FILL001-SERIES one figure", thread_name="FILL001-SERIES-Stage6",
+        )
 
     def _finish_fill001_series_single_run(self, result: dict, callback: Any) -> None:
         """Release Stage6 ownership before the series owner attempts Clear."""
-        self.running = False
-        self._set_execution_controls_enabled(True)
-        self.stop_button.configure(state="disabled")
-        self.start_button.configure(
-            state="normal"
-            if self.execution_plan is not None and self.area is not None
-            else "disabled"
-        )
+        self._release_isolated_stage6_owner()
         if result.get("brush_slider_no_response") is not None:
             self.brush_slider_confirmed_var.set(False)
             self.brush_slider_status_var.set(
@@ -1738,12 +1740,7 @@ class Stage6App:
             callback(result)
 
     def _finish_fill001_v5_single_run(self, result: dict, callback: Any) -> None:
-        self.running = False
-        self._set_execution_controls_enabled(True)
-        self.stop_button.configure(state="disabled")
-        self.start_button.configure(
-            state="normal" if self.execution_plan is not None and self.area is not None else "disabled"
-        )
+        self._release_isolated_stage6_owner()
         status = result.get("status", "FAILED")
         if result.get("failure_stage") == "BRUSH_SLIDER_NO_RESPONSE":
             # A geometrically accepted but behaviorally unresponsive slider

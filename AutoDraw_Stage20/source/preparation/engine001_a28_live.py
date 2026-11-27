@@ -267,6 +267,7 @@ return {discovery,snapshot:snap,geometry:ins.renderer,slot:k,empty:a.points[k].l
 
 
 class LiveReplay:
+    legacy_pointer_witness = True
     def __init__(self, driver, run_dir, stop, log, *, bridge_root=None, session_id=None, native_mouse=None):
         self.driver, self.out, self.stop, self.log = driver, run_dir, stop, log
         self.id = run_dir.name
@@ -276,6 +277,7 @@ class LiveReplay:
         self.bridge_witness = None
         self.capture_reference = None
         self.probe_plan = None
+        self.mapped_probe_plan = None
         self.canvas_diagnostics = None
         self.bridge_checked = 0.0
         self.discovery = None
@@ -325,7 +327,7 @@ class LiveReplay:
         from fill001_firefox_auto_probe import _collect_verified_boardpane_roi
         from firefox_foreground_witness import firefox_foreground_witness
         require(not self.stop.is_set(), "Stopped before passive ROI check")
-        _, witness, roi = _collect_verified_boardpane_roi(
+        self.mapped_probe_plan, witness, roi = _collect_verified_boardpane_roi(
             self.driver, self.bridge_root, self.session_id, self.probe_plan,
             native_mouse=self.native_mouse,now_utc=lambda:datetime.now(timezone.utc),
             firefox_foreground_checker=lambda: (
@@ -413,7 +415,7 @@ class LiveReplay:
         self.verify_bridge(force=True)
         a,b,c,d=self.bounds
         witnesses=[]
-        for fx,fy in ((.25,.25),(.5,.5),(.75,.75)):
+        for fx,fy in (((.25,.25),(.5,.5),(.75,.75)) if self.legacy_pointer_witness else ()):
             require(not self.stop.is_set(),"Stopped during calibration")
             self.verify_bridge()
             x,y=round(a+(c-a)*fx),round(b+(d-b)*fy)
