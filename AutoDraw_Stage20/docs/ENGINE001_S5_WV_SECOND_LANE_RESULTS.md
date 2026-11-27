@@ -6,6 +6,25 @@ Prospective independent arms: A30.1 tangent-aware straight joins (rank length pl
 
 Validation: SHA verify A27 and A29 baseline files, native exact control replays A27/R6/R12 (contour and full), render all candidate contour/full frames with unchanged fill tail; report stroke/point count, total/added logical length, actual simulator meter and per-color path membership plus native RGB/alpha and target diagnostics, compare image quality in contact sheets. Strict pixel-identical vs A27 gate preserved; any altered candidate requires separate user visual acceptance, no automatic promotion, no claim exact game CHALK. Local graph/search contracts include orientation, no cross-color connections, unsafe corridor, closure, tree route coverage and junction pairing; native E3 determines actual quality. All positives/negatives retained. Future full neural/topology regeneration is not claimed. E4/E5 NOT_RUN, no game test.
 
+**A30 native E3 results (2026-11-28).** [CI46070708715](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708715), code SHA `8eb81d0c71ca76b3a3f51fcfa105cb729bea8d56`, contracts/native(6)/native(12) 3/3 SUCCESS. Local syntax/graph contracts PASS. [R6 ZIP15232752910](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708715/artifacts/15232752910) SHA256 `ab1ce57e18e0aba5cfdd63d2de2083d7046df40a6d0d5891d6e5e7475d4c413b`; [R12 ZIP15232099575](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708715/artifacts/15232099575) SHA256 `773e9fe23a40c37163d273555e15112f1ea9200648f7465211d3ed5ea360f654`. Independently downloaded: 61/61 CRC each, 48/48 report-referenced plan/PNG hashes, 4 exact archived control PNG replays per radius, 12/12 identical full fill tails vs A27. Native geometry matches E1 model. All actual frames, plans, membership, scores and comparisons retained in archives. A27 full RGB MAE 7.33165/gaps 311; A29 R6 7.36662/313 and R12 7.52508/301.
+
+| R | Arm | Contour strokes | Full strokes | Contour vertices | Added logical length vs A27 | Short source paths <=5 | Full RGBA delta vs same-R A29 | Full gap union | Full RGB MAE |
+|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|
+|6|Tangent|751|2857|66416|611.8|0|729|313|7.372653|
+|6|Geodesic|759|2865|67895|781.09|0|2510|311|7.387261|
+|6|Blossom|745|2851|66428|634.11|0|673|313|7.370689|
+|6|Combined|749|2855|68048|858.18|0|2904|311|7.391424|
+|6|Postman|321|2427|91132|13835.07|0|10579|309|7.398467|
+|6|Topology|1111|3217|67206|632.72|71|8687|312|7.395996|
+|12|Tangent|472|2578|66416|1512.03|0|3060|297|7.533195|
+|12|Geodesic|477|2583|69399|1871.58|0|5848|293|7.55319|
+|12|Blossom|443|2549|66498|1928.7|0|4372|298|7.577772|
+|12|Combined|427|2533|70391|2564.55|0|7995|288|7.604837|
+|12|Postman|184|2290|95652|16775.94|0|11651|305|7.55329|
+|12|Topology|1090|3196|67322|1042.69|97|11485|308|7.55414|
+
+All 12 strict equality FAIL (nonzero RGBA differences), `VISUAL_REVIEW_REQUIRED`; assistant overview of actual full-color contact sheets at reduced scale shows recognizable overall geometry for all variants, not proof of fine-detail equality. R6 Blossom closest to same-R A29 by full RGBA delta among tested arms; R12 tangent closest by RGBA delta. R12 Blossom 443 strokes (-61.94% vs A27), +5.56% logical length, only 82 additional vertices; combined 427 (-63.32%) but greater changes; postman 184 (-84.19%) but +48.39% length and +29236 vertices due to retracing. Topology adaptation underperforms accepted A29 on stroke count and creates 71/97 short paths; retain negative result. No adaptive radius; no claim actual neural vectorizer was implemented. User visual review PENDING; exact game CHALK, live E4, E5 NOT_RUN; A27/A28.6/A29 DEC-067/068 preserved. No production promotion. General [CI46070708834](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708834) 4/5 mandatory jobs PASS; Application integration FAIL at unchanged legacy A28 `test_fill001_worker_is_the_only_launcher` (0 != 1), not repaired outside scope. [Markdown CI46070708691](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708691) PASS on code SHA.
+
 ## ENGINE-001 S5 A29 — contour endpoint graph experiment (2026-11-28)
 
 **E0 preregistration after read-only geometric feasibility inspection.** User requests another attempt to reduce contour stroke count. Freeze DEC-067 A28.6 and actual A27 Joined native artifact 15069251714 / CI45704720111 / SHA f33791afe82dee25d88c8fc0aef521b27c550861, archive SHA256 a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583, full plan SHA256 08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8. Stage1 1164 width1 strokes, 66416 vertices; full 3270/72128. Use actual archived plans, eight contiguous color blocks, unchanged tail (2106 strokes), source geometry and native renderer. No production/live changes.

@@ -4,7 +4,8 @@
 - [x] User visually accepts native R6 and R12 ([DEC-068](DECISIONS.md#dec-068-s5-a29-r6-and-r12-visual-acceptance-2026-11-28)); R12 hair artifacts noncritical. Frozen A28.6 and native A29 artifacts retained; no live/production promotion.
 - [x] Read-only literature search for next contour optimization options; [review](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a29--contour-endpoint-graph-experiment-2026-11-28).
 - [x] User authorizes all A30 research except adaptive radius. [Preregistered six fixed-R6/R12 arms](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a30--contour-routing-method-comparison-2026-11-28); local E2 and complete geometric plans PASS.
-- [ ] A30 native Egret matrix and visual review; record positive and negative outcomes.
+- [x] A30 native Egret matrix (12 candidate pairs): [CI46070708715](https://github.com/Kiddos19882/AutoDraw/actions/runs/46070708715) 3/3 PASS; archived and independently audited; positive and negative outcomes in [A30 results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a30--contour-routing-method-comparison-2026-11-28).
+- [ ] A30 user visual review (R6/R12 all six methods); strict equality FAIL, no candidate promoted. Compare Blossom, combined and postman trade-offs; E4/E5/exact CHALK NOT_RUN.
 
 **ENGINE-001 S5 FIRST NEXT A28.7:** [P1 live replay experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a287--p1-live-replay-2026-11-27).
 - [x] Apply research-only P1 timing to A28 using unchanged shared Stage6 and frozen A27.
