@@ -1,0 +1,483 @@
+{
+  "schema": "ENGINE001_S5_A28_LIVE_V1",
+  "run_id": "a28-850535ab4f04442e8bab26a8e4e5b1ac",
+  "started": "2026-11-26T20:24:50.458093+00:00",
+  "baseline_sha": "f33791afe82dee25d88c8fc0aef521b27c550861",
+  "baseline_run": "45704720111",
+  "archive_sha256": "a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583",
+  "runner_sha256": "f18699c85a480ca34359e39da1c4791e25828bc549274901f20c80fb3ee3db8e",
+  "plan_sha256": "08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8",
+  "mode": "normal",
+  "smooth": false,
+  "planned_strokes": 3270,
+  "planned_vertices": 72128,
+  "point_hold_seconds": 0.06,
+  "points_per_batch": 8,
+  "status": "BLOCKED",
+  "exact_CHALK": null,
+  "evidence_level": "E4_PENDING",
+  "completed_strokes": 0,
+  "startup": "FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
+  "bridge_session_id": "80d3ef58-1bca-44b1-a214-d606911ed72a",
+  "reason": "Blocked: Missing/ambiguous fully visible game canvas",
+  "failure_snapshot": {
+    "active": false,
+    "blank": [
+      [
+        1,
+        0,
+        16777215
+      ]
+    ],
+    "colorRgb": 1776411,
+    "discovery": {
+      "candidateCount": 2,
+      "candidates": [
+        {
+          "constructorMatch": true,
+          "controls": true,
+          "eligible": true,
+          "height": 240,
+          "monitorOwned": true,
+          "onStage": true,
+          "structural": true,
+          "visible": true,
+          "width": 460
+        },
+        {
+          "constructorMatch": true,
+          "controls": true,
+          "eligible": true,
+          "height": 240,
+          "monitorOwned": false,
+          "onStage": true,
+          "structural": true,
+          "visible": true,
+          "width": 460
+        }
+      ],
+      "candidatesTruncated": false,
+      "constructorAvailable": true,
+      "constructorMatches": 2,
+      "eligibleCount": 2,
+      "monitorOwnedCount": 1,
+      "structuralMatches": 2,
+      "visited": 2775
+    },
+    "empty": true,
+    "geometry": {
+      "boardDetected": true,
+      "boardDisplayChain": [
+        {
+          "className": "o",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 320.7916660308838,
+            "ty": 72
+          },
+          "height": 240,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": {
+            "height": 240,
+            "width": 460,
+            "x": 0,
+            "y": 0
+          },
+          "width": 460,
+          "x": 30,
+          "y": 75
+        },
+        {
+          "className": "o",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 290.7916660308838,
+            "ty": -3
+          },
+          "height": 379,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 676,
+          "x": 290.7916660308838,
+          "y": -3
+        },
+        {
+          "className": "i",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 603,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 1274,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "className": "Preloader",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 737.9490000000001,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": {
+            "height": 600,
+            "width": 1274,
+            "x": 0,
+            "y": 0
+          },
+          "width": 2830.0809053156145,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "className": "i",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 737.9490000000001,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 2830.0809053156145,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "boardLabel": "o",
+      "boardLogicalSize": {
+        "height": 240,
+        "width": 460
+      },
+      "canvasRenderer": "n",
+      "canvasScaleFactor": 2,
+      "canvasScaleX": 4,
+      "canvasScaleY": 4,
+      "devicePixelRatio": 1,
+      "engineVersion": "5.4.1",
+      "inspectionMode": "read_only",
+      "playerCount": 1,
+      "players": [
+        {
+          "boardClientCorners": {
+            "bottomLeft": {
+              "x": 483.4536882098092,
+              "y": 470.62
+            },
+            "bottomRight": {
+              "x": 1176.703295745131,
+              "y": 470.62
+            },
+            "topLeft": {
+              "x": 483.4536882098092,
+              "y": 108.22
+            },
+            "topRight": {
+              "x": 1176.703295745131,
+              "y": 108.22
+            }
+          },
+          "boardClientMappingMethod": "validated_axis_aligned_rect",
+          "boardDisplayChain": [
+            {
+              "className": "o",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              },
+              "height": 240,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": {
+                "height": 240,
+                "width": 460,
+                "x": 0,
+                "y": 0
+              },
+              "width": 460,
+              "x": 30,
+              "y": 75
+            },
+            {
+              "className": "o",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 290.7916660308838,
+                "ty": -3
+              },
+              "height": 379,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 676,
+              "x": 290.7916660308838,
+              "y": -3
+            },
+            {
+              "className": "i",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 603,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 1274,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "className": "Preloader",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 737.9490000000001,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": {
+                "height": 600,
+                "width": 1274,
+                "x": 0,
+                "y": 0
+              },
+              "width": 2830.0809053156145,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "className": "i",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 737.9490000000001,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 2830.0809053156145,
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "boardMask": {
+            "className": "i",
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            },
+            "height": 240,
+            "width": 460,
+            "x": 30,
+            "y": 75
+          },
+          "boardStageCorners": {
+            "bottomLeft": {
+              "x": 320.7916660308838,
+              "y": 312
+            },
+            "bottomRight": {
+              "x": 780.7916660308838,
+              "y": 312
+            },
+            "topLeft": {
+              "x": 320.7916660308838,
+              "y": 72
+            },
+            "topRight": {
+              "x": 780.7916660308838,
+              "y": 72
+            }
+          },
+          "canvas": {
+            "clientHeight": 2400,
+            "clientWidth": 5096,
+            "height": 2400,
+            "offsetLeft": 0,
+            "offsetTop": -1,
+            "rect": {
+              "bottom": 905.5,
+              "height": 906,
+              "left": 0,
+              "right": 1920,
+              "top": -0.5,
+              "width": 1920
+            },
+            "screenQuad": null,
+            "style": {
+              "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+              "computedTransformOrigin": "0px 0px",
+              "height": "",
+              "left": "0px",
+              "top": "-0.5px",
+              "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+              "transformOrigin": "0% 0% 0px",
+              "width": ""
+            },
+            "width": 5096
+          },
+          "containerRect": {
+            "bottom": 905,
+            "height": 905,
+            "left": 0,
+            "right": 1920,
+            "top": 0,
+            "width": 1920
+          },
+          "playerFound": true,
+          "playerMatchesStage": true,
+          "playerOptions": {
+            "contentHeight": 600,
+            "contentWidth": 740,
+            "frameRate": 30,
+            "renderModeOption": null,
+            "scaleMode": "fixedHeight"
+          },
+          "stage": {
+            "frameRate": 30,
+            "height": 600,
+            "orientation": "auto",
+            "scaleMode": "fixedHeight",
+            "width": 1274
+          }
+        }
+      ],
+      "renderMode": "webgl",
+      "runtimeType": "web",
+      "systemRenderer": "n",
+      "visualViewportScale": 1,
+      "windowGeometry": {
+        "availableScreenHeight": 1032,
+        "availableScreenWidth": 1920,
+        "innerHeight": 905,
+        "innerWidth": 1920,
+        "outerHeight": 1056,
+        "outerWidth": 1936,
+        "screenHeight": 1080,
+        "screenWidth": 1920,
+        "screenX": -8,
+        "screenY": -8
+      }
+    },
+    "slot": 1,
+    "smooth": false,
+    "snapshot": {
+      "currentRadius": 30,
+      "isExact": true,
+      "logicalHeight": 240,
+      "logicalWidth": 460,
+      "maxPoints": 6000,
+      "pointCount": 1,
+      "radius": [
+        0,
+        30
+      ],
+      "remainingPoints": 5999,
+      "scaleX": 1,
+      "scaleY": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "validationStatus": "valid"
+    },
+    "viewport": {
+      "height": 905,
+      "width": 1920
+    },
+    "width": 30,
+    "witness": null
+  },
+  "failure_capture_error": "Blocked",
+  "board_discovery": {
+    "candidateCount": 2,
+    "candidates": [
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": true,
+        "height": 240,
+        "monitorOwned": true,
+        "onStage": true,
+        "structural": true,
+        "visible": true,
+        "width": 460
+      },
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": true,
+        "height": 240,
+        "monitorOwned": false,
+        "onStage": true,
+        "structural": true,
+        "visible": true,
+        "width": 460
+      }
+    ],
+    "candidatesTruncated": false,
+    "constructorAvailable": true,
+    "constructorMatches": 2,
+    "eligibleCount": 2,
+    "monitorOwnedCount": 1,
+    "structuralMatches": 2,
+    "visited": 2775
+  },
+  "finished": "2026-11-26T20:24:50.561185+00:00"
+}

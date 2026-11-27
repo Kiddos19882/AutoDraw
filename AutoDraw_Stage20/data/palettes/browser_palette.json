@@ -1,17 +1,45 @@
 {
   "schema_version": 1,
-  "created_at": "2026-10-26T23:35:36+00:00",
+  "created_at": "2026-11-27T16:55:32+00:00",
   "screen": {
     "width": 1920,
     "height": 1080
   },
   "region": {
-    "x": 480,
-    "y": 755,
-    "width": 940,
-    "height": 113
+    "x": 465,
+    "y": 743,
+    "width": 969,
+    "height": 123
   },
   "colors": [
+    {
+      "name": "Цвет 1",
+      "hex": "#FD0100",
+      "rgb": [
+        253,
+        1,
+        0
+      ],
+      "screen_x": 482,
+      "screen_y": 763,
+      "local_x": 17,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 2",
+      "hex": "#FEFD04",
+      "rgb": [
+        254,
+        253,
+        4
+      ],
+      "screen_x": 512,
+      "screen_y": 763,
+      "local_x": 47,
+      "local_y": 20,
+      "source": "auto"
+    },
     {
       "name": "Цвет 3",
       "hex": "#00FE01",
@@ -20,10 +48,10 @@
         254,
         1
       ],
-      "screen_x": 555,
-      "screen_y": 771,
-      "local_x": 75,
-      "local_y": 16,
+      "screen_x": 542,
+      "screen_y": 763,
+      "local_x": 77,
+      "local_y": 20,
       "source": "auto"
     },
     {
@@ -34,10 +62,10 @@
         254,
         254
       ],
-      "screen_x": 584,
-      "screen_y": 771,
-      "local_x": 104,
-      "local_y": 16,
+      "screen_x": 572,
+      "screen_y": 763,
+      "local_x": 107,
+      "local_y": 20,
       "source": "auto"
     },
     {
@@ -48,10 +76,10 @@
         3,
         251
       ],
-      "screen_x": 613,
-      "screen_y": 771,
-      "local_x": 133,
-      "local_y": 16,
+      "screen_x": 602,
+      "screen_y": 763,
+      "local_x": 137,
+      "local_y": 20,
       "source": "auto"
     },
     {
@@ -62,10 +90,10 @@
         0,
         255
       ],
-      "screen_x": 642,
-      "screen_y": 771,
-      "local_x": 162,
-      "local_y": 16,
+      "screen_x": 633,
+      "screen_y": 763,
+      "local_x": 168,
+      "local_y": 20,
       "source": "auto"
     },
     {
@@ -77,9 +105,23 @@
         19
       ],
       "screen_x": 964,
-      "screen_y": 771,
-      "local_x": 484,
-      "local_y": 16,
+      "screen_y": 763,
+      "local_x": 499,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 8",
+      "hex": "#EE5F00",
+      "rgb": [
+        238,
+        95,
+        0
+      ],
+      "screen_x": 994,
+      "screen_y": 763,
+      "local_x": 529,
+      "local_y": 20,
       "source": "auto"
     },
     {
@@ -90,10 +132,150 @@
         151,
         1
       ],
-      "screen_x": 1022,
-      "screen_y": 771,
-      "local_x": 542,
-      "local_y": 16,
+      "screen_x": 1024,
+      "screen_y": 763,
+      "local_x": 559,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 10",
+      "hex": "#FFF100",
+      "rgb": [
+        255,
+        241,
+        0
+      ],
+      "screen_x": 1054,
+      "screen_y": 763,
+      "local_x": 589,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 11",
+      "hex": "#90C421",
+      "rgb": [
+        144,
+        196,
+        33
+      ],
+      "screen_x": 1085,
+      "screen_y": 763,
+      "local_x": 620,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 12",
+      "hex": "#23AC3A",
+      "rgb": [
+        35,
+        172,
+        58
+      ],
+      "screen_x": 1115,
+      "screen_y": 763,
+      "local_x": 650,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 13",
+      "hex": "#009846",
+      "rgb": [
+        0,
+        152,
+        70
+      ],
+      "screen_x": 1145,
+      "screen_y": 763,
+      "local_x": 680,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 14",
+      "hex": "#009E99",
+      "rgb": [
+        0,
+        158,
+        153
+      ],
+      "screen_x": 1175,
+      "screen_y": 763,
+      "local_x": 710,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 15",
+      "hex": "#00A1E9",
+      "rgb": [
+        0,
+        161,
+        233
+      ],
+      "screen_x": 1205,
+      "screen_y": 763,
+      "local_x": 740,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 16",
+      "hex": "#0167B7",
+      "rgb": [
+        1,
+        103,
+        183
+      ],
+      "screen_x": 1235,
+      "screen_y": 763,
+      "local_x": 770,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 17",
+      "hex": "#01479D",
+      "rgb": [
+        1,
+        71,
+        157
+      ],
+      "screen_x": 1266,
+      "screen_y": 763,
+      "local_x": 801,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 18",
+      "hex": "#1D2089",
+      "rgb": [
+        29,
+        32,
+        137
+      ],
+      "screen_x": 1296,
+      "screen_y": 763,
+      "local_x": 831,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 19",
+      "hex": "#601886",
+      "rgb": [
+        96,
+        24,
+        134
+      ],
+      "screen_x": 1326,
+      "screen_y": 763,
+      "local_x": 861,
+      "local_y": 20,
       "source": "auto"
     },
     {
@@ -104,10 +286,38 @@
         7,
         132
       ],
-      "screen_x": 1343,
-      "screen_y": 771,
-      "local_x": 863,
-      "local_y": 16,
+      "screen_x": 1356,
+      "screen_y": 763,
+      "local_x": 891,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 21",
+      "hex": "#E2007E",
+      "rgb": [
+        226,
+        0,
+        126
+      ],
+      "screen_x": 1386,
+      "screen_y": 763,
+      "local_x": 921,
+      "local_y": 20,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 22",
+      "hex": "#E40215",
+      "rgb": [
+        228,
+        2,
+        21
+      ],
+      "screen_x": 482,
+      "screen_y": 790,
+      "local_x": 17,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -118,10 +328,10 @@
         243,
         0
       ],
-      "screen_x": 525,
-      "screen_y": 798,
-      "local_x": 45,
-      "local_y": 43,
+      "screen_x": 512,
+      "screen_y": 790,
+      "local_x": 47,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -132,10 +342,24 @@
         150,
         73
       ],
-      "screen_x": 555,
-      "screen_y": 798,
-      "local_x": 75,
-      "local_y": 43,
+      "screen_x": 542,
+      "screen_y": 790,
+      "local_x": 77,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 25",
+      "hex": "#00A2E6",
+      "rgb": [
+        0,
+        162,
+        230
+      ],
+      "screen_x": 572,
+      "screen_y": 790,
+      "local_x": 107,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -146,10 +370,10 @@
         32,
         134
       ],
-      "screen_x": 613,
-      "screen_y": 798,
-      "local_x": 133,
-      "local_y": 43,
+      "screen_x": 602,
+      "screen_y": 790,
+      "local_x": 137,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -160,10 +384,38 @@
         0,
         133
       ],
-      "screen_x": 642,
-      "screen_y": 798,
-      "local_x": 162,
-      "local_y": 43,
+      "screen_x": 632,
+      "screen_y": 790,
+      "local_x": 167,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 28",
+      "hex": "#A40001",
+      "rgb": [
+        164,
+        0,
+        1
+      ],
+      "screen_x": 964,
+      "screen_y": 790,
+      "local_x": 499,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 29",
+      "hex": "#A94200",
+      "rgb": [
+        169,
+        66,
+        0
+      ],
+      "screen_x": 994,
+      "screen_y": 790,
+      "local_x": 529,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -174,10 +426,10 @@
         106,
         1
       ],
-      "screen_x": 1022,
-      "screen_y": 798,
-      "local_x": 542,
-      "local_y": 43,
+      "screen_x": 1024,
+      "screen_y": 790,
+      "local_x": 559,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -188,10 +440,10 @@
         171,
         1
       ],
-      "screen_x": 1051,
-      "screen_y": 798,
-      "local_x": 571,
-      "local_y": 43,
+      "screen_x": 1054,
+      "screen_y": 790,
+      "local_x": 589,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -202,10 +454,38 @@
         140,
         12
       ],
-      "screen_x": 1080,
-      "screen_y": 798,
-      "local_x": 600,
-      "local_y": 43,
+      "screen_x": 1084,
+      "screen_y": 790,
+      "local_x": 619,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 33",
+      "hex": "#087C29",
+      "rgb": [
+        8,
+        124,
+        41
+      ],
+      "screen_x": 1115,
+      "screen_y": 790,
+      "local_x": 650,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 34",
+      "hex": "#007131",
+      "rgb": [
+        0,
+        113,
+        49
+      ],
+      "screen_x": 1145,
+      "screen_y": 790,
+      "local_x": 680,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -216,10 +496,94 @@
         115,
         110
       ],
-      "screen_x": 1168,
-      "screen_y": 798,
-      "local_x": 688,
-      "local_y": 43,
+      "screen_x": 1175,
+      "screen_y": 790,
+      "local_x": 710,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 36",
+      "hex": "#0174AA",
+      "rgb": [
+        1,
+        116,
+        170
+      ],
+      "screen_x": 1205,
+      "screen_y": 790,
+      "local_x": 740,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 37",
+      "hex": "#014A8A",
+      "rgb": [
+        1,
+        74,
+        138
+      ],
+      "screen_x": 1235,
+      "screen_y": 790,
+      "local_x": 770,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 38",
+      "hex": "#012E72",
+      "rgb": [
+        1,
+        46,
+        114
+      ],
+      "screen_x": 1266,
+      "screen_y": 790,
+      "local_x": 801,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 39",
+      "hex": "#100966",
+      "rgb": [
+        16,
+        9,
+        102
+      ],
+      "screen_x": 1296,
+      "screen_y": 790,
+      "local_x": 831,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 40",
+      "hex": "#440063",
+      "rgb": [
+        68,
+        0,
+        99
+      ],
+      "screen_x": 1326,
+      "screen_y": 790,
+      "local_x": 861,
+      "local_y": 47,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 41",
+      "hex": "#6A0261",
+      "rgb": [
+        106,
+        2,
+        97
+      ],
+      "screen_x": 1356,
+      "screen_y": 790,
+      "local_x": 891,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -230,10 +594,10 @@
         1,
         91
       ],
-      "screen_x": 1373,
-      "screen_y": 798,
-      "local_x": 893,
-      "local_y": 43,
+      "screen_x": 1386,
+      "screen_y": 790,
+      "local_x": 921,
+      "local_y": 47,
       "source": "auto"
     },
     {
@@ -244,10 +608,24 @@
         155,
         119
       ],
-      "screen_x": 496,
-      "screen_y": 824,
-      "local_x": 16,
-      "local_y": 69,
+      "screen_x": 482,
+      "screen_y": 817,
+      "local_x": 17,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 44",
+      "hex": "#F6B381",
+      "rgb": [
+        246,
+        179,
+        129
+      ],
+      "screen_x": 512,
+      "screen_y": 817,
+      "local_x": 47,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -258,10 +636,52 @@
         206,
         140
       ],
-      "screen_x": 555,
-      "screen_y": 824,
-      "local_x": 75,
-      "local_y": 69,
+      "screen_x": 542,
+      "screen_y": 817,
+      "local_x": 77,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 46",
+      "hex": "#FFF99B",
+      "rgb": [
+        255,
+        249,
+        155
+      ],
+      "screen_x": 572,
+      "screen_y": 817,
+      "local_x": 107,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 47",
+      "hex": "#CDE39A",
+      "rgb": [
+        205,
+        227,
+        154
+      ],
+      "screen_x": 602,
+      "screen_y": 817,
+      "local_x": 137,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 48",
+      "hex": "#ADD599",
+      "rgb": [
+        173,
+        213,
+        153
+      ],
+      "screen_x": 632,
+      "screen_y": 817,
+      "local_x": 167,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -272,10 +692,80 @@
         199,
         152
       ],
-      "screen_x": 671,
-      "screen_y": 824,
-      "local_x": 191,
-      "local_y": 69,
+      "screen_x": 662,
+      "screen_y": 817,
+      "local_x": 197,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 50",
+      "hex": "#85CBCB",
+      "rgb": [
+        133,
+        203,
+        203
+      ],
+      "screen_x": 693,
+      "screen_y": 817,
+      "local_x": 228,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 51",
+      "hex": "#7FCEF5",
+      "rgb": [
+        127,
+        206,
+        245
+      ],
+      "screen_x": 723,
+      "screen_y": 817,
+      "local_x": 258,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 52",
+      "hex": "#89ABDB",
+      "rgb": [
+        137,
+        171,
+        219
+      ],
+      "screen_x": 753,
+      "screen_y": 817,
+      "local_x": 288,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 53",
+      "hex": "#8D97CC",
+      "rgb": [
+        141,
+        151,
+        204
+      ],
+      "screen_x": 783,
+      "screen_y": 817,
+      "local_x": 318,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 54",
+      "hex": "#9082BD",
+      "rgb": [
+        144,
+        130,
+        189
+      ],
+      "screen_x": 813,
+      "screen_y": 817,
+      "local_x": 348,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -286,10 +776,66 @@
         137,
         190
       ],
-      "screen_x": 847,
-      "screen_y": 824,
-      "local_x": 367,
-      "local_y": 69,
+      "screen_x": 843,
+      "screen_y": 817,
+      "local_x": 378,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 56",
+      "hex": "#C58FC0",
+      "rgb": [
+        197,
+        143,
+        192
+      ],
+      "screen_x": 873,
+      "screen_y": 817,
+      "local_x": 408,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 57",
+      "hex": "#F29EC2",
+      "rgb": [
+        242,
+        158,
+        194
+      ],
+      "screen_x": 903,
+      "screen_y": 817,
+      "local_x": 438,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 58",
+      "hex": "#F29C9F",
+      "rgb": [
+        242,
+        156,
+        159
+      ],
+      "screen_x": 934,
+      "screen_y": 817,
+      "local_x": 469,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 59",
+      "hex": "#7E0001",
+      "rgb": [
+        126,
+        0,
+        1
+      ],
+      "screen_x": 964,
+      "screen_y": 817,
+      "local_x": 499,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -300,10 +846,52 @@
         45,
         1
       ],
-      "screen_x": 993,
-      "screen_y": 824,
-      "local_x": 513,
-      "local_y": 69,
+      "screen_x": 994,
+      "screen_y": 817,
+      "local_x": 529,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 61",
+      "hex": "#834E00",
+      "rgb": [
+        131,
+        78,
+        0
+      ],
+      "screen_x": 1024,
+      "screen_y": 817,
+      "local_x": 559,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 62",
+      "hex": "#888001",
+      "rgb": [
+        136,
+        128,
+        1
+      ],
+      "screen_x": 1054,
+      "screen_y": 817,
+      "local_x": 589,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 63",
+      "hex": "#496A01",
+      "rgb": [
+        73,
+        106,
+        1
+      ],
+      "screen_x": 1084,
+      "screen_y": 817,
+      "local_x": 619,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -314,10 +902,52 @@
         94,
         23
       ],
-      "screen_x": 1110,
-      "screen_y": 824,
-      "local_x": 630,
-      "local_y": 69,
+      "screen_x": 1115,
+      "screen_y": 817,
+      "local_x": 650,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 65",
+      "hex": "#01561F",
+      "rgb": [
+        1,
+        86,
+        31
+      ],
+      "screen_x": 1145,
+      "screen_y": 817,
+      "local_x": 680,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 66",
+      "hex": "#015852",
+      "rgb": [
+        1,
+        88,
+        82
+      ],
+      "screen_x": 1175,
+      "screen_y": 817,
+      "local_x": 710,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 67",
+      "hex": "#005983",
+      "rgb": [
+        0,
+        89,
+        131
+      ],
+      "screen_x": 1205,
+      "screen_y": 817,
+      "local_x": 740,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -328,10 +958,52 @@
         53,
         103
       ],
-      "screen_x": 1227,
-      "screen_y": 824,
-      "local_x": 747,
-      "local_y": 69,
+      "screen_x": 1235,
+      "screen_y": 817,
+      "local_x": 770,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 69",
+      "hex": "#001D59",
+      "rgb": [
+        0,
+        29,
+        89
+      ],
+      "screen_x": 1265,
+      "screen_y": 817,
+      "local_x": 800,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 70",
+      "hex": "#04004D",
+      "rgb": [
+        4,
+        0,
+        77
+      ],
+      "screen_x": 1296,
+      "screen_y": 817,
+      "local_x": 831,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 71",
+      "hex": "#32004A",
+      "rgb": [
+        50,
+        0,
+        74
+      ],
+      "screen_x": 1326,
+      "screen_y": 817,
+      "local_x": 861,
+      "local_y": 74,
       "source": "auto"
     },
     {
@@ -342,10 +1014,94 @@
         0,
         71
       ],
-      "screen_x": 1344,
-      "screen_y": 824,
-      "local_x": 864,
-      "local_y": 69,
+      "screen_x": 1356,
+      "screen_y": 817,
+      "local_x": 891,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 73",
+      "hex": "#7F0043",
+      "rgb": [
+        127,
+        0,
+        67
+      ],
+      "screen_x": 1386,
+      "screen_y": 817,
+      "local_x": 921,
+      "local_y": 74,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 74",
+      "hex": "#EE6742",
+      "rgb": [
+        238,
+        103,
+        66
+      ],
+      "screen_x": 482,
+      "screen_y": 844,
+      "local_x": 17,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 75",
+      "hex": "#F3914A",
+      "rgb": [
+        243,
+        145,
+        74
+      ],
+      "screen_x": 512,
+      "screen_y": 844,
+      "local_x": 47,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 76",
+      "hex": "#F7B652",
+      "rgb": [
+        247,
+        182,
+        82
+      ],
+      "screen_x": 542,
+      "screen_y": 844,
+      "local_x": 77,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 77",
+      "hex": "#FEF45C",
+      "rgb": [
+        254,
+        244,
+        92
+      ],
+      "screen_x": 572,
+      "screen_y": 844,
+      "local_x": 107,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 78",
+      "hex": "#B5D269",
+      "rgb": [
+        181,
+        210,
+        105
+      ],
+      "screen_x": 602,
+      "screen_y": 844,
+      "local_x": 137,
+      "local_y": 101,
       "source": "auto"
     },
     {
@@ -356,10 +1112,24 @@
         196,
         102
       ],
-      "screen_x": 642,
-      "screen_y": 850,
-      "local_x": 162,
-      "local_y": 95,
+      "screen_x": 632,
+      "screen_y": 844,
+      "local_x": 167,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 80",
+      "hex": "#32B16C",
+      "rgb": [
+        50,
+        177,
+        108
+      ],
+      "screen_x": 663,
+      "screen_y": 844,
+      "local_x": 198,
+      "local_y": 101,
       "source": "auto"
     },
     {
@@ -370,10 +1140,10 @@
         179,
         172
       ],
-      "screen_x": 701,
-      "screen_y": 850,
-      "local_x": 221,
-      "local_y": 95,
+      "screen_x": 693,
+      "screen_y": 844,
+      "local_x": 228,
+      "local_y": 101,
       "source": "auto"
     },
     {
@@ -384,10 +1154,24 @@
         183,
         240
       ],
-      "screen_x": 730,
-      "screen_y": 850,
-      "local_x": 250,
-      "local_y": 95,
+      "screen_x": 723,
+      "screen_y": 844,
+      "local_x": 258,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 83",
+      "hex": "#458ACB",
+      "rgb": [
+        69,
+        138,
+        203
+      ],
+      "screen_x": 753,
+      "screen_y": 844,
+      "local_x": 288,
+      "local_y": 101,
       "source": "auto"
     },
     {
@@ -398,24 +1182,234 @@
         110,
         182
       ],
-      "screen_x": 788,
-      "screen_y": 850,
-      "local_x": 308,
-      "local_y": 95,
+      "screen_x": 783,
+      "screen_y": 844,
+      "local_x": 318,
+      "local_y": 101,
       "source": "auto"
     },
     {
-      "name": "Цвет 96",
+      "name": "Цвет 85",
+      "hex": "#5F52A1",
+      "rgb": [
+        95,
+        82,
+        161
+      ],
+      "screen_x": 813,
+      "screen_y": 844,
+      "local_x": 348,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 86",
+      "hex": "#8A57A2",
+      "rgb": [
+        138,
+        87,
+        162
+      ],
+      "screen_x": 843,
+      "screen_y": 844,
+      "local_x": 378,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 87",
+      "hex": "#AE5DA2",
+      "rgb": [
+        174,
+        93,
+        162
+      ],
+      "screen_x": 873,
+      "screen_y": 844,
+      "local_x": 408,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 88",
+      "hex": "#EC68A4",
+      "rgb": [
+        236,
+        104,
+        164
+      ],
+      "screen_x": 904,
+      "screen_y": 844,
+      "local_x": 439,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 89",
+      "hex": "#EC6876",
+      "rgb": [
+        236,
+        104,
+        118
+      ],
+      "screen_x": 934,
+      "screen_y": 844,
+      "local_x": 469,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 90",
+      "hex": "#D1C0A6",
+      "rgb": [
+        209,
+        192,
+        166
+      ],
+      "screen_x": 964,
+      "screen_y": 844,
+      "local_x": 499,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 91",
       "hex": "#A7927D",
       "rgb": [
         167,
         146,
         125
       ],
-      "screen_x": 993,
-      "screen_y": 851,
-      "local_x": 513,
-      "local_y": 96,
+      "screen_x": 994,
+      "screen_y": 844,
+      "local_x": 529,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 92",
+      "hex": "#D0A972",
+      "rgb": [
+        208,
+        169,
+        114
+      ],
+      "screen_x": 1114,
+      "screen_y": 844,
+      "local_x": 649,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 93",
+      "hex": "#B38851",
+      "rgb": [
+        179,
+        136,
+        81
+      ],
+      "screen_x": 1145,
+      "screen_y": 844,
+      "local_x": 680,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 94",
+      "hex": "#996C33",
+      "rgb": [
+        153,
+        108,
+        51
+      ],
+      "screen_x": 1175,
+      "screen_y": 844,
+      "local_x": 710,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 95",
+      "hex": "#83511E",
+      "rgb": [
+        131,
+        81,
+        30
+      ],
+      "screen_x": 1205,
+      "screen_y": 844,
+      "local_x": 740,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 96",
+      "hex": "#6A3906",
+      "rgb": [
+        106,
+        57,
+        6
+      ],
+      "screen_x": 1235,
+      "screen_y": 844,
+      "local_x": 770,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 97",
+      "hex": "#FCD2BC",
+      "rgb": [
+        252,
+        210,
+        188
+      ],
+      "screen_x": 1265,
+      "screen_y": 844,
+      "local_x": 800,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 98",
+      "hex": "#F8CCC3",
+      "rgb": [
+        248,
+        204,
+        195
+      ],
+      "screen_x": 1295,
+      "screen_y": 844,
+      "local_x": 830,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 99",
+      "hex": "#EDC6D8",
+      "rgb": [
+        237,
+        198,
+        216
+      ],
+      "screen_x": 1326,
+      "screen_y": 844,
+      "local_x": 861,
+      "local_y": 101,
+      "source": "auto"
+    },
+    {
+      "name": "Цвет 100",
+      "hex": "#FDAEAA",
+      "rgb": [
+        253,
+        174,
+        170
+      ],
+      "screen_x": 1356,
+      "screen_y": 844,
+      "local_x": 891,
+      "local_y": 101,
       "source": "auto"
     },
     {
@@ -426,296 +1420,394 @@
         192,
         175
       ],
-      "screen_x": 1373,
-      "screen_y": 851,
-      "local_x": 893,
-      "local_y": 96,
+      "screen_x": 1386,
+      "screen_y": 844,
+      "local_x": 921,
+      "local_y": 101,
       "source": "auto"
     },
     {
       "name": "Цвет 102",
-      "hex": "#FFFFFF",
+      "hex": "#E40150",
       "rgb": [
-        255,
-        255,
-        255
+        228,
+        1,
+        80
       ],
-      "screen_x": 670,
-      "screen_y": 770,
-      "local_x": 190,
-      "local_y": 15,
+      "screen_x": 1414,
+      "screen_y": 763,
+      "local_x": 949,
+      "local_y": 20,
       "source": "manual"
     },
     {
       "name": "Цвет 103",
+      "hex": "#A60236",
+      "rgb": [
+        166,
+        2,
+        54
+      ],
+      "screen_x": 1416,
+      "screen_y": 789,
+      "local_x": 951,
+      "local_y": 46,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 104",
+      "hex": "#A40035",
+      "rgb": [
+        164,
+        0,
+        53
+      ],
+      "screen_x": 1416,
+      "screen_y": 816,
+      "local_x": 951,
+      "local_y": 73,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 105",
+      "hex": "#FDB692",
+      "rgb": [
+        253,
+        182,
+        146
+      ],
+      "screen_x": 1416,
+      "screen_y": 843,
+      "local_x": 951,
+      "local_y": 100,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 106",
+      "hex": "#362E2B",
+      "rgb": [
+        54,
+        46,
+        43
+      ],
+      "screen_x": 1084,
+      "screen_y": 845,
+      "local_x": 619,
+      "local_y": 102,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 107",
+      "hex": "#5A4941",
+      "rgb": [
+        90,
+        73,
+        65
+      ],
+      "screen_x": 1054,
+      "screen_y": 844,
+      "local_x": 589,
+      "local_y": 101,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 108",
+      "hex": "#7E6B5C",
+      "rgb": [
+        126,
+        107,
+        92
+      ],
+      "screen_x": 1023,
+      "screen_y": 844,
+      "local_x": 558,
+      "local_y": 101,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 109",
       "hex": "#1B1B1B",
       "rgb": [
         27,
         27,
         27
       ],
-      "screen_x": 937,
-      "screen_y": 801,
-      "local_x": 457,
+      "screen_x": 932,
+      "screen_y": 791,
+      "local_x": 467,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 110",
+      "hex": "#9F9F9F",
+      "rgb": [
+        159,
+        159,
+        159
+      ],
+      "screen_x": 933,
+      "screen_y": 764,
+      "local_x": 468,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 111",
+      "hex": "#ABABAB",
+      "rgb": [
+        171,
+        171,
+        171
+      ],
+      "screen_x": 904,
+      "screen_y": 764,
+      "local_x": 439,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 112",
+      "hex": "#313131",
+      "rgb": [
+        49,
+        49,
+        49
+      ],
+      "screen_x": 905,
+      "screen_y": 791,
+      "local_x": 440,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 113",
+      "hex": "#424242",
+      "rgb": [
+        66,
+        66,
+        66
+      ],
+      "screen_x": 872,
+      "screen_y": 791,
+      "local_x": 407,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 114",
+      "hex": "#B4B4B4",
+      "rgb": [
+        180,
+        180,
+        180
+      ],
+      "screen_x": 874,
+      "screen_y": 764,
+      "local_x": 409,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 115",
+      "hex": "#BEBEBE",
+      "rgb": [
+        190,
+        190,
+        190
+      ],
+      "screen_x": 844,
+      "screen_y": 764,
+      "local_x": 379,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 116",
+      "hex": "#525252",
+      "rgb": [
+        82,
+        82,
+        82
+      ],
+      "screen_x": 840,
+      "screen_y": 791,
+      "local_x": 375,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 117",
+      "hex": "#535353",
+      "rgb": [
+        83,
+        83,
+        83
+      ],
+      "screen_x": 810,
+      "screen_y": 791,
+      "local_x": 345,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 118",
+      "hex": "#C8C8C8",
+      "rgb": [
+        200,
+        200,
+        200
+      ],
+      "screen_x": 814,
+      "screen_y": 763,
+      "local_x": 349,
+      "local_y": 20,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 119",
+      "hex": "#D3D3D3",
+      "rgb": [
+        211,
+        211,
+        211
+      ],
+      "screen_x": 783,
+      "screen_y": 764,
+      "local_x": 318,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 120",
+      "hex": "#626262",
+      "rgb": [
+        98,
+        98,
+        98
+      ],
+      "screen_x": 782,
+      "screen_y": 791,
+      "local_x": 317,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 121",
+      "hex": "#707070",
+      "rgb": [
+        112,
+        112,
+        112
+      ],
+      "screen_x": 752,
+      "screen_y": 789,
+      "local_x": 287,
       "local_y": 46,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 122",
+      "hex": "#DCDCDC",
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "screen_x": 753,
+      "screen_y": 764,
+      "local_x": 288,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 123",
+      "hex": "#E4E4E4",
+      "rgb": [
+        228,
+        228,
+        228
+      ],
+      "screen_x": 722,
+      "screen_y": 764,
+      "local_x": 257,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 124",
+      "hex": "#7C7C7C",
+      "rgb": [
+        124,
+        124,
+        124
+      ],
+      "screen_x": 725,
+      "screen_y": 791,
+      "local_x": 260,
+      "local_y": 48,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 125",
+      "hex": "#898989",
+      "rgb": [
+        137,
+        137,
+        137
+      ],
+      "screen_x": 692,
+      "screen_y": 789,
+      "local_x": 227,
+      "local_y": 46,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 126",
+      "hex": "#EEEEEE",
+      "rgb": [
+        238,
+        238,
+        238
+      ],
+      "screen_x": 691,
+      "screen_y": 764,
+      "local_x": 226,
+      "local_y": 21,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 127",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "screen_x": 661,
+      "screen_y": 767,
+      "local_x": 196,
+      "local_y": 24,
+      "source": "manual"
+    },
+    {
+      "name": "Цвет 128",
+      "hex": "#959696",
+      "rgb": [
+        149,
+        150,
+        150
+      ],
+      "screen_x": 662,
+      "screen_y": 791,
+      "local_x": 197,
+      "local_y": 48,
       "source": "manual"
     }
   ],
   "metadata": {
     "source": "desktop-screenshot",
     "method": "screenshot-assisted",
-    "captured_at": "2026-10-27T02:35:12+03:00",
-    "palette_reduction": {
-      "enabled": true,
-      "method": "CIELAB_farthest_point_seeding_plus_palette_medoid_refinement",
-      "input_color_count": 103,
-      "output_color_count": 32,
-      "target_color_count": 32,
-      "removed_color_count": 71,
-      "required_color_hexes": [
-        "#FFFFFF",
-        "#000000"
-      ],
-      "preserved_required_colors": [
-        "#FFFFFF"
-      ],
-      "missing_required_colors": [
-        "#000000"
-      ],
-      "reserved_color_hexes": [
-        "#FFFFFF"
-      ],
-      "mean_delta_e76": 9.5162,
-      "max_delta_e76": 27.1334,
-      "clusters": [
-        {
-          "representative_hex": "#00FE01",
-          "representative_name": "Цвет 3",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#01FEFE",
-          "representative_name": "Цвет 4",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#0003FB",
-          "representative_name": "Цвет 5",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#FF00FF",
-          "representative_name": "Цвет 6",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#E60213",
-          "representative_name": "Цвет 7",
-          "represented_color_count": 4,
-          "max_delta_e76": 18.0587
-        },
-        {
-          "representative_hex": "#F59701",
-          "representative_name": "Цвет 9",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#930784",
-          "representative_name": "Цвет 20",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#FBF300",
-          "representative_name": "Цвет 23",
-          "represented_color_count": 4,
-          "max_delta_e76": 20.261
-        },
-        {
-          "representative_hex": "#049649",
-          "representative_name": "Цвет 24",
-          "represented_color_count": 4,
-          "max_delta_e76": 11.4268
-        },
-        {
-          "representative_hex": "#212086",
-          "representative_name": "Цвет 26",
-          "represented_color_count": 7,
-          "max_delta_e76": 21.3689
-        },
-        {
-          "representative_hex": "#E20085",
-          "representative_name": "Цвет 27",
-          "represented_color_count": 3,
-          "max_delta_e76": 16.8268
-        },
-        {
-          "representative_hex": "#AD6A01",
-          "representative_name": "Цвет 30",
-          "represented_color_count": 4,
-          "max_delta_e76": 22.3801
-        },
-        {
-          "representative_hex": "#B7AB01",
-          "representative_name": "Цвет 31",
-          "represented_color_count": 3,
-          "max_delta_e76": 20.0109
-        },
-        {
-          "representative_hex": "#638C0C",
-          "representative_name": "Цвет 32",
-          "represented_color_count": 3,
-          "max_delta_e76": 17.3176
-        },
-        {
-          "representative_hex": "#00736E",
-          "representative_name": "Цвет 35",
-          "represented_color_count": 2,
-          "max_delta_e76": 11.2431
-        },
-        {
-          "representative_hex": "#A5015B",
-          "representative_name": "Цвет 42",
-          "represented_color_count": 2,
-          "max_delta_e76": 11.4273
-        },
-        {
-          "representative_hex": "#F39B77",
-          "representative_name": "Цвет 43",
-          "represented_color_count": 6,
-          "max_delta_e76": 22.5514
-        },
-        {
-          "representative_hex": "#F7CE8C",
-          "representative_name": "Цвет 45",
-          "represented_color_count": 3,
-          "max_delta_e76": 18.4823
-        },
-        {
-          "representative_hex": "#8CC798",
-          "representative_name": "Цвет 49",
-          "represented_color_count": 2,
-          "max_delta_e76": 11.6882
-        },
-        {
-          "representative_hex": "#AA89BE",
-          "representative_name": "Цвет 55",
-          "represented_color_count": 7,
-          "max_delta_e76": 27.1334
-        },
-        {
-          "representative_hex": "#802D01",
-          "representative_name": "Цвет 60",
-          "represented_color_count": 6,
-          "max_delta_e76": 16.534
-        },
-        {
-          "representative_hex": "#015E17",
-          "representative_name": "Цвет 64",
-          "represented_color_count": 3,
-          "max_delta_e76": 9.0701
-        },
-        {
-          "representative_hex": "#013567",
-          "representative_name": "Цвет 68",
-          "represented_color_count": 5,
-          "max_delta_e76": 18.4907
-        },
-        {
-          "representative_hex": "#500047",
-          "representative_name": "Цвет 72",
-          "represented_color_count": 3,
-          "max_delta_e76": 17.512
-        },
-        {
-          "representative_hex": "#81C466",
-          "representative_name": "Цвет 79",
-          "represented_color_count": 3,
-          "max_delta_e76": 17.765
-        },
-        {
-          "representative_hex": "#16B3AC",
-          "representative_name": "Цвет 81",
-          "represented_color_count": 3,
-          "max_delta_e76": 15.7736
-        },
-        {
-          "representative_hex": "#00B7F0",
-          "representative_name": "Цвет 82",
-          "represented_color_count": 4,
-          "max_delta_e76": 19.2989
-        },
-        {
-          "representative_hex": "#566EB6",
-          "representative_name": "Цвет 84",
-          "represented_color_count": 6,
-          "max_delta_e76": 16.7909
-        },
-        {
-          "representative_hex": "#A7927D",
-          "representative_name": "Цвет 96",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#FEC0AF",
-          "representative_name": "Цвет 101",
-          "represented_color_count": 6,
-          "max_delta_e76": 14.0842
-        },
-        {
-          "representative_hex": "#FFFFFF",
-          "representative_name": "Цвет 102",
-          "represented_color_count": 2,
-          "max_delta_e76": 20.9397
-        },
-        {
-          "representative_hex": "#1B1B1B",
-          "representative_name": "Цвет 103",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        }
-      ],
-      "selected_hex_colors": [
-        "#00FE01",
-        "#01FEFE",
-        "#0003FB",
-        "#FF00FF",
-        "#E60213",
-        "#F59701",
-        "#930784",
-        "#FBF300",
-        "#049649",
-        "#212086",
-        "#E20085",
-        "#AD6A01",
-        "#B7AB01",
-        "#638C0C",
-        "#00736E",
-        "#A5015B",
-        "#F39B77",
-        "#F7CE8C",
-        "#8CC798",
-        "#AA89BE",
-        "#802D01",
-        "#015E17",
-        "#013567",
-        "#500047",
-        "#81C466",
-        "#16B3AC",
-        "#00B7F0",
-        "#566EB6",
-        "#A7927D",
-        "#FEC0AF",
-        "#FFFFFF",
-        "#1B1B1B"
-      ],
-      "note": "Выбраны реальные образцы из исходной игровой палитры; координаты кликов и RGB сохранены без изменений. Обязательные цвета остаются в палитре, если присутствуют в источнике. ΔE76 используется для кластеризации и оценки покрытия."
-    }
+    "captured_at": "2026-11-27T19:53:47+03:00"
   }
 }

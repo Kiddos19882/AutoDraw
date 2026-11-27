@@ -1,0 +1,344 @@
+{
+  "schema_version": 2,
+  "session_id": "ce77c2a5-0fa6-4a2b-9bf9-9826fb9f921e",
+  "started_at_utc": "2026-11-26T21:58:52.035+00:00",
+  "run_idle_seconds": 2.5,
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:161.0) Gecko/20100101 Firefox/161.0",
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "monitor_status_at_connect": {
+    "version": "0.2.4",
+    "active": true,
+    "boardDetected": true,
+    "boardLabel": "o",
+    "snapshot": {
+      "logicalWidth": 460,
+      "logicalHeight": 240,
+      "scaleX": 0.5770652173913043,
+      "scaleY": 0.5770652173913043,
+      "maxPoints": 6000,
+      "remainingPoints": 2000,
+      "pointCount": 4000,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "isExact": true,
+      "validationStatus": "valid",
+      "radius": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        2,
+        2,
+        2,
+        2,
+        2,
+        5,
+        5,
+        5
+      ],
+      "currentRadius": 19
+    },
+    "eventCount": 546,
+    "droppedEvents": 0,
+    "errors": 0,
+    "inputTelemetryEnabled": true,
+    "engineFrameObserverConnected": true,
+    "engineFrameCount": 0
+  },
+  "bridge_configuration": {
+    "inputTelemetry": {
+      "requested": true,
+      "enabled": true,
+      "previous": false,
+      "changedByBridge": true,
+      "restoreStatus": "not_required"
+    }
+  },
+  "renderer_geometry": {
+    "inspectionMode": "read_only",
+    "engineVersion": "5.4.1",
+    "renderMode": "webgl",
+    "runtimeType": "web",
+    "systemRenderer": "n",
+    "canvasRenderer": "n",
+    "windowGeometry": {
+      "screenX": -8,
+      "screenY": -8,
+      "outerWidth": 1936,
+      "outerHeight": 1056,
+      "innerWidth": 1920,
+      "innerHeight": 905,
+      "screenWidth": 1920,
+      "screenHeight": 1080,
+      "availableScreenWidth": 1920,
+      "availableScreenHeight": 1032
+    },
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 4,
+    "canvasScaleY": 4,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "playerCount": 1,
+    "players": [
+      {
+        "playerFound": true,
+        "playerMatchesStage": true,
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 905,
+          "width": 1920,
+          "height": 905
+        },
+        "playerOptions": {
+          "scaleMode": "fixedHeight",
+          "frameRate": 30,
+          "contentWidth": 740,
+          "contentHeight": 600,
+          "renderModeOption": null
+        },
+        "stage": {
+          "width": 1274,
+          "height": 600,
+          "frameRate": 30,
+          "scaleMode": "fixedHeight",
+          "orientation": "auto"
+        },
+        "canvas": {
+          "width": 5096,
+          "height": 2400,
+          "clientWidth": 5096,
+          "clientHeight": 2400,
+          "offsetLeft": 0,
+          "offsetTop": -1,
+          "rect": {
+            "left": 0,
+            "top": -0.5,
+            "right": 1920,
+            "bottom": 905.5,
+            "width": 1920,
+            "height": 906
+          },
+          "screenQuad": null,
+          "style": {
+            "left": "0px",
+            "top": "-0.5px",
+            "width": "",
+            "height": "",
+            "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "transformOrigin": "0% 0% 0px",
+            "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "computedTransformOrigin": "0px 0px"
+          }
+        },
+        "boardStageCorners": {
+          "topLeft": {
+            "x": -133.6,
+            "y": -70.8
+          },
+          "topRight": {
+            "x": 131.85,
+            "y": -70.8
+          },
+          "bottomRight": {
+            "x": 131.85,
+            "y": 67.69565217391305
+          },
+          "bottomLeft": {
+            "x": -133.6,
+            "y": 67.69565217391305
+          }
+        },
+        "boardClientCorners": {
+          "topLeft": {
+            "x": -201.34379905808476,
+            "y": -107.408
+          },
+          "topRight": {
+            "x": 198.70643642072213,
+            "y": -107.408
+          },
+          "bottomRight": {
+            "x": 198.70643642072213,
+            "y": 101.7204347826087
+          },
+          "bottomLeft": {
+            "x": -201.34379905808476,
+            "y": 101.7204347826087
+          }
+        },
+        "boardClientMappingMethod": "validated_axis_aligned_rect",
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": -133.6,
+            "y": -70.8,
+            "width": 460,
+            "height": 240,
+            "scaleX": 0.5770652173913043,
+            "scaleY": 0.5770652173913043,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 0.5770652173913043,
+              "b": 0,
+              "c": 0,
+              "d": 0.5770652173913043,
+              "tx": -133.6,
+              "ty": -70.8
+            }
+          }
+        ],
+        "boardMask": null
+      }
+    ],
+    "boardDetected": true,
+    "boardLabel": "o",
+    "boardLogicalSize": {
+      "width": 460,
+      "height": 240
+    },
+    "boardDisplayChain": [
+      {
+        "className": "o",
+        "x": -133.6,
+        "y": -70.8,
+        "width": 460,
+        "height": 240,
+        "scaleX": 0.5770652173913043,
+        "scaleY": 0.5770652173913043,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 240
+        },
+        "concatenatedMatrix": {
+          "a": 0.5770652173913043,
+          "b": 0,
+          "c": 0,
+          "d": 0.5770652173913043,
+          "tx": -133.6,
+          "ty": -70.8
+        }
+      }
+    ]
+  },
+  "renderer_geometry_updated_at_utc": "2026-11-26T21:58:52.034+00:00",
+  "passive_preflight_samples": [],
+  "bridge_diagnostics": {
+    "received_message_count": 164,
+    "received_event_count": 138,
+    "received_event_types": {
+      "POINTER_DOWN_CANDIDATE": 7,
+      "DRAW_SAMPLE": 7,
+      "MOUSE_MOVE_SAMPLE": 65,
+      "ENGINE_FRAME_SAMPLE": 52,
+      "POINTER_UP_CANDIDATE": 7
+    },
+    "last_message_type": "heartbeat",
+    "last_sequence": 164,
+    "collector_sequence_gap_count": 0,
+    "last_message_at_utc": "2026-11-26T21:59:10.054+00:00",
+    "last_heartbeat_at_utc": "2026-11-26T21:59:10.054+00:00",
+    "last_monitor_status": {
+      "version": "0.2.4",
+      "active": true,
+      "boardDetected": true,
+      "boardLabel": "o",
+      "snapshot": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 0.5770652173913043,
+        "scaleY": 0.5770652173913043,
+        "maxPoints": 6000,
+        "remainingPoints": 2000,
+        "pointCount": 4000,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          11,
+          11,
+          11,
+          11,
+          11,
+          11,
+          2,
+          2,
+          2,
+          2,
+          2,
+          5,
+          5,
+          5
+        ],
+        "currentRadius": 19
+      },
+      "eventCount": 811,
+      "droppedEvents": 0,
+      "errors": 0,
+      "inputTelemetryEnabled": true,
+      "engineFrameObserverConnected": true,
+      "engineFrameCount": 52
+    },
+    "browser_bridge": {
+      "sentEventCount": 138,
+      "lastEventType": "POINTER_UP_CANDIDATE",
+      "lastEventAtPerformanceMs": 27250,
+      "sendFailureCount": 0
+    },
+    "frame_probe_count": 7,
+    "connection_closed": true,
+    "last_event_type": "POINTER_UP_CANDIDATE",
+    "last_event_performance_ms": 27250,
+    "closed_at_utc": "2026-11-26T21:59:10.411+00:00"
+  }
+}

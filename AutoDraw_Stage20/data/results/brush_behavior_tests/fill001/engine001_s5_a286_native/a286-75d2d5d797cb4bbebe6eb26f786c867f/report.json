@@ -1,0 +1,15 @@
+{
+  "schema": "ENGINE001_S5_A286_NATIVE_STAGE6_V1",
+  "run_id": "a286-75d2d5d797cb4bbebe6eb26f786c867f",
+  "startup": "FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
+  "baseline_sha": "f33791afe82dee25d88c8fc0aef521b27c550861",
+  "plan_sha256": "08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8",
+  "archive_sha256": "a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583",
+  "status": "BLOCKED",
+  "completed_strokes": 0,
+  "exact_CHALK": null,
+  "evidence_level": "E4_PENDING",
+  "reason": "FirefoxMonitorError: BLOCKED: Monitor \u0432\u043d\u0435\u0434\u0440\u0451\u043d, \u043d\u043e Bridge \u043d\u0435 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u043b \u0441\u0432\u0435\u0436\u0443\u044e \u043e\u0434\u043d\u043e\u0437\u043d\u0430\u0447\u043d\u0443\u044e \u0441\u0435\u0441\u0441\u0438\u044e \u0438\u0433\u0440\u043e\u0432\u043e\u0439 \u0434\u043e\u0441\u043a\u0438.",
+  "finished": "2026-11-27T19:14:55.964935+00:00",
+  "bridge_diagnostic_log": "bridge-startup.jsonl"
+}

@@ -1,0 +1,2 @@
+{"utc": "2026-11-27T19:40:51.563+00:00", "event": "server_starting", "port": 8765, "loopback_only": true, "input_telemetry": true}
+{"utc": "2026-11-27T19:40:51.580+00:00", "event": "server_listening", "port": 8765}

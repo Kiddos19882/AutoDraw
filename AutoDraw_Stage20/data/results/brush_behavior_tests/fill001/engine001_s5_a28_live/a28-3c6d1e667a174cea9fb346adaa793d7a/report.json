@@ -1,0 +1,48 @@
+{
+  "schema": "ENGINE001_S5_A28_LIVE_V1",
+  "run_id": "a28-3c6d1e667a174cea9fb346adaa793d7a",
+  "started": "2026-11-26T21:58:52.999958+00:00",
+  "baseline_sha": "f33791afe82dee25d88c8fc0aef521b27c550861",
+  "baseline_run": "45704720111",
+  "archive_sha256": "a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583",
+  "runner_sha256": "8e674d92834ff6a836211e05e3573709485a25fdfa32f23a0a5d35d7ffbe5bca",
+  "plan_sha256": "08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8",
+  "mode": "normal",
+  "smooth": false,
+  "planned_strokes": 3270,
+  "planned_vertices": 72128,
+  "point_hold_seconds": 0.06,
+  "points_per_batch": 8,
+  "status": "BLOCKED",
+  "exact_CHALK": null,
+  "evidence_level": "E4_PENDING",
+  "completed_strokes": 0,
+  "startup": "FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
+  "bridge_session_id": "ce77c2a5-0fa6-4a2b-9bf9-9826fb9f921e",
+  "reason": "Blocked: Expected exactly one visible 460x240 BoardPane already owned by FILL-001 Monitor",
+  "board_discovery": {
+    "candidateCount": 1,
+    "candidates": [
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": false,
+        "height": 240,
+        "monitorOwned": false,
+        "onStage": true,
+        "structural": true,
+        "visible": false,
+        "width": 460
+      }
+    ],
+    "candidatesTruncated": false,
+    "constructorAvailable": true,
+    "constructorMatches": 1,
+    "eligibleCount": 0,
+    "error": "Expected exactly one visible 460x240 BoardPane already owned by FILL-001 Monitor",
+    "monitorOwnedCount": 0,
+    "structuralMatches": 1,
+    "visited": 2224
+  },
+  "finished": "2026-11-26T21:58:53.019101+00:00"
+}

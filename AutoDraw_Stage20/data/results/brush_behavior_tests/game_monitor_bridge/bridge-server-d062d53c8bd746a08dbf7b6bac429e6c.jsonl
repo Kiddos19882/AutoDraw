@@ -1,0 +1,7 @@
+{"utc": "2026-11-27T20:04:30.830+00:00", "event": "server_starting", "port": 8765, "loopback_only": true, "input_telemetry": true}
+{"utc": "2026-11-27T20:04:30.852+00:00", "event": "server_listening", "port": 8765}
+{"utc": "2026-11-27T20:05:10.238+00:00", "event": "handshake_received", "origin_count": 1, "origin_matches": true, "upgrade_websocket": true, "websocket_key_present": true, "websocket_version_present": true}
+{"utc": "2026-11-27T20:05:10.239+00:00", "event": "socket_accepted", "active_connections": 0}
+{"utc": "2026-11-27T20:05:10.240+00:00", "event": "auth_accepted"}
+{"utc": "2026-11-27T20:05:10.241+00:00", "event": "ready_sent"}
+{"utc": "2026-11-27T20:05:10.264+00:00", "event": "session_start_received", "session_id": "4b24dba6-f060-436a-8a55-1cd5038a3d9d", "geometry_present": true, "telemetry_config_present": true, "session_file_exists": true}

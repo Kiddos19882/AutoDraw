@@ -1,19 +1,51 @@
 {
   "profile_schema_version": 1,
   "profile_name": "Browser palette",
-  "created_at": "2026-10-26T23:35:31+00:00",
-  "updated_at": "2026-10-26T23:35:31+00:00",
+  "created_at": "2026-11-27T16:54:38+00:00",
+  "updated_at": "2026-11-27T16:55:32+00:00",
   "screen": {
     "width": 1920,
     "height": 1080
   },
   "region": {
-    "x": 480,
-    "y": 755,
-    "width": 940,
-    "height": 113
+    "x": 465,
+    "y": 743,
+    "width": 969,
+    "height": 123
   },
   "colors": [
+    {
+      "name": "Цвет 1",
+      "hex": "#FD0100",
+      "rgb": [
+        253,
+        1,
+        0
+      ],
+      "screen_x": 482,
+      "screen_y": 763,
+      "local_x": 17,
+      "local_y": 20,
+      "source": "auto",
+      "id": "4fdc42a9-76f8-451d-b33e-07263c9af4b7",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 2",
+      "hex": "#FEFD04",
+      "rgb": [
+        254,
+        253,
+        4
+      ],
+      "screen_x": 512,
+      "screen_y": 763,
+      "local_x": 47,
+      "local_y": 20,
+      "source": "auto",
+      "id": "6bb9decd-a263-470f-91c5-90b54b370e60",
+      "status": "confirmed"
+    },
     {
       "name": "Цвет 3",
       "hex": "#00FE01",
@@ -22,12 +54,12 @@
         254,
         1
       ],
-      "screen_x": 555,
-      "screen_y": 771,
-      "local_x": 75,
-      "local_y": 16,
+      "screen_x": 542,
+      "screen_y": 763,
+      "local_x": 77,
+      "local_y": 20,
       "source": "auto",
-      "id": "627586e2-e77c-4194-b50e-78e838b27df7",
+      "id": "b01e5aac-09c4-43b5-b5a6-f410bfd8e76c",
       "status": "confirmed"
     },
     {
@@ -38,12 +70,12 @@
         254,
         254
       ],
-      "screen_x": 584,
-      "screen_y": 771,
-      "local_x": 104,
-      "local_y": 16,
+      "screen_x": 572,
+      "screen_y": 763,
+      "local_x": 107,
+      "local_y": 20,
       "source": "auto",
-      "id": "501434f6-d071-4d16-8da8-7234f8a24ccd",
+      "id": "8241825f-1508-455c-99ba-223d6264894a",
       "status": "confirmed"
     },
     {
@@ -54,12 +86,12 @@
         3,
         251
       ],
-      "screen_x": 613,
-      "screen_y": 771,
-      "local_x": 133,
-      "local_y": 16,
+      "screen_x": 602,
+      "screen_y": 763,
+      "local_x": 137,
+      "local_y": 20,
       "source": "auto",
-      "id": "bbdb4b9a-2c96-4ef9-bdd6-1b5fefea8c5c",
+      "id": "0308de7d-64f0-413e-a462-98dedbe888a0",
       "status": "confirmed"
     },
     {
@@ -70,12 +102,12 @@
         0,
         255
       ],
-      "screen_x": 642,
-      "screen_y": 771,
-      "local_x": 162,
-      "local_y": 16,
+      "screen_x": 633,
+      "screen_y": 763,
+      "local_x": 168,
+      "local_y": 20,
       "source": "auto",
-      "id": "eb8807cd-7390-488d-b04f-9cd54422edae",
+      "id": "71fce4e3-23bd-4562-ae97-73b821e4b6c8",
       "status": "confirmed"
     },
     {
@@ -87,11 +119,27 @@
         19
       ],
       "screen_x": 964,
-      "screen_y": 771,
-      "local_x": 484,
-      "local_y": 16,
+      "screen_y": 763,
+      "local_x": 499,
+      "local_y": 20,
       "source": "auto",
-      "id": "bedd746b-355c-435e-9c1d-3d2d18d069b5",
+      "id": "28a23a00-d453-456a-8f2f-bb89a22577a9",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 8",
+      "hex": "#EE5F00",
+      "rgb": [
+        238,
+        95,
+        0
+      ],
+      "screen_x": 994,
+      "screen_y": 763,
+      "local_x": 529,
+      "local_y": 20,
+      "source": "auto",
+      "id": "bd9a5017-b2af-426f-8188-de84efd1e5fc",
       "status": "confirmed"
     },
     {
@@ -102,12 +150,172 @@
         151,
         1
       ],
-      "screen_x": 1022,
-      "screen_y": 771,
-      "local_x": 542,
-      "local_y": 16,
+      "screen_x": 1024,
+      "screen_y": 763,
+      "local_x": 559,
+      "local_y": 20,
       "source": "auto",
-      "id": "6b58de42-30fe-4fc5-9435-6c391aa4b892",
+      "id": "faa82616-26a9-4e8b-b9d1-1287fc297926",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 10",
+      "hex": "#FFF100",
+      "rgb": [
+        255,
+        241,
+        0
+      ],
+      "screen_x": 1054,
+      "screen_y": 763,
+      "local_x": 589,
+      "local_y": 20,
+      "source": "auto",
+      "id": "d0c97335-83ca-47ad-8745-e5e6d1fbdb67",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 11",
+      "hex": "#90C421",
+      "rgb": [
+        144,
+        196,
+        33
+      ],
+      "screen_x": 1085,
+      "screen_y": 763,
+      "local_x": 620,
+      "local_y": 20,
+      "source": "auto",
+      "id": "a23fa582-0621-4ad6-afc6-1505be09ef92",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 12",
+      "hex": "#23AC3A",
+      "rgb": [
+        35,
+        172,
+        58
+      ],
+      "screen_x": 1115,
+      "screen_y": 763,
+      "local_x": 650,
+      "local_y": 20,
+      "source": "auto",
+      "id": "e8bfee08-bb4a-4aad-9c0a-65437b8d9415",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 13",
+      "hex": "#009846",
+      "rgb": [
+        0,
+        152,
+        70
+      ],
+      "screen_x": 1145,
+      "screen_y": 763,
+      "local_x": 680,
+      "local_y": 20,
+      "source": "auto",
+      "id": "9cb585e7-178e-4d17-981e-a558f346e480",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 14",
+      "hex": "#009E99",
+      "rgb": [
+        0,
+        158,
+        153
+      ],
+      "screen_x": 1175,
+      "screen_y": 763,
+      "local_x": 710,
+      "local_y": 20,
+      "source": "auto",
+      "id": "cd68b7b9-b866-4c1f-af24-63d5a4d3585d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 15",
+      "hex": "#00A1E9",
+      "rgb": [
+        0,
+        161,
+        233
+      ],
+      "screen_x": 1205,
+      "screen_y": 763,
+      "local_x": 740,
+      "local_y": 20,
+      "source": "auto",
+      "id": "14bbc531-60b7-449e-9a9a-32b2d08f8139",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 16",
+      "hex": "#0167B7",
+      "rgb": [
+        1,
+        103,
+        183
+      ],
+      "screen_x": 1235,
+      "screen_y": 763,
+      "local_x": 770,
+      "local_y": 20,
+      "source": "auto",
+      "id": "5c38e034-0c00-4c8c-8d63-4d6859edb7e8",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 17",
+      "hex": "#01479D",
+      "rgb": [
+        1,
+        71,
+        157
+      ],
+      "screen_x": 1266,
+      "screen_y": 763,
+      "local_x": 801,
+      "local_y": 20,
+      "source": "auto",
+      "id": "296d2ed1-7396-409e-bb18-d0d5565b71fd",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 18",
+      "hex": "#1D2089",
+      "rgb": [
+        29,
+        32,
+        137
+      ],
+      "screen_x": 1296,
+      "screen_y": 763,
+      "local_x": 831,
+      "local_y": 20,
+      "source": "auto",
+      "id": "d550f768-791d-476c-aadf-9d358ead1b7e",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 19",
+      "hex": "#601886",
+      "rgb": [
+        96,
+        24,
+        134
+      ],
+      "screen_x": 1326,
+      "screen_y": 763,
+      "local_x": 861,
+      "local_y": 20,
+      "source": "auto",
+      "id": "660c7f3a-412d-4412-a99c-e8ef9c4178ae",
       "status": "confirmed"
     },
     {
@@ -118,12 +326,44 @@
         7,
         132
       ],
-      "screen_x": 1343,
-      "screen_y": 771,
-      "local_x": 863,
-      "local_y": 16,
+      "screen_x": 1356,
+      "screen_y": 763,
+      "local_x": 891,
+      "local_y": 20,
       "source": "auto",
-      "id": "7f85dab5-e615-419c-9869-1e34d788a52d",
+      "id": "20a8249d-5c90-4695-8005-66f5ad52e384",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 21",
+      "hex": "#E2007E",
+      "rgb": [
+        226,
+        0,
+        126
+      ],
+      "screen_x": 1386,
+      "screen_y": 763,
+      "local_x": 921,
+      "local_y": 20,
+      "source": "auto",
+      "id": "4015df9a-7cf8-45ee-86d9-5d6228e5097a",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 22",
+      "hex": "#E40215",
+      "rgb": [
+        228,
+        2,
+        21
+      ],
+      "screen_x": 482,
+      "screen_y": 790,
+      "local_x": 17,
+      "local_y": 47,
+      "source": "auto",
+      "id": "21ba9e39-7b84-4a1d-96c7-5eebc2219f8f",
       "status": "confirmed"
     },
     {
@@ -134,12 +374,12 @@
         243,
         0
       ],
-      "screen_x": 525,
-      "screen_y": 798,
-      "local_x": 45,
-      "local_y": 43,
+      "screen_x": 512,
+      "screen_y": 790,
+      "local_x": 47,
+      "local_y": 47,
       "source": "auto",
-      "id": "efd2f6a2-8d6f-4221-8229-897876d6dd92",
+      "id": "f95e45ca-c7d4-4825-9b55-46c2384af03f",
       "status": "confirmed"
     },
     {
@@ -150,12 +390,28 @@
         150,
         73
       ],
-      "screen_x": 555,
-      "screen_y": 798,
-      "local_x": 75,
-      "local_y": 43,
+      "screen_x": 542,
+      "screen_y": 790,
+      "local_x": 77,
+      "local_y": 47,
       "source": "auto",
-      "id": "680f4f0e-3a32-48b6-8621-48c37e9d1fec",
+      "id": "78f2f5bc-b3c2-4531-8bdf-1f40c7405ee5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 25",
+      "hex": "#00A2E6",
+      "rgb": [
+        0,
+        162,
+        230
+      ],
+      "screen_x": 572,
+      "screen_y": 790,
+      "local_x": 107,
+      "local_y": 47,
+      "source": "auto",
+      "id": "55a5d37c-b2d7-4efe-89b9-7f0ce0724273",
       "status": "confirmed"
     },
     {
@@ -166,12 +422,12 @@
         32,
         134
       ],
-      "screen_x": 613,
-      "screen_y": 798,
-      "local_x": 133,
-      "local_y": 43,
+      "screen_x": 602,
+      "screen_y": 790,
+      "local_x": 137,
+      "local_y": 47,
       "source": "auto",
-      "id": "fa4ebed2-f8b0-4878-84c5-e26b58f3bf10",
+      "id": "c8c8bed6-4959-4e54-8dc5-072f73ab34bc",
       "status": "confirmed"
     },
     {
@@ -182,12 +438,44 @@
         0,
         133
       ],
-      "screen_x": 642,
-      "screen_y": 798,
-      "local_x": 162,
-      "local_y": 43,
+      "screen_x": 632,
+      "screen_y": 790,
+      "local_x": 167,
+      "local_y": 47,
       "source": "auto",
-      "id": "018d8c47-dec6-4ea2-8932-faa1e310642f",
+      "id": "62396619-8d97-4a5e-ae6c-ac8beba02866",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 28",
+      "hex": "#A40001",
+      "rgb": [
+        164,
+        0,
+        1
+      ],
+      "screen_x": 964,
+      "screen_y": 790,
+      "local_x": 499,
+      "local_y": 47,
+      "source": "auto",
+      "id": "02ce8449-16ad-4d6a-b577-68f7947b5f43",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 29",
+      "hex": "#A94200",
+      "rgb": [
+        169,
+        66,
+        0
+      ],
+      "screen_x": 994,
+      "screen_y": 790,
+      "local_x": 529,
+      "local_y": 47,
+      "source": "auto",
+      "id": "03398497-f034-41c4-bfa7-d290eb5086ea",
       "status": "confirmed"
     },
     {
@@ -198,12 +486,12 @@
         106,
         1
       ],
-      "screen_x": 1022,
-      "screen_y": 798,
-      "local_x": 542,
-      "local_y": 43,
+      "screen_x": 1024,
+      "screen_y": 790,
+      "local_x": 559,
+      "local_y": 47,
       "source": "auto",
-      "id": "22ddbcd4-93f5-4ab7-b932-5ffc00c27808",
+      "id": "cc16ec9e-ad89-4eea-b832-0db079226d3c",
       "status": "confirmed"
     },
     {
@@ -214,12 +502,12 @@
         171,
         1
       ],
-      "screen_x": 1051,
-      "screen_y": 798,
-      "local_x": 571,
-      "local_y": 43,
+      "screen_x": 1054,
+      "screen_y": 790,
+      "local_x": 589,
+      "local_y": 47,
       "source": "auto",
-      "id": "f93c6847-a798-4e17-87a0-37f35d1e3ef5",
+      "id": "a17a8cd4-da4d-42c6-9dda-7299b3dc07a6",
       "status": "confirmed"
     },
     {
@@ -230,12 +518,44 @@
         140,
         12
       ],
-      "screen_x": 1080,
-      "screen_y": 798,
-      "local_x": 600,
-      "local_y": 43,
+      "screen_x": 1084,
+      "screen_y": 790,
+      "local_x": 619,
+      "local_y": 47,
       "source": "auto",
-      "id": "c2ab9df1-074c-4483-a7ca-609e9a6966dc",
+      "id": "aaa1e2aa-1694-4c99-902a-53daad51ebfa",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 33",
+      "hex": "#087C29",
+      "rgb": [
+        8,
+        124,
+        41
+      ],
+      "screen_x": 1115,
+      "screen_y": 790,
+      "local_x": 650,
+      "local_y": 47,
+      "source": "auto",
+      "id": "74cd612c-7b95-4799-94d3-7c134617e8e0",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 34",
+      "hex": "#007131",
+      "rgb": [
+        0,
+        113,
+        49
+      ],
+      "screen_x": 1145,
+      "screen_y": 790,
+      "local_x": 680,
+      "local_y": 47,
+      "source": "auto",
+      "id": "97d20005-ae0d-412c-97e5-d373eb3e7af3",
       "status": "confirmed"
     },
     {
@@ -246,12 +566,108 @@
         115,
         110
       ],
-      "screen_x": 1168,
-      "screen_y": 798,
-      "local_x": 688,
-      "local_y": 43,
+      "screen_x": 1175,
+      "screen_y": 790,
+      "local_x": 710,
+      "local_y": 47,
       "source": "auto",
-      "id": "233076bc-d478-4a8b-887f-455dec90989e",
+      "id": "db87809a-d7e5-439c-a1dc-c871e802b2ab",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 36",
+      "hex": "#0174AA",
+      "rgb": [
+        1,
+        116,
+        170
+      ],
+      "screen_x": 1205,
+      "screen_y": 790,
+      "local_x": 740,
+      "local_y": 47,
+      "source": "auto",
+      "id": "75f7db51-d2f3-43cf-a442-cf893b0199fc",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 37",
+      "hex": "#014A8A",
+      "rgb": [
+        1,
+        74,
+        138
+      ],
+      "screen_x": 1235,
+      "screen_y": 790,
+      "local_x": 770,
+      "local_y": 47,
+      "source": "auto",
+      "id": "e3d8cca4-c9e4-4cee-baee-3c10f21ff4b5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 38",
+      "hex": "#012E72",
+      "rgb": [
+        1,
+        46,
+        114
+      ],
+      "screen_x": 1266,
+      "screen_y": 790,
+      "local_x": 801,
+      "local_y": 47,
+      "source": "auto",
+      "id": "6329682d-7332-40ea-8c5d-3451e86d6b25",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 39",
+      "hex": "#100966",
+      "rgb": [
+        16,
+        9,
+        102
+      ],
+      "screen_x": 1296,
+      "screen_y": 790,
+      "local_x": 831,
+      "local_y": 47,
+      "source": "auto",
+      "id": "8411ce1a-0486-48b1-882e-ddb1ddbbd437",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 40",
+      "hex": "#440063",
+      "rgb": [
+        68,
+        0,
+        99
+      ],
+      "screen_x": 1326,
+      "screen_y": 790,
+      "local_x": 861,
+      "local_y": 47,
+      "source": "auto",
+      "id": "b7a5c42c-8d98-4d52-b693-4c14ad217fc2",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 41",
+      "hex": "#6A0261",
+      "rgb": [
+        106,
+        2,
+        97
+      ],
+      "screen_x": 1356,
+      "screen_y": 790,
+      "local_x": 891,
+      "local_y": 47,
+      "source": "auto",
+      "id": "7f2d756e-23bd-4061-b415-373d0ec3a237",
       "status": "confirmed"
     },
     {
@@ -262,12 +678,12 @@
         1,
         91
       ],
-      "screen_x": 1373,
-      "screen_y": 798,
-      "local_x": 893,
-      "local_y": 43,
+      "screen_x": 1386,
+      "screen_y": 790,
+      "local_x": 921,
+      "local_y": 47,
       "source": "auto",
-      "id": "33330940-f4d1-47a4-86c6-c10fbfb4980a",
+      "id": "4006428f-df8f-4801-b0d7-2a8166366052",
       "status": "confirmed"
     },
     {
@@ -278,12 +694,28 @@
         155,
         119
       ],
-      "screen_x": 496,
-      "screen_y": 824,
-      "local_x": 16,
-      "local_y": 69,
+      "screen_x": 482,
+      "screen_y": 817,
+      "local_x": 17,
+      "local_y": 74,
       "source": "auto",
-      "id": "db918d87-67bc-4c5b-bdda-fb25e97a189d",
+      "id": "a815981a-711d-465c-a348-f4a36322b148",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 44",
+      "hex": "#F6B381",
+      "rgb": [
+        246,
+        179,
+        129
+      ],
+      "screen_x": 512,
+      "screen_y": 817,
+      "local_x": 47,
+      "local_y": 74,
+      "source": "auto",
+      "id": "4c421978-1b0f-46ca-a100-b24515138dd8",
       "status": "confirmed"
     },
     {
@@ -294,12 +726,60 @@
         206,
         140
       ],
-      "screen_x": 555,
-      "screen_y": 824,
-      "local_x": 75,
-      "local_y": 69,
+      "screen_x": 542,
+      "screen_y": 817,
+      "local_x": 77,
+      "local_y": 74,
       "source": "auto",
-      "id": "92b02535-386d-4270-9669-3488c7761d06",
+      "id": "443677ef-8196-43f1-bd63-185e500a6bde",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 46",
+      "hex": "#FFF99B",
+      "rgb": [
+        255,
+        249,
+        155
+      ],
+      "screen_x": 572,
+      "screen_y": 817,
+      "local_x": 107,
+      "local_y": 74,
+      "source": "auto",
+      "id": "a1b496fa-267b-4302-a823-773b5411cea2",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 47",
+      "hex": "#CDE39A",
+      "rgb": [
+        205,
+        227,
+        154
+      ],
+      "screen_x": 602,
+      "screen_y": 817,
+      "local_x": 137,
+      "local_y": 74,
+      "source": "auto",
+      "id": "407f08f3-4fe6-461a-bb80-3e869afc2ea5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 48",
+      "hex": "#ADD599",
+      "rgb": [
+        173,
+        213,
+        153
+      ],
+      "screen_x": 632,
+      "screen_y": 817,
+      "local_x": 167,
+      "local_y": 74,
+      "source": "auto",
+      "id": "6112f111-e6c0-4bfc-b031-d3e474f3901b",
       "status": "confirmed"
     },
     {
@@ -310,12 +790,92 @@
         199,
         152
       ],
-      "screen_x": 671,
-      "screen_y": 824,
-      "local_x": 191,
-      "local_y": 69,
+      "screen_x": 662,
+      "screen_y": 817,
+      "local_x": 197,
+      "local_y": 74,
       "source": "auto",
-      "id": "7121741f-52d1-43fc-b14c-57a14940e734",
+      "id": "5053723c-5876-4943-aad2-741a97982cd2",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 50",
+      "hex": "#85CBCB",
+      "rgb": [
+        133,
+        203,
+        203
+      ],
+      "screen_x": 693,
+      "screen_y": 817,
+      "local_x": 228,
+      "local_y": 74,
+      "source": "auto",
+      "id": "2f6004eb-54f3-40b4-9d0e-6efd22dbed80",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 51",
+      "hex": "#7FCEF5",
+      "rgb": [
+        127,
+        206,
+        245
+      ],
+      "screen_x": 723,
+      "screen_y": 817,
+      "local_x": 258,
+      "local_y": 74,
+      "source": "auto",
+      "id": "b02066f5-0080-4a3b-a700-5c8fdf8b34d0",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 52",
+      "hex": "#89ABDB",
+      "rgb": [
+        137,
+        171,
+        219
+      ],
+      "screen_x": 753,
+      "screen_y": 817,
+      "local_x": 288,
+      "local_y": 74,
+      "source": "auto",
+      "id": "05d9f74d-1e48-43e9-9c1c-390eef55d44d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 53",
+      "hex": "#8D97CC",
+      "rgb": [
+        141,
+        151,
+        204
+      ],
+      "screen_x": 783,
+      "screen_y": 817,
+      "local_x": 318,
+      "local_y": 74,
+      "source": "auto",
+      "id": "3f9d02fa-9ef9-4508-bfde-8eb606ac00ab",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 54",
+      "hex": "#9082BD",
+      "rgb": [
+        144,
+        130,
+        189
+      ],
+      "screen_x": 813,
+      "screen_y": 817,
+      "local_x": 348,
+      "local_y": 74,
+      "source": "auto",
+      "id": "97369ed9-1fd8-44cc-8f4c-3b3596278e64",
       "status": "confirmed"
     },
     {
@@ -326,12 +886,76 @@
         137,
         190
       ],
-      "screen_x": 847,
-      "screen_y": 824,
-      "local_x": 367,
-      "local_y": 69,
+      "screen_x": 843,
+      "screen_y": 817,
+      "local_x": 378,
+      "local_y": 74,
       "source": "auto",
-      "id": "b5b90906-b34a-4d10-8eb2-6e259e8055e8",
+      "id": "45773a61-4f16-40f3-bbf9-64d109a57575",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 56",
+      "hex": "#C58FC0",
+      "rgb": [
+        197,
+        143,
+        192
+      ],
+      "screen_x": 873,
+      "screen_y": 817,
+      "local_x": 408,
+      "local_y": 74,
+      "source": "auto",
+      "id": "c59b7d15-1ff9-4430-89cf-4002dbd68873",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 57",
+      "hex": "#F29EC2",
+      "rgb": [
+        242,
+        158,
+        194
+      ],
+      "screen_x": 903,
+      "screen_y": 817,
+      "local_x": 438,
+      "local_y": 74,
+      "source": "auto",
+      "id": "392aedea-1c55-425a-a855-2abfcfc0b5f4",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 58",
+      "hex": "#F29C9F",
+      "rgb": [
+        242,
+        156,
+        159
+      ],
+      "screen_x": 934,
+      "screen_y": 817,
+      "local_x": 469,
+      "local_y": 74,
+      "source": "auto",
+      "id": "aae8baa8-22da-400d-af6f-86e12ed5f0df",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 59",
+      "hex": "#7E0001",
+      "rgb": [
+        126,
+        0,
+        1
+      ],
+      "screen_x": 964,
+      "screen_y": 817,
+      "local_x": 499,
+      "local_y": 74,
+      "source": "auto",
+      "id": "f68d4c69-0426-4f52-a82b-58c794fa58d9",
       "status": "confirmed"
     },
     {
@@ -342,12 +966,60 @@
         45,
         1
       ],
-      "screen_x": 993,
-      "screen_y": 824,
-      "local_x": 513,
-      "local_y": 69,
+      "screen_x": 994,
+      "screen_y": 817,
+      "local_x": 529,
+      "local_y": 74,
       "source": "auto",
-      "id": "d4a19d6a-9ace-4897-91ea-052806bb17d8",
+      "id": "6c750ca2-65c9-411c-bf27-5d72e77d050b",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 61",
+      "hex": "#834E00",
+      "rgb": [
+        131,
+        78,
+        0
+      ],
+      "screen_x": 1024,
+      "screen_y": 817,
+      "local_x": 559,
+      "local_y": 74,
+      "source": "auto",
+      "id": "bb174c9c-b36e-47bf-a8a6-d9c041420ea9",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 62",
+      "hex": "#888001",
+      "rgb": [
+        136,
+        128,
+        1
+      ],
+      "screen_x": 1054,
+      "screen_y": 817,
+      "local_x": 589,
+      "local_y": 74,
+      "source": "auto",
+      "id": "256dafae-ba17-481b-8211-e03e99cecbc6",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 63",
+      "hex": "#496A01",
+      "rgb": [
+        73,
+        106,
+        1
+      ],
+      "screen_x": 1084,
+      "screen_y": 817,
+      "local_x": 619,
+      "local_y": 74,
+      "source": "auto",
+      "id": "2d88b78e-375d-4290-bced-b8af4df2220e",
       "status": "confirmed"
     },
     {
@@ -358,12 +1030,60 @@
         94,
         23
       ],
-      "screen_x": 1110,
-      "screen_y": 824,
-      "local_x": 630,
-      "local_y": 69,
+      "screen_x": 1115,
+      "screen_y": 817,
+      "local_x": 650,
+      "local_y": 74,
       "source": "auto",
-      "id": "5b6c6eab-2b19-429b-b254-c2b03c5f77db",
+      "id": "b40f564d-762a-4457-8d54-cf1ca078a924",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 65",
+      "hex": "#01561F",
+      "rgb": [
+        1,
+        86,
+        31
+      ],
+      "screen_x": 1145,
+      "screen_y": 817,
+      "local_x": 680,
+      "local_y": 74,
+      "source": "auto",
+      "id": "02e04e8c-0605-48d0-9fc2-3cca0da1d0f9",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 66",
+      "hex": "#015852",
+      "rgb": [
+        1,
+        88,
+        82
+      ],
+      "screen_x": 1175,
+      "screen_y": 817,
+      "local_x": 710,
+      "local_y": 74,
+      "source": "auto",
+      "id": "fa769540-9d93-4b6a-b68e-8316c622fe8c",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 67",
+      "hex": "#005983",
+      "rgb": [
+        0,
+        89,
+        131
+      ],
+      "screen_x": 1205,
+      "screen_y": 817,
+      "local_x": 740,
+      "local_y": 74,
+      "source": "auto",
+      "id": "28ad82bf-c33b-4b9d-a565-87cc53b5a034",
       "status": "confirmed"
     },
     {
@@ -374,12 +1094,60 @@
         53,
         103
       ],
-      "screen_x": 1227,
-      "screen_y": 824,
-      "local_x": 747,
-      "local_y": 69,
+      "screen_x": 1235,
+      "screen_y": 817,
+      "local_x": 770,
+      "local_y": 74,
       "source": "auto",
-      "id": "9b0830d1-b48c-487b-96f0-2b3ce7cd9cdb",
+      "id": "d513fdb8-e49c-47a2-91d4-9250067f7742",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 69",
+      "hex": "#001D59",
+      "rgb": [
+        0,
+        29,
+        89
+      ],
+      "screen_x": 1265,
+      "screen_y": 817,
+      "local_x": 800,
+      "local_y": 74,
+      "source": "auto",
+      "id": "4876ab58-4f37-4c2f-aa88-e863dca060d8",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 70",
+      "hex": "#04004D",
+      "rgb": [
+        4,
+        0,
+        77
+      ],
+      "screen_x": 1296,
+      "screen_y": 817,
+      "local_x": 831,
+      "local_y": 74,
+      "source": "auto",
+      "id": "f64e0c81-51a4-45ba-bd98-37982295caca",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 71",
+      "hex": "#32004A",
+      "rgb": [
+        50,
+        0,
+        74
+      ],
+      "screen_x": 1326,
+      "screen_y": 817,
+      "local_x": 861,
+      "local_y": 74,
+      "source": "auto",
+      "id": "44427c88-d19f-4b10-9bff-e6acec879a41",
       "status": "confirmed"
     },
     {
@@ -390,12 +1158,108 @@
         0,
         71
       ],
-      "screen_x": 1344,
-      "screen_y": 824,
-      "local_x": 864,
-      "local_y": 69,
+      "screen_x": 1356,
+      "screen_y": 817,
+      "local_x": 891,
+      "local_y": 74,
       "source": "auto",
-      "id": "6850464a-781a-43d2-b080-687ab0bf38a7",
+      "id": "f9cf169d-8f12-48fc-bb85-0f5edae6e644",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 73",
+      "hex": "#7F0043",
+      "rgb": [
+        127,
+        0,
+        67
+      ],
+      "screen_x": 1386,
+      "screen_y": 817,
+      "local_x": 921,
+      "local_y": 74,
+      "source": "auto",
+      "id": "600ee16a-58a3-4487-ae72-2bf470cde239",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 74",
+      "hex": "#EE6742",
+      "rgb": [
+        238,
+        103,
+        66
+      ],
+      "screen_x": 482,
+      "screen_y": 844,
+      "local_x": 17,
+      "local_y": 101,
+      "source": "auto",
+      "id": "8fff5c52-47ad-4330-9d95-06641f5e4261",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 75",
+      "hex": "#F3914A",
+      "rgb": [
+        243,
+        145,
+        74
+      ],
+      "screen_x": 512,
+      "screen_y": 844,
+      "local_x": 47,
+      "local_y": 101,
+      "source": "auto",
+      "id": "8ade511b-d84d-479b-b3ea-19ddf430f37a",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 76",
+      "hex": "#F7B652",
+      "rgb": [
+        247,
+        182,
+        82
+      ],
+      "screen_x": 542,
+      "screen_y": 844,
+      "local_x": 77,
+      "local_y": 101,
+      "source": "auto",
+      "id": "fd16f603-0524-4c81-adb2-c5b5a657ce02",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 77",
+      "hex": "#FEF45C",
+      "rgb": [
+        254,
+        244,
+        92
+      ],
+      "screen_x": 572,
+      "screen_y": 844,
+      "local_x": 107,
+      "local_y": 101,
+      "source": "auto",
+      "id": "7dfb4369-b139-4763-9b4c-d1dcc7aed351",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 78",
+      "hex": "#B5D269",
+      "rgb": [
+        181,
+        210,
+        105
+      ],
+      "screen_x": 602,
+      "screen_y": 844,
+      "local_x": 137,
+      "local_y": 101,
+      "source": "auto",
+      "id": "47723a58-1fcc-43b9-85ba-70e6fbc58903",
       "status": "confirmed"
     },
     {
@@ -406,12 +1270,28 @@
         196,
         102
       ],
-      "screen_x": 642,
-      "screen_y": 850,
-      "local_x": 162,
-      "local_y": 95,
+      "screen_x": 632,
+      "screen_y": 844,
+      "local_x": 167,
+      "local_y": 101,
       "source": "auto",
-      "id": "bceb2652-d18b-4e1f-9c54-0906f676589d",
+      "id": "20d4b3c4-4263-4a7f-95f0-e3c1e103f8ce",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 80",
+      "hex": "#32B16C",
+      "rgb": [
+        50,
+        177,
+        108
+      ],
+      "screen_x": 663,
+      "screen_y": 844,
+      "local_x": 198,
+      "local_y": 101,
+      "source": "auto",
+      "id": "9f0d79e6-41eb-4532-bf50-fa2a874d5eab",
       "status": "confirmed"
     },
     {
@@ -422,12 +1302,12 @@
         179,
         172
       ],
-      "screen_x": 701,
-      "screen_y": 850,
-      "local_x": 221,
-      "local_y": 95,
+      "screen_x": 693,
+      "screen_y": 844,
+      "local_x": 228,
+      "local_y": 101,
       "source": "auto",
-      "id": "516ee74f-d65e-4c7c-b3bc-8d8edcd7c920",
+      "id": "0edd8371-e2eb-4f41-91de-0ec3e542a1ed",
       "status": "confirmed"
     },
     {
@@ -438,12 +1318,28 @@
         183,
         240
       ],
-      "screen_x": 730,
-      "screen_y": 850,
-      "local_x": 250,
-      "local_y": 95,
+      "screen_x": 723,
+      "screen_y": 844,
+      "local_x": 258,
+      "local_y": 101,
       "source": "auto",
-      "id": "05684e91-f15f-447d-a201-37ea5dfcc5b6",
+      "id": "85b95180-2589-419a-9c91-aeff3e92222d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 83",
+      "hex": "#458ACB",
+      "rgb": [
+        69,
+        138,
+        203
+      ],
+      "screen_x": 753,
+      "screen_y": 844,
+      "local_x": 288,
+      "local_y": 101,
+      "source": "auto",
+      "id": "bcfe1fef-ddcf-4872-9e7c-130a1905b331",
       "status": "confirmed"
     },
     {
@@ -454,28 +1350,268 @@
         110,
         182
       ],
-      "screen_x": 788,
-      "screen_y": 850,
-      "local_x": 308,
-      "local_y": 95,
+      "screen_x": 783,
+      "screen_y": 844,
+      "local_x": 318,
+      "local_y": 101,
       "source": "auto",
-      "id": "0dec5d87-bcb1-4e39-a588-6ff0613e1b54",
+      "id": "9034fc4b-5662-4d71-bb45-44c4fadb6fd7",
       "status": "confirmed"
     },
     {
-      "name": "Цвет 96",
+      "name": "Цвет 85",
+      "hex": "#5F52A1",
+      "rgb": [
+        95,
+        82,
+        161
+      ],
+      "screen_x": 813,
+      "screen_y": 844,
+      "local_x": 348,
+      "local_y": 101,
+      "source": "auto",
+      "id": "92b8f2c4-d73c-40a3-a3f7-a25b957788a3",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 86",
+      "hex": "#8A57A2",
+      "rgb": [
+        138,
+        87,
+        162
+      ],
+      "screen_x": 843,
+      "screen_y": 844,
+      "local_x": 378,
+      "local_y": 101,
+      "source": "auto",
+      "id": "a28b1c65-250c-422f-9ff9-c0f8562ed258",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 87",
+      "hex": "#AE5DA2",
+      "rgb": [
+        174,
+        93,
+        162
+      ],
+      "screen_x": 873,
+      "screen_y": 844,
+      "local_x": 408,
+      "local_y": 101,
+      "source": "auto",
+      "id": "de7e937e-8806-4273-b210-5985607279e4",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 88",
+      "hex": "#EC68A4",
+      "rgb": [
+        236,
+        104,
+        164
+      ],
+      "screen_x": 904,
+      "screen_y": 844,
+      "local_x": 439,
+      "local_y": 101,
+      "source": "auto",
+      "id": "c1e17688-4b7b-40d1-b185-e9f00c0a0619",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 89",
+      "hex": "#EC6876",
+      "rgb": [
+        236,
+        104,
+        118
+      ],
+      "screen_x": 934,
+      "screen_y": 844,
+      "local_x": 469,
+      "local_y": 101,
+      "source": "auto",
+      "id": "e3f70431-aad9-49aa-ba9e-9aff63d9f94d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 90",
+      "hex": "#D1C0A6",
+      "rgb": [
+        209,
+        192,
+        166
+      ],
+      "screen_x": 964,
+      "screen_y": 844,
+      "local_x": 499,
+      "local_y": 101,
+      "source": "auto",
+      "id": "aeb95adf-6b1c-4d6e-8ff9-b781a82a8f43",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 91",
       "hex": "#A7927D",
       "rgb": [
         167,
         146,
         125
       ],
-      "screen_x": 993,
-      "screen_y": 851,
-      "local_x": 513,
-      "local_y": 96,
+      "screen_x": 994,
+      "screen_y": 844,
+      "local_x": 529,
+      "local_y": 101,
       "source": "auto",
-      "id": "5e5ce64f-0920-44d2-a67c-cfb6317e13c6",
+      "id": "20b0cb79-e805-46e4-95ce-41d17764015b",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 92",
+      "hex": "#D0A972",
+      "rgb": [
+        208,
+        169,
+        114
+      ],
+      "screen_x": 1114,
+      "screen_y": 844,
+      "local_x": 649,
+      "local_y": 101,
+      "source": "auto",
+      "id": "c4d9e9ec-fdfe-418f-982a-768d746ae7d2",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 93",
+      "hex": "#B38851",
+      "rgb": [
+        179,
+        136,
+        81
+      ],
+      "screen_x": 1145,
+      "screen_y": 844,
+      "local_x": 680,
+      "local_y": 101,
+      "source": "auto",
+      "id": "72934670-a4ab-472b-80e6-5f41e614d932",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 94",
+      "hex": "#996C33",
+      "rgb": [
+        153,
+        108,
+        51
+      ],
+      "screen_x": 1175,
+      "screen_y": 844,
+      "local_x": 710,
+      "local_y": 101,
+      "source": "auto",
+      "id": "afd832bc-ceb8-4839-9227-1a92ff224e3c",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 95",
+      "hex": "#83511E",
+      "rgb": [
+        131,
+        81,
+        30
+      ],
+      "screen_x": 1205,
+      "screen_y": 844,
+      "local_x": 740,
+      "local_y": 101,
+      "source": "auto",
+      "id": "4e9410a9-3e0a-409e-9bad-951426068695",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 96",
+      "hex": "#6A3906",
+      "rgb": [
+        106,
+        57,
+        6
+      ],
+      "screen_x": 1235,
+      "screen_y": 844,
+      "local_x": 770,
+      "local_y": 101,
+      "source": "auto",
+      "id": "e1607dab-4d96-4fc5-af60-d5e1b7edfa6a",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 97",
+      "hex": "#FCD2BC",
+      "rgb": [
+        252,
+        210,
+        188
+      ],
+      "screen_x": 1265,
+      "screen_y": 844,
+      "local_x": 800,
+      "local_y": 101,
+      "source": "auto",
+      "id": "db760c7e-a371-4e0b-93f3-251b2b9e6232",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 98",
+      "hex": "#F8CCC3",
+      "rgb": [
+        248,
+        204,
+        195
+      ],
+      "screen_x": 1295,
+      "screen_y": 844,
+      "local_x": 830,
+      "local_y": 101,
+      "source": "auto",
+      "id": "770a9663-fe1e-4b81-8012-7fbd40e30576",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 99",
+      "hex": "#EDC6D8",
+      "rgb": [
+        237,
+        198,
+        216
+      ],
+      "screen_x": 1326,
+      "screen_y": 844,
+      "local_x": 861,
+      "local_y": 101,
+      "source": "auto",
+      "id": "1288bed1-90a6-4343-b8d0-9c89bd5d484c",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 100",
+      "hex": "#FDAEAA",
+      "rgb": [
+        253,
+        174,
+        170
+      ],
+      "screen_x": 1356,
+      "screen_y": 844,
+      "local_x": 891,
+      "local_y": 101,
+      "source": "auto",
+      "id": "de494e5e-829f-4fad-8dff-1127e4db175f",
       "status": "confirmed"
     },
     {
@@ -486,44 +1622,444 @@
         192,
         175
       ],
-      "screen_x": 1373,
-      "screen_y": 851,
-      "local_x": 893,
-      "local_y": 96,
+      "screen_x": 1386,
+      "screen_y": 844,
+      "local_x": 921,
+      "local_y": 101,
       "source": "auto",
-      "id": "7ecc8e4b-bc74-4db4-a7bd-c186692b3c5f",
+      "id": "f010ca25-23ca-4e91-9e1b-1f9ca3e0c0f7",
       "status": "confirmed"
     },
     {
       "name": "Цвет 102",
-      "hex": "#FFFFFF",
+      "hex": "#E40150",
       "rgb": [
-        255,
-        255,
-        255
+        228,
+        1,
+        80
       ],
-      "screen_x": 670,
-      "screen_y": 770,
-      "local_x": 190,
-      "local_y": 15,
+      "screen_x": 1414,
+      "screen_y": 763,
+      "local_x": 949,
+      "local_y": 20,
       "source": "manual",
-      "id": "dc6ff484-275c-4f0e-8bd8-eaf548cbeea4",
+      "id": "98050ba1-be4f-40c0-85a3-9c7117911690",
       "status": "confirmed"
     },
     {
       "name": "Цвет 103",
+      "hex": "#A60236",
+      "rgb": [
+        166,
+        2,
+        54
+      ],
+      "screen_x": 1416,
+      "screen_y": 789,
+      "local_x": 951,
+      "local_y": 46,
+      "source": "manual",
+      "id": "54c47d99-6e75-439d-a49d-9baa1f11f5ca",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 104",
+      "hex": "#A40035",
+      "rgb": [
+        164,
+        0,
+        53
+      ],
+      "screen_x": 1416,
+      "screen_y": 816,
+      "local_x": 951,
+      "local_y": 73,
+      "source": "manual",
+      "id": "e71c0ca8-7ae4-4943-8ef7-0a500a5dac5b",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 105",
+      "hex": "#FDB692",
+      "rgb": [
+        253,
+        182,
+        146
+      ],
+      "screen_x": 1416,
+      "screen_y": 843,
+      "local_x": 951,
+      "local_y": 100,
+      "source": "manual",
+      "id": "0b1be1b7-bf2e-41c4-9a48-e76d676fc575",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 106",
+      "hex": "#362E2B",
+      "rgb": [
+        54,
+        46,
+        43
+      ],
+      "screen_x": 1084,
+      "screen_y": 845,
+      "local_x": 619,
+      "local_y": 102,
+      "source": "manual",
+      "id": "bf2c3426-a3b4-4650-8e5d-48475ca00de9",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 107",
+      "hex": "#5A4941",
+      "rgb": [
+        90,
+        73,
+        65
+      ],
+      "screen_x": 1054,
+      "screen_y": 844,
+      "local_x": 589,
+      "local_y": 101,
+      "source": "manual",
+      "id": "98987b6f-8095-4918-8ca4-085b30e690ba",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 108",
+      "hex": "#7E6B5C",
+      "rgb": [
+        126,
+        107,
+        92
+      ],
+      "screen_x": 1023,
+      "screen_y": 844,
+      "local_x": 558,
+      "local_y": 101,
+      "source": "manual",
+      "id": "91b6991d-e65b-47f0-8f36-9bde634a96af",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 109",
       "hex": "#1B1B1B",
       "rgb": [
         27,
         27,
         27
       ],
-      "screen_x": 937,
-      "screen_y": 801,
-      "local_x": 457,
+      "screen_x": 932,
+      "screen_y": 791,
+      "local_x": 467,
+      "local_y": 48,
+      "source": "manual",
+      "id": "9da0badc-7856-4754-84ba-5ba5f9c64cb0",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 110",
+      "hex": "#9F9F9F",
+      "rgb": [
+        159,
+        159,
+        159
+      ],
+      "screen_x": 933,
+      "screen_y": 764,
+      "local_x": 468,
+      "local_y": 21,
+      "source": "manual",
+      "id": "c882b1fa-4a4b-4cd4-af6b-8df98c1d6f12",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 111",
+      "hex": "#ABABAB",
+      "rgb": [
+        171,
+        171,
+        171
+      ],
+      "screen_x": 904,
+      "screen_y": 764,
+      "local_x": 439,
+      "local_y": 21,
+      "source": "manual",
+      "id": "18a89926-88bd-41f4-bcca-e1737811a55d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 112",
+      "hex": "#313131",
+      "rgb": [
+        49,
+        49,
+        49
+      ],
+      "screen_x": 905,
+      "screen_y": 791,
+      "local_x": 440,
+      "local_y": 48,
+      "source": "manual",
+      "id": "be162fe2-6df0-4f08-8443-a1cfc6794c9e",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 113",
+      "hex": "#424242",
+      "rgb": [
+        66,
+        66,
+        66
+      ],
+      "screen_x": 872,
+      "screen_y": 791,
+      "local_x": 407,
+      "local_y": 48,
+      "source": "manual",
+      "id": "e69f9f86-bfe4-46f9-b86b-e094af59e335",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 114",
+      "hex": "#B4B4B4",
+      "rgb": [
+        180,
+        180,
+        180
+      ],
+      "screen_x": 874,
+      "screen_y": 764,
+      "local_x": 409,
+      "local_y": 21,
+      "source": "manual",
+      "id": "da80c55f-f513-4c58-b65d-45cdcf9000fd",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 115",
+      "hex": "#BEBEBE",
+      "rgb": [
+        190,
+        190,
+        190
+      ],
+      "screen_x": 844,
+      "screen_y": 764,
+      "local_x": 379,
+      "local_y": 21,
+      "source": "manual",
+      "id": "a6b69a29-b654-464c-aa7f-4d076b34aae4",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 116",
+      "hex": "#525252",
+      "rgb": [
+        82,
+        82,
+        82
+      ],
+      "screen_x": 840,
+      "screen_y": 791,
+      "local_x": 375,
+      "local_y": 48,
+      "source": "manual",
+      "id": "f51b8906-3643-482c-8f44-fde43f7420ef",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 117",
+      "hex": "#535353",
+      "rgb": [
+        83,
+        83,
+        83
+      ],
+      "screen_x": 810,
+      "screen_y": 791,
+      "local_x": 345,
+      "local_y": 48,
+      "source": "manual",
+      "id": "8b5933e9-64f2-449e-bf11-2953e2f3cbf5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 118",
+      "hex": "#C8C8C8",
+      "rgb": [
+        200,
+        200,
+        200
+      ],
+      "screen_x": 814,
+      "screen_y": 763,
+      "local_x": 349,
+      "local_y": 20,
+      "source": "manual",
+      "id": "7b4e0976-212e-4e2e-9859-4c14dbc9bbc5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 119",
+      "hex": "#D3D3D3",
+      "rgb": [
+        211,
+        211,
+        211
+      ],
+      "screen_x": 783,
+      "screen_y": 764,
+      "local_x": 318,
+      "local_y": 21,
+      "source": "manual",
+      "id": "1722be9c-bcd5-49ef-a854-60d0ff817d7d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 120",
+      "hex": "#626262",
+      "rgb": [
+        98,
+        98,
+        98
+      ],
+      "screen_x": 782,
+      "screen_y": 791,
+      "local_x": 317,
+      "local_y": 48,
+      "source": "manual",
+      "id": "e22c5a86-b263-43cc-b21e-408572ad7bff",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 121",
+      "hex": "#707070",
+      "rgb": [
+        112,
+        112,
+        112
+      ],
+      "screen_x": 752,
+      "screen_y": 789,
+      "local_x": 287,
       "local_y": 46,
       "source": "manual",
-      "id": "61f37653-6af2-4fe9-9533-2d024ca6c9f4",
+      "id": "168cc42a-d45b-4e27-8550-43ead9d83f75",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 122",
+      "hex": "#DCDCDC",
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "screen_x": 753,
+      "screen_y": 764,
+      "local_x": 288,
+      "local_y": 21,
+      "source": "manual",
+      "id": "2f7b3354-35c8-4755-8f18-140a53ad5f15",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 123",
+      "hex": "#E4E4E4",
+      "rgb": [
+        228,
+        228,
+        228
+      ],
+      "screen_x": 722,
+      "screen_y": 764,
+      "local_x": 257,
+      "local_y": 21,
+      "source": "manual",
+      "id": "5475c21a-d3d3-4bea-a8ee-f16bbdea13b4",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 124",
+      "hex": "#7C7C7C",
+      "rgb": [
+        124,
+        124,
+        124
+      ],
+      "screen_x": 725,
+      "screen_y": 791,
+      "local_x": 260,
+      "local_y": 48,
+      "source": "manual",
+      "id": "27fad305-2ac3-42f9-8549-7e78eed22bd5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 125",
+      "hex": "#898989",
+      "rgb": [
+        137,
+        137,
+        137
+      ],
+      "screen_x": 692,
+      "screen_y": 789,
+      "local_x": 227,
+      "local_y": 46,
+      "source": "manual",
+      "id": "2193a093-1734-408c-b453-e5b21fb44d2b",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 126",
+      "hex": "#EEEEEE",
+      "rgb": [
+        238,
+        238,
+        238
+      ],
+      "screen_x": 691,
+      "screen_y": 764,
+      "local_x": 226,
+      "local_y": 21,
+      "source": "manual",
+      "id": "e0ca7c0e-9a62-400c-84f2-46491e3830bf",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 127",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "screen_x": 661,
+      "screen_y": 767,
+      "local_x": 196,
+      "local_y": 24,
+      "source": "manual",
+      "id": "548b16f2-22b2-4521-941c-2217edc8072f",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 128",
+      "hex": "#959696",
+      "rgb": [
+        149,
+        150,
+        150
+      ],
+      "screen_x": 662,
+      "screen_y": 791,
+      "local_x": 197,
+      "local_y": 48,
+      "source": "manual",
+      "id": "ff411e71-cbf6-4e69-a6f7-ac548d1ca40e",
       "status": "confirmed"
     }
   ],
@@ -531,264 +2067,12 @@
     "dpi_scale_percent": 100,
     "browser_label": "",
     "notes": "",
-    "captured_at": "2026-10-27T02:35:12+03:00",
+    "captured_at": "2026-11-27T19:53:47+03:00",
     "capture_method": "screenshot-assisted"
   },
   "metadata": {
     "source": "desktop-screenshot",
     "method": "screenshot-assisted",
-    "captured_at": "2026-10-27T02:35:12+03:00",
-    "palette_reduction": {
-      "enabled": true,
-      "method": "CIELAB_farthest_point_seeding_plus_palette_medoid_refinement",
-      "input_color_count": 103,
-      "output_color_count": 32,
-      "target_color_count": 32,
-      "removed_color_count": 71,
-      "required_color_hexes": [
-        "#FFFFFF",
-        "#000000"
-      ],
-      "preserved_required_colors": [
-        "#FFFFFF"
-      ],
-      "missing_required_colors": [
-        "#000000"
-      ],
-      "reserved_color_hexes": [
-        "#FFFFFF"
-      ],
-      "mean_delta_e76": 9.5162,
-      "max_delta_e76": 27.1334,
-      "clusters": [
-        {
-          "representative_hex": "#00FE01",
-          "representative_name": "Цвет 3",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#01FEFE",
-          "representative_name": "Цвет 4",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#0003FB",
-          "representative_name": "Цвет 5",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#FF00FF",
-          "representative_name": "Цвет 6",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#E60213",
-          "representative_name": "Цвет 7",
-          "represented_color_count": 4,
-          "max_delta_e76": 18.0587
-        },
-        {
-          "representative_hex": "#F59701",
-          "representative_name": "Цвет 9",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#930784",
-          "representative_name": "Цвет 20",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#FBF300",
-          "representative_name": "Цвет 23",
-          "represented_color_count": 4,
-          "max_delta_e76": 20.261
-        },
-        {
-          "representative_hex": "#049649",
-          "representative_name": "Цвет 24",
-          "represented_color_count": 4,
-          "max_delta_e76": 11.4268
-        },
-        {
-          "representative_hex": "#212086",
-          "representative_name": "Цвет 26",
-          "represented_color_count": 7,
-          "max_delta_e76": 21.3689
-        },
-        {
-          "representative_hex": "#E20085",
-          "representative_name": "Цвет 27",
-          "represented_color_count": 3,
-          "max_delta_e76": 16.8268
-        },
-        {
-          "representative_hex": "#AD6A01",
-          "representative_name": "Цвет 30",
-          "represented_color_count": 4,
-          "max_delta_e76": 22.3801
-        },
-        {
-          "representative_hex": "#B7AB01",
-          "representative_name": "Цвет 31",
-          "represented_color_count": 3,
-          "max_delta_e76": 20.0109
-        },
-        {
-          "representative_hex": "#638C0C",
-          "representative_name": "Цвет 32",
-          "represented_color_count": 3,
-          "max_delta_e76": 17.3176
-        },
-        {
-          "representative_hex": "#00736E",
-          "representative_name": "Цвет 35",
-          "represented_color_count": 2,
-          "max_delta_e76": 11.2431
-        },
-        {
-          "representative_hex": "#A5015B",
-          "representative_name": "Цвет 42",
-          "represented_color_count": 2,
-          "max_delta_e76": 11.4273
-        },
-        {
-          "representative_hex": "#F39B77",
-          "representative_name": "Цвет 43",
-          "represented_color_count": 6,
-          "max_delta_e76": 22.5514
-        },
-        {
-          "representative_hex": "#F7CE8C",
-          "representative_name": "Цвет 45",
-          "represented_color_count": 3,
-          "max_delta_e76": 18.4823
-        },
-        {
-          "representative_hex": "#8CC798",
-          "representative_name": "Цвет 49",
-          "represented_color_count": 2,
-          "max_delta_e76": 11.6882
-        },
-        {
-          "representative_hex": "#AA89BE",
-          "representative_name": "Цвет 55",
-          "represented_color_count": 7,
-          "max_delta_e76": 27.1334
-        },
-        {
-          "representative_hex": "#802D01",
-          "representative_name": "Цвет 60",
-          "represented_color_count": 6,
-          "max_delta_e76": 16.534
-        },
-        {
-          "representative_hex": "#015E17",
-          "representative_name": "Цвет 64",
-          "represented_color_count": 3,
-          "max_delta_e76": 9.0701
-        },
-        {
-          "representative_hex": "#013567",
-          "representative_name": "Цвет 68",
-          "represented_color_count": 5,
-          "max_delta_e76": 18.4907
-        },
-        {
-          "representative_hex": "#500047",
-          "representative_name": "Цвет 72",
-          "represented_color_count": 3,
-          "max_delta_e76": 17.512
-        },
-        {
-          "representative_hex": "#81C466",
-          "representative_name": "Цвет 79",
-          "represented_color_count": 3,
-          "max_delta_e76": 17.765
-        },
-        {
-          "representative_hex": "#16B3AC",
-          "representative_name": "Цвет 81",
-          "represented_color_count": 3,
-          "max_delta_e76": 15.7736
-        },
-        {
-          "representative_hex": "#00B7F0",
-          "representative_name": "Цвет 82",
-          "represented_color_count": 4,
-          "max_delta_e76": 19.2989
-        },
-        {
-          "representative_hex": "#566EB6",
-          "representative_name": "Цвет 84",
-          "represented_color_count": 6,
-          "max_delta_e76": 16.7909
-        },
-        {
-          "representative_hex": "#A7927D",
-          "representative_name": "Цвет 96",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        },
-        {
-          "representative_hex": "#FEC0AF",
-          "representative_name": "Цвет 101",
-          "represented_color_count": 6,
-          "max_delta_e76": 14.0842
-        },
-        {
-          "representative_hex": "#FFFFFF",
-          "representative_name": "Цвет 102",
-          "represented_color_count": 2,
-          "max_delta_e76": 20.9397
-        },
-        {
-          "representative_hex": "#1B1B1B",
-          "representative_name": "Цвет 103",
-          "represented_color_count": 1,
-          "max_delta_e76": 0.0
-        }
-      ],
-      "selected_hex_colors": [
-        "#00FE01",
-        "#01FEFE",
-        "#0003FB",
-        "#FF00FF",
-        "#E60213",
-        "#F59701",
-        "#930784",
-        "#FBF300",
-        "#049649",
-        "#212086",
-        "#E20085",
-        "#AD6A01",
-        "#B7AB01",
-        "#638C0C",
-        "#00736E",
-        "#A5015B",
-        "#F39B77",
-        "#F7CE8C",
-        "#8CC798",
-        "#AA89BE",
-        "#802D01",
-        "#015E17",
-        "#013567",
-        "#500047",
-        "#81C466",
-        "#16B3AC",
-        "#00B7F0",
-        "#566EB6",
-        "#A7927D",
-        "#FEC0AF",
-        "#FFFFFF",
-        "#1B1B1B"
-      ],
-      "note": "Выбраны реальные образцы из исходной игровой палитры; координаты кликов и RGB сохранены без изменений. Обязательные цвета остаются в палитре, если присутствуют в источнике. ΔE76 используется для кластеризации и оценки покрытия."
-    }
+    "captured_at": "2026-11-27T19:53:47+03:00"
   }
 }

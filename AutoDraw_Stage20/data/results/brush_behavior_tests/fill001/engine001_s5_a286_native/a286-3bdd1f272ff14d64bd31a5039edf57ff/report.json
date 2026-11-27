@@ -1,0 +1,1275 @@
+{
+  "schema": "ENGINE001_S5_A286_NATIVE_STAGE6_V1",
+  "run_id": "a286-3bdd1f272ff14d64bd31a5039edf57ff",
+  "started": "2026-11-27T16:43:43.002597+00:00",
+  "baseline_sha": "f33791afe82dee25d88c8fc0aef521b27c550861",
+  "baseline_run": "45704720111",
+  "archive_sha256": "a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583",
+  "plan_sha256": "08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8",
+  "runner_sha256": "e2c33563628f9150dc3829cbc1f35739fe8b07d57cb5812b9b59fdcec363eb63",
+  "observer_sha256": "abca32995e59dd9222f5eb20c04920f4990750abd7638a3e273b43f7decffdaf",
+  "bridge_session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a",
+  "startup": "FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
+  "input_transport": "STAGE6_PYAUTOGUI",
+  "smooth": false,
+  "mode": "normal",
+  "planned_strokes": 3270,
+  "planned_vertices": 72128,
+  "quota_reserve": 300,
+  "status": "BLOCKED",
+  "exact_CHALK": null,
+  "slider_calibration_source": "TAB2_CONFIRMED_STAGE6",
+  "slider_track": {
+    "x_at_min": 1363,
+    "x_at_max": 1207,
+    "y": 306,
+    "initial_value": 7,
+    "screen_width": 1920,
+    "screen_height": 1080,
+    "confirmed": true,
+    "min_value": 1,
+    "max_value": 30
+  },
+  "raw_tab9_endpoints": {
+    "mode": "slider",
+    "start": [
+      1207,
+      307
+    ],
+    "end": [
+      1363,
+      306
+    ],
+    "screen_size": {
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  "completed_strokes": 0,
+  "evidence_level": "E4_PENDING",
+  "pre": {
+    "active": false,
+    "blank": [
+      [
+        1,
+        0,
+        16777215
+      ]
+    ],
+    "colorRgb": 1776411,
+    "discovery": {
+      "candidateCount": 2,
+      "candidates": [
+        {
+          "constructorMatch": true,
+          "controls": true,
+          "eligible": true,
+          "height": 240,
+          "monitorOwned": true,
+          "onStage": true,
+          "structural": true,
+          "visible": true,
+          "width": 460
+        },
+        {
+          "constructorMatch": true,
+          "controls": true,
+          "eligible": true,
+          "height": 240,
+          "monitorOwned": false,
+          "onStage": true,
+          "structural": true,
+          "visible": true,
+          "width": 460
+        }
+      ],
+      "candidatesTruncated": false,
+      "constructorAvailable": true,
+      "constructorMatches": 2,
+      "eligibleCount": 2,
+      "monitorOwnedCount": 1,
+      "structuralMatches": 2,
+      "visited": 2800
+    },
+    "empty": true,
+    "geometry": {
+      "boardDetected": true,
+      "boardDisplayChain": [
+        {
+          "className": "o",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 320.7916660308838,
+            "ty": 72
+          },
+          "height": 240,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": {
+            "height": 240,
+            "width": 460,
+            "x": 0,
+            "y": 0
+          },
+          "width": 460,
+          "x": 30,
+          "y": 75
+        },
+        {
+          "className": "o",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 290.7916660308838,
+            "ty": -3
+          },
+          "height": 379,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 676,
+          "x": 290.7916660308838,
+          "y": -3
+        },
+        {
+          "className": "i",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 603,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 1274,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "className": "Preloader",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 740.2658760292177,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": {
+            "height": 600,
+            "width": 1274,
+            "x": 0,
+            "y": 0
+          },
+          "width": 2830.0809053156145,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "className": "i",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 740.2658760292177,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 2830.0809053156145,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "boardLabel": "o",
+      "boardLogicalSize": {
+        "height": 240,
+        "width": 460
+      },
+      "canvasRenderer": "n",
+      "canvasScaleFactor": 2,
+      "canvasScaleX": 4,
+      "canvasScaleY": 4,
+      "devicePixelRatio": 1,
+      "engineVersion": "5.4.1",
+      "inspectionMode": "read_only",
+      "playerCount": 1,
+      "players": [
+        {
+          "boardClientCorners": {
+            "bottomLeft": {
+              "x": 483.4536882098092,
+              "y": 470.62
+            },
+            "bottomRight": {
+              "x": 1176.703295745131,
+              "y": 470.62
+            },
+            "topLeft": {
+              "x": 483.4536882098092,
+              "y": 108.22
+            },
+            "topRight": {
+              "x": 1176.703295745131,
+              "y": 108.22
+            }
+          },
+          "boardClientMappingMethod": "validated_axis_aligned_rect",
+          "boardDisplayChain": [
+            {
+              "className": "o",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              },
+              "height": 240,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": {
+                "height": 240,
+                "width": 460,
+                "x": 0,
+                "y": 0
+              },
+              "width": 460,
+              "x": 30,
+              "y": 75
+            },
+            {
+              "className": "o",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 290.7916660308838,
+                "ty": -3
+              },
+              "height": 379,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 676,
+              "x": 290.7916660308838,
+              "y": -3
+            },
+            {
+              "className": "i",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 603,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 1274,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "className": "Preloader",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 740.2658760292177,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": {
+                "height": 600,
+                "width": 1274,
+                "x": 0,
+                "y": 0
+              },
+              "width": 2830.0809053156145,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "className": "i",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 740.2658760292177,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 2830.0809053156145,
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "boardMask": {
+            "className": "i",
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            },
+            "height": 240,
+            "width": 460,
+            "x": 30,
+            "y": 75
+          },
+          "boardStageCorners": {
+            "bottomLeft": {
+              "x": 320.7916660308838,
+              "y": 312
+            },
+            "bottomRight": {
+              "x": 780.7916660308838,
+              "y": 312
+            },
+            "topLeft": {
+              "x": 320.7916660308838,
+              "y": 72
+            },
+            "topRight": {
+              "x": 780.7916660308838,
+              "y": 72
+            }
+          },
+          "canvas": {
+            "clientHeight": 2400,
+            "clientWidth": 5096,
+            "height": 2400,
+            "offsetLeft": 0,
+            "offsetTop": -1,
+            "rect": {
+              "bottom": 905.5,
+              "height": 906,
+              "left": 0,
+              "right": 1920,
+              "top": -0.5,
+              "width": 1920
+            },
+            "screenQuad": null,
+            "style": {
+              "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+              "computedTransformOrigin": "0px 0px",
+              "height": "",
+              "left": "0px",
+              "top": "-0.5px",
+              "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+              "transformOrigin": "0% 0% 0px",
+              "width": ""
+            },
+            "width": 5096
+          },
+          "containerRect": {
+            "bottom": 905,
+            "height": 905,
+            "left": 0,
+            "right": 1920,
+            "top": 0,
+            "width": 1920
+          },
+          "playerFound": true,
+          "playerMatchesStage": true,
+          "playerOptions": {
+            "contentHeight": 600,
+            "contentWidth": 740,
+            "frameRate": 30,
+            "renderModeOption": null,
+            "scaleMode": "fixedHeight"
+          },
+          "stage": {
+            "frameRate": 30,
+            "height": 600,
+            "orientation": "auto",
+            "scaleMode": "fixedHeight",
+            "width": 1274
+          }
+        }
+      ],
+      "renderMode": "webgl",
+      "runtimeType": "web",
+      "systemRenderer": "n",
+      "visualViewportScale": 1,
+      "windowGeometry": {
+        "availableScreenHeight": 1032,
+        "availableScreenWidth": 1920,
+        "innerHeight": 905,
+        "innerWidth": 1920,
+        "outerHeight": 1056,
+        "outerWidth": 1936,
+        "screenHeight": 1080,
+        "screenWidth": 1920,
+        "screenX": -8,
+        "screenY": -8
+      }
+    },
+    "slot": 1,
+    "smooth": false,
+    "snapshot": {
+      "currentRadius": 30,
+      "isExact": true,
+      "logicalHeight": 240,
+      "logicalWidth": 460,
+      "maxPoints": 6000,
+      "pointCount": 1,
+      "radius": [
+        0,
+        30
+      ],
+      "remainingPoints": 5999,
+      "scaleX": 1,
+      "scaleY": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "validationStatus": "valid"
+    },
+    "viewport": {
+      "height": 905,
+      "width": 1920
+    },
+    "width": 30,
+    "witness": {
+      "buttons": 0,
+      "canvas": true,
+      "trusted": true,
+      "x": 941,
+      "y": 340
+    }
+  },
+  "passive_witnesses": [],
+  "bridge_passive_preflight": {
+    "mapping": {
+      "schema": "FILL001_BOARDPANE_PREFLIGHT_V1",
+      "status": "validated_preflight_input_transform_not_live_draw",
+      "session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a",
+      "renderer_geometry_sha256": "7a7d2a09be88f23772e1277d13d36feccd805947738fded1c7327008ffb2665d",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "passive_samples_sha256": "d39ba784bcc58eb8580459e19804ab9134a1196e5bbcc8183eff57e7f2c02d62",
+      "passive_samples": [
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a",
+          "renderer_geometry_sha256": "7a7d2a09be88f23772e1277d13d36feccd805947738fded1c7327008ffb2665d",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-27T16:43:44.984+00:00",
+          "clientX": 719.0,
+          "clientY": 253.0,
+          "screenX": 719.0,
+          "screenY": 388.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a",
+          "renderer_geometry_sha256": "7a7d2a09be88f23772e1277d13d36feccd805947738fded1c7327008ffb2665d",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-27T16:43:45.434+00:00",
+          "clientX": 830.0,
+          "clientY": 297.0,
+          "screenX": 830.0,
+          "screenY": 432.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a",
+          "renderer_geometry_sha256": "7a7d2a09be88f23772e1277d13d36feccd805947738fded1c7327008ffb2665d",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-27T16:43:45.881+00:00",
+          "clientX": 941.0,
+          "clientY": 340.0,
+          "screenX": 941.0,
+          "screenY": 475.0
+        }
+      ],
+      "passive_sample_count": 3,
+      "client_to_desktop_offset": {
+        "x": 0.0,
+        "y": 135.0
+      },
+      "board_screen_corners": {
+        "left": 483.4536882098092,
+        "top": 243.22,
+        "right": 1176.703295745131,
+        "bottom": 605.62
+      },
+      "screen_roi": {
+        "x": 483,
+        "y": 243,
+        "width": 694,
+        "height": 363
+      },
+      "method": "same_session_passive_DOM_mouse_plus_validated_BoardPane_corners",
+      "no_fallback": true,
+      "preflight_valid_at_utc": "2026-11-27T16:43:46.277511+00:00"
+    },
+    "roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    }
+  },
+  "board_bounds_css": [
+    483.4536882098092,
+    108.22,
+    1176.703295745131,
+    470.62
+  ],
+  "live_initial_radius": 30,
+  "executor_config": {
+    "point_step_px": 2.0,
+    "line_extension_px": 0.0,
+    "point_delay_ms": 60,
+    "after_mouse_up_ms": 100,
+    "before_mouse_down_ms": 100,
+    "after_mouse_down_ms": 100,
+    "end_hold_ms": 100,
+    "countdown_seconds": 1
+  },
+  "required_colors": [
+    "#535353",
+    "#9082BD",
+    "#9F9F9F",
+    "#B38851",
+    "#EEEEEE",
+    "#F29C9F",
+    "#FCD2BC",
+    "#FEFD04"
+  ],
+  "before_png": {
+    "sha256": "7151232fe29fdeb19615f5700184865d2daadeee31acd17886eaa6896a17488f",
+    "size": [
+      694,
+      363
+    ],
+    "capture_method": "FILL001_VERIFIED_NATIVE_ROI",
+    "roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    },
+    "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+    "session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a"
+  },
+  "stage6_summary": {
+    "status": "failed",
+    "completed_strokes": 0,
+    "total_strokes": 3270,
+    "started_at": "2026-11-27T19:43:50+03:00",
+    "ended_at": "2026-11-27T19:43:51+03:00",
+    "duration_seconds": 1.195,
+    "move_calls": 0,
+    "error": "ColorPlanExecutionError: Палитра не прошла проверку на текущем экране. Рисование не начато.\n• Цвет образца Цвет 1 изменился: сохранено #FD0100, на снимке #E9FCFF.\n• Цвет образца Цвет 2 изменился: сохранено #FEFD04, на снимке #E9FCFF.\n• Цвет образца Цвет 3 изменился: сохранено #00FE01, на снимке #E9FCFF.\n• Цвет образца Цвет 4 изменился: сохранено #01FEFE, на снимке #E9FCFF.\n• Цвет образца Цвет 5 изменился: сохранено #0003FB, на снимке #DFF1FF.\n• Цвет образца Цвет 19 изменился: сохранено #601886, на снимке #804EA2.\n• Цвет образца Цвет 20 изменился: сохранено #930784, на снимке #E9FCFF.\n• Цвет образца Цвет 21 изменился: сохранено #E2007E, на снимке #E9FCFF.\n• Цвет образца Цвет 22 изменился: сохранено #E40215, на снимке #E9FCFF.\n• Цвет образца Цвет 23 изменился: сохранено #FBF300, на снимке #E9FCFF.\n• Цвет образца Цвет 24 изменился: сохранено #049649, на снимке #E9FCFF.\n• Цвет образца Цвет 25 изменился: сохранено #00A2E6, на снимке #E9FCFF.\n• Цвет образца Цвет 40 изменился: сохранено #440063, на снимке #6B3C88.\n• Цвет образца Цвет 41 изменился: сохранено #6A0261, на снимке #E9FCFF.\n• Цвет образца Цвет 42 изменился: сохранено #A5015B, на снимке #E9FCFF.\n• Цвет образца Цвет 43 изменился: сохранено #F39B77, на снимке #E9FCFF.\n• Цвет образца Цвет 44 изменился: сохранено #F6B381, на снимке #E9FCFF.\n• Цвет образца Цвет 45 изменился: сохранено #F7CE8C, на снимке #E9FCFF.\n• Цвет образца Цвет 46 изменился: сохранено #FFF99B, на снимке #E9FCFF.\n• Цвет образца Цвет 71 изменился: сохранено #32004A, на снимке #5D3C74.\n• Цвет образца Цвет 72 изменился: сохранено #500047, на снимке #E9FCFF.\n• Цвет образца Цвет 73 изменился: сохранено #7F0043, на снимке #E9FCFF.\n• Цвет образца Цвет 74 изменился: сохранено #EE6742, на снимке #E9FCFF.\n• Цвет образца Цвет 75 изменился: сохранено #F3914A, на снимке #E9FCFF.\n• Цвет образца Цвет 76 изменился: сохранено #F7B652, на снимке #E9FCFF.\n• Цвет образца Цвет 77 изменился: сохранено #FEF45C, на снимке #E9FCFF.\n• Цвет образца Цвет 100 изменился: сохранено #FDAEAA, на снимке #E9FCFF.\n• Цвет образца Цвет 101 изменился: сохранено #FEC0AF, на снимке #E9FCFF.\n• Цвет образца Цвет 102 изменился: сохранено #FDB692, на снимке #E9FCFF.\n• Цвет образца Цвет 103 изменился: сохранено #A40035, на снимке #E9FCFF.\n• Цвет образца Цвет 104 изменился: сохранено #A60236, на снимке #E9FCFF.\n• Цвет образца Цвет 105 изменился: сохранено #E40150, на снимке #E9FCFF.\nОткройте браузер с палитрой, проверьте профиль на вкладке 3 и повторите запуск.",
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 60,
+      "after_mouse_up_ms": 100,
+      "before_mouse_down_ms": 100,
+      "after_mouse_down_ms": 100,
+      "end_hold_ms": 100,
+      "countdown_seconds": 1
+    }
+  },
+  "tool_selection": {
+    "profile_name": "Browser palette",
+    "browser_label": "",
+    "selected_color_count": 0,
+    "selection_order": [],
+    "used_colors": [
+      {
+        "palette_index": 0,
+        "color_id": "184219e3-9ce1-44a9-bd67-7e8963ce4de5",
+        "name": "Цвет 126",
+        "rgb": [
+          238,
+          238,
+          238
+        ],
+        "hex": "#EEEEEE",
+        "screen_x": 699,
+        "screen_y": 771,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 1,
+        "color_id": "064929c5-6ba8-4098-9cd5-c08a40493352",
+        "name": "Цвет 2",
+        "rgb": [
+          254,
+          253,
+          4
+        ],
+        "hex": "#FEFD04",
+        "screen_x": 525,
+        "screen_y": 770,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 2,
+        "color_id": "7f70215c-acd7-4c8f-98dd-c46daf8dfa66",
+        "name": "Цвет 97",
+        "rgb": [
+          252,
+          210,
+          188
+        ],
+        "hex": "#FCD2BC",
+        "screen_x": 1257,
+        "screen_y": 850,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 3,
+        "color_id": "c0eeae12-88c5-45de-9848-847382add054",
+        "name": "Цвет 58",
+        "rgb": [
+          242,
+          156,
+          159
+        ],
+        "hex": "#F29C9F",
+        "screen_x": 934,
+        "screen_y": 823,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 4,
+        "color_id": "50118a01-cbbf-4c4a-8fd2-960a1eac96ee",
+        "name": "Цвет 110",
+        "rgb": [
+          159,
+          159,
+          159
+        ],
+        "hex": "#9F9F9F",
+        "screen_x": 935,
+        "screen_y": 769,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 5,
+        "color_id": "9397d5f0-75a5-442f-af18-92ec99a7f03d",
+        "name": "Цвет 91",
+        "rgb": [
+          179,
+          136,
+          81
+        ],
+        "hex": "#B38851",
+        "screen_x": 1139,
+        "screen_y": 849,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 6,
+        "color_id": "452adf09-7292-4bd2-b355-a20505f52086",
+        "name": "Цвет 54",
+        "rgb": [
+          144,
+          130,
+          189
+        ],
+        "hex": "#9082BD",
+        "screen_x": 817,
+        "screen_y": 823,
+        "status": "confirmed"
+      },
+      {
+        "palette_index": 7,
+        "color_id": "e74d0b98-1d8d-4bc8-be2e-13c1cd8f70d1",
+        "name": "Цвет 117",
+        "rgb": [
+          83,
+          83,
+          83
+        ],
+        "hex": "#535353",
+        "screen_x": 818,
+        "screen_y": 797,
+        "status": "confirmed"
+      }
+    ],
+    "selection_policy": "select_only_when_color_changes; preserve_source_plan_stroke_order",
+    "screenshot_preflight": "not_completed",
+    "brush_size_selection_count": 0,
+    "brush_size_selection_order": [],
+    "brush_size_correction_counts": [],
+    "final_brush_slider_x": 1207,
+    "final_brush_value": 30,
+    "brush_slider_calibration": {
+      "x_at_min": 1363,
+      "x_at_max": 1207,
+      "y": 306,
+      "initial_value": 30,
+      "screen_width": 1920,
+      "screen_height": 1080,
+      "confirmed": true
+    }
+  },
+  "reason": "Blocked: ColorPlanExecutionError: Палитра не прошла проверку на текущем экране. Рисование не начато.",
+  "failure_snapshot": {
+    "active": false,
+    "blank": [
+      [
+        1,
+        0,
+        16777215
+      ]
+    ],
+    "colorRgb": 1776411,
+    "discovery": {
+      "candidateCount": 2,
+      "candidates": [
+        {
+          "constructorMatch": true,
+          "controls": true,
+          "eligible": true,
+          "height": 240,
+          "monitorOwned": true,
+          "onStage": true,
+          "structural": true,
+          "visible": true,
+          "width": 460
+        },
+        {
+          "constructorMatch": true,
+          "controls": true,
+          "eligible": true,
+          "height": 240,
+          "monitorOwned": false,
+          "onStage": true,
+          "structural": true,
+          "visible": true,
+          "width": 460
+        }
+      ],
+      "candidatesTruncated": false,
+      "constructorAvailable": true,
+      "constructorMatches": 2,
+      "eligibleCount": 2,
+      "monitorOwnedCount": 1,
+      "structuralMatches": 2,
+      "visited": 2813
+    },
+    "empty": true,
+    "geometry": {
+      "boardDetected": true,
+      "boardDisplayChain": [
+        {
+          "className": "o",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 320.7916660308838,
+            "ty": 72
+          },
+          "height": 240,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": {
+            "height": 240,
+            "width": 460,
+            "x": 0,
+            "y": 0
+          },
+          "width": 460,
+          "x": 30,
+          "y": 75
+        },
+        {
+          "className": "o",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 290.7916660308838,
+            "ty": -3
+          },
+          "height": 379,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 676,
+          "x": 290.7916660308838,
+          "y": -3
+        },
+        {
+          "className": "i",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 603,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 1274,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "className": "Preloader",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 737.9490000000001,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": {
+            "height": 600,
+            "width": 1274,
+            "x": 0,
+            "y": 0
+          },
+          "width": 2830.0809053156145,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "className": "i",
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 0,
+            "ty": 0
+          },
+          "height": 737.9490000000001,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scrollRect": null,
+          "width": 2830.0809053156145,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "boardLabel": "o",
+      "boardLogicalSize": {
+        "height": 240,
+        "width": 460
+      },
+      "canvasRenderer": "n",
+      "canvasScaleFactor": 2,
+      "canvasScaleX": 4,
+      "canvasScaleY": 4,
+      "devicePixelRatio": 1,
+      "engineVersion": "5.4.1",
+      "inspectionMode": "read_only",
+      "playerCount": 1,
+      "players": [
+        {
+          "boardClientCorners": {
+            "bottomLeft": {
+              "x": 483.4536882098092,
+              "y": 470.62
+            },
+            "bottomRight": {
+              "x": 1176.703295745131,
+              "y": 470.62
+            },
+            "topLeft": {
+              "x": 483.4536882098092,
+              "y": 108.22
+            },
+            "topRight": {
+              "x": 1176.703295745131,
+              "y": 108.22
+            }
+          },
+          "boardClientMappingMethod": "validated_axis_aligned_rect",
+          "boardDisplayChain": [
+            {
+              "className": "o",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              },
+              "height": 240,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": {
+                "height": 240,
+                "width": 460,
+                "x": 0,
+                "y": 0
+              },
+              "width": 460,
+              "x": 30,
+              "y": 75
+            },
+            {
+              "className": "o",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 290.7916660308838,
+                "ty": -3
+              },
+              "height": 379,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 676,
+              "x": 290.7916660308838,
+              "y": -3
+            },
+            {
+              "className": "i",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 603,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 1274,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "className": "Preloader",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 737.9490000000001,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": {
+                "height": 600,
+                "width": 1274,
+                "x": 0,
+                "y": 0
+              },
+              "width": 2830.0809053156145,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "className": "i",
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 0,
+                "ty": 0
+              },
+              "height": 737.9490000000001,
+              "rotation": 0,
+              "scaleX": 1,
+              "scaleY": 1,
+              "scrollRect": null,
+              "width": 2830.0809053156145,
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "boardMask": {
+            "className": "i",
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            },
+            "height": 240,
+            "width": 460,
+            "x": 30,
+            "y": 75
+          },
+          "boardStageCorners": {
+            "bottomLeft": {
+              "x": 320.7916660308838,
+              "y": 312
+            },
+            "bottomRight": {
+              "x": 780.7916660308838,
+              "y": 312
+            },
+            "topLeft": {
+              "x": 320.7916660308838,
+              "y": 72
+            },
+            "topRight": {
+              "x": 780.7916660308838,
+              "y": 72
+            }
+          },
+          "canvas": {
+            "clientHeight": 2400,
+            "clientWidth": 5096,
+            "height": 2400,
+            "offsetLeft": 0,
+            "offsetTop": -1,
+            "rect": {
+              "bottom": 905.5,
+              "height": 906,
+              "left": 0,
+              "right": 1920,
+              "top": -0.5,
+              "width": 1920
+            },
+            "screenQuad": null,
+            "style": {
+              "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+              "computedTransformOrigin": "0px 0px",
+              "height": "",
+              "left": "0px",
+              "top": "-0.5px",
+              "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+              "transformOrigin": "0% 0% 0px",
+              "width": ""
+            },
+            "width": 5096
+          },
+          "containerRect": {
+            "bottom": 905,
+            "height": 905,
+            "left": 0,
+            "right": 1920,
+            "top": 0,
+            "width": 1920
+          },
+          "playerFound": true,
+          "playerMatchesStage": true,
+          "playerOptions": {
+            "contentHeight": 600,
+            "contentWidth": 740,
+            "frameRate": 30,
+            "renderModeOption": null,
+            "scaleMode": "fixedHeight"
+          },
+          "stage": {
+            "frameRate": 30,
+            "height": 600,
+            "orientation": "auto",
+            "scaleMode": "fixedHeight",
+            "width": 1274
+          }
+        }
+      ],
+      "renderMode": "webgl",
+      "runtimeType": "web",
+      "systemRenderer": "n",
+      "visualViewportScale": 1,
+      "windowGeometry": {
+        "availableScreenHeight": 1032,
+        "availableScreenWidth": 1920,
+        "innerHeight": 905,
+        "innerWidth": 1920,
+        "outerHeight": 1056,
+        "outerWidth": 1936,
+        "screenHeight": 1080,
+        "screenWidth": 1920,
+        "screenX": -8,
+        "screenY": -8
+      }
+    },
+    "slot": 1,
+    "smooth": false,
+    "snapshot": {
+      "currentRadius": 30,
+      "isExact": true,
+      "logicalHeight": 240,
+      "logicalWidth": 460,
+      "maxPoints": 6000,
+      "pointCount": 1,
+      "radius": [
+        0,
+        30
+      ],
+      "remainingPoints": 5999,
+      "scaleX": 1,
+      "scaleY": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "validationStatus": "valid"
+    },
+    "viewport": {
+      "height": 905,
+      "width": 1920
+    },
+    "width": 30,
+    "witness": {
+      "buttons": 0,
+      "canvas": true,
+      "trusted": true,
+      "x": 941,
+      "y": 340
+    }
+  },
+  "failure_png": {
+    "sha256": "7151232fe29fdeb19615f5700184865d2daadeee31acd17886eaa6896a17488f",
+    "size": [
+      694,
+      363
+    ],
+    "capture_method": "FILL001_VERIFIED_NATIVE_ROI",
+    "roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    },
+    "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+    "session_id": "8d8460b7-e822-4773-ba04-550ba89aaa9a"
+  },
+  "board_discovery": {
+    "candidateCount": 2,
+    "candidates": [
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": true,
+        "height": 240,
+        "monitorOwned": true,
+        "onStage": true,
+        "structural": true,
+        "visible": true,
+        "width": 460
+      },
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": true,
+        "height": 240,
+        "monitorOwned": false,
+        "onStage": true,
+        "structural": true,
+        "visible": true,
+        "width": 460
+      }
+    ],
+    "candidatesTruncated": false,
+    "constructorAvailable": true,
+    "constructorMatches": 2,
+    "eligibleCount": 2,
+    "monitorOwnedCount": 1,
+    "structuralMatches": 2,
+    "visited": 2803
+  },
+  "canvas_discovery": {
+    "board_bounds_css": [
+      483.4536882098092,
+      108.22,
+      1176.703295745131,
+      470.62
+    ],
+    "monitor_canvas_rect": {
+      "bottom": 905.5,
+      "height": 906,
+      "left": 0,
+      "right": 1920,
+      "top": -0.5,
+      "width": 1920
+    },
+    "dom_canvas_rects": [
+      [
+        0,
+        -0.5,
+        1920,
+        905.5,
+        1920,
+        905
+      ]
+    ],
+    "selected_index": 0
+  },
+  "finished": "2026-11-27T16:43:55.196093+00:00"
+}

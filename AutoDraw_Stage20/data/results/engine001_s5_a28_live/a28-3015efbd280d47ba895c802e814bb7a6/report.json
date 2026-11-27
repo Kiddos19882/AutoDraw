@@ -1,0 +1,54 @@
+{
+  "schema": "ENGINE001_S5_A28_LIVE_V1",
+  "run_id": "a28-3015efbd280d47ba895c802e814bb7a6",
+  "started": "2026-11-26T15:06:03.812192+00:00",
+  "baseline_sha": "f33791afe82dee25d88c8fc0aef521b27c550861",
+  "baseline_run": "45704720111",
+  "archive_sha256": "a17074538f9ba1015d7495cce6a9adc22567081f836d29c0457f4bff1874f583",
+  "runner_sha256": "0061be4b05ce3e16fc8645330e5b02a8937f5738d87524f7405c324efa5862a3",
+  "plan_sha256": "08fd735c86bb8403fe797f8bdbcceab344e6a2635bd4b4bed391211480be6bb8",
+  "mode": "normal",
+  "smooth": false,
+  "planned_strokes": 3270,
+  "planned_vertices": 72128,
+  "point_hold_seconds": 0.06,
+  "points_per_batch": 8,
+  "status": "BLOCKED",
+  "exact_CHALK": null,
+  "evidence_level": "E4_PENDING",
+  "completed_strokes": 0,
+  "reason": "Blocked: Expected exactly one visible structurally verified 460x240 BoardPane",
+  "board_discovery": {
+    "candidateCount": 2,
+    "candidates": [
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": true,
+        "height": 240,
+        "onStage": true,
+        "structural": true,
+        "visible": true,
+        "width": 460
+      },
+      {
+        "constructorMatch": true,
+        "controls": true,
+        "eligible": true,
+        "height": 240,
+        "onStage": true,
+        "structural": true,
+        "visible": true,
+        "width": 460
+      }
+    ],
+    "candidatesTruncated": false,
+    "constructorAvailable": true,
+    "constructorMatches": 2,
+    "eligibleCount": 2,
+    "error": "Expected exactly one visible structurally verified 460x240 BoardPane",
+    "structuralMatches": 2,
+    "visited": 2755
+  },
+  "finished": "2026-11-26T15:06:03.889521+00:00"
+}
