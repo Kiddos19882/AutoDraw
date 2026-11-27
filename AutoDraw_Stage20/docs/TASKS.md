@@ -1,7 +1,8 @@
 **ENGINE-001 S5 FIRST NEXT A28.6:** [shared Stage6 ownership and calibration](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a286--shared-stage6-ownership-and-calibration-2026-11-27).
 - [x] A28.5 E4 BLOCKED before drawing; slider endpoint equality inconsistent with tab 2.
 - [x] A28.6 reuse tab2/FILL owner, confirmed slider, mapped plan and shared MouseExecutor; local E2 PASS.
-- [ ] Verify A28.6 CI and operator live replay with confirmed tab2 slider, full palette, clean board and smoothing off; report/Monitor/PNG. E4/E5 NOT_RUN.
+- [x] A28.6 E3 [CI46035227938](https://github.com/Kiddos19882/AutoDraw/actions/runs/46035227938) 5/5 SUCCESS on 86e50780; FILL/Markdown PASS; offline original A27 adapter fixture 3270/72128 PASS.
+- [ ] Operator live replay with confirmed tab2 slider, full palette, clean board and smoothing off; report/Monitor/PNG. E4/E5 NOT_RUN.
 
 **ENGINE-001 S5 A28.5 history:** [physical Stage6 replay](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a285--physical-stage6-replay-2026-11-27).
 - [x] A28.4 E4 PARTIAL/BLOCKED twice; Monitor exact 323/3415, runner exact CHALK null; visual not verified.
