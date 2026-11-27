@@ -1,4 +1,4 @@
-"""A28.6: frozen A27 adapter for shared Stage6 and FILL-001 execution."""
+"""A28.7: frozen A27 adapter for shared Stage6 and FILL-001 execution."""
 from __future__ import annotations
 
 import json
@@ -11,7 +11,7 @@ from engine001_a28_live import (
     Blocked, LiveReplay, digest, error_summary, exact, require, utc,
 )
 
-SCHEMA = "ENGINE001_S5_A286_NATIVE_STAGE6_V1"
+SCHEMA = "ENGINE001_S5_A287_NATIVE_STAGE6_V1"
 SETTERS = """if(op==='selectBrush'){
  if(b._isStart||a.points[k].length!==0)throw Error('Active/nonempty stroke slot');
  b.setRadius(options.width);b.setColor(options.colorRgb);b.setSmooth(false);
@@ -155,7 +155,7 @@ class NativeLiveReplay(LiveReplay):
         self.progress_callback = progress_callback
 
     def read(self, op="read", options=None):
-        require(op in ALLOWED_OPS, "A28.6 browser mutation forbidden")
+        require(op in ALLOWED_OPS, "A28.7 browser mutation forbidden")
         from firefox_monitor_session import GAME_ORIGIN, MONITOR_VERSION
         result = self.driver.execute_script(READ_ONLY_SCRIPT, op, self.id, options,
                                             GAME_ORIGIN, MONITOR_VERSION)
@@ -165,7 +165,7 @@ class NativeLiveReplay(LiveReplay):
         return result
 
     def draw(self, *_args, **_kwargs):
-        raise Blocked("A28.4 Selenium drawing disabled in A28.6")
+        raise Blocked("A28.4 Selenium drawing disabled in A28.7")
 
     def run(self, paths):
         from drawing.color_plan_execution import ColorPlanExecutionHooks
@@ -178,7 +178,7 @@ class NativeLiveReplay(LiveReplay):
                       runner_sha256=digest(Path(__file__).read_bytes()),
                       observer_sha256=digest(Path(__file__).with_name("engine001_a28_live.py").read_bytes()),
                       bridge_session_id=self.session_id, startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
-                      input_transport="STAGE6_PYAUTOGUI", smooth=False, mode="normal",
+                      input_transport="STAGE6_PYAUTOGUI", sampling_profile="P1", smooth=False, mode="normal",
                       planned_strokes=len(paths), planned_vertices=sum(len(p["points"]) for p in paths),
                       quota_reserve=QUOTA_SAFETY_MARGIN, status="BLOCKED", exact_CHALK=None,
                       slider_calibration_source="TAB2_CONFIRMED_STAGE6",
@@ -197,7 +197,7 @@ class NativeLiveReplay(LiveReplay):
             report.update(pre=before, passive_witnesses=witnesses,
                           bridge_passive_preflight=self.bridge_witness, board_bounds_css=self.bounds,
                           live_initial_radius=before["width"])
-            require(before["smooth"] is False, "Disable game smoothing manually before A28.6")
+            require(before["smooth"] is False, "Disable game smoothing manually before A28.7")
             roi = self.bridge_witness["roi"]
             proof = self.bridge_witness["mapping"]
             plan = desktop_plan(paths, self.mapped_probe_plan, roi)
@@ -224,9 +224,9 @@ class NativeLiveReplay(LiveReplay):
                         "Palette swatch intersects BoardPane; no click permitted")
             # Only explicit experimental configuration: preserve path, no extension.
             # Stage6 interpolation/physical timing is distinct from A28.4 W3C sampling.
-            config = ExecutorConfig(point_step_px=2.0,line_extension_px=0,
-                point_delay_ms=60,after_mouse_up_ms=100,before_mouse_down_ms=100,
-                after_mouse_down_ms=100,end_hold_ms=100,countdown_seconds=1)
+            config = ExecutorConfig(point_step_px=4.0,line_extension_px=0,
+                point_delay_ms=5,after_mouse_up_ms=20,before_mouse_down_ms=20,
+                after_mouse_down_ms=40,end_hold_ms=50,countdown_seconds=1)
             report.update(executor_config=config.to_dict(),
                 required_colors=sorted(f"#{p:06X}" for p in {s["colorRgb"] for s in paths}),
                 before_png=self.capture("before.png"))

@@ -1581,7 +1581,7 @@ class Stage6App:
                           "reason": error_summary(exc)}
             self.root.after(0, self._finish_a28_single_run, result, finished_callback)
         return self._start_isolated_stage6_worker(
-            worker, label="A28.6 Stage6", thread_name="A28.6-Stage6",
+            worker, label="A28.7 Stage6", thread_name="A28.7-Stage6",
             stop_event=stop_event,
         )
 
@@ -1595,7 +1595,7 @@ class Stage6App:
 
     def _finish_a28_single_run(self, result, callback):
         self._release_isolated_stage6_owner()
-        self.execution_state_var.set(f"Состояние: A28.6 {result.get('status', 'BLOCKED')}")
+        self.execution_state_var.set(f"Состояние: A28.7 {result.get('status', 'BLOCKED')}")
         if callable(callback):
             callback(result)
 

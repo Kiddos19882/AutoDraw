@@ -1,11 +1,15 @@
-**ENGINE-001 S5 FIRST NEXT A28.6:** [shared Stage6 ownership and calibration](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a286--shared-stage6-ownership-and-calibration-2026-11-27).
+**ENGINE-001 S5 FIRST NEXT A28.7:** [P1 live replay experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a287--p1-live-replay-2026-11-27).
+- [x] Apply research-only P1 timing to A28 using unchanged shared Stage6 and frozen A27.
+- [ ] Operator A28.7 live verification; preserve report, strokes, Monitor, PNG and compare actual accepted points/CHALK and visual details. E2/E3 NOT_RUN by request; E4/E5 pending.
+
+**ENGINE-001 S5 A28.6 history:** [shared Stage6 ownership and calibration](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a286--shared-stage6-ownership-and-calibration-2026-11-27).
 - [x] A28.5 E4 BLOCKED before drawing; slider endpoint equality inconsistent with tab 2.
 - [x] A28.6 reuse tab2/FILL owner, confirmed slider, mapped plan and shared MouseExecutor; local E2 PASS.
 - [x] A28.6 E3 [CI46035227938](https://github.com/Kiddos19882/AutoDraw/actions/runs/46035227938) 5/5 SUCCESS on 86e50780; FILL/Markdown PASS; offline original A27 adapter fixture 3270/72128 PASS.
 - [x] A28.6 startup diagnostic/corrective change: exact game host LNA exception in disposable WebDriver profile only; scoped access includes other local resources for this host; no changes to proxy or Bridge gates. E2 mock contracts 9/9 PASS.
 - [x] E4 retest at 3383bcd3 FAIL: exact-host exception configured, WebSocket closed 1006 after 5 ms before handshake; no strokes. User authorized temporary test-profile LNA disablement (base and WebSocket flags); E2 mock contracts 9/9 PASS. No production promotion.
 - [x] User reports startup succeeds; no new startup artifact supplied. User-authorized A28.6 post-stroke diagnostics: log rejected/mismatched closed stroke and continue from safe idle slot; exact_CHALK null if any warning, separate verified/attempted counts. Focused E2 7/7 PASS; existing input safety gates unchanged.
-- [ ] Verify fresh Firefox with both VPN and Windows proxy OFF: new WebSocket open, exact Origin, auth accepted, fresh unique board session; then operator live replay with confirmed tab2 slider, full palette, clean board and smoothing off; report/Monitor/PNG. Post-fix E4/E5 NOT_RUN.
+- [ ] A28.6 post-change primary runtime artifacts not supplied; next operator replay superseded by A28.7.
 
 **ENGINE-001 S5 A28.5 history:** [physical Stage6 replay](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a285--physical-stage6-replay-2026-11-27).
 - [x] A28.4 E4 PARTIAL/BLOCKED twice; Monitor exact 323/3415, runner exact CHALK null; visual not verified.

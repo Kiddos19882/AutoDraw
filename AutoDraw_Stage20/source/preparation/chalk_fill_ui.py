@@ -188,7 +188,7 @@ class Fill001Tab:
             command=self.stop_firefox_monitor,
         ).pack(side="left")
         ttk.Button(
-            bridge_controls, text="A28.6: A27 Joined — Stage6 мышь + Monitor + Bridge",
+            bridge_controls, text="A28.7: A27 Joined — Stage6 мышь + Monitor + Bridge",
             command=self.start_a28_live,
         ).pack(anchor="w", pady=(5, 0))
         ttk.Checkbutton(
@@ -422,7 +422,7 @@ class Fill001Tab:
             pass
 
     def start_a28_live(self) -> None:
-        """A28.6: use existing Firefox worker, physical Stage6 tool selection and drawing."""
+        """A28.7: use existing Firefox worker, physical Stage6 tool selection and drawing."""
         if self._firefox_thread is not None and self._firefox_thread.is_alive():
             self.bridge_status_var.set("BLOCKED: Firefox уже занят.")
             return
@@ -437,22 +437,22 @@ class Fill001Tab:
         try:
             paths, reference, target = load_plan(selected)
             if not callable(self.get_a28_palette_profile):
-                raise ValueError("A28.6: источник сохранённой палитры вкладки 3 не подключён.")
+                raise ValueError("A28.7: источник сохранённой палитры вкладки 3 не подключён.")
             palette_path, profile = self.get_a28_palette_profile()
             palette_targets(paths, profile)  # require exact confirmed colors before Firefox
             control = self.brush_tab.get_brush_control()
             if not callable(self.on_a28_run):
-                raise ValueError("A28.6: общий исполнитель Stage6 не подключён.")
+                raise ValueError("A28.7: общий исполнитель Stage6 не подключён.")
             # Tab 9 endpoints are retained as diagnostic data only. Stage6 owns the
             # confirmed track (including the shared averaging of the two Y values).
             if not messagebox.askyesno(
-                "A28.6", f"Палитра вкладки 3: {palette_path.name} ({len(profile['colors'])} цветов).\n"
+                "A28.7", f"Палитра вкладки 3: {palette_path.name} ({len(profile['colors'])} цветов).\n"
                 "Откройте чистую тестовую доску, видимую палитру и ползунок; выключите сглаживание. "
                 "Stage6 управляет физической мышью, резерв 300 CHALK, Alt/Stop для остановки; без Clear. Продолжить?",
                 icon="warning", parent=self.root,
             ):
                 return
-            out = self.output_dir / "engine001_s5_a286_native" / ("a286-" + uuid.uuid4().hex)
+            out = self.output_dir / "engine001_s5_a287_native" / ("a287-" + uuid.uuid4().hex)
             out.mkdir(parents=True, exist_ok=False)
             (out / "a27-native-reference.png").write_bytes(reference)
             (out / "a27-target.png").write_bytes(target)
@@ -473,7 +473,7 @@ class Fill001Tab:
         report = out / "report.json"
         if not report.exists():
             with report.open("x", encoding="utf-8") as f:
-                json.dump(dict(schema="ENGINE001_S5_A286_NATIVE_STAGE6_V1", run_id=out.name,
+                json.dump(dict(schema="ENGINE001_S5_A287_NATIVE_STAGE6_V1", run_id=out.name,
                                startup="FILL001_SHARED_FIREFOX_MONITOR_BRIDGE",
                                baseline_sha=BASE_SHA, plan_sha256=PLAN_SHA,
                                archive_sha256=ARCHIVE_SHA, status="BLOCKED",
