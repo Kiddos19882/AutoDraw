@@ -11,7 +11,7 @@ from unittest.mock import patch
 from firefox_monitor_session import (
     GAME_ORIGIN, FirefoxMonitorError, attach_monitor_after_confirmation,
     find_game_frame, validate_bridge_snippet, write_bridge_diagnostic, bridge_session_diagnostic,
-    open_firefox, PORTAL_URL, GAME_LNA_HOST, LNA_SKIP_DOMAINS_PREF,
+    open_firefox, PORTAL_URL, LNA_ENABLED_PREF, LNA_WEBSOCKET_ENABLED_PREF,
 )
 
 
@@ -69,7 +69,7 @@ class FirefoxMonitorContractTests(unittest.TestCase):
     def tearDown(self):
         self.modules.stop()
 
-    def test_open_firefox_scopes_lna_exception_to_game_host(self):
+    def test_open_firefox_disables_lna_only_in_temporary_test_profile(self):
         events = []
         preferences = {}
         driver = types.SimpleNamespace(get=lambda url: events.append(("navigate", url)))
@@ -83,14 +83,17 @@ class FirefoxMonitorContractTests(unittest.TestCase):
         sys.modules["selenium"].webdriver = webdriver
         self.assertIs(open_firefox(diagnostic=lambda event, **fields:
                       events.append((event, fields))), driver)
-        self.assertEqual(GAME_ORIGIN, "https://" + GAME_LNA_HOST)
         self.assertEqual(preferences, {
             "dom.webnotifications.enabled": False,
-            LNA_SKIP_DOMAINS_PREF: "eufbpet.hust.me",
+            "network.lna.enabled": False,
+            "network.lna.websocket.enabled": False,
         })
         self.assertEqual(events[0][0], "firefox_lna_profile_configured")
         self.assertEqual(events[0][1]["scope"], "temporary_webdriver_profile")
-        self.assertTrue(events[0][1]["global_lna_unchanged"])
+        self.assertTrue(events[0][1]["test_only"])
+        self.assertEqual(events[0][1]["preferences"], {
+            LNA_ENABLED_PREF: False, LNA_WEBSOCKET_ENABLED_PREF: False,
+        })
         self.assertTrue(events[0][1]["proxy_unchanged"])
         self.assertEqual(events[1], ("launch", preferences))
         self.assertEqual(events[2], ("navigate", PORTAL_URL))

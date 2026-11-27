@@ -14,9 +14,8 @@ from pathlib import Path
 
 PORTAL_URL = "https://pet-eu.hust.me/"
 GAME_ORIGIN = "https://eufbpet.hust.me"
-# Exact requesting host only; never add localhost, a wildcard or the portal.
-GAME_LNA_HOST = "eufbpet.hust.me"
-LNA_SKIP_DOMAINS_PREF = "network.lna.skip-domains"
+LNA_ENABLED_PREF = "network.lna.enabled"
+LNA_WEBSOCKET_ENABLED_PREF = "network.lna.websocket.enabled"
 MONITOR_VERSION = "0.2.4"
 
 
@@ -125,9 +124,9 @@ def validate_bridge_snippet(source: str) -> None:
 def open_firefox(*, diagnostic=None):
     """Create a dedicated temporary WebDriver session; the operator logs in.
 
-    LNA exception is scoped to the game host in this disposable profile only.
-    It authorizes that host to reach local resources, not just the Bridge port.
-    No system proxy, normal Firefox profile, or general LNA setting is changed.
+    User-authorized test-only LNA disablement in this disposable profile.
+    All sites in this test browser can reach local resources without LNA checks.
+    No system proxy, normal Firefox profile, or other security settings change.
     """
     try:
         from selenium import webdriver
@@ -137,14 +136,16 @@ def open_firefox(*, diagnostic=None):
         ) from exc
     options = webdriver.FirefoxOptions()
     options.set_preference("dom.webnotifications.enabled", False)
-    # Firefox >=153 gates public-to-loopback WebSockets with LNA. The game is
-    # a cross-origin iframe, so a remembered permission is not reliable.
-    # Apply the documented, operator-approved host exception before launch.
-    options.set_preference(LNA_SKIP_DOMAINS_PREF, GAME_LNA_HOST)
+    # The exact-host exception failed in live A28.6 (3383bcd3).
+    # Disable only Local Network Access (including WebSocket enforcement) for
+    # this test browser, at the user's explicit request. Do not use for production.
+    options.set_preference(LNA_ENABLED_PREF, False)
+    options.set_preference(LNA_WEBSOCKET_ENABLED_PREF, False)
     if diagnostic is not None:
         diagnostic("firefox_lna_profile_configured",
-                   preference=LNA_SKIP_DOMAINS_PREF, requesting_host=GAME_LNA_HOST,
-                   scope="temporary_webdriver_profile", global_lna_unchanged=True,
+                   preferences={LNA_ENABLED_PREF: False,
+                                LNA_WEBSOCKET_ENABLED_PREF: False},
+                   scope="temporary_webdriver_profile", test_only=True,
                    proxy_unchanged=True)
     driver = webdriver.Firefox(options=options)
     try:

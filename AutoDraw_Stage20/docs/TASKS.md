@@ -3,7 +3,8 @@
 - [x] A28.6 reuse tab2/FILL owner, confirmed slider, mapped plan and shared MouseExecutor; local E2 PASS.
 - [x] A28.6 E3 [CI46035227938](https://github.com/Kiddos19882/AutoDraw/actions/runs/46035227938) 5/5 SUCCESS on 86e50780; FILL/Markdown PASS; offline original A27 adapter fixture 3270/72128 PASS.
 - [x] A28.6 startup diagnostic/corrective change: exact game host LNA exception in disposable WebDriver profile only; scoped access includes other local resources for this host; no changes to proxy or Bridge gates. E2 mock contracts 9/9 PASS.
-- [ ] Verify fresh Firefox with VPN and Windows proxy OFF: new WebSocket open, exact Origin, auth accepted, fresh unique board session; then operator live replay with confirmed tab2 slider, full palette, clean board and smoothing off; report/Monitor/PNG. Post-fix E4/E5 NOT_RUN.
+- [x] E4 retest at 3383bcd3 FAIL: exact-host exception configured, WebSocket closed 1006 after 5 ms before handshake; no strokes. User authorized temporary test-profile LNA disablement (base and WebSocket flags); E2 mock contracts 9/9 PASS. No production promotion.
+- [ ] Verify fresh Firefox with both VPN and Windows proxy OFF: new WebSocket open, exact Origin, auth accepted, fresh unique board session; then operator live replay with confirmed tab2 slider, full palette, clean board and smoothing off; report/Monitor/PNG. Post-fix E4/E5 NOT_RUN.
 
 **ENGINE-001 S5 A28.5 history:** [physical Stage6 replay](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a285--physical-stage6-replay-2026-11-27).
 - [x] A28.4 E4 PARTIAL/BLOCKED twice; Monitor exact 323/3415, runner exact CHALK null; visual not verified.
