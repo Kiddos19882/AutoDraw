@@ -1,6 +1,7 @@
 **ENGINE-001 S5 A31:** [preregistered R6 optimization](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a31--fixed-r6-budgeted-blossom-routing-2026-11-28).
 - [x] Cycle repair, no-retrace interior contacts, bounded-repeat 5/10/15/20% arms; local E2 and geometry PASS.
-- [ ] Native Egret comparison and user visual review; no production or live promotion.
+- [x] Native Egret comparison, [CI46072763754](https://github.com/Kiddos19882/AutoDraw/actions/runs/46072763754) 2/2 PASS and archive audit; results [A31 results](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a31--fixed-r6-budgeted-blossom-routing-2026-11-28).
+- [ ] User visual review of all six A31 variants, especially 5/10/15/20% repeated routes; exact CHALK/E4/E5 NOT_RUN. No production or live promotion.
 
 **ENGINE-001 S5 A29 contour optimization:** [registered experiment](ENGINE001_S5_WV_SECOND_LANE_RESULTS.md#engine-001-s5-a29--contour-endpoint-graph-experiment-2026-11-28).
 - [x] Verify A27 archived plan and implement global same-color endpoint graph, four model arms; local contracts PASS.
