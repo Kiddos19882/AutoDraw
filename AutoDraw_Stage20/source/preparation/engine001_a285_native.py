@@ -105,6 +105,41 @@ def path_error(point, path):
     return best
 
 
+def observe_native_stroke(planned, previous, post, read_stroke):
+    """Record rejected/partial input without aborting a safe, idle board.
+
+    A live stroke, unexpected slot advance or decreasing game counter still
+    means the next click cannot safely be bound to the same board.
+    """
+    delta = exact(post["snapshot"]) - exact(previous["snapshot"])
+    slot_delta = post["slot"] - previous["slot"]
+    require(not post["active"] and post["empty"] and slot_delta in (0, 1),
+            "Native stroke did not close safely")
+    require(delta >= 0, "Game point counter decreased")
+    warnings = []
+    actual = None
+    max_error = None
+    if slot_delta == 0:
+        warnings.append("Native stroke not accepted (no new slot)")
+        if delta != 0:
+            warnings.append("Native accepted stroke/counter mismatch")
+    else:
+        actual = read_stroke(previous["slot"])
+        points = actual["points"]
+        if (delta <= 0 or delta != len(points)
+                or actual["width"] != planned["width"]
+                or actual["colorRgb"] != planned["colorRgb"]
+                or actual["smooth"] is not False):
+            warnings.append("Native accepted stroke/counter mismatch")
+        if points:
+            max_error = max(path_error(q, planned["points"]) for q in points)
+            if max_error > 2:
+                warnings.append("Native accepted point outside intended polyline")
+    return dict(stroke_id=planned["strokeId"], chalk=delta, actual=actual,
+                slot_delta=slot_delta, verified=not warnings, warnings=warnings,
+                max_vertex_error_logical=max_error)
+
+
 class QuotaLimited(Blocked):
     pass
 
@@ -148,9 +183,11 @@ class NativeLiveReplay(LiveReplay):
                       quota_reserve=QUOTA_SAFETY_MARGIN, status="BLOCKED", exact_CHALK=None,
                       slider_calibration_source="TAB2_CONFIRMED_STAGE6",
                       slider_track=self.brush_control, raw_tab9_endpoints=self.raw_brush_control,
-                      completed_strokes=0, evidence_level="E4_PENDING")
+                      completed_strokes=0, attempted_strokes=0, unverified_strokes=0,
+                      observed_CHALK=0, evidence_level="E4_PENDING")
         before = last = selected = None
         verified = 0
+        attempted = 0
         observed = 0
         quota_limited = False
         worker_called = False
@@ -238,26 +275,28 @@ class NativeLiveReplay(LiveReplay):
 
             with (self.out/"strokes.jsonl").open("x",encoding="utf-8") as f:
                 def after_stroke(worker,index,stroke):
-                    nonlocal last,selected,verified,observed
-                    require(index == verified+1, "Unexpected Stage6 stroke completion")
+                    nonlocal last,selected,verified,attempted,observed
+                    require(index == attempted+1, "Unexpected Stage6 stroke completion")
                     time.sleep(.1)  # allow game mouse-up/atom closure to settle
                     self.verify_bridge(force=True)
                     post=self.check(self.read())
-                    p=paths[verified]
-                    delta=exact(post["snapshot"])-exact(last["snapshot"])
-                    require(not post["active"] and post["empty"] and post["slot"]==last["slot"]+1,
-                            "Native stroke did not close uniquely")
-                    actual=self.read("stroke",{"index":last["slot"]})
-                    row=dict(stroke_id=p["strokeId"],chalk=delta,actual=actual)
+                    p=paths[index-1]
+                    row=observe_native_stroke(
+                        p,last,post,lambda slot:self.read("stroke",{"index":slot}))
+                    row["attempt_index"]=index
                     f.write(json.dumps(row,allow_nan=False)+"\n");f.flush()
-                    require(delta>0 and delta==len(actual["points"])
-                        and actual["width"]==p["width"] and actual["colorRgb"]==p["colorRgb"]
-                        and actual["smooth"] is False, "Native accepted stroke/counter mismatch")
-                    require(max(path_error(q,p["points"]) for q in actual["points"])<=2,
-                            "Native accepted point outside intended polyline")
-                    observed+=delta; verified+=1; last=post; selected=None
-                    report["completed_strokes"]=verified
-                    self.log(f"{verified}/{len(paths)}; CHALK={observed}; остаток {post['snapshot']['remainingPoints']}")
+                    attempted+=1
+                    observed+=row["chalk"]
+                    verified+=int(row["verified"])
+                    last=post; selected=None
+                    report.update(completed_strokes=verified, attempted_strokes=attempted,
+                                  unverified_strokes=attempted-verified,
+                                  observed_CHALK=observed)
+                    if row["warnings"]:
+                        self.log(f"WARNING: штрих {index} ({p['strokeId']}): "
+                                 + "; ".join(row["warnings"]) + ". Продолжаем.")
+                    self.log(f"{attempted}/{len(paths)}; проверено {verified}; "
+                             f"CHALK={observed}; остаток {post['snapshot']['remainingPoints']}")
 
                 def progress(current,total,detail):
                     if callable(self.progress_callback):
@@ -274,7 +313,7 @@ class NativeLiveReplay(LiveReplay):
             if self.stop.is_set() or summary.status=="stopped":
                 report.update(status="STOPPED",capture_skipped="Operator Stop / native failsafe")
             else:
-                require(quota_limited or (summary.status=="completed" and verified==len(paths)),
+                require(quota_limited or (summary.status=="completed" and attempted==len(paths)),
                         summary.error or "Stage6 failed")
                 final=self.check(self.read())
                 diag=self.driver.execute_script("return AutoDrawGameMonitor.diagnosticSnapshot()")
@@ -287,8 +326,13 @@ class NativeLiveReplay(LiveReplay):
                 report["after_png"]=self.capture("after.png")
                 require(exact(self.check(self.read())["snapshot"])==exact(final["snapshot"]),
                         "Counter changed during final capture")
-                report.update(status="QUOTA_LIMITED" if quota_limited else "REPLAY_COMPLETE_NOT_VISUALLY_VALIDATED",
-                              exact_CHALK=observed,evidence_level="E4_CAPTURE_REQUIRES_REVIEW")
+                if attempted != verified:
+                    report.update(status="QUOTA_LIMITED_WITH_WARNINGS" if quota_limited else
+                                  "REPLAY_COMPLETE_WITH_WARNINGS", exact_CHALK=None,
+                                  evidence_level="E4_DIAGNOSTIC_ONLY")
+                else:
+                    report.update(status="QUOTA_LIMITED" if quota_limited else "REPLAY_COMPLETE_NOT_VISUALLY_VALIDATED",
+                                  exact_CHALK=observed,evidence_level="E4_CAPTURE_REQUIRES_REVIEW")
         except Exception as exc:
             report.update(status="STOPPED" if self.stop.is_set() else "BLOCKED",
                           reason=error_summary(exc),exact_CHALK=None)

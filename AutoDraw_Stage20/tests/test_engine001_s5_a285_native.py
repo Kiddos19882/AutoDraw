@@ -1,10 +1,13 @@
 """A28.6 shared Stage6 contract tests (never use a live browser or mouse)."""
 import ast
+import json
+import tempfile
+import threading
 import sys
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 for directory in (ROOT, ROOT/"source/preparation", ROOT/"source/executor"):
@@ -13,6 +16,7 @@ for directory in (ROOT, ROOT/"source/preparation", ROOT/"source/executor"):
 from engine001_a285_native import (
     ALLOWED_OPS, READ_ONLY_SCRIPT, Blocked, NativeLiveReplay,
     color_plan, desktop_plan, outside_roi, path_error, slider_calibration,
+    observe_native_stroke,
 )
 
 
@@ -97,6 +101,113 @@ class Contracts(unittest.TestCase):
         self.assertAlmostEqual(path_error(dict(x=15,y=25),p),0)
         self.assertAlmostEqual(path_error(dict(x=30,y=32),p),2)
         self.assertGreater(path_error(dict(x=30,y=35),p),2)
+
+    @staticmethod
+    def stroke_state(slot, count, *, active=False, empty=True):
+        return dict(slot=slot, active=active, empty=empty,
+                    snapshot=dict(isExact=True, validationStatus="valid",
+                                  pointCount=count, maxPoints=6000, remainingPoints=6000-count))
+
+    def test_rejected_click_is_logged_and_next_stroke_can_be_verified(self):
+        a,b,_=paths()
+        before=self.stroke_state(10,100)
+        rejected=self.stroke_state(10,100)
+        reader=Mock()
+        row=observe_native_stroke(a,before,rejected,reader)
+        self.assertFalse(row["verified"])
+        self.assertEqual(row["chalk"],0)
+        self.assertIn("no new slot",row["warnings"][0])
+        reader.assert_not_called()
+        reader.return_value=dict(points=b["points"],width=b["width"],
+                                 colorRgb=b["colorRgb"],smooth=False)
+        row2=observe_native_stroke(b,rejected,self.stroke_state(11,102),reader)
+        self.assertTrue(row2["verified"])
+        self.assertEqual(row2["chalk"],2)
+        reader.assert_called_once_with(10)
+
+    def test_post_stroke_mismatch_and_path_error_are_warnings(self):
+        plan=paths()[0]
+        before=self.stroke_state(10,100)
+        post=self.stroke_state(11,103)
+        actual=dict(points=[dict(x=200,y=200)], width=1,colorRgb=0xEEEEEE,smooth=False)
+        row=observe_native_stroke(plan,before,post,lambda slot:actual)
+        self.assertFalse(row["verified"])
+        self.assertEqual(row["chalk"],3)
+        self.assertEqual(len(row["warnings"]),2)
+
+    def test_unsafe_board_still_blocks(self):
+        plan=paths()[0]
+        before=self.stroke_state(10,100)
+        for state in (self.stroke_state(11,101,active=True),
+                      self.stroke_state(11,101,empty=False),
+                      self.stroke_state(12,102), self.stroke_state(9,100),
+                      self.stroke_state(10,99)):
+            with self.assertRaises(Blocked):
+                observe_native_stroke(plan,before,state,Mock())
+
+    def test_run_keeps_order_and_marks_warning_result_diagnostic_only(self):
+        planned=paths()[:2]
+        current=self.stroke_state(10,100)
+        current.update(width=1,colorRgb=planned[0]["colorRgb"],smooth=False)
+        logs=[]
+        attempted=[]
+        class Config:
+            def __init__(self,**kwargs): self.fields=kwargs
+            def to_dict(self): return self.fields
+        class Worker:
+            def __init__(self,*args,**kwargs): pass
+            def execute(self,plan,x,y,*,progress,preflight,before_stroke,after_stroke):
+                nonlocal current
+                preflight(self)
+                for index,p in enumerate(planned,1):
+                    current.update(width=p["width"],colorRgb=p["colorRgb"])
+                    before_stroke(self,index,p)
+                    attempted.append(p["strokeId"])
+                    if index==2:
+                        current=dict(self_state(11,102),width=p["width"],
+                                     colorRgb=p["colorRgb"],smooth=False)
+                    after_stroke(self,index,p)
+                return SimpleNamespace(status="completed",mouse_release_succeeded=True,error=None,
+                                       to_dict=lambda cfg:{"status":"completed"})
+        self_state=self.stroke_state
+        hooks=SimpleNamespace(targets={},preflight=lambda worker:None,
+                              before_stroke=lambda *args:None,to_report=lambda:{})
+        modules={
+            "drawing.color_plan_execution":SimpleNamespace(ColorPlanExecutionHooks=lambda *a,**k:hooks),
+            "drawing.mouse_executor":SimpleNamespace(ExecutorConfig=Config,MouseExecutor=Worker),
+            "fill001_v5_live_gate":SimpleNamespace(verify_v5_live_gate=Mock()),
+            "fill001_series_stage6_execution":SimpleNamespace(QUOTA_SAFETY_MARGIN=300),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            replay=NativeLiveReplay(Mock(),Path(tmp),threading.Event(),logs.append,
+                                    profile={},brush_control={},native_mouse=Mock())
+            replay.bridge_witness={"roi":ROI,"mapping":{"boardpane_mapping_sha256":"fixture"}}
+            replay.preflight=lambda paths:(dict(current),{})
+            replay.verify_bridge=Mock()
+            replay.check=lambda state:state
+            replay.capture=lambda name:{"name":name}
+            def read(op="read",options=None):
+                if op=="stroke":
+                    p=planned[1]
+                    return dict(points=p["points"],width=p["width"],colorRgb=p["colorRgb"],smooth=False)
+                return dict(current)
+            replay.read=read
+            replay.driver.execute_script.side_effect=lambda *_:dict(current["snapshot"],pointCountMatches=True)
+            with patch.dict(sys.modules,modules), \
+                 patch("engine001_a285_native.desktop_plan",return_value=object()), \
+                 patch("engine001_a285_native.slider_calibration",return_value=object()), \
+                 patch("engine001_a285_native.time.sleep"):
+                result=replay.run(planned)
+            rows=[json.loads(line) for line in (Path(tmp)/"strokes.jsonl").read_text().splitlines()]
+            self.assertEqual(attempted,["a","b"])
+            self.assertEqual([r["verified"] for r in rows],[False,True])
+            self.assertEqual(result["attempted_strokes"],2)
+            self.assertEqual(result["completed_strokes"],1)
+            self.assertEqual(result["unverified_strokes"],1)
+            self.assertEqual(result["observed_CHALK"],2)
+            self.assertIsNone(result["exact_CHALK"])
+            self.assertEqual(result["status"],"REPLAY_COMPLETE_WITH_WARNINGS",result.get("reason"))
+            self.assertTrue(any("WARNING" in line for line in logs))
 
     def test_current_worker_uses_native_replay_and_stage6(self):
         source=(ROOT/"source/preparation/engine001_a285_native.py").read_text(encoding="utf-8")
