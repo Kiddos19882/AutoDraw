@@ -46,6 +46,12 @@ jobs:
           run-id: 46068739911
           name: S5-A29-contour-comparison
           path: ${{ runner.temp }}/a29
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 46070708715
+          name: S5-A30-R6-contour-comparison
+          path: ${{ runner.temp }}/a30
       - run: python AutoDraw_Stage20/tests/run_engine001_s5_native_a31.py --baseline "${{ runner.temp }}/a27" --a29 "${{ runner.temp }}/a29" --a30 "${{ runner.temp }}/a30"
       - uses: actions/upload-artifact@v4
         if: always()
