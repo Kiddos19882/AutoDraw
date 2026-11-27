@@ -478,13 +478,22 @@ class Fill001Tab:
                                baseline_sha=BASE_SHA, plan_sha256=PLAN_SHA,
                                archive_sha256=ARCHIVE_SHA, status="BLOCKED",
                                completed_strokes=0, exact_CHALK=None,
-                               evidence_level="E4_PENDING", reason=reason, finished=utc()), f, indent=2)
+                               evidence_level="E4_PENDING", reason=reason, finished=utc(),
+                               bridge_diagnostic_log="bridge-startup.jsonl" if (out / "bridge-startup.jsonl").is_file() else None), f, indent=2)
 
     def start_firefox_monitor(self) -> None:
         """Opt-in browser telemetry; never bypass FILL-001 Stage6 preflight."""
         if self._firefox_thread is not None and self._firefox_thread.is_alive():
             self.bridge_status_var.set("Firefox уже запущен. Откройте доску и подтвердите.")
             return
+        from firefox_monitor_session import write_bridge_diagnostic, proxy_environment_diagnostic
+        pending = getattr(self, "_a28_pending", None)
+        self._firefox_diagnostic_path = (
+            pending[1] / "bridge-startup.jsonl" if pending else
+            self.output_dir / "v5_passive_roi" / ("bridge-startup-" + uuid.uuid4().hex + ".jsonl")
+        )
+        write_bridge_diagnostic(self._firefox_diagnostic_path, "start_requested",
+                                proxy_environment=proxy_environment_diagnostic())
         try:
             # Reuse the only shared Bridge, bound to the actual game iframe origin.
             accepted = self.brush_tab.start_game_monitor_bridge(
@@ -492,11 +501,15 @@ class Fill001Tab:
                 origin_override="https://eufbpet.hust.me/",
             )
         except (OSError, RuntimeError, ValueError, TypeError, AttributeError) as exc:
+            write_bridge_diagnostic(self._firefox_diagnostic_path, "bridge_launch_error",
+                                    error_type=type(exc).__name__)
             self.bridge_status_var.set(f"BLOCKED: {exc}")
             self._firefox_execute_series = False
             self._series_pending_manifest = None
             self._finish_a28_startup("Shared Bridge startup failed")
             return
+        write_bridge_diagnostic(self._firefox_diagnostic_path, "bridge_launch_result",
+                                accepted=bool(accepted))
         if not accepted:
             self.bridge_status_var.set("BLOCKED: Bridge не запущен с Input Telemetry ON.")
             self._firefox_execute_series = False
@@ -518,6 +531,7 @@ class Fill001Tab:
         if self._firefox_thread is None or not self._firefox_thread.is_alive():
             self.bridge_status_var.set("BLOCKED: Firefox ещё не запущен.")
             return
+        self.bridge_status_var.set("Доска подтверждена. Проверка Monitor и соединения Bridge…")
         self._firefox_confirm.set()
 
     def stop_firefox_monitor(self) -> None:
@@ -529,15 +543,32 @@ class Fill001Tab:
 
     def _firefox_worker(self) -> None:
         driver = None
+        from firefox_monitor_session import (
+            FirefoxMonitorError, open_firefox, attach_monitor_after_confirmation,
+            write_bridge_diagnostic, browser_bridge_diagnostic, bridge_session_diagnostic,
+        )
+        diagnostic_path = getattr(self, "_firefox_diagnostic_path", None)
+        if diagnostic_path is None:
+            diagnostic_path = self.output_dir / "v5_passive_roi" / ("bridge-startup-" + uuid.uuid4().hex + ".jsonl")
+        def note(event, **fields):
+            write_bridge_diagnostic(diagnostic_path, event, **fields)
+        def process_exit():
+            try:
+                process = getattr(self.brush_tab, "bridge_process", None)
+                return {"process_known": process is not None,
+                        "exit_code": process.poll() if process is not None else None}
+            except Exception as exc:
+                return {"process_error_type": type(exc).__name__}
         try:
-            from firefox_monitor_session import (
-                FirefoxMonitorError, open_firefox, attach_monitor_after_confirmation,
-            )
+            note("firefox_opening", **process_exit())
             driver = open_firefox()
+            note("firefox_opened")
             self._firefox_messages.put(("READY", "Откройте доску в Firefox, подтвердите её в AutoDraw, затем активируйте Firefox щелчком по верхней панели браузера."))
             # No game input and no Monitor injection until the operator confirms.
             if not self._firefox_confirm.wait(timeout=600) or self._firefox_stop.is_set():
                 raise FirefoxMonitorError("Доска не подтверждена; действие отменено.")
+            note("board_confirmed")
+            self._firefox_messages.put(("CONNECTING", "Доска подтверждена. Внедрение Monitor и проверка Bridge…"))
             if getattr(sys, "frozen", False):
                 monitor_dir = Path(sys.executable).resolve().parent / "game_monitor"
             else:
@@ -549,18 +580,30 @@ class Fill001Tab:
             while not snippet_path.is_file() and time.monotonic() < deadline:
                 if self._firefox_stop.wait(0.5):
                     raise FirefoxMonitorError("Оператор остановил сессию.")
+            note("snippet_wait_finished", snippet_present=snippet_path.is_file(),
+                 snippet_name=snippet_path.name, **process_exit())
             from brush_radius_feedback import read_active_bridge_geometry
             bridge_root = self.brush_tab.output_dir / "game_monitor_bridge"
             previous = read_active_bridge_geometry(bridge_root)
             previous_sid = previous.get("session_id") if isinstance(previous, dict) else None
+            note("before_attach", previous_session_id=previous_sid,
+                 collector_sessions=bridge_session_diagnostic(bridge_root))
             attached = attach_monitor_after_confirmation(
                 driver, monitor_dir / "game_monitor.js", snippet_path,
-                operator_confirmed=True,
+                operator_confirmed=True, diagnostic=note,
             )
+            note("monitor_attached", monitor_version=attached["monitor_version"])
+            self._firefox_messages.put(("CONNECTING", "Monitor внедрён. Ожидание новой сессии Bridge (до 30 секунд)…"))
             ready = None
             deadline = time.monotonic() + 30
             while time.monotonic() < deadline and not self._firefox_stop.is_set():
                 ready = read_active_bridge_geometry(bridge_root)
+                note("bridge_readiness_poll", selected_session_id=ready.get("session_id") if isinstance(ready, dict) else None,
+                     previous_session_id=previous_sid,
+                     selected_board_detected=ready.get("board_detected") if isinstance(ready, dict) else None,
+                     selected_board_ambiguous=ready.get("board_ambiguous") if isinstance(ready, dict) else None,
+                     browser=browser_bridge_diagnostic(driver),
+                     collector_sessions=bridge_session_diagnostic(bridge_root), **process_exit())
                 if isinstance(ready, dict) and ready.get("board_detected") \
                         and not ready.get("board_ambiguous") \
                         and ready.get("session_id") \
@@ -574,11 +617,16 @@ class Fill001Tab:
                                 and telemetry.get("enabled") is True
                                 and status.get("version") == "0.2.4"
                                 and status.get("inputTelemetryEnabled") is True):
+                            note("bridge_ready", session_id=ready["session_id"])
                             break
-                    except (OSError, ValueError, KeyError, TypeError):
-                        pass
+                        note("session_gate_rejected", telemetry_requested=telemetry.get("requested"),
+                             telemetry_enabled=telemetry.get("enabled"), monitor_version=status.get("version"),
+                             monitor_telemetry=status.get("inputTelemetryEnabled"))
+                    except (OSError, ValueError, KeyError, TypeError) as exc:
+                        note("session_gate_read_failed", error_type=type(exc).__name__)
                 self._firefox_stop.wait(0.5)
             else:
+                note("bridge_readiness_timeout", stopped=self._firefox_stop.is_set())
                 raise FirefoxMonitorError(
                     "BLOCKED: Monitor внедрён, но Bridge не подтвердил свежую "
                     "однозначную сессию игровой доски."
@@ -740,6 +788,7 @@ class Fill001Tab:
             # still releasing mouseDown from an in-progress stroke.
             self._v5_stage6_completed.wait(timeout=30)
         except Exception as exc:
+            note("worker_blocked", error_type=type(exc).__name__, **process_exit())
             details = str(exc)
             if getattr(self, "_a28_pending", None):
                 from engine001_a28_live import error_summary
@@ -764,7 +813,7 @@ class Fill001Tab:
                     details = f"{details}. Диагностика: {report_path}"
                 except (OSError, ValueError, TypeError):
                     pass
-            self._firefox_messages.put(("BLOCKED", details))
+            self._firefox_messages.put(("BLOCKED", f"{details}. Лог подключения: {diagnostic_path}"))
             self.root.after(0, self.root.deiconify)
             if driver is not None:
                 self._firefox_stop.wait()
@@ -779,6 +828,7 @@ class Fill001Tab:
                     driver.quit()
                 except Exception:
                     pass
+            note("worker_stopped")
             self._firefox_messages.put(("STOPPED", "Firefox-сессия завершена."))
 
     def _run_fill001_series_in_firefox(

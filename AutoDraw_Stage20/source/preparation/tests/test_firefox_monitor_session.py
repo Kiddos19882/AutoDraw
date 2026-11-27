@@ -1,5 +1,7 @@
 """Fail-closed contract tests for opt-in Firefox Game Monitor attachment."""
 import sys
+import json
+import uuid
 import tempfile
 import types
 import unittest
@@ -8,7 +10,7 @@ from unittest.mock import patch
 
 from firefox_monitor_session import (
     GAME_ORIGIN, FirefoxMonitorError, attach_monitor_after_confirmation,
-    find_game_frame, validate_bridge_snippet,
+    find_game_frame, validate_bridge_snippet, write_bridge_diagnostic, bridge_session_diagnostic,
 )
 
 
@@ -65,6 +67,29 @@ class FirefoxMonitorContractTests(unittest.TestCase):
 
     def tearDown(self):
         self.modules.stop()
+
+    def test_session_diagnostic_does_not_copy_raw_payload(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sid = str(uuid.uuid4())
+            session = root / sid / "session.json"
+            session.parent.mkdir()
+            session.write_text(json.dumps({
+                "secret": "DO_NOT_COPY",
+                "bridge_diagnostics": {"connection_closed": False,
+                    "last_monitor_status": {"version": "0.2.4", "inputTelemetryEnabled": True}},
+                "renderer_geometry": {"players": [{"boardStageCorners": {}}]},
+                "bridge_configuration": {"inputTelemetry": {"requested": True, "enabled": True}},
+            }), encoding="utf-8")
+            rows = bridge_session_diagnostic(root)
+            self.assertEqual(rows[0]["session_id"], sid)
+            self.assertEqual(rows[0]["board_count"], 1)
+            self.assertTrue(rows[0]["telemetry_enabled"])
+            log = root / "startup.jsonl"
+            write_bridge_diagnostic(log, "poll", sessions=rows)
+            saved = log.read_text(encoding="utf-8")
+            self.assertNotIn("DO_NOT_COPY", saved)
+            self.assertEqual(json.loads(saved)["event"], "poll")
 
     def test_invalid_snippet_rejected(self):
         for snippet in ("", "__AUTODRAW_BRIDGE_TOKEN__ new WebSocket()",

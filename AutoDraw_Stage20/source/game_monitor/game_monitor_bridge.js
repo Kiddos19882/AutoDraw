@@ -18,6 +18,20 @@
   }
 
   const sessionId = crypto.randomUUID();
+  const startup = { sessionId, events: [] };
+  window.AutoDrawGameMonitorBridgeDiagnostics = startup;
+  const note = (event, fields = {}) => {
+    startup.events.push({ utc: new Date().toISOString(), event, ...fields });
+    if (startup.events.length > 40) startup.events.shift();
+  };
+  note("snippet_started", { telemetryRequested: INPUT_TELEMETRY_ENABLED });
+  const policyListener = event => {
+    if (event.effectiveDirective === "connect-src") {
+      note("connect_policy_violation", { disposition: event.disposition,
+        loopbackTarget: String(event.blockedURI || "").startsWith(ENDPOINT) });
+    }
+  };
+  document.addEventListener("securitypolicyviolation", policyListener);
   let sequence = 0;
   let geometryUpdateTimer = null;
   let lastRendererGeometryFingerprint = null;
@@ -257,59 +271,89 @@
     rafHandle = requestAnimationFrame(frame);
   };
 
-  const socket = new WebSocket(ENDPOINT);
+  let socket;
+  try {
+    socket = new WebSocket(ENDPOINT);
+    note("websocket_created", { readyState: socket.readyState });
+  } catch (error) {
+    note("websocket_constructor_failed", { errorType: error.name });
+    document.removeEventListener("securitypolicyviolation", policyListener);
+    throw error;
+  }
   socket.addEventListener("open", () => {
+    note("websocket_open");
     socket.send(JSON.stringify({ type: "auth", token: TOKEN }));
+    note("auth_sent");
   });
   socket.addEventListener("message", event => {
     let message;
     try { message = JSON.parse(event.data); } catch (_) { return; }
     if (message.type === "ready") {
-      connected = true;
-      const inputTelemetry = configureInputTelemetry();
-      const initialRendererGeometry = readRendererGeometry();
-      lastRendererGeometryFingerprint = initialRendererGeometry ? JSON.stringify(initialRendererGeometry) : null;
-      send("session_start", {
-        monitorStatus: monitor.status(),
-        bridgeConfiguration: { inputTelemetry },
-        rendererGeometry: initialRendererGeometry,
-        browser: navigator.userAgent,
-        page: { origin: location.origin, pathname: location.pathname },
-        visibilityState: document.visibilityState
-      });
-      installGeometryListeners();
-      installPassivePreflight();
-      unsubscribe = monitor.subscribe(item => {
-        if (!ALLOWED_EVENTS.has(item.type)) return;
-        // BoardPane callbacks are not exposed in every game frame. Pointer
-        // candidates are the explicit fallback lifecycle; startFpsProbe/stopFpsProbe
-        // are idempotent so engine and pointer events cannot double-count probes.
-        if (item.type === "DRAW_START" || item.type === "POINTER_DOWN_CANDIDATE") startFpsProbe(item.strokeId);
-        if ((item.type === "DRAW_END" || item.type === "POINTER_UP_CANDIDATE") && fpsActive) stopFpsProbe();
-        sentEventCount++;
-        lastEventType = item.type;
-        lastEventAtPerformanceMs = item.t;
-        send("event", { event: item });
-      });
-      heartbeatTimer = setInterval(() => {
-        send("heartbeat", {
+      try {
+        connected = true;
+        note("server_ready");
+        const inputTelemetry = configureInputTelemetry();
+        const initialRendererGeometry = readRendererGeometry();
+        lastRendererGeometryFingerprint = initialRendererGeometry ? JSON.stringify(initialRendererGeometry) : null;
+        note("initial_state", { telemetryEnabled: inputTelemetry.enabled,
+          geometryPresent: !!initialRendererGeometry,
+          boardDetected: !!monitor.status().boardDetected });
+        const sessionStartSent = send("session_start", {
           monitorStatus: monitor.status(),
-          performanceNowMs: performance.now(),
-          visibilityState: document.visibilityState,
-          bridgeDiagnostics: {
-            sentEventCount,
-            lastEventType,
-            lastEventAtPerformanceMs,
-            sendFailureCount
-          }
+          bridgeConfiguration: { inputTelemetry },
+          rendererGeometry: initialRendererGeometry,
+          browser: navigator.userAgent,
+          page: { origin: location.origin, pathname: location.pathname },
+          visibilityState: document.visibilityState
         });
-      }, 1000);
-      window.AutoDrawGameMonitorBridge.connected = true;
-      console.info("AutoDraw Game Monitor Bridge connected. Session:", sessionId);
+        note("session_start_send", { sent: sessionStartSent });
+        installGeometryListeners();
+        installPassivePreflight();
+        unsubscribe = monitor.subscribe(item => {
+          if (!ALLOWED_EVENTS.has(item.type)) return;
+          // BoardPane callbacks are not exposed in every game frame. Pointer
+          // candidates are the explicit fallback lifecycle; startFpsProbe/stopFpsProbe
+          // are idempotent so engine and pointer events cannot double-count probes.
+          if (item.type === "DRAW_START" || item.type === "POINTER_DOWN_CANDIDATE") startFpsProbe(item.strokeId);
+          if ((item.type === "DRAW_END" || item.type === "POINTER_UP_CANDIDATE") && fpsActive) stopFpsProbe();
+          sentEventCount++;
+          lastEventType = item.type;
+          lastEventAtPerformanceMs = item.t;
+          send("event", { event: item });
+        });
+        let firstHeartbeat = true;
+        heartbeatTimer = setInterval(() => {
+          const heartbeatSent = send("heartbeat", {
+            monitorStatus: monitor.status(),
+            performanceNowMs: performance.now(),
+            visibilityState: document.visibilityState,
+            bridgeDiagnostics: {
+              sentEventCount,
+              lastEventType,
+              lastEventAtPerformanceMs,
+              sendFailureCount
+            }
+          });
+          if (firstHeartbeat) {
+            note("first_heartbeat", { sent: heartbeatSent });
+            firstHeartbeat = false;
+          }
+        }, 1000);
+        window.AutoDrawGameMonitorBridge.connected = true;
+        console.info("AutoDraw Game Monitor Bridge connected. Session:", sessionId);
+      } catch (error) {
+        note("ready_handler_error", { errorType: error.name });
+        throw error;
+      }
     }
   });
-  socket.addEventListener("error", () => console.error("AutoDraw Game Monitor Bridge WebSocket error."));
+  socket.addEventListener("error", () => {
+    note("websocket_error", { readyState: socket.readyState });
+    console.error("AutoDraw Game Monitor Bridge WebSocket error.");
+  });
   socket.addEventListener("close", event => {
+    note("websocket_close", { code: event.code, wasClean: event.wasClean });
+    document.removeEventListener("securitypolicyviolation", policyListener);
     connected = false;
     if (unsubscribe) unsubscribe();
     removeGeometryListeners();

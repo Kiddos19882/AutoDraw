@@ -371,20 +371,40 @@ class LiveReplay:
     def verify_bridge(self, *, force=False):
         from brush_radius_feedback import read_active_bridge_geometry
         from firefox_foreground_witness import firefox_foreground_witness
-        require(self.session_id and self.bridge_root is not None, "FILL-001 Bridge required")
-        require(firefox_foreground_witness(self.driver), "Firefox lost native foreground")
-        if force or time.monotonic()-self.bridge_checked >= 2:
-            ready=read_active_bridge_geometry(self.bridge_root)
-            require(isinstance(ready,dict) and ready.get("session_id")==self.session_id
-                    and ready.get("board_detected") and not ready.get("board_ambiguous")
-                    and mapping(ready["renderer_geometry"])==self.bounds,
-                    "FILL-001 Bridge session/geometry drift")
-            if self.capture_reference is not None:
-                from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
-                require(_boardpane_mapping_fingerprint(ready["renderer_geometry"]) ==
-                        self.capture_reference["boardpane_mapping_sha256"],
-                        "Bridge desktop projection changed")
-            self.bridge_checked=time.monotonic()
+        from firefox_monitor_session import write_bridge_diagnostic, bridge_session_diagnostic
+        ready = None
+        foreground = None
+        actual_bounds = None
+        actual_fingerprint = None
+        try:
+            require(self.session_id and self.bridge_root is not None, "FILL-001 Bridge required")
+            foreground = firefox_foreground_witness(self.driver)
+            require(foreground, "Firefox lost native foreground")
+            if force or time.monotonic()-self.bridge_checked >= 2:
+                ready=read_active_bridge_geometry(self.bridge_root)
+                same_session = isinstance(ready,dict) and ready.get("session_id")==self.session_id
+                unique_board = same_session and ready.get("board_detected") and not ready.get("board_ambiguous")
+                if unique_board:
+                    actual_bounds = mapping(ready["renderer_geometry"])
+                require(unique_board and actual_bounds==self.bounds,
+                        "FILL-001 Bridge session/geometry drift")
+                if self.capture_reference is not None:
+                    from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
+                    actual_fingerprint = _boardpane_mapping_fingerprint(ready["renderer_geometry"])
+                    require(actual_fingerprint == self.capture_reference["boardpane_mapping_sha256"],
+                            "Bridge desktop projection changed")
+                self.bridge_checked=time.monotonic()
+        except Exception as exc:
+            write_bridge_diagnostic(self.out / "bridge-runtime.jsonl", "runtime_gate_blocked",
+                error_type=type(exc).__name__, foreground=foreground, expected_session_id=self.session_id,
+                selected_session_id=ready.get("session_id") if isinstance(ready,dict) else None,
+                selected_board_detected=ready.get("board_detected") if isinstance(ready,dict) else None,
+                selected_board_ambiguous=ready.get("board_ambiguous") if isinstance(ready,dict) else None,
+                expected_bounds=self.bounds, actual_bounds=actual_bounds,
+                expected_mapping=self.capture_reference.get("boardpane_mapping_sha256") if self.capture_reference else None,
+                actual_mapping=actual_fingerprint,
+                collector_sessions=bridge_session_diagnostic(self.bridge_root) if self.bridge_root is not None else [])
+            raise
 
     def preflight(self, paths):
         require(self.session_id and self.bridge_root is not None, "Launch via FILL-001")

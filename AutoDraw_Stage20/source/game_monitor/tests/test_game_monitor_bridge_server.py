@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import asyncio
 
 import pytest
 
-from game_monitor_bridge_server import RunRecorder, render_bridge_snippet
+from game_monitor_bridge_server import RunRecorder, render_bridge_snippet, make_handler
 
 
 TEMPLATE = (
@@ -49,6 +50,24 @@ def test_render_bridge_snippet_rejects_invalid_ports(port) -> None:
 def test_render_bridge_snippet_rejects_non_boolean_telemetry_flag() -> None:
     with pytest.raises(TypeError, match="boolean"):
         render_bridge_snippet(TEMPLATE, "token", 8765, enable_input_telemetry=1)
+
+
+def test_auth_rejection_is_diagnosed_without_tokens(tmp_path):
+    class Socket:
+        async def recv(self):
+            return json.dumps({"type": "auth", "token": "wrong-secret"})
+        async def close(self, *, code, reason):
+            self.code = code
+
+    events = []
+    socket = Socket()
+    handler = make_handler("correct-secret", "https://example.test", tmp_path, 2.5,
+                           lambda event, **fields: events.append(dict(event=event, **fields)))
+    asyncio.run(handler(socket))
+    assert socket.code == 4003
+    assert events[-1]["code"] == 4003
+    assert "wrong-secret" not in json.dumps(events)
+    assert "correct-secret" not in json.dumps(events)
 
 
 def test_bridge_configuration_is_bound_to_the_run_record(tmp_path) -> None:

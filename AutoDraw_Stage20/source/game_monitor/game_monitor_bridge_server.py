@@ -806,25 +806,39 @@ async def persist_json_atomically(
 
 
 
-def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float):
+def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float, diagnostic=None):
+    def note(event, **fields):
+        if diagnostic is not None:
+            diagnostic(event, **fields)
+
     active_connections = {"count": 0}
 
     async def handler(websocket):
+        note("socket_accepted", active_connections=active_connections["count"])
+        async def reject(code, reason):
+            note("protocol_rejected", code=code, reason=reason)
+            await websocket.close(code=code, reason=reason)
         if active_connections["count"]:
-            await websocket.close(code=4008, reason="bridge already has an active browser")
+            await reject(4008, "bridge already has an active browser")
             return
-        raw = await asyncio.wait_for(websocket.recv(), timeout=10)
+        try:
+            raw = await asyncio.wait_for(websocket.recv(), timeout=10)
+        except (asyncio.TimeoutError, ConnectionClosed) as exc:
+            note("auth_receive_failed", error_type=type(exc).__name__,
+                 close_code=getattr(exc, "code", None))
+            raise
         message = parse_json(raw)
         if not message or set(message) != {"type", "token"} or message.get("type") != "auth":
-            await websocket.close(code=4001, reason="invalid auth message")
+            await reject(4001, "invalid auth message")
             return
         candidate = message.get("token")
         if not isinstance(candidate, str) or not hmac.compare_digest(token, candidate):
-            await websocket.close(code=4003, reason="authentication failed")
+            await reject(4003, "authentication failed")
             return
         if active_connections["count"]:
-            await websocket.close(code=4008, reason="bridge already has an active browser")
+            await reject(4008, "bridge already has an active browser")
             return
+        note("auth_accepted")
         active_connections["count"] += 1
         recorder: RunRecorder | None = None
         last_sequence = 0
@@ -836,6 +850,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                 return
             saved = await persist_json_atomically(session_path, session_record)
             if not saved:
+                note("session_persist_failed", session_id=recorder.session_id if recorder else None)
                 diagnostics = session_record["bridge_diagnostics"]
                 diagnostics["session_persist_failures"] = diagnostics.get("session_persist_failures", 0) + 1
                 diagnostics["last_session_persist_error"] = "atomic_replace_failed"
@@ -847,45 +862,46 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
 
         try:
             await websocket.send(json.dumps({"type": "ready"}, separators=(",", ":")))
+            note("ready_sent")
             async for raw in websocket:
                 message = parse_json(raw)
                 if not message:
-                    await websocket.close(code=4002, reason="invalid JSON message")
+                    await reject(4002, "invalid JSON message")
                     return
                 msg_type = message.get("type")
                 if msg_type == "session_start":
                     if recorder is not None:
-                        await websocket.close(code=4002, reason="duplicate session_start")
+                        await reject(4002, "duplicate session_start")
                         return
                     if message.get("sequence") != 1:
-                        await websocket.close(code=4002, reason="invalid initial sequence")
+                        await reject(4002, "invalid initial sequence")
                         return
                     session_id = message.get("sessionId")
                     try:
                         session_id = str(uuid.UUID(session_id))
                     except (ValueError, TypeError, AttributeError):
-                        await websocket.close(code=4002, reason="invalid session id")
+                        await reject(4002, "invalid session id")
                         return
                     initial_geometry = message.get("rendererGeometry")
                     if initial_geometry is not None and not isinstance(initial_geometry, dict):
-                        await websocket.close(code=4002, reason="invalid renderer geometry")
+                        await reject(4002, "invalid renderer geometry")
                         return
                     recorder = RunRecorder(output_dir / session_id, session_id, idle_seconds)
                     if isinstance(initial_geometry, dict):
                         try:
                             recorder.set_renderer_geometry(initial_geometry, "session_start")
                         except ValueError:
-                            await websocket.close(code=4002, reason="invalid renderer geometry")
+                            await reject(4002, "invalid renderer geometry")
                             return
                     initial_bridge_configuration = message.get("bridgeConfiguration")
                     if initial_bridge_configuration is not None:
                         if not isinstance(initial_bridge_configuration, dict):
-                            await websocket.close(code=4002, reason="invalid bridge configuration")
+                            await reject(4002, "invalid bridge configuration")
                             return
                         try:
                             recorder.set_bridge_configuration(initial_bridge_configuration)
                         except ValueError:
-                            await websocket.close(code=4002, reason="invalid bridge configuration")
+                            await reject(4002, "invalid bridge configuration")
                             return
                     initial_status = message.get("monitorStatus")
                     if isinstance(initial_status, dict):
@@ -925,13 +941,17 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     }
                     last_sequence = 1
                     await persist_session()
+                    note("session_start_received", session_id=session_id,
+                         geometry_present=bool(initial_geometry),
+                         telemetry_config_present=bool(initial_bridge_configuration),
+                         session_file_exists=session_path.is_file())
                     continue
                 if recorder is None or message.get("sessionId") != recorder.session_id:
-                    await websocket.close(code=4002, reason="unknown session")
+                    await reject(4002, "unknown session")
                     return
                 sequence = message.get("sequence")
                 if type(sequence) is not int or sequence <= last_sequence:
-                    await websocket.close(code=4002, reason="invalid sequence")
+                    await reject(4002, "invalid sequence")
                     return
                 sequence_gap = sequence - last_sequence - 1
                 if sequence_gap > 0:
@@ -951,7 +971,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                 if msg_type == "event":
                     event = message.get("event")
                     if not isinstance(event, dict):
-                        await websocket.close(code=4002, reason="invalid event")
+                        await reject(4002, "invalid event")
                         return
                     if session_record is not None:
                         diagnostics = session_record["bridge_diagnostics"]
@@ -964,18 +984,18 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     try:
                         recorder.event(event, asyncio.get_running_loop().time())
                     except ValueError:
-                        await websocket.close(code=4002, reason="unsupported game event")
+                        await reject(4002, "unsupported game event")
                         return
                 elif msg_type == "renderer_geometry":
                     geometry = message.get("rendererGeometry")
                     if not isinstance(geometry, dict):
-                        await websocket.close(code=4002, reason="invalid renderer geometry")
+                        await reject(4002, "invalid renderer geometry")
                         return
                     reason = message.get("reason")
                     try:
                         recorder.set_renderer_geometry(geometry, reason if isinstance(reason, str) else None)
                     except ValueError:
-                        await websocket.close(code=4002, reason="invalid renderer geometry")
+                        await reject(4002, "invalid renderer geometry")
                         return
                     if session_record is not None:
                         session_record["renderer_geometry"] = recorder.renderer_geometry
@@ -985,14 +1005,14 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         )
                 elif msg_type == "preflight_sample":
                     if session_record is None:
-                        await websocket.close(code=4002, reason="missing preflight session")
+                        await reject(4002, "missing preflight session")
                         return
                     try:
                         sample = normalize_passive_preflight_sample(
                             message.get("sample"), session_record,
                         )
                     except ValueError:
-                        await websocket.close(code=4002, reason="invalid passive preflight sample")
+                        await reject(4002, "invalid passive preflight sample")
                         return
                     existing = session_record.get("passive_preflight_samples")
                     if not isinstance(existing, list):
@@ -1019,12 +1039,17 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         diagnostics = session_record["bridge_diagnostics"]
                         diagnostics["frame_probe_count"] += 1
                 else:
-                    await websocket.close(code=4002, reason="unsupported message type")
+                    await reject(4002, "unsupported message type")
                     return
                 await persist_session()
-        except (asyncio.TimeoutError, ConnectionClosed):
-            pass
+        except (asyncio.TimeoutError, ConnectionClosed) as exc:
+            note("connection_ended", error_type=type(exc).__name__, close_code=getattr(exc, "code", None))
+        except Exception as exc:
+            note("collector_error", error_type=type(exc).__name__)
+            raise
         finally:
+            note("socket_closed", session_id=recorder.session_id if recorder else None,
+                 close_code=getattr(websocket, "close_code", None))
             if recorder is not None:
                 recorder.finalize("partial")
             if session_record is not None:
@@ -1040,7 +1065,29 @@ async def run_server(
     origin: str, port: int, output_dir: Path, idle_seconds: float, token: str,
     snippet_file: Path | None = None, enable_input_telemetry: bool = False,
 ) -> None:
+    diagnostic_path = output_dir / ("bridge-server-" + uuid.uuid4().hex + ".jsonl")
+    def note(event, **fields):
+        try:
+            diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
+            with diagnostic_path.open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps({"utc": utc_now(), "event": event, **fields},
+                                        ensure_ascii=False) + "\n")
+        except (OSError, ValueError, TypeError):
+            pass
+
+    async def inspect_handshake(_path, headers):
+        # Do not persist raw HTTP headers or request paths, and do not change origin validation.
+        origins = headers.get_all("Origin")
+        note("handshake_received", origin_count=len(origins),
+             origin_matches=len(origins) == 1 and origins[0] == origin,
+             upgrade_websocket=any(v.lower() == "websocket" for v in headers.get_all("Upgrade")),
+             websocket_key_present=bool(headers.get_all("Sec-WebSocket-Key")),
+             websocket_version_present=bool(headers.get_all("Sec-WebSocket-Version")))
+        return None
+
+    note("server_starting", port=port, loopback_only=True, input_telemetry=enable_input_telemetry)
     print("AutoDraw Game Monitor Bridge — read-only telemetry collector")
+    print(f"Connection diagnostics: {diagnostic_path.name}")
     print(f"Listening only on ws://{HOST}:{port}")
     print(f"Allowed game Origin: {origin}")
     print(f"Output directory: {output_dir.resolve()}")
@@ -1067,12 +1114,17 @@ async def run_server(
     print(snippet)
     print("\nWaiting for browser telemetry. Press Ctrl+C to stop.")
     try:
-        async with websockets.serve(make_handler(token, origin, output_dir, idle_seconds),
+        async with websockets.serve(make_handler(token, origin, output_dir, idle_seconds, note),
                                     HOST, port, origins=[origin], max_size=MAX_MESSAGE_BYTES,
                                     max_queue=128, ping_interval=20, ping_timeout=10,
-                                    close_timeout=3):
+                                    close_timeout=3, process_request=inspect_handshake):
+            note("server_listening", port=port)
             await asyncio.Future()
+    except Exception as exc:
+        note("server_error", error_type=type(exc).__name__, errno=getattr(exc, "errno", None))
+        raise
     finally:
+        note("server_stopped")
         if snippet_file is not None:
             try:
                 snippet_file.unlink(missing_ok=True)
